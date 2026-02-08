@@ -39,6 +39,25 @@ Coming soon:
 - User guide
 - API documentation
 
+## 🚀 Deployment
+
+### Mainnet Status
+
+Contract Address: `TBD`
+Network: Stacks Mainnet
+Status: Ready for deployment
+
+### Deploy Instructions
+
+See [Deployment Guide](docs/DEPLOYMENT.md) for complete instructions.
+
+Quick deploy:
+```bash
+clarinet check
+npm test
+clarinet deploy --mainnet
+```
+
 ## 🤝 Contributing
 
 This is an active development project. Contribution guidelines will be added soon.
