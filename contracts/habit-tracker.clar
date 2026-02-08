@@ -81,6 +81,24 @@
 (define-data-var forfeited-pool-balance uint u0)
 
 ;; ============================================
+;; PRIVATE HELPER FUNCTIONS
+;; ============================================
+
+;; Validate habit name
+;; Returns true if name is valid (non-empty and within length limit)
+(define-private (is-valid-habit-name (name (string-utf8 50)))
+  (let
+    (
+      (name-length (len name))
+    )
+    (and
+      (> name-length u0)
+      (<= name-length MAX-HABIT-NAME-LENGTH)
+    )
+  )
+)
+
+;; ============================================
 ;; CONTRACT INITIALIZATION
 ;; ============================================
 
