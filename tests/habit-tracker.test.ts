@@ -165,4 +165,56 @@ describe("AhhbitTracker Contract", () => {
 
   });
 
+  describe("check-in function", () => {
+
+    beforeEach(() => {
+      // Create a habit before each check-in test
+      createHabit(user1, VALID_HABIT_NAME, MIN_STAKE);
+    });
+
+    it("should allow first check-in", () => {
+      const result = checkIn(user1, 1);
+
+      expect(result.result).toBeOk(Cl.uint(1)); // Streak = 1
+    });
+
+    it("should reject check-in by non-owner", () => {
+      const result = checkIn(user2, 1); // user2 trying to check in user1's habit
+
+      expect(result.result).toBeErr(Cl.uint(104)); // ERR-NOT-HABIT-OWNER
+    });
+
+    it("should allow only owner to check in", () => {
+      createHabit(user2, "User2 Habit", MIN_STAKE);
+
+      const result1 = checkIn(user1, 1); // user1's habit
+      const result2 = checkIn(user2, 2); // user2's habit
+
+      expect(result1.result).toBeOk(Cl.uint(1));
+      expect(result2.result).toBeOk(Cl.uint(1));
+    });
+
+    it("should reject check-in for non-existent habit", () => {
+      const result = checkIn(user1, 999);
+
+      expect(result.result).toBeErr(Cl.uint(103)); // ERR-HABIT-NOT-FOUND
+    });
+
+    it("should increment streak on consecutive check-ins", () => {
+      // First check-in
+      checkIn(user1, 1);
+
+      // Advance blocks to next day (144 blocks = ~24 hours, need >14 for new window in logic? 
+      // Actually is-check-in-valid checks blocks <= 144. 
+      // already-checked-in-today checks blocks < 1.
+      simnet.mineEmptyBlocks(10);
+
+      // Second check-in
+      const result = checkIn(user1, 1);
+
+      expect(result.result).toBeOk(Cl.uint(2)); // Streak = 2
+    });
+
+  });
+
 });
