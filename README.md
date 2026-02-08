@@ -1,68 +1,75 @@
-[200~# AhhbitTracker
+# AhhbitTracker
 
-**On-chain habit tracker with staking accountability on Stacks blockchain**
+On-chain habit tracker with staking accountability on Stacks blockchain.
 
-## 🎯 Overview
+## Overview
 
-AhhbitTracker helps users build lasting habits through blockchain-based accountability. Stake STX on your daily habits, check in every 24 hours to maintain your streak, and earn from a shared pool of forfeited stakes when others fail.
+AhhbitTracker helps users build lasting habits through blockchain-based accountability. Stake STX on your daily habits, check in every 24 hours to maintain your streak, and earn from a shared pool of forfeited stakes.
 
-## 🔗 Built on Stacks
+## Features
 
-- **Smart Contracts**: Clarity
-- **Network**: Stacks Mainnet
-- **Wallet**: Leather, Xverse, Asigna
+- Habit creation with STX staking
+- Daily check-ins with streak tracking
+- Automatic stake forfeiture for missed check-ins
+- Withdrawal after successful completion
+- Bonus pool for successful users
 
-## 🚀 Features
+## Tech Stack
 
-- **Habit Staking**: Commit STX to your habit goals
-- **Daily Check-ins**: On-chain verification of consistency
-- **Streak Tracking**: Visual progress monitoring
-- **Forfeiture Pool**: Earn bonuses from others' missed check-ins
-- **Multiple Habits**: Track unlimited concurrent habits
+- Smart Contracts: Clarity
+- Network: Stacks Mainnet
+- Testing: Vitest
+- Wallet Integration: @stacks/connect
 
-## 📊 Status
+## Getting Started
 
-🚧 **In Development** - Mainnet deployment coming soon
+### Prerequisites
 
-## 🛠️ Tech Stack
+- Clarinet CLI
+- Node.js and npm
+- Stacks wallet
 
-- **Smart Contracts**: Clarity
-- **Frontend**: React + TypeScript + Vite
-- **Wallet Integration**: @stacks/connect
-- **Blockchain Interaction**: @stacks/transactions
+### Installation
 
-## 📖 Documentation
-
-Coming soon:
-- Architecture overview
-- Deployment guide
-- User guide
-- API documentation
-
-## 🚀 Deployment
-
-### Mainnet Status
-
-Contract Address: `TBD`
-Network: Stacks Mainnet
-Status: Ready for deployment
-
-### Deploy Instructions
-
-See [Deployment Guide](docs/DEPLOYMENT.md) for complete instructions.
-
-Quick deploy:
 ```bash
-clarinet check
-npm test
-clarinet deploy --mainnet
+npm install
 ```
 
-## 🤝 Contributing
+### Testing
 
-This is an active development project. Contribution guidelines will be added soon.
+```bash
+npm test
+```
 
-## 📄 License
+### Deployment
+
+See [Deployment Guide](docs/DEPLOYMENT.md)
+
+## Contract Functions
+
+### Public Functions
+
+- `create-habit` - Create new habit with stake
+- `check-in` - Record daily check-in
+- `withdraw-stake` - Withdraw after completion
+- `claim-bonus` - Claim bonus from forfeited pool
+- `slash-habit` - Forfeit expired habits to pool
+
+### Read-Only Functions
+
+- `get-habit` - Retrieve habit details
+- `get-user-habits` - Get user's habit list
+- `get-habit-streak` - Get current streak
+- `get-forfeited-pool-balance` - Get pool balance
+- `get-user-stats` - Get user statistics
+
+## Documentation
+
+- [Architecture](docs/ARCHITECTURE.md)
+- [Deployment Guide](docs/DEPLOYMENT.md)
+- [Post-Deployment](docs/POST_DEPLOYMENT.md)
+
+## License
 
 MIT
 
