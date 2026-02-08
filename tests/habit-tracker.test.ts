@@ -65,4 +65,14 @@ describe("AhhbitTracker Contract", () => {
     });
   });
 
+  describe("create-habit function", () => {
+
+    it("should create habit with valid inputs", () => {
+      const result = createHabit(user1, VALID_HABIT_NAME, MIN_STAKE);
+
+      expect(result.result).toBeOk(Cl.uint(1));
+    });
+
+  });
+
 });
