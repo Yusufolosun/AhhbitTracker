@@ -1,4 +1,4 @@
-;; ============================================
+﻿;; ============================================
 ;; AhhbitTracker - On-Chain Habit Tracking with Staking
 ;; ============================================
 ;; 
@@ -229,6 +229,14 @@
             last-check-in-block: block-height
           })
         )
+        ;; Emit event
+        (print {
+          event: "habit-checked-in",
+          habit-id: habit-id,
+          owner: caller,
+          new-streak: (+ current-streak u1),
+          block: block-height
+        })
         (ok (+ current-streak u1))
       )
       ;; Missed window: forfeit stake and reset
