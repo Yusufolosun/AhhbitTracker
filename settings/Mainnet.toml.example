@@ -1,0 +1,6 @@
+[network]
+name = "mainnet"
+deployment_fee_rate = 10
+
+[accounts.deployer]
+mnemonic = "YOUR_MNEMONIC_HERE"
