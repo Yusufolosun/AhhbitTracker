@@ -183,6 +183,15 @@
       )
     )
     
+    ;; Emit event
+    (print {
+      event: "habit-created",
+      habit-id: habit-id,
+      owner: caller,
+      stake-amount: stake-amount,
+      block: block-height
+    })
+    
     ;; Return habit ID
     (ok habit-id)
   )
