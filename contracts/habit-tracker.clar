@@ -188,6 +188,60 @@
   )
 )
 
+;; Daily check-in for habit
+;; @param habit-id: ID of the habit to check in
+;; @returns: current streak on success, error on failure
+(define-public (check-in (habit-id uint))
+  (let
+    (
+      (caller tx-sender)
+      (habit (unwrap! (map-get? habits { habit-id: habit-id }) ERR-HABIT-NOT-FOUND))
+      (last-check-in (get last-check-in-block habit))
+      (current-streak (get current-streak habit))
+      (stake-amount (get stake-amount habit))
+    )
+    ;; Verify caller is habit owner
+    (asserts! (is-eq caller (get owner habit)) ERR-NOT-HABIT-OWNER)
+    
+    ;; Verify habit is still active
+    (asserts! (get is-active habit) ERR-HABIT-ALREADY-COMPLETED)
+    
+    ;; Check if already checked in today
+    (asserts! (not (already-checked-in-today last-check-in)) ERR-ALREADY-CHECKED-IN)
+    
+    ;; Check if within valid window
+    (if (is-check-in-valid last-check-in)
+      ;; Valid check-in: increment streak
+      (begin
+        (map-set habits
+          { habit-id: habit-id }
+          (merge habit {
+            current-streak: (+ current-streak u1),
+            last-check-in-block: block-height
+          })
+        )
+        (ok (+ current-streak u1))
+      )
+      ;; Missed window: forfeit stake and reset
+      (begin
+        ;; Add stake to forfeited pool
+        (var-set forfeited-pool-balance (+ (var-get forfeited-pool-balance) stake-amount))
+        
+        ;; Reset habit
+        (map-set habits
+          { habit-id: habit-id }
+          (merge habit {
+            current-streak: u0,
+            is-active: false
+          })
+        )
+        
+        ERR-CHECK-IN-WINDOW-EXPIRED
+      )
+    )
+  )
+)
+
 ;; ============================================
 ;; CONTRACT INITIALIZATION
 ;; ============================================
