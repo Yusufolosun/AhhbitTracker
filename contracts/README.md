@@ -67,12 +67,12 @@ Links users to their habit IDs for efficient querying
 
 ### Public Functions
 
-| Function | Parameters | Returns | Description |
-|----------|-----------|---------|-------------|
-| `create-habit` | `name: string`, `stake-amount: uint` | `habit-id` | Create new habit with stake |
-| `check-in` | `habit-id: uint` | `current-streak` | Daily check-in |
-| `withdraw-stake` | `habit-id: uint` | `stake-amount` | Withdraw after min streak |
-| `claim-bonus` | `habit-id: uint` | `bonus-amount` | Claim from forfeited pool |
+| Function | Parameters | Returns | Description | Events |
+|----------|-----------|---------|-------------|--------|
+| `create-habit` | `name: string`, `stake-amount: uint` | `habit-id` | Create new habit with stake | `habit-created` |
+| `check-in` | `habit-id: uint` | `current-streak` | Daily check-in | `habit-checked-in` |
+| `withdraw-stake` | `habit-id: uint` | `stake-amount` | Withdraw after min streak | `stake-withdrawn` |
+| `claim-bonus` | `habit-id: uint` | `bonus-amount` | Claim from forfeited pool | `bonus-claimed` |
 
 ### Read-Only Functions
 
@@ -83,6 +83,7 @@ Links users to their habit IDs for efficient querying
 | `get-habit-streak` | `habit-id: uint` | `streak-count` | Get current streak |
 | `get-pool-balance` | - | `balance` | Get forfeited pool total |
 | `get-total-habits` | - | `count` | Get total habits created |
+| `get-user-stats` | `user: principal` | `stats-tuple` | Get aggregated user stats |
 
 ## Development
 

@@ -1,4 +1,4 @@
-;; ============================================
+﻿;; ============================================
 ;; AhhbitTracker - On-Chain Habit Tracking with Staking
 ;; ============================================
 ;; 
@@ -183,6 +183,15 @@
       )
     )
     
+    ;; Emit event
+    (print {
+      event: "habit-created",
+      habit-id: habit-id,
+      owner: caller,
+      stake-amount: stake-amount,
+      block: block-height
+    })
+    
     ;; Return habit ID
     (ok habit-id)
   )
@@ -220,6 +229,14 @@
             last-check-in-block: block-height
           })
         )
+        ;; Emit event
+        (print {
+          event: "habit-checked-in",
+          habit-id: habit-id,
+          owner: caller,
+          new-streak: (+ current-streak u1),
+          block: block-height
+        })
         (ok (+ current-streak u1))
       )
       ;; Missed window: forfeit stake and reset
@@ -274,6 +291,16 @@
       })
     )
     
+    ;; Emit event
+    (print {
+      event: "stake-withdrawn",
+      habit-id: habit-id,
+      owner: caller,
+      amount: stake-amount,
+      final-streak: current-streak,
+      block: block-height
+    })
+    
     (ok stake-amount)
   )
 )
@@ -304,6 +331,16 @@
     
     ;; Update pool balance
     (var-set forfeited-pool-balance (- pool-balance bonus-amount))
+    
+    ;; Emit event
+    (print {
+      event: "bonus-claimed",
+      habit-id: habit-id,
+      owner: caller,
+      amount: bonus-amount,
+      remaining-pool: (- pool-balance bonus-amount),
+      block: block-height
+    })
     
     (ok bonus-amount)
   )
@@ -342,6 +379,21 @@
 ;; Get total habits created
 (define-read-only (get-total-habits)
   (ok (var-get habit-id-nonce))
+)
+
+;; Get aggregated statistics for a user
+(define-read-only (get-user-stats (user principal))
+  (match (map-get? user-habits { user: user })
+    user-habit-data
+      (ok {
+        total-habits: (len (get habit-ids user-habit-data)),
+        habit-ids: (get habit-ids user-habit-data)
+      })
+    (ok {
+      total-habits: u0,
+      habit-ids: (list)
+    })
+  )
 )
 
 ;; ============================================
