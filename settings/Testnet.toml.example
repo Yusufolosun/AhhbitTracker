@@ -1,0 +1,6 @@
+[network]
+name = "testnet"
+
+[accounts.deployer]
+mnemonic = "YOUR_24_WORD_MNEMONIC_HERE"
+balance = 100000000000
