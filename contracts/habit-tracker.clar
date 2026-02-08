@@ -310,6 +310,41 @@
 )
 
 ;; ============================================
+;; READ-ONLY FUNCTIONS
+;; ============================================
+
+;; Get habit details
+(define-read-only (get-habit (habit-id uint))
+  (map-get? habits { habit-id: habit-id })
+)
+
+;; Get all habit IDs for a user
+(define-read-only (get-user-habits (user principal))
+  (default-to 
+    { habit-ids: (list) }
+    (map-get? user-habits { user: user })
+  )
+)
+
+;; Get current streak for a habit
+(define-read-only (get-habit-streak (habit-id uint))
+  (match (map-get? habits { habit-id: habit-id })
+    habit (ok (get current-streak habit))
+    ERR-HABIT-NOT-FOUND
+  )
+)
+
+;; Get forfeited pool balance
+(define-read-only (get-pool-balance)
+  (ok (var-get forfeited-pool-balance))
+)
+
+;; Get total habits created
+(define-read-only (get-total-habits)
+  (ok (var-get habit-id-nonce))
+)
+
+;; ============================================
 ;; CONTRACT INITIALIZATION
 ;; ============================================
 
