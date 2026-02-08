@@ -98,6 +98,18 @@
   )
 )
 
+;; Generate next habit ID
+(define-private (get-next-habit-id)
+  (let
+    (
+      (current-id (var-get habit-id-nonce))
+      (next-id (+ current-id u1))
+    )
+    (var-set habit-id-nonce next-id)
+    next-id
+  )
+)
+
 ;; ============================================
 ;; CONTRACT INITIALIZATION
 ;; ============================================
