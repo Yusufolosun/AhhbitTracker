@@ -63,6 +63,27 @@ Links users to their habit IDs for efficient querying
 | 109 | `ERR-POOL-INSUFFICIENT-BALANCE` | Pool lacks funds |
 | 110 | `ERR-TRANSFER-FAILED` | STX transfer error |
 
+## Implemented Functions
+
+### Public Functions
+
+| Function | Parameters | Returns | Description |
+|----------|-----------|---------|-------------|
+| `create-habit` | `name: string`, `stake-amount: uint` | `habit-id` | Create new habit with stake |
+| `check-in` | `habit-id: uint` | `current-streak` | Daily check-in |
+| `withdraw-stake` | `habit-id: uint` | `stake-amount` | Withdraw after min streak |
+| `claim-bonus` | `habit-id: uint` | `bonus-amount` | Claim from forfeited pool |
+
+### Read-Only Functions
+
+| Function | Parameters | Returns | Description |
+|----------|-----------|---------|-------------|
+| `get-habit` | `habit-id: uint` | `habit-data` | Get habit details |
+| `get-user-habits` | `user: principal` | `habit-ids` | Get all user habits |
+| `get-habit-streak` | `habit-id: uint` | `streak-count` | Get current streak |
+| `get-pool-balance` | - | `balance` | Get forfeited pool total |
+| `get-total-habits` | - | `count` | Get total habits created |
+
 ## Development
 
 ### Testing
