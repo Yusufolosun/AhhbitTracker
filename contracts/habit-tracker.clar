@@ -381,6 +381,21 @@
   (ok (var-get habit-id-nonce))
 )
 
+;; Get aggregated statistics for a user
+(define-read-only (get-user-stats (user principal))
+  (match (map-get? user-habits { user: user })
+    user-habit-data
+      (ok {
+        total-habits: (len (get habit-ids user-habit-data)),
+        habit-ids: (get habit-ids user-habit-data)
+      })
+    (ok {
+      total-habits: u0,
+      habit-ids: (list)
+    })
+  )
+)
+
 ;; ============================================
 ;; CONTRACT INITIALIZATION
 ;; ============================================
