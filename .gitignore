@@ -1,0 +1,127 @@
+# ============================================
+# STACKS NETWORK CONFIGURATIONS (CRITICAL)
+# ============================================
+# These files contain deployer private keys
+# and network-specific sensitive data
+Mainnet.toml
+Testnet.toml
+Devnet.toml
+settings/Mainnet.toml
+settings/Testnet.toml
+settings/Devnet.toml
+
+# ============================================
+# ENVIRONMENT VARIABLES (CRITICAL)
+# ============================================
+# Contains API keys, wallet seeds, RPC endpoints
+.env
+.env.local
+.env.production
+.env.development
+.env.staging
+.env.*.local
+.env.test
+
+# ============================================
+# WALLET & PRIVATE KEYS (CRITICAL)
+# ============================================
+# Financial security - never commit these
+*.wallet
+*.keychain
+seed-phrase.txt
+private-keys.txt
+wallet-backup.json
+mnemonic.txt
+secrets/
+
+# ============================================
+# CLARINET GENERATED FILES
+# ============================================
+.cache/
+.clarinet/
+costs-reports.json
+deployments/
+
+# ============================================
+# NODE & DEPENDENCIES
+# ============================================
+node_modules/
+.pnpm-store/
+.yarn/
+.npm/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ============================================
+# BUILD ARTIFACTS
+# ============================================
+dist/
+build/
+out/
+.next/
+.nuxt/
+.vite/
+*.tsbuildinfo
+.turbo/
+
+# ============================================
+# IDE & EDITOR FILES
+# ============================================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.fleet/
+
+# ============================================
+# OPERATING SYSTEM FILES
+# ============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ============================================
+# LOGS & DEBUGGING
+# ============================================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+logs/
+*.log.*
+
+# ============================================
+# TESTING & COVERAGE
+# ============================================
+coverage/
+.nyc_output/
+.coverage/
+*.lcov
+.jest/
+
+# ============================================
+# TEMPORARY FILES
+# ============================================
+tmp/
+temp/
+*.tmp
+*.swp
+*.swo
+*~
+.cache/
+
+# ============================================
+# MISCELLANEOUS
+# ============================================
+.env.backup
+.history/
+.vercel
+.netlify
