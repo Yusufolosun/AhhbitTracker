@@ -128,3 +128,6 @@ temp/
 
 # Clarinet settings (network configs)
 settings/*.toml
+
+# Clarinet settings (network configs)
+settings/*.toml
