@@ -332,6 +332,16 @@
     ;; Update pool balance
     (var-set forfeited-pool-balance (- pool-balance bonus-amount))
     
+    ;; Emit event
+    (print {
+      event: "bonus-claimed",
+      habit-id: habit-id,
+      owner: caller,
+      amount: bonus-amount,
+      remaining-pool: (- pool-balance bonus-amount),
+      block: block-height
+    })
+    
     (ok bonus-amount)
   )
 )
