@@ -125,3 +125,6 @@ temp/
 .history/
 .vercel
 .netlify
+
+# Clarinet settings (network configs)
+settings/*.toml
