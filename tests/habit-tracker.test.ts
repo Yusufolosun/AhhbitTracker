@@ -93,6 +93,19 @@ describe("AhhbitTracker Contract", () => {
       expect(result.result).toBeOk(Cl.uint(1));
     });
 
+    it("should reject empty habit name", () => {
+      const result = createHabit(user1, "", MIN_STAKE);
+
+      expect(result.result).toBeErr(Cl.uint(102)); // ERR-INVALID-HABIT-NAME
+    });
+
+    it("should accept maximum length name", () => {
+      const maxName = "a".repeat(MAX_NAME_LENGTH);
+      const result = createHabit(user1, maxName, MIN_STAKE);
+
+      expect(result.result).toBeOk(Cl.uint(1));
+    });
+
   });
 
 });
