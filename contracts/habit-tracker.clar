@@ -132,6 +132,63 @@
 )
 
 ;; ============================================
+;; PUBLIC FUNCTIONS - HABIT MANAGEMENT
+;; ============================================
+
+;; Create a new habit with stake
+;; @param name: Habit description (max 50 characters)
+;; @param stake-amount: Amount to stake in microSTX (min 0.1 STX)
+;; @returns: habit-id on success, error code on failure
+(define-public (create-habit (name (string-utf8 50)) (stake-amount uint))
+  (let
+    (
+      (habit-id (get-next-habit-id))
+      (caller tx-sender)
+    )
+    ;; Validate stake amount
+    (asserts! (>= stake-amount MIN-STAKE-AMOUNT) ERR-INVALID-STAKE-AMOUNT)
+    
+    ;; Validate habit name
+    (asserts! (is-valid-habit-name name) ERR-INVALID-HABIT-NAME)
+    
+    ;; Transfer stake from user to contract
+    (try! (stx-transfer? stake-amount caller (as-contract tx-sender)))
+    
+    ;; Store habit data
+    (map-set habits
+      { habit-id: habit-id }
+      {
+        owner: caller,
+        name: name,
+        stake-amount: stake-amount,
+        current-streak: u0,
+        last-check-in-block: block-height,
+        created-at-block: block-height,
+        is-active: true,
+        is-completed: false
+      }
+    )
+    
+    ;; Add habit to user's habit list
+    (match (map-get? user-habits { user: caller })
+      existing-habits
+        (map-set user-habits
+          { user: caller }
+          { habit-ids: (unwrap! (as-max-len? (append (get habit-ids existing-habits) habit-id) u100) ERR-HABIT-NOT-FOUND) }
+        )
+      ;; First habit for this user
+      (map-set user-habits
+        { user: caller }
+        { habit-ids: (list habit-id) }
+      )
+    )
+    
+    ;; Return habit ID
+    (ok habit-id)
+  )
+)
+
+;; ============================================
 ;; CONTRACT INITIALIZATION
 ;; ============================================
 
