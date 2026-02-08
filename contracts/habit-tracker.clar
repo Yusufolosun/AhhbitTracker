@@ -110,6 +110,27 @@
   )
 )
 
+;; Check if check-in is within valid window
+;; Returns true if blocks since last check-in <= CHECK-IN-WINDOW
+(define-private (is-check-in-valid (last-check-in-block uint))
+  (let
+    (
+      (blocks-elapsed (- block-height last-check-in-block))
+    )
+    (<= blocks-elapsed CHECK-IN-WINDOW)
+  )
+)
+
+;; Check if already checked in today (same block height range)
+(define-private (already-checked-in-today (last-check-in-block uint))
+  (let
+    (
+      (blocks-elapsed (- block-height last-check-in-block))
+    )
+    (< blocks-elapsed u1)
+  )
+)
+
 ;; ============================================
 ;; CONTRACT INITIALIZATION
 ;; ============================================
