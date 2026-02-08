@@ -73,6 +73,26 @@ describe("AhhbitTracker Contract", () => {
       expect(result.result).toBeOk(Cl.uint(1));
     });
 
+    it("should accept minimum stake amount", () => {
+      const result = createHabit(user1, VALID_HABIT_NAME, MIN_STAKE);
+
+      expect(result.result).toBeOk(Cl.uint(1));
+    });
+
+    it("should reject stake below minimum", () => {
+      const belowMin = MIN_STAKE - 1;
+      const result = createHabit(user1, VALID_HABIT_NAME, belowMin);
+
+      expect(result.result).toBeErr(Cl.uint(101)); // ERR-INVALID-STAKE-AMOUNT
+    });
+
+    it("should accept stake above minimum", () => {
+      const aboveMin = MIN_STAKE * 10;
+      const result = createHabit(user1, VALID_HABIT_NAME, aboveMin);
+
+      expect(result.result).toBeOk(Cl.uint(1));
+    });
+
   });
 
 });
