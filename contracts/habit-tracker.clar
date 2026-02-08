@@ -291,6 +291,16 @@
       })
     )
     
+    ;; Emit event
+    (print {
+      event: "stake-withdrawn",
+      habit-id: habit-id,
+      owner: caller,
+      amount: stake-amount,
+      final-streak: current-streak,
+      block: block-height
+    })
+    
     (ok stake-amount)
   )
 )
