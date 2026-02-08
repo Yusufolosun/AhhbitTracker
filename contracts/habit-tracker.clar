@@ -242,6 +242,73 @@
   )
 )
 
+;; Withdraw stake after completing minimum streak
+;; @param habit-id: ID of the habit
+;; @returns: ok on success with stake amount, error on failure
+(define-public (withdraw-stake (habit-id uint))
+  (let
+    (
+      (caller tx-sender)
+      (habit (unwrap! (map-get? habits { habit-id: habit-id }) ERR-HABIT-NOT-FOUND))
+      (stake-amount (get stake-amount habit))
+      (current-streak (get current-streak habit))
+    )
+    ;; Verify caller is habit owner
+    (asserts! (is-eq caller (get owner habit)) ERR-NOT-HABIT-OWNER)
+    
+    ;; Verify habit is active
+    (asserts! (get is-active habit) ERR-HABIT-ALREADY-COMPLETED)
+    
+    ;; Verify minimum streak requirement
+    (asserts! (>= current-streak MIN-STREAK-FOR-WITHDRAWAL) ERR-INSUFFICIENT-STREAK)
+    
+    ;; Transfer stake back to user
+    (try! (as-contract (stx-transfer? stake-amount tx-sender caller)))
+    
+    ;; Mark habit as completed
+    (map-set habits
+      { habit-id: habit-id }
+      (merge habit {
+        is-active: false,
+        is-completed: true
+      })
+    )
+    
+    (ok stake-amount)
+  )
+)
+
+;; Claim bonus from forfeited pool
+;; @param habit-id: ID of a completed habit (proof of eligibility)
+;; @returns: bonus amount on success, error on failure
+(define-public (claim-bonus (habit-id uint))
+  (let
+    (
+      (caller tx-sender)
+      (habit (unwrap! (map-get? habits { habit-id: habit-id }) ERR-HABIT-NOT-FOUND))
+      (pool-balance (var-get forfeited-pool-balance))
+      ;; Simple bonus calculation: 10% of pool per completed habit
+      (bonus-amount (/ pool-balance u10))
+    )
+    ;; Verify caller is habit owner
+    (asserts! (is-eq caller (get owner habit)) ERR-NOT-HABIT-OWNER)
+    
+    ;; Verify habit is completed
+    (asserts! (get is-completed habit) ERR-INSUFFICIENT-STREAK)
+    
+    ;; Verify pool has sufficient balance
+    (asserts! (>= pool-balance bonus-amount) ERR-POOL-INSUFFICIENT-BALANCE)
+    
+    ;; Transfer bonus from pool to user
+    (try! (as-contract (stx-transfer? bonus-amount tx-sender caller)))
+    
+    ;; Update pool balance
+    (var-set forfeited-pool-balance (- pool-balance bonus-amount))
+    
+    (ok bonus-amount)
+  )
+)
+
 ;; ============================================
 ;; CONTRACT INITIALIZATION
 ;; ============================================
