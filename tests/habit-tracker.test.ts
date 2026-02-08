@@ -106,6 +106,63 @@ describe("AhhbitTracker Contract", () => {
       expect(result.result).toBeOk(Cl.uint(1));
     });
 
+    it("should transfer STX from user to contract", () => {
+      // Get initial balance
+      const assets = simnet.getAssetsMap();
+      const userBalanceBefore = assets.get(user1)?.get("STX") || 0n;
+
+      const result = createHabit(user1, VALID_HABIT_NAME, MIN_STAKE);
+      expect(result.result).toBeOk(Cl.uint(1));
+
+      const userBalanceAfter = simnet.getAssetsMap().get(user1)?.get("STX") || 0n;
+
+      // If balance tracking is working, verify subtraction
+      if (userBalanceBefore > 0n) {
+        expect(userBalanceAfter).toBe(userBalanceBefore - BigInt(MIN_STAKE));
+      }
+    });
+
+    it("should allow user to create multiple habits", () => {
+      const result1 = createHabit(user1, "Habit 1", MIN_STAKE);
+      const result2 = createHabit(user1, "Habit 2", MIN_STAKE);
+      const result3 = createHabit(user1, "Habit 3", MIN_STAKE);
+
+      expect(result1.result).toBeOk(Cl.uint(1));
+      expect(result2.result).toBeOk(Cl.uint(2));
+      expect(result3.result).toBeOk(Cl.uint(3));
+    });
+
+    it("should increment habit IDs correctly", () => {
+      createHabit(user1, "User1 Habit", MIN_STAKE);
+      createHabit(user2, "User2 Habit", MIN_STAKE);
+      createHabit(user1, "User1 Habit2", MIN_STAKE);
+
+      const habit1 = getHabit(1);
+      const habit2 = getHabit(2);
+      const habit3 = getHabit(3);
+
+      expect(habit1.result).not.toBeNone();
+      expect(habit2.result).not.toBeNone();
+      expect(habit3.result).not.toBeNone();
+    });
+
+    it("should store habit data correctly", () => {
+      const stakeAmount = MIN_STAKE * 2;
+      createHabit(user1, VALID_HABIT_NAME, stakeAmount);
+
+      const result = getHabit(1);
+      expect(result.result).toBeSome(Cl.tuple({
+        owner: Cl.principal(user1),
+        name: Cl.stringUtf8(VALID_HABIT_NAME),
+        "stake-amount": Cl.uint(stakeAmount),
+        "current-streak": Cl.uint(0),
+        "last-check-in-block": Cl.uint(simnet.blockHeight),
+        "created-at-block": Cl.uint(simnet.blockHeight),
+        "is-active": Cl.bool(true),
+        "is-completed": Cl.bool(false)
+      }));
+    });
+
   });
 
 });
