@@ -1,13 +1,12 @@
 import { Cl } from "@stacks/transactions";
-import { StacksTestnet } from "@stacks/network";
 
-const NETWORK = new StacksTestnet();
-const CONTRACT_ADDRESS = "ST..."; // To be filled after testnet deployment
+const CONTRACT_ADDRESS = "ST1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK1GA0CF0";
 const CONTRACT_NAME = "habit-tracker";
+const NETWORK_API = "https://api.testnet.hiro.so";
 
 console.log("AhhbitTracker Testnet Interaction");
-console.log("Network:", NETWORK.version);
-console.log("API:", NETWORK.coreApiUrl);
+console.log("Network: Testnet");
+console.log("API:", NETWORK_API);
 
 export async function createTestHabit(name: string, stakeAmount: number) {
   console.log("\nCreating test habit:");
