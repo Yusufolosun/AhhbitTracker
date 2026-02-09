@@ -64,7 +64,18 @@ Your stake is forfeited to the community pool and your streak resets to zero.
 
 ### Can I check in multiple times per day?
 
-No. The contract prevents check-ins within 14 blocks (~2.4 hours) to ensure one check-in per day.
+No. The contract prevents check-ins until at least 1 block has passed (~10 minutes on Stacks). This ensures one check-in per block minimum.
+
+### Why can't I check in immediately after creating a habit?
+
+When you create a habit, the contract automatically sets the `last-check-in-block` to the creation block. You must wait at least 1 block (~10 minutes) before your first manual check-in. This prevents:
+- Double-claiming rewards (creation + immediate check-in)
+- Gaming the system
+- Ensures genuine daily habit tracking
+
+**Error code:** If you try, you'll get `(err u105)` - ERR-ALREADY-CHECKED-IN
+
+**Solution:** Wait approximately 10 minutes after creating a habit before your first check-in.
 
 ### How many days for withdrawal?
 
@@ -202,9 +213,19 @@ No. All blockchain transactions are public. Anyone can see:
 - Increase transaction fee
 - Wait and retry
 
-### "Already Checked In" error
+### "Already Checked In" error (ERR-U105)
 
-You've checked in today already. Wait 14+ blocks before next check-in.
+**Error Code:** `(err u105)` - ERR-ALREADY-CHECKED-IN
+
+**Common Causes:**
+1. You already checked in today
+2. You just created the habit and tried to check in immediately
+3. Less than 1 block has passed since last check-in
+
+**Solution:**
+- If you just created the habit: Wait at least 10 minutes (1 Stacks block) before first check-in
+- If you already checked in: Wait until next day for your next check-in
+- Check the habit details with `get-habit` to see `last-check-in-block`
 
 ### "Window Expired" error
 
@@ -237,6 +258,23 @@ If you lose access to your wallet (seed phrase), you lose access to your stakes.
 ### Can someone steal my habits?
 
 No. Only you (the owner) can check in or withdraw from your habits.
+
+### What are the error codes?
+
+**Common Error Codes:**
+- `(err u100)` - ERR-UNAUTHORIZED: You don't have permission for this action
+- `(err u101)` - ERR-HABIT-NOT-FOUND: Habit ID doesn't exist
+- `(err u102)` - ERR-INSUFFICIENT-STAKE: Stake amount too low (minimum 0.1 STX)
+- `(err u103)` - ERR-NOT-HABIT-OWNER: You're trying to check in on someone else's habit
+- `(err u104)` - ERR-HABIT-NOT-ACTIVE: Habit was deactivated
+- `(err u105)` - ERR-ALREADY-CHECKED-IN: You already checked in or just created the habit
+- `(err u106)` - ERR-ALREADY-COMPLETED: Habit finished, use complete-habit to collect
+- `(err u107)` - ERR-INSUFFICIENT-STREAK: Need 7+ days to withdraw/complete
+- `(err u108)` - ERR-STREAK-BROKEN: Missed check-in window, stake forfeited
+- `(err u109)` - ERR-TRANSFER-FAILED: STX transfer issue
+- `(err u110)` - ERR-INVALID-NAME: Habit name too long (max 50 characters)
+
+**Troubleshooting Tip:** Use `get-habit` to check habit status before transactions.
 
 ### Is there an admin key?
 
