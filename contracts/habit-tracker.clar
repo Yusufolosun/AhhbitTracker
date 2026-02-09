@@ -1,4 +1,4 @@
-﻿;; ============================================
+;; ============================================
 ;; AhhbitTracker - On-Chain Habit Tracking with Staking
 ;; ============================================
 ;; 
@@ -217,7 +217,6 @@
     
     ;; Check if already checked in today
     (asserts! (not (already-checked-in-today last-check-in)) ERR-ALREADY-CHECKED-IN)
-    
     ;; Check if within valid window
     (if (is-check-in-valid last-check-in)
       ;; Valid check-in: increment streak
@@ -239,23 +238,51 @@
         })
         (ok (+ current-streak u1))
       )
-      ;; Missed window: forfeit stake and reset
-      (begin
-        ;; Add stake to forfeited pool
-        (var-set forfeited-pool-balance (+ (var-get forfeited-pool-balance) stake-amount))
-        
-        ;; Reset habit
-        (map-set habits
-          { habit-id: habit-id }
-          (merge habit {
-            current-streak: u0,
-            is-active: false
-          })
-        )
-        
-        ERR-CHECK-IN-WINDOW-EXPIRED
-      )
+      ;; Missed window: return error (use slash-habit to forfeit)
+      ERR-CHECK-IN-WINDOW-EXPIRED
     )
+  )
+)
+
+;; Slash a habit that has missed its check-in window
+;; Anyone can call this to move the stake to the pool
+;; @param habit-id: ID of the habit to slash
+;; @returns: ok on success, error on failure
+(define-public (slash-habit (habit-id uint))
+  (let
+    (
+      (habit (unwrap! (map-get? habits { habit-id: habit-id }) ERR-HABIT-NOT-FOUND))
+      (last-check-in (get last-check-in-block habit))
+      (stake-amount (get stake-amount habit))
+    )
+    ;; Verify habit is still active
+    (asserts! (get is-active habit) ERR-HABIT-ALREADY-COMPLETED)
+    
+    ;; Verify window has actually expired
+    (asserts! (not (is-check-in-valid last-check-in)) ERR-NOT-AUTHORIZED)
+    
+    ;; Move stake to pool
+    (var-set forfeited-pool-balance (+ (var-get forfeited-pool-balance) stake-amount))
+    
+    ;; Mark habit as inactive
+    (map-set habits
+      { habit-id: habit-id }
+      (merge habit {
+        current-streak: u0,
+        is-active: false
+      })
+    )
+    
+    ;; Emit event
+    (print {
+      event: "habit-slashed",
+      habit-id: habit-id,
+      slasher: tx-sender,
+      amount: stake-amount,
+      block: block-height
+    })
+    
+    (ok true)
   )
 )
 
