@@ -6,20 +6,28 @@ On-chain habit tracker with staking accountability on Stacks blockchain.
 
 AhhbitTracker helps users build lasting habits through blockchain-based accountability. Stake STX on your daily habits, check in every 24 hours to maintain your streak, and earn from a shared pool of forfeited stakes.
 
+## Deployment
+
+**Status:** 🟢 Live on Mainnet
+
+**Contract:** `SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker`
+
+**Explorer:** [View on Stacks Explorer](https://explorer.hiro.so/txid/SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker?chain=mainnet)
+
 ## Features
 
-- Habit creation with STX staking
-- Daily check-ins with streak tracking
+- Habit creation with STX staking (min 0.1 STX)
+- Daily check-ins with streak tracking (24-hour window)
 - Automatic stake forfeiture for missed check-ins
-- Withdrawal after successful completion
-- Bonus pool for successful users
+- Withdrawal after 7-day streak completion
+- Bonus pool distribution for successful users
 
 ## Tech Stack
 
-- Smart Contracts: Clarity
+- Smart Contracts: Clarity 2.0
 - Network: Stacks Mainnet
-- Testing: Vitest
-- Wallet Integration: @stacks/connect
+- Testing: Vitest + Clarinet SDK
+- Development: Clarinet CLI
 
 ## Getting Started
 
@@ -60,7 +68,8 @@ See [Deployment Guide](docs/DEPLOYMENT.md)
 - `get-habit` - Retrieve habit details
 - `get-user-habits` - Get user's habit list
 - `get-habit-streak` - Get current streak
-- `get-forfeited-pool-balance` - Get pool balance
+- `get-pool-balance` - Get forfeited pool balance
+- `get-total-habits` - Get total habits created
 - `get-user-stats` - Get user statistics
 
 ## Documentation
