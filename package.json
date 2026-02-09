@@ -9,7 +9,8 @@
     "test:report": "vitest run -- --coverage --costs",
     "test:watch": "chokidar \"tests/**/*.ts\" \"contracts/**/*.clar\" -c \"npm run test:report\"",
     "deploy:estimate": "ts-node scripts/estimate-gas.ts",
-    "deploy:verify": "ts-node scripts/verify-deployment.ts"
+    "deploy:verify": "ts-node scripts/verify-deployment.ts",
+    "verify:mainnet": "ts-node scripts/verify-mainnet.ts"
   },
   "author": "",
   "license": "ISC",
