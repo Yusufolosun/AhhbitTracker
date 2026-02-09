@@ -10,7 +10,8 @@
     "test:watch": "chokidar \"tests/**/*.ts\" \"contracts/**/*.clar\" -c \"npm run test:report\"",
     "deploy:estimate": "ts-node scripts/estimate-gas.ts",
     "deploy:verify": "ts-node scripts/verify-deployment.ts",
-    "verify:mainnet": "ts-node scripts/verify-mainnet.ts"
+    "verify:mainnet": "ts-node scripts/verify-mainnet.ts",
+    "test:mainnet": "ts-node scripts/test-mainnet-transactions.ts"
   },
   "author": "",
   "license": "ISC",
