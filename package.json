@@ -24,6 +24,9 @@
     "chokidar-cli": "^3.0.0"
   },
   "devDependencies": {
+    "@stacks/network": "^7.3.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3",
     "vitest": "^2.1.8",
     "vitest-environment-clarinet": "^2.6.0"
   }
