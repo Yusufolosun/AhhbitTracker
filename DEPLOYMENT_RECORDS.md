@@ -2,29 +2,27 @@
 
 ## Testnet Deployment
 
-**Status:** Pending
+**Status:** ✅ Deployed Successfully
 
 ### Prerequisites Checklist
 
-- [ ] Testnet.toml configured with mnemonic
-- [ ] Testnet STX obtained from faucet (need ~2 STX)
-- [ ] Contract syntax verified (`clarinet check`)
-- [ ] All tests passing (`npm test`)
+- [x] Testnet.toml configured with mnemonic
+- [x] Testnet STX obtained from faucet
+- [x] Contract syntax verified (`clarinet check`)
+- [x] All tests passing (`npm test` - 29/29 tests)
 
 ### Deployment Information
 
-**Date:** TBD  
+**Date:** February 8, 2026  
 **Network:** Stacks Testnet  
-**Transaction ID:** TBD  
-**Contract Address:** TBD  
-**Block Height:** TBD  
-**Deployer Address:** TBD  
-**Gas Cost:** TBD  
+**Contract Address:** `ST1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK1GA0CF0.habit-tracker`  
+**Deployer Address:** `ST1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK1GA0CF0`  
+**Gas Cost:** 0.122090 STX  
 
 ### Explorer Links
 
-- Contract: TBD
-- Deployment TX: TBD
+- Contract: https://explorer.hiro.so/address/ST1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK1GA0CF0.habit-tracker?chain=testnet
+- Deployer: https://explorer.hiro.so/address/ST1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK1GA0CF0?chain=testnet
 
 ### Testing Results
 
