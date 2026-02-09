@@ -11,7 +11,9 @@
     "deploy:estimate": "ts-node scripts/estimate-gas.ts",
     "deploy:verify": "ts-node scripts/verify-deployment.ts",
     "verify:mainnet": "ts-node scripts/verify-mainnet.ts",
-    "test:mainnet": "ts-node scripts/test-mainnet-transactions.ts"
+    "test:mainnet": "ts-node scripts/test-mainnet-transactions.ts",
+    "stats": "ts-node scripts/contract-stats.ts",
+    "query": "ts-node scripts/batch-query.ts"
   },
   "author": "",
   "license": "ISC",
