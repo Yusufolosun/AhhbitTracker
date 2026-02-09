@@ -1,5 +1,21 @@
 # Deployment Guide
 
+> **Status:** ✅ Contract deployed to mainnet on February 9, 2026
+> 
+> **Contract Address:** `SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker`
+>
+> **Explorer:** [View Contract](https://explorer.hiro.so/txid/SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker?chain=mainnet)
+
+## Deployment Complete
+
+The contract has been successfully deployed to Stacks mainnet. See [DEPLOYMENT_RECORD.md](../DEPLOYMENT_RECORD.md) for full details.
+
+---
+
+## Redeployment Guide
+
+If you need to redeploy or deploy to testnet, follow these steps:
+
 ## Prerequisites
 
 - Clarinet CLI installed
