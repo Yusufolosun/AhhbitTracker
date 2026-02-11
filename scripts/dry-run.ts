@@ -154,7 +154,8 @@ async function simulateBalanceCheck(address: string): Promise<number> {
     
     if (response.ok) {
       const data = await response.json();
-      const balanceMicroSTX = parseInt(data.balance);
+      // Stacks API v2 returns balance in data.stx.balance or data.balance
+      const balanceMicroSTX = parseInt(data.stx?.balance || data.balance || '0');
       const balanceSTX = balanceMicroSTX / 1000000;
       console.log(`Current Balance: ${balanceSTX.toFixed(4)} STX`);
       
@@ -167,16 +168,17 @@ async function simulateBalanceCheck(address: string): Promise<number> {
       }
       console.log();
       return balanceSTX;
+    } else {
+      console.log(`⚠️  API Error: ${response.status} ${response.statusText}`);
     }
-  } catch (error) {
-    console.log('⚠️  Could not fetch real balance (using simulated)');
-    console.log('Simulated Balance: 5.0000 STX');
-    console.log('✅ Balance check would pass (simulated)');
+  } catch (error: any) {
+    console.log(`⚠️  Could not fetch real balance: ${error.message}`);
+    console.log('Using simulated balance: 0.0000 STX');
     console.log();
-    return 5.0;
+    return 0.0;
   }
   
-  return 5.0;
+  return 0.0;
 }
 
 // ============================================

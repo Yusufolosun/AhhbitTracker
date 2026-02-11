@@ -166,7 +166,8 @@ async function checkBalance(address: string): Promise<number> {
   }
   
   const data = await response.json();
-  const balanceMicroSTX = parseInt(data.balance);
+  // Stacks API v2 returns balance in data.stx.balance or data.balance
+  const balanceMicroSTX = parseInt(data.stx?.balance || data.balance || '0');
   const balanceSTX = balanceMicroSTX / 1000000;
   
   return balanceSTX;
