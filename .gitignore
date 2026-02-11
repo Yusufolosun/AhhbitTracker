@@ -131,5 +131,28 @@ fix_encoding.py
 # Clarinet settings (network configs)
 settings/*.toml
 
-# Clarinet settings (network configs)
-settings/*.toml
+# ============================================
+# TRANSACTION SCRIPTS (CRITICAL - Contains private keys)
+# ============================================
+scripts/transaction-executor.env
+scripts/.wallet-config
+scripts/private-keys.json
+scripts/transaction-history.json
+scripts/transaction-results.json
+scripts/wallet-backup.json
+
+# User Wallet Data
+user-wallet.json
+*.keystore
+*.pem
+*.key
+
+# Transaction Logs
+transaction-logs/
+*.tx.log
+tx-history-*.json
+
+# Test Wallets
+test-wallet-*.json
+scripts/*-private-key.txt
+scripts/.wallet-*
