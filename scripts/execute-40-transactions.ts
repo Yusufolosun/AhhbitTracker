@@ -17,6 +17,9 @@ import {
   getAddressFromPrivateKey,
 } from '@stacks/transactions';
 import { STACKS_MAINNET } from '@stacks/network';
+import * as bip39 from '@scure/bip39';
+import { wordlist } from '@scure/bip39/wordlists/english';
+import { HDKey } from '@scure/bip32';
 import * as fs from 'fs';
 import * as readline from 'readline';
 
@@ -91,21 +94,67 @@ async function getUserWallet(): Promise<{ privateKey: string; address: string }>
   console.log('⚠️  IMPORTANT: Use a wallet DIFFERENT from the deployer wallet');
   console.log('⚠️  This wallet must have at least 3 STX (budget + buffer)');
   console.log();
+  console.log('You can provide either:');
+  console.log('  1. Your 24-word mnemonic seed phrase');
+  console.log('  2. Your 64-character hexadecimal private key');
+  console.log();
   
-  const privateKeyInput = await promptUser('Enter your private key (64-char hex): ');
+  const input = await promptUser('Enter your credentials: ');
   
-  if (privateKeyInput.length !== 64) {
-    throw new Error('Invalid private key length. Must be 64 hexadecimal characters.');
+  // Check if input is a mnemonic (contains spaces, typically 12 or 24 words)
+  if (input.includes(' ')) {
+    const words = input.trim().split(/\s+/);
+    if (words.length === 12 || words.length === 24) {
+      console.log();
+      console.log(`✅ Mnemonic phrase detected (${words.length} words)`);
+      
+      try {
+        // Validate mnemonic
+        if (!bip39.validateMnemonic(input, wordlist)) {
+          throw new Error('Invalid mnemonic phrase');
+        }
+        
+        // Derive seed from mnemonic
+        const seed = await bip39.mnemonicToSeed(input);
+        
+        // Derive Stacks wallet path: m/44'/5757'/0'/0/0
+        const masterKey = HDKey.fromMasterSeed(seed);
+        const accountKey = masterKey.derive("m/44'/5757'/0'/0/0");
+        
+        if (!accountKey.privateKey) {
+          throw new Error('Failed to derive private key');
+        }
+        
+        const privateKey = Buffer.from(accountKey.privateKey).toString('hex');
+        const address = getAddressFromPrivateKey(privateKey, 'mainnet');
+        
+        console.log(`✅ Wallet Address: ${address}`);
+        console.log();
+        
+        return { privateKey, address };
+      } catch (error: any) {
+        throw new Error(`Failed to derive wallet from mnemonic: ${error.message}`);
+      }
+    } else {
+      throw new Error(`Invalid mnemonic. Expected 12 or 24 words, got ${words.length}.`);
+    }
   }
-
-  const privateKey = privateKeyInput;
-  const address = getAddressFromPrivateKey(privateKey, 'mainnet');
   
-  console.log();
-  console.log(`✅ Wallet Address: ${address}`);
-  console.log();
+  // Check if input is a private key (64 hex characters)
+  if (/^[0-9a-fA-F]{64}$/.test(input)) {
+    console.log();
+    console.log('✅ Private key detected');
+    
+    const privateKey = input;
+    const address = getAddressFromPrivateKey(privateKey, 'mainnet');
+    
+    console.log(`✅ Wallet Address: ${address}`);
+    console.log();
+    
+    return { privateKey, address };
+  }
   
-  return { privateKey, address };
+  throw new Error('Invalid input. Please provide either a 24-word mnemonic phrase or 64-character hexadecimal private key.');
 }
 
 async function checkBalance(address: string): Promise<number> {
