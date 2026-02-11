@@ -158,7 +158,7 @@ async function getUserWallet(): Promise<{ privateKey: string; address: string }>
 }
 
 async function checkBalance(address: string): Promise<number> {
-  const url = `https://api.mainnet.hiro.so/v2/accounts/${address}`;
+  const url = `https://api.mainnet.hiro.so/extended/v1/address/${address}/balances`;
   const response = await fetch(url);
   
   if (!response.ok) {
@@ -166,8 +166,9 @@ async function checkBalance(address: string): Promise<number> {
   }
   
   const data = await response.json();
-  // Stacks API v2 returns balance in data.stx.balance or data.balance
-  const balanceMicroSTX = parseInt(data.stx?.balance || data.balance || '0');
+  // Extended API returns balance as string in microSTX
+  const balanceString = data.stx?.balance || '0';
+  const balanceMicroSTX = parseInt(balanceString, 10);
   const balanceSTX = balanceMicroSTX / 1000000;
   
   return balanceSTX;
