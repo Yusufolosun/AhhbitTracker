@@ -30,7 +30,7 @@ npm run tx:40
 
 ### 5. Follow Prompts
 
-- Enter your private key (64-char hex)
+- Enter your **24-word mnemonic phrase** OR **64-char hex private key**
 - Type "EXECUTE" to confirm
 - Wait ~80 minutes for completion
 

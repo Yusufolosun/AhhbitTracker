@@ -16,6 +16,11 @@ npm run dry-run
 
 Send 3 STX to your test wallet address.
 
+**Wallet Input:**
+- You can use your **24-word mnemonic seed phrase** (recommended)
+- OR your **64-character hexadecimal private key**
+- Scripts will auto-detect which format you provide
+
 **Important:**
 - Use a **different wallet** than the contract deployer
 - Need minimum 3 STX (2.5 for fees + 0.5 buffer)
@@ -76,7 +81,13 @@ After completion:
 
 ## Troubleshooting
 
-**Insufficient balance error:**
+**"Invalid input" error:**
+- Ensure you're using either:
+  - 24-word mnemonic: `word1 word2 word3 ... word24`
+  - 64-char private key: `abc123def456...` (no spaces)
+- Remove any extra spaces or newlines
+
+**Insufficient balance error:****
 - Ensure wallet has at least 3 STX
 - Check balance on Stacks Explorer
 
