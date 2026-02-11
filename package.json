@@ -13,7 +13,8 @@
     "verify:mainnet": "ts-node scripts/verify-mainnet.ts",
     "test:mainnet": "ts-node scripts/test-mainnet-transactions.ts",
     "stats": "ts-node scripts/contract-stats.ts",
-    "query": "ts-node scripts/batch-query.ts"
+    "query": "ts-node scripts/batch-query.ts",
+    "tx:40": "ts-node scripts/execute-40-transactions.ts"
   },
   "author": "",
   "license": "ISC",
