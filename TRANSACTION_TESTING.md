@@ -8,8 +8,8 @@
 # Install dependencies
 npm install
 
-# Verify installation
-npx ts-node --version
+# TEST FIRST - Dry run validation (no real transactions)
+npm run dry-run
 ```
 
 ### 2. Fund Wallet
@@ -24,13 +24,11 @@ Send 3 STX to your test wallet address.
 ### 3. Execute
 
 ```bash
+# First: Test with dry run
+npm run dry-run
+
+# Then: Execute real transactions
 npm run tx:40
-```
-
-Or directly:
-
-```bash
-npx ts-node scripts/execute-40-transactions.ts
 ```
 
 ### 4. Follow Prompts
@@ -43,6 +41,7 @@ npx ts-node scripts/execute-40-transactions.ts
 
 ## Important Notes
 
+⚠️ **Run dry-run first to validate setup**  
 ⚠️ **Use a different wallet than the deployer**  
 ⚠️ **Transactions are real and irreversible**  
 ⚠️ **Budget is 2.5 STX total for 40 transactions**  

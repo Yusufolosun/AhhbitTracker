@@ -12,13 +12,11 @@ import {
   broadcastTransaction,
   AnchorMode,
   PostConditionMode,
-  getNonce,
   uintCV,
   stringUtf8CV,
   getAddressFromPrivateKey,
-  TransactionVersion,
 } from '@stacks/transactions';
-import { StacksMainnet } from '@stacks/network';
+import { STACKS_MAINNET } from '@stacks/network';
 import * as fs from 'fs';
 import * as readline from 'readline';
 
@@ -26,7 +24,7 @@ import * as readline from 'readline';
 // CONFIGURATION (From Project)
 // ============================================
 
-const NETWORK = new StacksMainnet();
+const NETWORK = STACKS_MAINNET;
 const CONTRACT_ADDRESS = 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193';
 const CONTRACT_NAME = 'habit-tracker';
 
@@ -101,7 +99,7 @@ async function getUserWallet(): Promise<{ privateKey: string; address: string }>
   }
 
   const privateKey = privateKeyInput;
-  const address = getAddressFromPrivateKey(privateKey, TransactionVersion.Mainnet);
+  const address = getAddressFromPrivateKey(privateKey, 'mainnet');
   
   console.log();
   console.log(`✅ Wallet Address: ${address}`);
@@ -111,7 +109,7 @@ async function getUserWallet(): Promise<{ privateKey: string; address: string }>
 }
 
 async function checkBalance(address: string): Promise<number> {
-  const url = `${NETWORK.coreApiUrl}/v2/accounts/${address}`;
+  const url = `https://api.mainnet.hiro.so/v2/accounts/${address}`;
   const response = await fetch(url);
   
   if (!response.ok) {
@@ -150,7 +148,7 @@ async function createHabit(
   };
 
   const transaction = await makeContractCall(txOptions);
-  const broadcastResponse = await broadcastTransaction(transaction, NETWORK);
+  const broadcastResponse = await broadcastTransaction({ transaction, network: NETWORK });
   
   if ('error' in broadcastResponse) {
     throw new Error(broadcastResponse.error);
@@ -179,7 +177,7 @@ async function checkIn(
   };
 
   const transaction = await makeContractCall(txOptions);
-  const broadcastResponse = await broadcastTransaction(transaction, NETWORK);
+  const broadcastResponse = await broadcastTransaction({ transaction, network: NETWORK });
   
   if ('error' in broadcastResponse) {
     throw new Error(broadcastResponse.error);
@@ -208,7 +206,7 @@ async function withdrawStake(
   };
 
   const transaction = await makeContractCall(txOptions);
-  const broadcastResponse = await broadcastTransaction(transaction, NETWORK);
+  const broadcastResponse = await broadcastTransaction({ transaction, network: NETWORK });
   
   if ('error' in broadcastResponse) {
     throw new Error(broadcastResponse.error);
@@ -237,7 +235,7 @@ async function claimBonus(
   };
 
   const transaction = await makeContractCall(txOptions);
-  const broadcastResponse = await broadcastTransaction(transaction, NETWORK);
+  const broadcastResponse = await broadcastTransaction({ transaction, network: NETWORK });
   
   if ('error' in broadcastResponse) {
     throw new Error(broadcastResponse.error);
@@ -313,7 +311,10 @@ async function executeTransactions() {
   console.log();
   
   // Get starting nonce
-  let currentNonce = await getNonce(address, NETWORK);
+  const nonceUrl = `https://api.mainnet.hiro.so/v2/accounts/${address}?proof=0`;
+  const nonceResponse = await fetch(nonceUrl);
+  const nonceData = await nonceResponse.json();
+  let currentNonce = BigInt(nonceData.nonce);
   console.log(`Starting nonce: ${currentNonce}`);
   console.log();
   

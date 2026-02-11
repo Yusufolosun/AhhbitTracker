@@ -8,23 +8,49 @@
 npm install
 ```
 
-### 2. Fund Wallet
+### 2. Test Configuration (Dry Run)
+
+```bash
+npm run dry-run
+```
+
+This validates your setup without executing real transactions.
+
+### 3. Fund Wallet
 
 - Create new Stacks wallet OR use existing
 - Send 3 STX to wallet address
 - **Do NOT use deployer wallet**
 
-### 3. Run Script
+### 4. Run Script
 
 ```bash
-npx ts-node scripts/execute-40-transactions.ts
+npm run tx:40
 ```
 
-### 4. Follow Prompts
+### 5. Follow Prompts
 
 - Enter your private key (64-char hex)
 - Type "EXECUTE" to confirm
 - Wait ~80 minutes for completion
+
+## Dry Run Testing
+
+**Always test first before executing real transactions:**
+
+```bash
+npm run dry-run
+```
+
+The dry run will:
+- ✅ Validate your private key format
+- ✅ Check wallet balance (real or simulated)
+- ✅ Verify all transaction parameters
+- ✅ Calculate exact costs
+- ✅ Estimate execution time
+- ✅ Confirm you're ready to execute
+
+**No real transactions are executed in dry-run mode!**
 
 ## What Happens
 
