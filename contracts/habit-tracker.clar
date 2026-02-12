@@ -218,30 +218,47 @@
     ;; Check if already checked in today
     (asserts! (not (already-checked-in-today last-check-in)) ERR-ALREADY-CHECKED-IN)
     ;; Check if within valid window
-    (if (is-check-in-valid last-check-in)
-      ;; Valid check-in: increment streak
-      (begin
-        (map-set habits
-          { habit-id: habit-id }
-          (merge habit {
-            current-streak: (+ current-streak u1),
-            last-check-in-block: block-height
-          })
-        )
-        ;; Emit event
-        (print {
-          event: "habit-checked-in",
-          habit-id: habit-id,
-          owner: caller,
-          new-streak: (+ current-streak u1),
-          block: block-height
-        })
-        (ok (+ current-streak u1))
-      )
-      ;; Missed window: return error (use slash-habit to forfeit)
-      ERR-CHECK-IN-WINDOW-EXPIRED
+   (if (is-check-in-valid last-check-in)
+  ;; Valid check-in
+  (begin
+    (map-set habits
+      { habit-id: habit-id }
+      (merge habit {
+        current-streak: (+ current-streak u1),
+        last-check-in-block: block-height
+      })
     )
+    (print {
+      event: "habit-checked-in",
+      habit-id: habit-id,
+      owner: caller,
+      new-streak: (+ current-streak u1),
+      block: block-height
+    })
+    (ok (+ current-streak u1))
   )
+  ;; Window expired → auto slash
+  (begin
+    (var-set forfeited-pool-balance
+      (+ (var-get forfeited-pool-balance) stake-amount)
+    )
+    (map-set habits
+      { habit-id: habit-id }
+      (merge habit {
+        current-streak: u0,
+        is-active: false
+      })
+    )
+    (print {
+      event: "habit-auto-slashed",
+      habit-id: habit-id,
+      owner: caller,
+      amount: stake-amount,
+      block: block-height
+    })
+    ERR-CHECK-IN-WINDOW-EXPIRED
+  )
+)
 )
 
 ;; Slash a habit that has missed its check-in window
