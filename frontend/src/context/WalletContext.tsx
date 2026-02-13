@@ -27,6 +27,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const [walletState, setWalletState] = useState<WalletState>({
     isConnected: false,
     address: null,
+    balance: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -40,6 +41,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
           setWalletState({
             isConnected: true,
             address,
+            balance: 0, // Balance can be fetched separately if needed
           });
         }
       } catch (error) {
@@ -60,6 +62,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
         setWalletState({
           isConnected: true,
           address,
+          balance: 0, // Balance can be fetched separately if needed
         });
         setIsLoading(false);
       });
@@ -75,6 +78,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     setWalletState({
       isConnected: false,
       address: null,
+      balance: 0,
     });
   };
 
