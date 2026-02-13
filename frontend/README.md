@@ -14,7 +14,12 @@ npm install
 ```bash
 npm run dev
 ```
+or
 
+```bash
+cd frontend
+node node_modules/vite/bin/vite.js
+```
 Opens at http://localhost:3000
 
 ## Build
