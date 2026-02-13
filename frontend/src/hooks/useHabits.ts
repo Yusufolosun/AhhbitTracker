@@ -97,13 +97,13 @@ export const useHabits = () => {
       contractService.createHabit(name, stakeAmount),
     onSuccess: () => {
       // Invalidate queries to refetch data after transaction confirmation
-      queryClient.invalidateQueries({ queryKey: ['habits'] });
-      queryClient.invalidateQueries({ queryKey: ['userStats'] });
+      queryClient.invalidateQueries({ queryKey: ['habits', walletState.address] });
+      queryClient.invalidateQueries({ queryKey: ['userStats', walletState.address] });
       
       // Refetch again after additional delay to ensure blockchain state is updated
       setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: ['habits'] });
-        queryClient.invalidateQueries({ queryKey: ['userStats'] });
+        queryClient.invalidateQueries({ queryKey: ['habits', walletState.address] });
+        queryClient.invalidateQueries({ queryKey: ['userStats', walletState.address] });
       }, 5000); // Additional 5 second delay
     },
   });
@@ -112,8 +112,8 @@ export const useHabits = () => {
   const checkInMutation = useMutation({
     mutationFn: (habitId: number) => contractService.checkIn(habitId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['habits'] });
-      queryClient.invalidateQueries({ queryKey: ['userStats'] });
+      queryClient.invalidateQueries({ queryKey: ['habits', walletState.address] });
+      queryClient.invalidateQueries({ queryKey: ['userStats', walletState.address] });
     },
   });
 
@@ -121,8 +121,8 @@ export const useHabits = () => {
   const withdrawStakeMutation = useMutation({
     mutationFn: (habitId: number) => contractService.withdrawStake(habitId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['habits'] });
-      queryClient.invalidateQueries({ queryKey: ['userStats'] });
+      queryClient.invalidateQueries({ queryKey: ['habits', walletState.address] });
+      queryClient.invalidateQueries({ queryKey: ['userStats', walletState.address] });
       queryClient.invalidateQueries({ queryKey: ['poolBalance'] });
     },
   });
@@ -131,7 +131,7 @@ export const useHabits = () => {
   const claimBonusMutation = useMutation({
     mutationFn: (habitId: number) => contractService.claimBonus(habitId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['habits'] });
+      queryClient.invalidateQueries({ queryKey: ['habits', walletState.address] });
       queryClient.invalidateQueries({ queryKey: ['poolBalance'] });
     },
   });
