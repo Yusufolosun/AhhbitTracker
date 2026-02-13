@@ -24,9 +24,8 @@ export const useHabits = () => {
       
       // Parse habit IDs from result
       // get-user-habits returns: { habit-ids: (list) }
-      if (result.type === 'ok' && result.value) {
-        const habitIdsData = result.value.value;
-        const habitIds = habitIdsData['habit-ids']?.value || [];
+      if (result.value && result.value['habit-ids']) {
+        const habitIds = result.value['habit-ids'].value || [];
         console.log('Habit IDs:', habitIds);
         
         // Fetch each habit's details
@@ -72,12 +71,12 @@ export const useHabits = () => {
     queryFn: async () => {
       if (!walletState.address) return null;
       const result = await contractService.getUserStats(walletState.address);
+      console.log('getUserStats result:', result);
       
-      if (result.type === 'ok') {
-        const stats = result.value.value;
-        const habitIdsValue = stats['habit-ids']?.value || [];
+      if (result.value) {
+        const habitIdsValue = result.value['habit-ids']?.value || [];
         return {
-          totalHabits: parseInt(stats['total-habits'].value),
+          totalHabits: parseInt(result.value['total-habits'].value),
           habitIds: habitIdsValue.map((id: any) => parseInt(id.value)),
         } as UserStats;
       }
