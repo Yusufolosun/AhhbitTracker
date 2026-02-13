@@ -17,7 +17,12 @@
     "analytics:streaks": "ts-node scripts/analytics/streak-analyzer.ts",
     "analytics:pool": "ts-node scripts/analytics/pool-tracker.ts",
     "analytics:activity": "ts-node scripts/analytics/user-activity.ts",
-    "analytics:dashboard": "ts-node scripts/analytics/dashboard.ts"
+    "analytics:dashboard": "ts-node scripts/analytics/dashboard.ts",
+    "dev:inspect": "ts-node scripts/dev-tools/inspect-contract.ts",
+    "dev:test": "ts-node scripts/dev-tools/test-function.ts",
+    "dev:nonce": "ts-node scripts/dev-tools/get-nonce.ts",
+    "dev:balance": "ts-node scripts/dev-tools/check-balance.ts",
+    "dev:track": "ts-node scripts/dev-tools/track-transaction.ts"
   },
   "author": "",
   "license": "ISC",
