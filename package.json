@@ -32,7 +32,8 @@
     "@stacks/clarinet-sdk": "^3.9.0",
     "@stacks/transactions": "^7.2.0",
     "@types/node": "^24.4.0",
-    "chokidar-cli": "^3.0.0"
+    "chokidar-cli": "^3.0.0",
+    "object-hash": "^3.0.0"
   },
   "devDependencies": {
     "@stacks/network": "^7.3.1",
