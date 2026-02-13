@@ -4,26 +4,30 @@ import { HabitCard } from '../components/HabitCard';
 import { Habit } from '../types/habit';
 
 const mockHabit: Habit = {
-  id: 1,
+  habitId: 1,
   name: 'Morning Exercise',
   owner: 'SP2ABC123',
   stakeAmount: 1000000,
-  createdAt: Date.now(),
-  lastCheckIn: Date.now() - 86400000,
+  lastCheckInBlock: 100,
   currentStreak: 5,
-  longestStreak: 10,
-  totalCheckIns: 25,
   isActive: true,
+  isCompleted: false,
 };
 
 describe('HabitCard', () => {
   it('renders habit name', () => {
-    render(<HabitCard habit={mockHabit} onCheckIn={vi.fn()} />);
+    render(<HabitCard habit={mockHabit} onUpdate={vi.fn()} />);
     expect(screen.getByText('Morning Exercise')).toBeInTheDocument();
   });
 
   it('displays current streak', () => {
-    render(<HabitCard habit={mockHabit} onCheckIn={vi.fn()} />);
-    expect(screen.getByText(/5/)).toBeInTheDocument();
+    render(<HabitCard habit={mockHabit} onUpdate={vi.fn()} />);
+    expect(screen.getByText('5')).toBeInTheDocument();
+  });
+
+  it('shows active status', () => {
+    render(<HabitCard habit={mockHabit} onUpdate={vi.fn()} />);
+    expect(screen.getByText('🟢 Active')).toBeInTheDocument();
   });
 });
+
