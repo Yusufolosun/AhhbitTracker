@@ -96,9 +96,15 @@ export const useHabits = () => {
     mutationFn: ({ name, stakeAmount }: { name: string; stakeAmount: number }) =>
       contractService.createHabit(name, stakeAmount),
     onSuccess: () => {
-      // Invalidate queries to refetch data
+      // Invalidate queries to refetch data after transaction confirmation
       queryClient.invalidateQueries({ queryKey: ['habits'] });
       queryClient.invalidateQueries({ queryKey: ['userStats'] });
+      
+      // Refetch again after additional delay to ensure blockchain state is updated
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['habits'] });
+        queryClient.invalidateQueries({ queryKey: ['userStats'] });
+      }, 5000); // Additional 5 second delay
     },
   });
 
