@@ -57,7 +57,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const connect = async () => {
     setIsLoading(true);
     try {
-      walletService.connect((payload) => {
+      walletService.connect(() => {
         const address = walletService.getAddress();
         setWalletState({
           isConnected: true,
