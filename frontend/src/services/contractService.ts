@@ -5,20 +5,41 @@ import {
   principalCV,
   callReadOnlyFunction,
   cvToJSON,
+  PostConditionMode,
+  makeStandardSTXPostCondition,
+  FungibleConditionCode,
+  makeContractSTXPostCondition,
 } from '@stacks/transactions';
 import { CONTRACT_ADDRESS, CONTRACT_NAME, NETWORK } from '../utils/constants';
+import { walletService } from './walletService';
 
 export const contractService = {
   /**
    * Create a new habit
    */
   async createHabit(name: string, stakeAmount: number): Promise<void> {
+    const userAddress = walletService.getAddress();
+    if (!userAddress) {
+      throw new Error('Wallet not connected');
+    }
+
+    // Post-condition: User must transfer exactly the stake amount to the contract
+    const postConditions = [
+      makeStandardSTXPostCondition(
+        userAddress,
+        FungibleConditionCode.Equal,
+        stakeAmount
+      ),
+    ];
+
     return openContractCall({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
       functionName: 'create-habit',
       functionArgs: [stringUtf8CV(name), uintCV(stakeAmount)],
       network: NETWORK,
+      postConditions,
+      postConditionMode: PostConditionMode.Deny,
       appDetails: {
         name: 'AhhbitTracker',
         icon: window.location.origin + '/logo.svg',
@@ -50,12 +71,29 @@ export const contractService = {
    * Withdraw stake
    */
   async withdrawStake(habitId: number): Promise<void> {
+    const userAddress = walletService.getAddress();
+    if (!userAddress) {
+      throw new Error('Wallet not connected');
+    }
+
+    // Post-condition: Contract must transfer at least 0 STX (actual amount determined by contract)
+    const postConditions = [
+      makeContractSTXPostCondition(
+        CONTRACT_ADDRESS,
+        CONTRACT_NAME,
+        FungibleConditionCode.GreaterEqual,
+        0
+      ),
+    ];
+
     return openContractCall({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
       functionName: 'withdraw-stake',
       functionArgs: [uintCV(habitId)],
       network: NETWORK,
+      postConditions,
+      postConditionMode: PostConditionMode.Deny,
       appDetails: {
         name: 'AhhbitTracker',
         icon: window.location.origin + '/logo.svg',
@@ -67,12 +105,29 @@ export const contractService = {
    * Claim bonus
    */
   async claimBonus(habitId: number): Promise<void> {
+    const userAddress = walletService.getAddress();
+    if (!userAddress) {
+      throw new Error('Wallet not connected');
+    }
+
+    // Post-condition: Contract must transfer at least 0 STX (actual amount determined by contract)
+    const postConditions = [
+      makeContractSTXPostCondition(
+        CONTRACT_ADDRESS,
+        CONTRACT_NAME,
+        FungibleConditionCode.GreaterEqual,
+        0
+      ),
+    ];
+
     return openContractCall({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
       functionName: 'claim-bonus',
       functionArgs: [uintCV(habitId)],
       network: NETWORK,
+      postConditions,
+      postConditionMode: PostConditionMode.Deny,
       appDetails: {
         name: 'AhhbitTracker',
         icon: window.location.origin + '/logo.svg',
