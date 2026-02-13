@@ -4,11 +4,6 @@ import { useWallet } from '../context/WalletContext';
 export function WalletConnect() {
   const { connect, isLoading } = useWallet();
 
-  const handleConnect = () => {
-    console.log('Connect button clicked');
-    connect();
-  };
-
   return (
     <div className="card max-w-md mx-auto text-center animate-fade-in">
       <div className="mb-6">
@@ -26,7 +21,7 @@ export function WalletConnect() {
       </div>
 
       <button
-        onClick={handleConnect}
+        onClick={connect}
         disabled={isLoading}
         className="btn-primary w-full mb-4"
       >
