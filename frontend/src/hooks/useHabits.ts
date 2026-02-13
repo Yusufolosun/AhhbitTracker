@@ -34,7 +34,8 @@ export const useHabits = () => {
           const habitData = await contractService.getHabit(habitId);
           console.log(`Habit ${habitId} data:`, habitData);
           
-          if (habitData.type === 'some') {
+          // Check if optional value exists (habitData.value will be the tuple)
+          if (habitData.value && habitData.value.value) {
             const habit = habitData.value.value;
             return {
               habitId: habitId,
@@ -73,10 +74,12 @@ export const useHabits = () => {
       const result = await contractService.getUserStats(walletState.address);
       console.log('getUserStats result:', result);
       
-      if (result.value) {
-        const habitIdsValue = result.value['habit-ids']?.value || [];
+      // get-user-stats returns a response type
+      if (result.success && result.value && result.value.value) {
+        const stats = result.value.value;
+        const habitIdsValue = stats['habit-ids']?.value || [];
         return {
-          totalHabits: parseInt(result.value['total-habits'].value),
+          totalHabits: parseInt(stats['total-habits'].value),
           habitIds: habitIdsValue.map((id: any) => parseInt(id.value)),
         } as UserStats;
       }
