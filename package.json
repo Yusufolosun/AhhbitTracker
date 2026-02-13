@@ -13,7 +13,11 @@
     "verify:mainnet": "ts-node scripts/verify-mainnet.ts",
     "test:mainnet": "ts-node scripts/test-mainnet-transactions.ts",
     "stats": "ts-node scripts/contract-stats.ts",
-    "query": "ts-node scripts/batch-query.ts"
+    "query": "ts-node scripts/batch-query.ts",
+    "analytics:streaks": "ts-node scripts/analytics/streak-analyzer.ts",
+    "analytics:pool": "ts-node scripts/analytics/pool-tracker.ts",
+    "analytics:activity": "ts-node scripts/analytics/user-activity.ts",
+    "analytics:dashboard": "ts-node scripts/analytics/dashboard.ts"
   },
   "author": "",
   "license": "ISC",
