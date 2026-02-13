@@ -1,4 +1,3 @@
-import React from 'react';
 import { Habit } from '../types/habit';
 import { HabitCard } from './HabitCard';
 
