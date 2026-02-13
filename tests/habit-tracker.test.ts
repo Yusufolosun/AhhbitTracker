@@ -248,6 +248,31 @@ describe("AhhbitTracker Contract", () => {
       const result = checkIn(user1, habitId);
       expect(result.result).toBeErr(Cl.uint(108)); // ERR-HABIT-ALREADY-COMPLETED (inactive)
     });
+    it("should auto-slash when owner checks in after window expired", () => {
+  // First check-in
+  checkIn(user1, habitId);
+
+  // Move beyond CHECK-IN-WINDOW (144)
+  simnet.mineEmptyBlocks(150);
+
+  // Attempt late check-in
+  const result = checkIn(user1, habitId);
+
+  // Should return window expired error
+  expect(result.result).toBeErr(Cl.uint(106)); // ERR-CHECK-IN-WINDOW-EXPIRED
+
+  // Habit should now be inactive
+  const habit = getHabit(habitId);
+  const data = (habit.result as any).value.data;
+
+  expect(data["is-active"]).toEqual(Cl.bool(false));
+  expect(data["current-streak"]).toEqual(Cl.uint(0));
+
+  // Pool should receive stake
+  const poolBalance = simnet.getDataVar("habit-tracker", "forfeited-pool-balance");
+  expect(poolBalance).toBeUint(MIN_STAKE);
+});
+
 
   });
 
