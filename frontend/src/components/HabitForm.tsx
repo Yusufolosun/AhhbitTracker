@@ -60,7 +60,7 @@ export function HabitForm() {
             onChange={(e) => setName(e.target.value)}
             maxLength={50}
             required
-            disabled={loading}
+            disabled={isCreatingHabit}
           />
           <p className="mt-1 text-xs text-gray-500">
             {name.length}/50 characters
