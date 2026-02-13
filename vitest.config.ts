@@ -21,7 +21,7 @@ import {
 
 export default defineConfig({
   test: {
-    // use vitest-environment-clarinet
+    // use vitest-environment-clarinet for Clarity tests
     environment: "clarinet",
     pool: "forks",
     // clarinet handles test isolation by resetting the simnet between tests
@@ -37,6 +37,15 @@ export default defineConfig({
         // add or override options
       },
     },
+    // Exclude frontend tests from default Clarinet environment
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/cypress/**',
+      '**/.{idea,git,cache,output,temp}/**',
+      'frontend/src/__tests__/**',
+    ],
   },
 });
+
 
