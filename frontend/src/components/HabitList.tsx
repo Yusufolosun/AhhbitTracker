@@ -4,10 +4,9 @@ import { HabitCard } from './HabitCard';
 interface HabitListProps {
   habits: Habit[];
   loading: boolean;
-  onUpdate?: () => void;
 }
 
-export function HabitList({ habits, loading, onUpdate }: HabitListProps) {
+export function HabitList({ habits, loading }: HabitListProps) {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-12">
@@ -49,7 +48,7 @@ export function HabitList({ habits, loading, onUpdate }: HabitListProps) {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {activeHabits.map((habit) => (
-              <HabitCard key={habit.habitId} habit={habit} onUpdate={onUpdate} />
+              <HabitCard key={habit.habitId} habit={habit} />
             ))}
           </div>
         </div>
@@ -63,7 +62,7 @@ export function HabitList({ habits, loading, onUpdate }: HabitListProps) {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {completedHabits.map((habit) => (
-              <HabitCard key={habit.habitId} habit={habit} onUpdate={onUpdate} />
+              <HabitCard key={habit.habitId} habit={habit} />
             ))}
           </div>
         </div>
@@ -77,7 +76,7 @@ export function HabitList({ habits, loading, onUpdate }: HabitListProps) {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 opacity-60">
             {inactiveHabits.map((habit) => (
-              <HabitCard key={habit.habitId} habit={habit} onUpdate={onUpdate} />
+              <HabitCard key={habit.habitId} habit={habit} />
             ))}
           </div>
         </div>

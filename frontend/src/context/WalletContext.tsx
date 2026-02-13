@@ -55,17 +55,18 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const connect = async () => {
     setIsLoading(true);
     try {
-      await walletService.connect();
-      const address = await walletService.getAddress();
-      setWalletState({
-        isConnected: true,
-        address,
+      walletService.connect(() => {
+        const address = walletService.getAddress();
+        setWalletState({
+          isConnected: true,
+          address,
+        });
+        setIsLoading(false);
       });
     } catch (error) {
       console.error('Error connecting wallet:', error);
-      throw error;
-    } finally {
       setIsLoading(false);
+      throw error;
     }
   };
 
