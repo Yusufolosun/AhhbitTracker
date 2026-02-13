@@ -55,10 +55,13 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   }, []);
 
   const connect = async () => {
+    console.log('Connect function called');
     setIsLoading(true);
     try {
-      walletService.connect(() => {
+      walletService.connect((payload) => {
+        console.log('Wallet connected with payload:', payload);
         const address = walletService.getAddress();
+        console.log('Retrieved address:', address);
         setWalletState({
           isConnected: true,
           address,

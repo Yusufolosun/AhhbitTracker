@@ -2,7 +2,12 @@ import React from 'react';
 import { useWallet } from '../context/WalletContext';
 
 export function WalletConnect() {
-  const { connect } = useWallet();
+  const { connect, isLoading } = useWallet();
+
+  const handleConnect = () => {
+    console.log('Connect button clicked');
+    connect();
+  };
 
   return (
     <div className="card max-w-md mx-auto text-center animate-fade-in">
@@ -21,10 +26,11 @@ export function WalletConnect() {
       </div>
 
       <button
-        onClick={connect}
+        onClick={handleConnect}
+        disabled={isLoading}
         className="btn-primary w-full mb-4"
       >
-        Connect Wallet
+        {isLoading ? 'Connecting...' : 'Connect Wallet'}
       </button>
 
       <div className="text-sm text-gray-500">

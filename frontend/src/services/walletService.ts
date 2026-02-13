@@ -9,14 +9,18 @@ export const walletService = {
   /**
    * Connect wallet
    */
-  connect: (onFinish: () => void) => {
+  connect: (onFinish?: (payload: any) => void) => {
     showConnect({
       appDetails: {
         name: 'AhhbitTracker',
         icon: window.location.origin + '/logo.svg',
       },
       redirectTo: '/',
-      onFinish,
+      onFinish: (payload) => {
+        if (onFinish) {
+          onFinish(payload);
+        }
+      },
       userSession,
     });
   },
