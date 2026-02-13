@@ -32,21 +32,30 @@ export const contractService = {
       ),
     ];
 
-    return openContractCall({
-      contractAddress: CONTRACT_ADDRESS,
-      contractName: CONTRACT_NAME,
-      functionName: 'create-habit',
-      functionArgs: [stringUtf8CV(name), uintCV(stakeAmount)],
-      network: NETWORK,
-      postConditions,
-      postConditionMode: PostConditionMode.Deny,
-      appDetails: {
-        name: 'AhhbitTracker',
-        icon: window.location.origin + '/logo.svg',
-      },
-      onFinish: (data) => {
-        console.log('Transaction submitted:', data.txId);
-      },
+    return new Promise((resolve, reject) => {
+      openContractCall({
+        contractAddress: CONTRACT_ADDRESS,
+        contractName: CONTRACT_NAME,
+        functionName: 'create-habit',
+        functionArgs: [stringUtf8CV(name), uintCV(stakeAmount)],
+        network: NETWORK,
+        postConditions,
+        postConditionMode: PostConditionMode.Deny,
+        appDetails: {
+          name: 'AhhbitTracker',
+          icon: window.location.origin + '/logo.svg',
+        },
+        onFinish: (data) => {
+          console.log('Transaction submitted:', data.txId);
+          // Resolve after a delay to allow for block confirmation
+          setTimeout(() => {
+            resolve();
+          }, 3000); // Wait 3 seconds for block confirmation
+        },
+        onCancel: () => {
+          reject(new Error('Transaction cancelled'));
+        },
+      });
     });
   },
 
