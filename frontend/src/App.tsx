@@ -24,10 +24,10 @@ const queryClient = new QueryClient({
 });
 
 function AppContent() {
-  const { address, isConnected } = useWallet();
-  const { habits, loading, refetch } = useHabits(address);
+  const { walletState } = useWallet();
+  const { habits, isLoadingHabits } = useHabits();
 
-  if (!isConnected) {
+  if (!walletState.isConnected) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
         <WalletConnect />
@@ -48,12 +48,12 @@ function AppContent() {
           <PoolDisplay />
 
           {/* Create Habit Form */}
-          <HabitForm onSuccess={refetch} />
+          <HabitForm />
 
           {/* Habit List */}
           <div>
             <h2 className="text-2xl font-bold text-gray-900 mb-6">My Habits</h2>
-            <HabitList habits={habits} loading={loading} onUpdate={refetch} />
+            <HabitList habits={habits} loading={isLoadingHabits} />
           </div>
         </div>
       </main>

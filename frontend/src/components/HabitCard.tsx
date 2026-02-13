@@ -1,50 +1,25 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Habit } from '../types/habit';
-import { contractService } from '../services/contractService';
+import { useHabits } from '../hooks/useHabits';
 import { formatSTX, blocksToTime } from '../utils/formatting';
 
 interface HabitCardProps {
   habit: Habit;
-  onUpdate?: () => void;
 }
 
-export function HabitCard({ habit, onUpdate }: HabitCardProps) {
-  const [loading, setLoading] = useState<'checkin' | 'withdraw' | 'bonus' | null>(null);
+export function HabitCard({ habit }: HabitCardProps) {
+  const { checkIn, withdrawStake, claimBonus, isCheckingIn, isWithdrawing, isClaiming } = useHabits();
 
-  const handleCheckIn = async () => {
-    try {
-      setLoading('checkin');
-      await contractService.checkIn(habit.habitId);
-      if (onUpdate) onUpdate();
-    } catch (err) {
-      console.error('Check-in failed:', err);
-    } finally {
-      setLoading(null);
-    }
+  const handleCheckIn = () => {
+    checkIn(habit.habitId);
   };
 
-  const handleWithdraw = async () => {
-    try {
-      setLoading('withdraw');
-      await contractService.withdrawStake(habit.habitId);
-      if (onUpdate) onUpdate();
-    } catch (err) {
-      console.error('Withdrawal failed:', err);
-    } finally {
-      setLoading(null);
-    }
+  const handleWithdraw = () => {
+    withdrawStake(habit.habitId);
   };
 
-  const handleClaimBonus = async () => {
-    try {
-      setLoading('bonus');
-      await contractService.claimBonus(habit.habitId);
-      if (onUpdate) onUpdate();
-    } catch (err) {
-      console.error('Claim bonus failed:', err);
-    } finally {
-      setLoading(null);
-    }
+  const handleClaimBonus = () => {
+    claimBonus(habit.habitId);
   };
 
   const canWithdraw = habit.currentStreak >= 7 && habit.isActive;
@@ -101,30 +76,30 @@ export function HabitCard({ habit, onUpdate }: HabitCardProps) {
         {habit.isActive && (
           <button
             onClick={handleCheckIn}
-            disabled={loading === 'checkin'}
+            disabled={isCheckingIn}
             className="btn-primary w-full"
           >
-            {loading === 'checkin' ? 'Checking In...' : 'Check In'}
+            {isCheckingIn ? 'Checking In...' : 'Check In'}
           </button>
         )}
 
         {canWithdraw && (
           <button
             onClick={handleWithdraw}
-            disabled={loading === 'withdraw'}
+            disabled={isWithdrawing}
             className="btn-secondary w-full"
           >
-            {loading === 'withdraw' ? 'Withdrawing...' : 'Withdraw Stake'}
+            {isWithdrawing ? 'Withdrawing...' : 'Withdraw Stake'}
           </button>
         )}
 
         {canClaimBonus && (
           <button
             onClick={handleClaimBonus}
-            disabled={loading === 'bonus'}
+            disabled={isClaiming}
             className="btn-secondary w-full"
           >
-            {loading === 'bonus' ? 'Claiming...' : 'Claim Bonus'}
+            {isClaiming ? 'Claiming...' : 'Claim Bonus'}
           </button>
         )}
       </div>
