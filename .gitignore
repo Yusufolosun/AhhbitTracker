@@ -162,3 +162,9 @@ scripts/.wallet-*
 # ============================================
 transaction-automation/node
 transaction-automation/ahhbittracker-transaction-automation@*
+
+# ============================================
+# ANALYTICS DATA
+# ============================================
+scripts/analytics/pool-history.json
+scripts/analytics/*.data.json
