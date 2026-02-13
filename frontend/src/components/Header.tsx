@@ -3,7 +3,7 @@ import { useWallet } from '../context/WalletContext';
 import { shortenAddress } from '../utils/formatting';
 
 export function Header() {
-  const { address, isConnected, connect, disconnect } = useWallet();
+  const { walletState, connect, disconnect } = useWallet();
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -34,12 +34,12 @@ export function Header() {
 
           {/* Wallet Connection */}
           <div className="flex items-center space-x-4">
-            {isConnected ? (
+            {walletState.isConnected ? (
               <>
                 <div className="hidden sm:flex items-center space-x-2 px-4 py-2 bg-gray-100 rounded-lg">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                   <span className="text-sm font-medium text-gray-700">
-                    {shortenAddress(address!)}
+                    {shortenAddress(walletState.address!)}
                   </span>
                 </div>
                 <button
