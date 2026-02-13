@@ -14,3 +14,20 @@ export interface UserStats {
   totalHabits: number;
   habitIds: number[];
 }
+
+export interface PoolBalance {
+  balance: number;
+  balanceSTX: number;
+}
+
+export interface TransactionResult {
+  txId: string;
+  success: boolean;
+  error?: string;
+}
+
+export interface WalletState {
+  address: string | null;
+  isConnected: boolean;
+  balance: number;
+}
