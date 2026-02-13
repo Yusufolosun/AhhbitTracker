@@ -20,35 +20,40 @@ export const useHabits = () => {
     queryFn: async () => {
       if (!walletState.address) return [];
       const result = await contractService.getUserHabits(walletState.address);
+      console.log('getUserHabits result:', result);
       
       // Parse habit IDs from result
+      // get-user-habits returns: { habit-ids: (list) }
       if (result.type === 'ok' && result.value) {
-        const habitIds = result.value.value || [];
+        const habitIdsData = result.value.value;
+        const habitIds = habitIdsData['habit-ids']?.value || [];
+        console.log('Habit IDs:', habitIds);
         
         // Fetch each habit's details
         const habitPromises = habitIds.map(async (id: any) => {
           const habitId = parseInt(id.value);
           const habitData = await contractService.getHabit(habitId);
+          console.log(`Habit ${habitId} data:`, habitData);
           
           if (habitData.type === 'some') {
             const habit = habitData.value.value;
             return {
-              id: habitId,
+              habitId: habitId,
               name: habit.name.value,
               owner: habit.owner.value,
               stakeAmount: parseInt(habit['stake-amount'].value),
-              createdAt: parseInt(habit['created-at'].value),
-              lastCheckIn: parseInt(habit['last-check-in'].value),
+              createdAtBlock: parseInt(habit['created-at-block'].value),
+              lastCheckInBlock: parseInt(habit['last-check-in-block'].value),
               currentStreak: parseInt(habit['current-streak'].value),
-              longestStreak: parseInt(habit['longest-streak'].value),
-              totalCheckIns: parseInt(habit['total-check-ins'].value),
               isActive: habit['is-active'].value,
+              isCompleted: habit['is-completed'].value,
             } as Habit;
           }
           return null;
         });
 
         const habitsData = await Promise.all(habitPromises);
+        console.log('Fetched habits:', habitsData);
         return habitsData.filter((h): h is Habit => h !== null);
       }
       
@@ -68,13 +73,12 @@ export const useHabits = () => {
       if (!walletState.address) return null;
       const result = await contractService.getUserStats(walletState.address);
       
-      if (result.type === 'some') {
+      if (result.type === 'ok') {
         const stats = result.value.value;
+        const habitIdsValue = stats['habit-ids']?.value || [];
         return {
           totalHabits: parseInt(stats['total-habits'].value),
-          activeHabits: parseInt(stats['active-habits'].value),
-          totalCheckIns: parseInt(stats['total-check-ins'].value),
-          totalStaked: parseInt(stats['total-staked'].value),
+          habitIds: habitIdsValue.map((id: any) => parseInt(id.value)),
         } as UserStats;
       }
       
