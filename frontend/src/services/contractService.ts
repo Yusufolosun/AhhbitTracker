@@ -136,7 +136,7 @@ export const contractService = {
     const result = await callReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
-      functionName: 'get-forfeited-pool-balance',
+      functionName: 'get-pool-balance',
       functionArgs: [],
       network: NETWORK,
       senderAddress: CONTRACT_ADDRESS,
