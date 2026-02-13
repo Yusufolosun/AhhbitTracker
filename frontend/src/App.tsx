@@ -27,8 +27,6 @@ function AppContent() {
   const { walletState } = useWallet();
   const { habits, isLoadingHabits } = useHabits();
 
-  console.log('AppContent - walletState:', walletState);
-
   if (!walletState.isConnected) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
