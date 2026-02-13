@@ -1,5 +1,9 @@
 # AhhbitTracker
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Stacks](https://img.shields.io/badge/Stacks-Mainnet-5546FF)](https://www.stacks.co/)
+[![Clarity](https://img.shields.io/badge/Clarity-v2-blue)](https://docs.stacks.co/clarity)
+
 On-chain habit tracker with staking accountability on Stacks blockchain.
 
 ## Overview
