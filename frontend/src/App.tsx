@@ -1,4 +1,5 @@
 import React from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WalletProvider, useWallet } from './context/WalletContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Header } from './components/Header';
@@ -10,6 +11,17 @@ import { HabitList } from './components/HabitList';
 import { PoolDisplay } from './components/PoolDisplay';
 import { useHabits } from './hooks/useHabits';
 import './styles/global.css';
+
+// Create a react-query client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+      staleTime: 30000, // 30 seconds
+    },
+  },
+});
 
 function AppContent() {
   const { address, isConnected } = useWallet();
@@ -54,9 +66,11 @@ function AppContent() {
 export function App() {
   return (
     <ErrorBoundary>
-      <WalletProvider>
-        <AppContent />
-      </WalletProvider>
+      <QueryClientProvider client={queryClient}>
+        <WalletProvider>
+          <AppContent />
+        </WalletProvider>
+      </QueryClientProvider>
     </ErrorBoundary>
   );
 }
