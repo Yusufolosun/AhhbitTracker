@@ -1,0 +1,40 @@
+# Environment variables (CONTAINS PRIVATE KEYS!)
+.env
+.env.local
+.env.*.local
+
+# Logs and transaction history
+logs/*.log
+logs/*.json
+logs/transaction-*.txt
+
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Backup files
+*.backup
+*.bak
