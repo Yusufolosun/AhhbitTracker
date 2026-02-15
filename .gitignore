@@ -168,3 +168,11 @@ transaction-automation/ahhbittracker-transaction-automation@*
 # ============================================
 scripts/analytics/pool-history.json
 scripts/analytics/*.data.json
+
+# ============================================
+# TRANSACTION AUTOMATION - ADDITIONAL SECURITY
+# ============================================
+scripts/.env*
+scripts/wallet-keys.txt
+**/mnemonic*.txt
+**/private-key*.txt

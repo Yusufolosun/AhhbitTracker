@@ -22,7 +22,10 @@
     "dev:test": "ts-node scripts/dev-tools/test-function.ts",
     "dev:nonce": "ts-node scripts/dev-tools/get-nonce.ts",
     "dev:balance": "ts-node scripts/dev-tools/check-balance.ts",
-    "dev:track": "ts-node scripts/dev-tools/track-transaction.ts"
+    "dev:track": "ts-node scripts/dev-tools/track-transaction.ts",
+    "extract-keys": "ts-node --project scripts/tsconfig.scripts.json scripts/extract-wallet-keys.ts",
+    "dry-run": "ts-node --project scripts/tsconfig.scripts.json scripts/dry-run-test.ts",
+    "tx:execute": "ts-node --project scripts/tsconfig.scripts.json scripts/execute-40-transactions-enhanced.ts"
   },
   "author": "",
   "license": "ISC",
@@ -31,8 +34,10 @@
     "@scure/bip39": "^1.2.1",
     "@stacks/clarinet-sdk": "^3.9.0",
     "@stacks/transactions": "^7.2.0",
+    "@stacks/wallet-sdk": "^7.2.0",
     "@types/node": "^24.4.0",
     "chokidar-cli": "^3.0.0",
+    "dotenv": "^17.3.1",
     "object-hash": "^3.0.0"
   },
   "devDependencies": {
