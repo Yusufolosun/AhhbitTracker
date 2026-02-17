@@ -1,9 +1,32 @@
 {
-  "name": "AhhbitTracker-tests",
+  "name": "ahhbittracker",
   "version": "1.0.0",
-  "description": "Run unit tests on this project.",
+  "description": "Build lasting habits with blockchain accountability. Stake STX, track streaks, earn rewards on Stacks blockchain.",
   "type": "module",
   "private": true,
+  "keywords": [
+    "stacks",
+    "blockchain",
+    "habit-tracker",
+    "clarity",
+    "smart-contract",
+    "web3",
+    "stx",
+    "accountability",
+    "productivity"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yusufolosun/AhhbitTracker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Yusufolosun/AhhbitTracker/issues"
+  },
+  "homepage": "https://github.com/Yusufolosun/AhhbitTracker#readme",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
   "scripts": {
     "test": "vitest run",
     "test:report": "vitest run -- --coverage --costs",

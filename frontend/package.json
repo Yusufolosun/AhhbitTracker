@@ -1,8 +1,31 @@
 {
   "name": "ahhbittracker-frontend",
   "version": "1.0.0",
+  "description": "Frontend dApp for AhhbitTracker - A blockchain-based habit tracking platform on Stacks",
   "private": true,
   "type": "module",
+  "keywords": [
+    "react",
+    "stacks",
+    "blockchain",
+    "habit-tracker",
+    "web3",
+    "dapp",
+    "frontend"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yusufolosun/AhhbitTracker.git",
+    "directory": "frontend"
+  },
+  "bugs": {
+    "url": "https://github.com/Yusufolosun/AhhbitTracker/issues"
+  },
+  "homepage": "https://github.com/Yusufolosun/AhhbitTracker#readme",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",

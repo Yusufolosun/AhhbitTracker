@@ -1,0 +1,37 @@
+# CODEOWNERS file for AhhbitTracker
+# This file defines who is responsible for code review in different parts of the repository
+# Format: path/pattern @username @team-name
+
+# Global owner - will be requested for review on all PRs unless a specific rule matches
+* @Yusufolosun
+
+# Smart Contracts - require careful review for security and correctness
+/contracts/ @Yusufolosun
+/contracts/**/*.clar @Yusufolosun
+Clarinet.toml @Yusufolosun
+
+# Tests - ensure test coverage and quality
+/tests/ @Yusufolosun
+**/*.test.ts @Yusufolosun
+
+# Frontend - UI/UX and user-facing code
+/frontend/ @Yusufolosun
+/frontend/src/components/ @Yusufolosun
+
+# Documentation - maintain accuracy and clarity
+/docs/ @Yusufolosun
+README.md @Yusufolosun
+CONTRIBUTING.md @Yusufolosun
+
+# Build & Configuration
+package.json @Yusufolosun
+tsconfig.json @Yusufolosun
+vite.config.ts @Yusufolosun
+
+# CI/CD and DevOps
+/.github/ @Yusufolosun
+/.github/workflows/ @Yusufolosun
+
+# Security-sensitive files
+SECURITY_AUDIT_REPORT.md @Yusufolosun
+.env.example @Yusufolosun

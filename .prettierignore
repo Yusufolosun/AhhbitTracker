@@ -1,0 +1,33 @@
+# Ignore build outputs
+dist
+build
+coverage
+.cache
+.clarinet
+
+# Ignore dependencies
+node_modules
+.pnpm-store
+
+# Ignore generated files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Ignore environment files
+.env*
+!.env.example
+
+# Ignore logs
+*.log
+
+# Ignore Clarity generated files
+costs-reports.json
+deployments/
+
+# Ignore git
+.git
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
