@@ -1,4 +1,3 @@
-import React from 'react';
 import { useWallet } from '../context/WalletContext';
 import { shortenAddress } from '../utils/formatting';
 
@@ -27,7 +26,7 @@ export function Header() {
             <a href="#pool" className="text-gray-700 hover:text-primary-500 transition-colors">
               Pool
             </a>
-            <a href="#docs" className="text-gray-700 hover:text-primary-500 transition-colors">
+            <a href="https://github.com/Yusufolosun/AhhbitTracker#readme" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-primary-500 transition-colors">
               Docs
             </a>
           </nav>
