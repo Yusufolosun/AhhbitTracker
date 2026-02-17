@@ -132,13 +132,18 @@ fix_encoding.py
 settings/*.toml
 
 # ============================================
-# TRANSACTION SCRIPTS (CRITICAL - Contains private keys)
+# TRANSACTION AUTOMATION (CRITICAL - Keep local only)
 # ============================================
+# Automation scripts (private, not for public repo)
 scripts/transaction-executor.env
+scripts/execute-40-transactions-enhanced.ts
+scripts/dry-run-test.ts
+scripts/extract-wallet-keys.ts
+scripts/tsconfig.scripts.json
+scripts/transaction-results.json
 scripts/.wallet-config
 scripts/private-keys.json
 scripts/transaction-history.json
-scripts/transaction-results.json
 scripts/wallet-backup.json
 
 # User Wallet Data
@@ -157,11 +162,7 @@ test-wallet-*.json
 scripts/*-private-key.txt
 scripts/.wallet-*
 
-# ============================================
-# ACCIDENTALLY CREATED FILES
-# ============================================
-transaction-automation/node
-transaction-automation/ahhbittracker-transaction-automation@*
+
 
 # ============================================
 # ANALYTICS DATA

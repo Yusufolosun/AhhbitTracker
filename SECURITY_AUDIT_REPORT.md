@@ -30,18 +30,18 @@ This security audit was conducted on the AhhbitTracker project, a blockchain-bas
 **Finding:** 
 
 - `.env` files properly excluded via `.gitignore`
-- Mnemonic phrase exists in `transaction-automation/.env` but is **NOT** tracked in git
+- Private keys stored in `scripts/transaction-executor.env` which is **NOT** tracked in git
 - No sensitive data found in git history
 - `.gitignore` properly configured with comprehensive exclusions
 
 **Verified:**
 ```bash
-# Confirmed .env is not tracked
-$ git ls-files transaction-automation/.env
+# Confirmed transaction-executor.env is not tracked
+$ git ls-files scripts/transaction-executor.env
 (no output - file not tracked)
 
-# Confirmed no history of .env file
-$ git log --all --full-history -- transaction-automation/.env
+# Confirmed no history of env file
+$ git log --all --full-history -- scripts/transaction-executor.env
 (no commits found)
 ```
 
@@ -371,7 +371,6 @@ No **critical security vulnerabilities** were identified. The application is rea
 ### Configuration
 - `.gitignore`
 - `frontend/.gitignore`
-- `transaction-automation/.gitignore`
 - `.env.example` files
 
 ### Tests
