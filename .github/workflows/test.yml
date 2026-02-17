@@ -14,5 +14,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '18'
+      - name: Install Clarinet
+        run: |
+          curl -sL https://github.com/hirosystems/clarinet/releases/download/v2.14.2/clarinet-linux-x64-glibc.tar.gz | tar xz
+          sudo mv clarinet /usr/local/bin/
+          clarinet --version
       - run: npm ci
       - run: npm test
