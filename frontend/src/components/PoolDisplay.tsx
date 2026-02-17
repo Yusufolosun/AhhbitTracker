@@ -1,29 +1,8 @@
-import { useState, useEffect } from 'react';
-import { contractService } from '../services/contractService';
+import { useHabits } from '../hooks/useHabits';
 import { formatSTX } from '../utils/formatting';
 
 export function PoolDisplay() {
-  const [poolBalance, setPoolBalance] = useState<number>(0);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchPool() {
-      try {
-        const balance = await contractService.getPoolBalance();
-        setPoolBalance(balance);
-      } catch (err) {
-        console.error('Failed to fetch pool balance:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchPool();
-
-    // Poll every 30 seconds
-    const interval = setInterval(fetchPool, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  const { poolBalance, isLoadingHabits: loading } = useHabits();
 
   if (loading) {
     return (
