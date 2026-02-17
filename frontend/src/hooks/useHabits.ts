@@ -21,19 +21,19 @@ export const useHabits = () => {
       if (!walletState.address) return [];
       const result = await contractService.getUserHabits(walletState.address);
       console.log('getUserHabits result:', result);
-      
+
       // Parse habit IDs from result
       // get-user-habits returns: { habit-ids: (list) }
       if (result.value && result.value['habit-ids']) {
         const habitIds = result.value['habit-ids'].value || [];
         console.log('Habit IDs:', habitIds);
-        
+
         // Fetch each habit's details
         const habitPromises = habitIds.map(async (id: any) => {
           const habitId = parseInt(id.value);
           const habitData = await contractService.getHabit(habitId);
           console.log(`Habit ${habitId} data:`, habitData);
-          
+
           // Check if optional value exists (habitData.value will be the tuple)
           if (habitData.value && habitData.value.value) {
             const habit = habitData.value.value;
@@ -56,11 +56,13 @@ export const useHabits = () => {
         console.log('Fetched habits:', habitsData);
         return habitsData.filter((h): h is Habit => h !== null);
       }
-      
+
       return [];
     },
     enabled: !!walletState.address,
-    staleTime: 30000, // 30 seconds
+    staleTime: 120000, // 2 minutes - reduces API calls to stay under Hiro rate limits
+    retry: 3,
+    retryDelay: (attempt) => Math.min(15000 * Math.pow(2, attempt - 1), 60000),
   });
 
   // Fetch user stats
@@ -73,7 +75,7 @@ export const useHabits = () => {
       if (!walletState.address) return null;
       const result = await contractService.getUserStats(walletState.address);
       console.log('getUserStats result:', result);
-      
+
       // get-user-stats returns a response type
       if (result.success && result.value && result.value.value) {
         const stats = result.value.value;
@@ -83,18 +85,22 @@ export const useHabits = () => {
           habitIds: habitIdsValue.map((id: any) => parseInt(id.value)),
         } as UserStats;
       }
-      
+
       return null;
     },
     enabled: !!walletState.address,
-    staleTime: 30000,
+    staleTime: 120000,
+    retry: 3,
+    retryDelay: (attempt) => Math.min(15000 * Math.pow(2, attempt - 1), 60000),
   });
 
   // Fetch pool balance
   const { data: poolBalance } = useQuery({
     queryKey: ['poolBalance'],
     queryFn: () => contractService.getPoolBalance(),
-    staleTime: 60000, // 1 minute
+    staleTime: 300000, // 5 minutes - pool balance changes infrequently
+    retry: 3,
+    retryDelay: (attempt) => Math.min(15000 * Math.pow(2, attempt - 1), 60000),
   });
 
   // Create habit mutation
@@ -105,7 +111,7 @@ export const useHabits = () => {
       // Invalidate queries to refetch data after transaction confirmation
       queryClient.invalidateQueries({ queryKey: ['habits', walletState.address] });
       queryClient.invalidateQueries({ queryKey: ['userStats', walletState.address] });
-      
+
       // Refetch again after additional delay to ensure blockchain state is updated
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ['habits', walletState.address] });
@@ -147,20 +153,20 @@ export const useHabits = () => {
     habits: habits || [],
     userStats,
     poolBalance: poolBalance || 0,
-    
+
     // Loading states
     isLoadingHabits,
     isLoadingStats,
-    
+
     // Errors
     habitsError,
-    
+
     // Mutations
     createHabit: createHabitMutation.mutate,
     checkIn: checkInMutation.mutate,
     withdrawStake: withdrawStakeMutation.mutate,
     claimBonus: claimBonusMutation.mutate,
-    
+
     // Mutation states
     isCreatingHabit: createHabitMutation.isPending,
     isCheckingIn: checkInMutation.isPending,
