@@ -1,7 +1,6 @@
-import React from 'react';
 import { Habit } from '../types/habit';
 import { useHabits } from '../hooks/useHabits';
-import { formatSTX, blocksToTime } from '../utils/formatting';
+import { formatSTX } from '../utils/formatting';
 
 interface HabitCardProps {
   habit: Habit;
@@ -34,13 +33,12 @@ export function HabitCard({ habit }: HabitCardProps) {
             {habit.name}
           </h3>
           <div className="flex items-center space-x-2">
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-              habit.isActive 
-                ? 'bg-green-100 text-green-800' 
-                : habit.isCompleted 
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${habit.isActive
+              ? 'bg-green-100 text-green-800'
+              : habit.isCompleted
                 ? 'bg-blue-100 text-blue-800'
                 : 'bg-gray-100 text-gray-800'
-            }`}>
+              }`}>
               {habit.isActive ? '🟢 Active' : habit.isCompleted ? '✅ Completed' : '⚫ Inactive'}
             </span>
           </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { contractService } from '../services/contractService';
 import { formatSTX } from '../utils/formatting';
 

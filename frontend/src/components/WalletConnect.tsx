@@ -1,4 +1,3 @@
-import React from 'react';
 import { useWallet } from '../context/WalletContext';
 
 export function WalletConnect() {

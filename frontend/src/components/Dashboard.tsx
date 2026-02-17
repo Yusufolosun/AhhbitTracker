@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { Habit } from '../types/habit';
 import { StatsCard } from './StatsCard';
 import { formatSTX } from '../utils/formatting';
