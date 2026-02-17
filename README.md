@@ -94,6 +94,8 @@ npm test
 cd frontend
 npm run dev
 # Opens at http://localhost:3000
+
+# OR node node_modules/vite/bin/vite.js
 ```
 
 ### Testing
