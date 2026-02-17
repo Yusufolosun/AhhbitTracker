@@ -134,7 +134,8 @@ settings/*.toml
 # ============================================
 # TRANSACTION AUTOMATION (CRITICAL - Keep local only)
 # ============================================
-# Automation scripts (private, not for public repo)
+# Automation scripts and guides (private, not for public repo)
+MULTI_WALLET_AUTOMATION.md
 scripts/transaction-executor.env
 scripts/execute-40-transactions-enhanced.ts
 scripts/dry-run-test.ts
