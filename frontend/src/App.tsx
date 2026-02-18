@@ -16,6 +16,7 @@ import { TransactionTracker } from './components/TransactionTracker';
 import { RateLimitBanner } from './components/RateLimitBanner';
 import { ToastContainer } from './components/ToastContainer';
 import { useHabits } from './hooks/useHabits';
+import { DashboardSkeleton } from './components/Skeletons';
 import { useHashRoute } from './hooks/useHashRoute';
 import './styles/global.css';
 
@@ -70,7 +71,7 @@ function AppContent() {
           {/* Route-based rendering */}
           {route === 'dashboard' && (
             <section id="dashboard">
-              <Dashboard habits={habits} />
+              {isLoadingHabits ? <DashboardSkeleton /> : <Dashboard habits={habits} />}
             </section>
           )}
 

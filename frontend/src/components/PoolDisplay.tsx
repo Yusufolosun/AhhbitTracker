@@ -1,17 +1,12 @@
 import { useHabits } from '../hooks/useHabits';
 import { formatSTX } from '../utils/formatting';
+import { PoolSkeleton } from './Skeletons';
 
 export function PoolDisplay() {
   const { poolBalance, isLoadingHabits: loading } = useHabits();
 
   if (loading) {
-    return (
-      <div className="card">
-        <div className="flex justify-center py-8">
-          <div className="spinner w-8 h-8"></div>
-        </div>
-      </div>
-    );
+    return <PoolSkeleton />;
   }
 
   return (

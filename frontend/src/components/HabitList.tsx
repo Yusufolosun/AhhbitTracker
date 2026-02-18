@@ -1,5 +1,6 @@
 import { Habit } from '../types/habit';
 import { HabitCard } from './HabitCard';
+import { HabitListSkeleton } from './Skeletons';
 
 interface HabitListProps {
   habits: Habit[];
@@ -8,11 +9,7 @@ interface HabitListProps {
 
 export function HabitList({ habits, loading }: HabitListProps) {
   if (loading) {
-    return (
-      <div className="flex justify-center items-center py-12">
-        <div className="spinner w-12 h-12"></div>
-      </div>
-    );
+    return <HabitListSkeleton />;
   }
 
   if (habits.length === 0) {
