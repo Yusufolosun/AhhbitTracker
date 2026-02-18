@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Habit } from '../types/habit';
 import { useHabits } from '../hooks/useHabits';
-import { formatSTX } from '../utils/formatting';
+import { formatSTX, blocksAgo } from '../utils/formatting';
+import { useCurrentBlock } from '../hooks/useCurrentBlock';
 import { MIN_STREAK_FOR_WITHDRAWAL } from '../utils/constants';
 import { ConfirmationDialog } from './ConfirmationDialog';
 
@@ -12,6 +13,7 @@ interface HabitCardProps {
 export function HabitCard({ habit }: HabitCardProps) {
   const { checkIn, withdrawStake, claimBonus, isCheckingIn, isWithdrawing, isClaiming } = useHabits();
   const [confirmAction, setConfirmAction] = useState<'withdraw' | 'claim' | null>(null);
+  const currentBlock = useCurrentBlock();
 
   const handleCheckIn = () => {
     checkIn(habit.habitId);
@@ -76,8 +78,10 @@ export function HabitCard({ habit }: HabitCardProps) {
         </div>
         <div>
           <p className="text-xs text-gray-500">Last Check-in</p>
-          <p className="text-sm font-semibold text-gray-900">
-            Block {habit.lastCheckInBlock}
+          <p className="text-sm font-semibold text-gray-900" title={`Block ${habit.lastCheckInBlock}`}>
+            {currentBlock
+              ? blocksAgo(currentBlock, habit.lastCheckInBlock)
+              : `Block ${habit.lastCheckInBlock}`}
           </p>
         </div>
       </div>
