@@ -63,6 +63,7 @@ export function HabitForm() {
             maxLength={50}
             required
             disabled={isCreatingHabit}
+            aria-describedby={error ? 'form-error' : undefined}
           />
           <p className="mt-1 text-xs text-gray-500">
             {name.length}/50 characters
@@ -91,7 +92,7 @@ export function HabitForm() {
         </div>
 
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+          <div id="form-error" role="alert" className="p-3 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-sm text-red-600">{error}</p>
           </div>
         )}
