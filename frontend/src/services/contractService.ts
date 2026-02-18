@@ -70,15 +70,15 @@ export const contractService = {
   /**
    * Withdraw stake
    */
-  async withdrawStake(habitId: number): Promise<void> {
+  async withdrawStake(habitId: number, stakeAmount: number): Promise<void> {
     const userAddress = walletService.getAddress();
     if (!userAddress) {
       throw new Error('Wallet not connected');
     }
 
-    // Post-condition: Contract must transfer at least 0 STX (actual amount determined by contract)
+    // Post-condition: Contract must transfer exactly the staked amount back to the user
     const postConditions = [
-      Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`).willSendGte(0).ustx(),
+      Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`).willSendEq(stakeAmount).ustx(),
     ];
 
     return openContractCall({
@@ -105,9 +105,9 @@ export const contractService = {
       throw new Error('Wallet not connected');
     }
 
-    // Post-condition: Contract must transfer at least 0 STX (actual amount determined by contract)
+    // Post-condition: Contract must transfer at least 1 microSTX from the pool
     const postConditions = [
-      Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`).willSendGte(0).ustx(),
+      Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`).willSendGte(1).ustx(),
     ];
 
     return openContractCall({

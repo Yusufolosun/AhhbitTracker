@@ -126,7 +126,8 @@ export const useHabits = () => {
 
   // Withdraw stake mutation
   const withdrawStakeMutation = useMutation({
-    mutationFn: (habitId: number) => contractService.withdrawStake(habitId),
+    mutationFn: ({ habitId, stakeAmount }: { habitId: number; stakeAmount: number }) =>
+      contractService.withdrawStake(habitId, stakeAmount),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['habits', walletState.address] });
       queryClient.invalidateQueries({ queryKey: ['userStats', walletState.address] });

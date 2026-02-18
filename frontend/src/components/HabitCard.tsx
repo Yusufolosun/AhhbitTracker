@@ -27,7 +27,7 @@ export function HabitCard({ habit }: HabitCardProps) {
 
   const executeConfirmedAction = () => {
     if (confirmAction === 'withdraw') {
-      withdrawStake(habit.habitId);
+      withdrawStake({ habitId: habit.habitId, stakeAmount: habit.stakeAmount });
     } else if (confirmAction === 'claim') {
       claimBonus(habit.habitId);
     }
