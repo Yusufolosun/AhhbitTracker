@@ -9,6 +9,7 @@
 
   body {
     @apply bg-gray-50 text-gray-900 antialiased;
+    @apply dark:bg-gray-900 dark:text-gray-100;
   }
 }
 
@@ -21,17 +22,21 @@
   
   .btn-secondary {
     @apply bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold
-           hover:bg-gray-300 transition-colors duration-200;
+           hover:bg-gray-300 transition-colors duration-200
+           dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600;
   }
   
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
+    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6
+           dark:bg-gray-800 dark:border-gray-700;
   }
   
   .input {
     @apply w-full px-4 py-3 border border-gray-300 rounded-lg
            focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
-           disabled:bg-gray-100 disabled:cursor-not-allowed;
+           disabled:bg-gray-100 disabled:cursor-not-allowed
+           dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100
+           dark:disabled:bg-gray-800;
   }
 }
 
