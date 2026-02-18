@@ -1,11 +1,11 @@
-import { StacksMainnet } from '@stacks/network';
+import { STACKS_MAINNET, createNetwork } from '@stacks/network';
 
 // Network Configuration
 // In development, use Vite proxy to avoid CORS issues with Hiro API
 const isDev = import.meta.env.DEV;
-export const NETWORK = new StacksMainnet({
-  url: isDev ? `${window.location.origin}/api/stacks` : 'https://api.mainnet.hiro.so',
-});
+export const NETWORK = isDev
+  ? createNetwork({ network: 'mainnet', client: { baseUrl: `${window.location.origin}/api/stacks` } })
+  : STACKS_MAINNET;
 
 // Contract Configuration
 export const CONTRACT_ADDRESS = 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193';
