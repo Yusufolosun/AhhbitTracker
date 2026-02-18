@@ -6,6 +6,7 @@ interface WalletContextType {
   walletState: WalletState;
   connect: () => Promise<void>;
   disconnect: () => void;
+  refreshBalance: () => Promise<void>;
   isLoading: boolean;
 }
 
@@ -31,6 +32,21 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   });
   const [isLoading, setIsLoading] = useState(true);
 
+  const fetchAndSetBalance = async (address: string) => {
+    try {
+      const balance = await walletService.fetchBalance(address);
+      setWalletState((prev) => ({ ...prev, balance }));
+    } catch (error) {
+      console.error('Error fetching balance:', error);
+    }
+  };
+
+  const refreshBalance = async () => {
+    if (walletState.address) {
+      await fetchAndSetBalance(walletState.address);
+    }
+  };
+
   useEffect(() => {
     // Check if wallet is already connected on mount
     const checkConnection = async () => {
@@ -41,8 +57,11 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
           setWalletState({
             isConnected: true,
             address,
-            balance: 0, // Balance can be fetched separately if needed
+            balance: 0,
           });
+          if (address) {
+            fetchAndSetBalance(address);
+          }
         }
       } catch (error) {
         console.error('Error checking wallet connection:', error);
@@ -62,8 +81,11 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
         setWalletState({
           isConnected: true,
           address,
-          balance: 0, // Balance can be fetched separately if needed
+          balance: 0,
         });
+        if (address) {
+          fetchAndSetBalance(address);
+        }
         setIsLoading(false);
       });
     } catch (error) {
@@ -83,7 +105,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   };
 
   return (
-    <WalletContext.Provider value={{ walletState, connect, disconnect, isLoading }}>
+    <WalletContext.Provider value={{ walletState, connect, disconnect, refreshBalance, isLoading }}>
       {children}
     </WalletContext.Provider>
   );
