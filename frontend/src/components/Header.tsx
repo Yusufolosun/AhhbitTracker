@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useWallet } from '../context/WalletContext';
 import { shortenAddress, formatSTX } from '../utils/formatting';
+import { EXPLORER_ADDRESS_URL } from '../utils/constants';
 import { ThemeToggle } from './ThemeToggle';
 import { useHashRoute } from '../hooks/useHashRoute';
 
@@ -64,9 +65,15 @@ export function Header() {
               <>
                 <div className="hidden sm:flex items-center space-x-2 px-4 py-2 bg-gray-100 rounded-lg">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-medium text-gray-700">
+                  <a
+                    href={`${EXPLORER_ADDRESS_URL}${walletState.address!}?chain=mainnet`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium text-gray-700 hover:text-primary-500 transition-colors"
+                    title="View on Stacks Explorer"
+                  >
                     {shortenAddress(walletState.address!)}
-                  </span>
+                  </a>
                   {walletState.balance > 0 && (
                     <span className="text-xs text-gray-500 border-l border-gray-300 pl-2">
                       {formatSTX(walletState.balance)} STX

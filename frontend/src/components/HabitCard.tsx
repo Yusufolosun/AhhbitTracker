@@ -3,7 +3,7 @@ import { Habit } from '../types/habit';
 import { useHabits } from '../hooks/useHabits';
 import { formatSTX, blocksAgo } from '../utils/formatting';
 import { useCurrentBlock } from '../hooks/useCurrentBlock';
-import { MIN_STREAK_FOR_WITHDRAWAL } from '../utils/constants';
+import { MIN_STREAK_FOR_WITHDRAWAL, CONTRACT_ADDRESS, CONTRACT_NAME, EXPLORER_ADDRESS_URL } from '../utils/constants';
 import { ConfirmationDialog } from './ConfirmationDialog';
 
 interface HabitCardProps {
@@ -117,6 +117,18 @@ export function HabitCard({ habit }: HabitCardProps) {
             {isClaiming ? 'Claiming...' : 'Claim Bonus'}
           </button>
         )}
+      </div>
+
+      {/* Contract link */}
+      <div className="mt-3 pt-3 border-t border-gray-200 text-right">
+        <a
+          href={`${EXPLORER_ADDRESS_URL}${CONTRACT_ADDRESS}.${CONTRACT_NAME}?chain=mainnet`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-gray-400 hover:text-primary-500 transition-colors"
+        >
+          View contract on Explorer &rarr;
+        </a>
       </div>
 
       {/* Progress Indicator */}
