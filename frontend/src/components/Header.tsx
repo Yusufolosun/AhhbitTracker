@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useWallet } from '../context/WalletContext';
-import { shortenAddress } from '../utils/formatting';
+import { shortenAddress, formatSTX } from '../utils/formatting';
 
 const NAV_LINKS = [
   { href: '#dashboard', label: 'Dashboard' },
@@ -55,6 +55,11 @@ export function Header() {
                   <span className="text-sm font-medium text-gray-700">
                     {shortenAddress(walletState.address!)}
                   </span>
+                  {walletState.balance > 0 && (
+                    <span className="text-xs text-gray-500 border-l border-gray-300 pl-2">
+                      {formatSTX(walletState.balance)} STX
+                    </span>
+                  )}
                 </div>
                 <button
                   onClick={disconnect}
