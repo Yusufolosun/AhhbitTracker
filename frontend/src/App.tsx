@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WalletProvider, useWallet } from './context/WalletContext';
+import { TransactionProvider } from './context/TransactionContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
@@ -8,6 +9,7 @@ import { Dashboard } from './components/Dashboard';
 import { HabitForm } from './components/HabitForm';
 import { HabitList } from './components/HabitList';
 import { PoolDisplay } from './components/PoolDisplay';
+import { TransactionTracker } from './components/TransactionTracker';
 import { useHabits } from './hooks/useHabits';
 import './styles/global.css';
 
@@ -64,6 +66,7 @@ function AppContent() {
       </main>
 
       <Footer />
+      <TransactionTracker />
     </div>
   );
 }
@@ -73,7 +76,9 @@ export function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <WalletProvider>
-          <AppContent />
+          <TransactionProvider>
+            <AppContent />
+          </TransactionProvider>
         </WalletProvider>
       </QueryClientProvider>
     </ErrorBoundary>
