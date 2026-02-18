@@ -32,6 +32,7 @@ export const ERROR_CODES: Record<number, string> = {
   108: 'Habit already completed',
   109: 'Insufficient pool balance',
   110: 'Transfer failed',
+  111: 'Bonus already claimed for this habit',
 };
 
 // UI Constants

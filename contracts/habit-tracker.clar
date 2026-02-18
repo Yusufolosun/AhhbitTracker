@@ -47,6 +47,7 @@
 (define-constant ERR-HABIT-ALREADY-COMPLETED (err u108))
 (define-constant ERR-POOL-INSUFFICIENT-BALANCE (err u109))
 (define-constant ERR-TRANSFER-FAILED (err u110))
+(define-constant ERR-BONUS-ALREADY-CLAIMED (err u111))
 
 ;; ============================================
 ;; DATA STRUCTURES
@@ -63,7 +64,8 @@
     last-check-in-block: uint,
     created-at-block: uint,
     is-active: bool,
-    is-completed: bool
+    is-completed: bool,
+    bonus-claimed: bool
   }
 )
 
@@ -165,7 +167,8 @@
         last-check-in-block: block-height,
         created-at-block: block-height,
         is-active: true,
-        is-completed: false
+        is-completed: false,
+        bonus-claimed: false
       }
     )
     
@@ -349,6 +352,9 @@
     
     ;; Verify habit is completed
     (asserts! (get is-completed habit) ERR-INSUFFICIENT-STREAK)
+
+    ;; Verify bonus has not already been claimed for this habit
+    (asserts! (not (get bonus-claimed habit)) ERR-BONUS-ALREADY-CLAIMED)
     
     ;; Verify pool has sufficient balance
     (asserts! (>= pool-balance bonus-amount) ERR-POOL-INSUFFICIENT-BALANCE)
@@ -358,6 +364,12 @@
     
     ;; Update pool balance
     (var-set forfeited-pool-balance (- pool-balance bonus-amount))
+
+    ;; Mark bonus as claimed to prevent re-entrancy
+    (map-set habits
+      { habit-id: habit-id }
+      (merge habit { bonus-claimed: true })
+    )
     
     ;; Emit event
     (print {
