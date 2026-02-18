@@ -16,8 +16,9 @@ import { walletService } from './walletService';
 export const contractService = {
   /**
    * Create a new habit
+   * Returns the transaction ID on success for tracking
    */
-  async createHabit(name: string, stakeAmount: number): Promise<void> {
+  async createHabit(name: string, stakeAmount: number): Promise<string> {
     const userAddress = walletService.getAddress();
     if (!userAddress) {
       throw new Error('Wallet not connected');
@@ -46,11 +47,7 @@ export const contractService = {
           icon: window.location.origin + '/logo.svg',
         },
         onFinish: (data) => {
-          console.log('Transaction submitted:', data.txId);
-          // Resolve after a delay to allow for block confirmation
-          setTimeout(() => {
-            resolve();
-          }, 3000); // Wait 3 seconds for block confirmation
+          resolve(data.txId);
         },
         onCancel: () => {
           reject(new Error('Transaction cancelled'));
