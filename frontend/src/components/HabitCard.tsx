@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Habit } from '../types/habit';
 import { useHabits } from '../hooks/useHabits';
 import { formatSTX } from '../utils/formatting';
+import { MIN_STREAK_FOR_WITHDRAWAL } from '../utils/constants';
 import { ConfirmationDialog } from './ConfirmationDialog';
 
 interface HabitCardProps {
@@ -33,7 +34,7 @@ export function HabitCard({ habit }: HabitCardProps) {
     setConfirmAction(null);
   };
 
-  const canWithdraw = habit.currentStreak >= 7 && habit.isActive;
+  const canWithdraw = habit.currentStreak >= MIN_STREAK_FOR_WITHDRAWAL && habit.isActive;
   const canClaimBonus = habit.isCompleted;
 
   return (
@@ -120,13 +121,13 @@ export function HabitCard({ habit }: HabitCardProps) {
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs text-gray-600">Progress to Withdrawal</span>
             <span className="text-xs font-medium text-gray-900">
-              {habit.currentStreak}/7 days
+              {habit.currentStreak}/{MIN_STREAK_FOR_WITHDRAWAL} days
             </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
               className="bg-primary-500 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${Math.min((habit.currentStreak / 7) * 100, 100)}%` }}
+              style={{ width: `${Math.min((habit.currentStreak / MIN_STREAK_FOR_WITHDRAWAL) * 100, 100)}%` }}
             ></div>
           </div>
         </div>
