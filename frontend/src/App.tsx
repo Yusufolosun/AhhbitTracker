@@ -40,9 +40,17 @@ function AppContent() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
+      {/* Skip to content link for keyboard/screen-reader users */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:bg-white focus:px-4 focus:py-2 focus:rounded focus:shadow-lg focus:text-primary-500"
+      >
+        Skip to content
+      </a>
+
       <Header />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
           {/* Dashboard */}
           <section id="dashboard" className="scroll-mt-20">

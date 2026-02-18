@@ -22,7 +22,11 @@ export function Toast({ message, type, onClose }: ToastProps) {
     <div className={`${bgColors[type]} text-white px-6 py-4 rounded-lg shadow-lg animate-fade-in`}>
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium">{message}</p>
-        <button onClick={onClose} className="ml-4 text-white hover:text-gray-200">
+        <button
+          onClick={onClose}
+          className="ml-4 text-white hover:text-gray-200"
+          aria-label="Close notification"
+        >
           ✕
         </button>
       </div>

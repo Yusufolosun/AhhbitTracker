@@ -64,6 +64,7 @@ export function Header() {
                 <button
                   onClick={disconnect}
                   className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                  aria-label="Disconnect wallet"
                 >
                   Disconnect
                 </button>

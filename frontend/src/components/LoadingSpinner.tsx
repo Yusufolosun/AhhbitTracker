@@ -13,10 +13,12 @@ export function LoadingSpinner({ size = 'md', text }: LoadingSpinnerProps) {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center py-8">
-      <div className={`spinner ${sizeClasses[size]}`}></div>
-      {text && (
+    <div className="flex flex-col items-center justify-center py-8" role="status" aria-live="polite">
+      <div className={`spinner ${sizeClasses[size]}`} aria-hidden="true"></div>
+      {text ? (
         <p className="mt-4 text-sm text-gray-600">{text}</p>
+      ) : (
+        <span className="sr-only">Loading…</span>
       )}
     </div>
   );
