@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useHabits } from '../hooks/useHabits';
+import { useToast } from '../context/ToastContext';
 import { validateHabitName, validateStakeAmount } from '../utils/validation';
 import { toMicroSTX } from '../utils/formatting';
 
@@ -7,13 +8,12 @@ export function HabitForm() {
   const [name, setName] = useState('');
   const [stake, setStake] = useState('0.1');
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
   const { createHabit, isCreatingHabit } = useHabits();
+  const { showToast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setSuccess(null);
 
     // Validate
     const nameError = validateHabitName(name);
@@ -33,16 +33,12 @@ export function HabitForm() {
       const stakeAmount = toMicroSTX(stakeNum);
       createHabit({ name, stakeAmount });
       
-      // Reset form and show success message
+      // Reset form and show success toast
       setName('');
       setStake('0.1');
-      setSuccess('Habit created! It will appear in your list once the transaction is confirmed (~10 seconds).');
-      
-      // Clear success message after 15 seconds
-      setTimeout(() => setSuccess(null), 15000);
+      showToast('Habit created! It will appear once the transaction confirms.', 'success');
     } catch (err: any) {
-      console.error('Failed to create habit:', err);
-      setError(err.message || 'Failed to create habit');
+      showToast(err.message || 'Failed to create habit', 'error');
     }
   };
 
@@ -97,12 +93,6 @@ export function HabitForm() {
         {error && (
           <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-sm text-red-600">{error}</p>
-          </div>
-        )}
-
-        {success && (
-          <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-sm text-green-600">{success}</p>
           </div>
         )}
 

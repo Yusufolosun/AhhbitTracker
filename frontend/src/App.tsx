@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WalletProvider, useWallet } from './context/WalletContext';
 import { TransactionProvider } from './context/TransactionContext';
+import { ToastProvider } from './context/ToastContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
@@ -10,6 +11,7 @@ import { HabitForm } from './components/HabitForm';
 import { HabitList } from './components/HabitList';
 import { PoolDisplay } from './components/PoolDisplay';
 import { TransactionTracker } from './components/TransactionTracker';
+import { ToastContainer } from './components/ToastContainer';
 import { useHabits } from './hooks/useHabits';
 import './styles/global.css';
 
@@ -67,6 +69,7 @@ function AppContent() {
 
       <Footer />
       <TransactionTracker />
+      <ToastContainer />
     </div>
   );
 }
@@ -77,7 +80,9 @@ export function App() {
       <QueryClientProvider client={queryClient}>
         <WalletProvider>
           <TransactionProvider>
-            <AppContent />
+            <ToastProvider>
+              <AppContent />
+            </ToastProvider>
           </TransactionProvider>
         </WalletProvider>
       </QueryClientProvider>
