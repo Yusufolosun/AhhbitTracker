@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { Habit } from '../types/habit';
 import { useHabits } from '../hooks/useHabits';
 import { formatSTX } from '../utils/formatting';
+import { ConfirmationDialog } from './ConfirmationDialog';
 
 interface HabitCardProps {
   habit: Habit;
@@ -8,17 +10,27 @@ interface HabitCardProps {
 
 export function HabitCard({ habit }: HabitCardProps) {
   const { checkIn, withdrawStake, claimBonus, isCheckingIn, isWithdrawing, isClaiming } = useHabits();
+  const [confirmAction, setConfirmAction] = useState<'withdraw' | 'claim' | null>(null);
 
   const handleCheckIn = () => {
     checkIn(habit.habitId);
   };
 
   const handleWithdraw = () => {
-    withdrawStake(habit.habitId);
+    setConfirmAction('withdraw');
   };
 
   const handleClaimBonus = () => {
-    claimBonus(habit.habitId);
+    setConfirmAction('claim');
+  };
+
+  const executeConfirmedAction = () => {
+    if (confirmAction === 'withdraw') {
+      withdrawStake(habit.habitId);
+    } else if (confirmAction === 'claim') {
+      claimBonus(habit.habitId);
+    }
+    setConfirmAction(null);
   };
 
   const canWithdraw = habit.currentStreak >= 7 && habit.isActive;
@@ -119,6 +131,64 @@ export function HabitCard({ habit }: HabitCardProps) {
           </div>
         </div>
       )}
+
+      {/* Withdraw Confirmation Dialog */}
+      <ConfirmationDialog
+        open={confirmAction === 'withdraw'}
+        title="Withdraw Stake"
+        confirmLabel="Withdraw"
+        onConfirm={executeConfirmedAction}
+        onCancel={() => setConfirmAction(null)}
+        isLoading={isWithdrawing}
+      >
+        <div className="space-y-2">
+          <p>You are about to withdraw your stake from:</p>
+          <dl className="bg-gray-50 rounded-lg p-3 space-y-1">
+            <div className="flex justify-between">
+              <dt className="text-gray-500">Habit</dt>
+              <dd className="font-medium text-gray-900">{habit.name}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-gray-500">Stake</dt>
+              <dd className="font-medium text-gray-900">{formatSTX(habit.stakeAmount)} STX</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-gray-500">Current Streak</dt>
+              <dd className="font-medium text-gray-900">{habit.currentStreak} days</dd>
+            </div>
+          </dl>
+          <p className="text-xs text-amber-600">
+            This action is irreversible and will incur a gas fee.
+          </p>
+        </div>
+      </ConfirmationDialog>
+
+      {/* Claim Bonus Confirmation Dialog */}
+      <ConfirmationDialog
+        open={confirmAction === 'claim'}
+        title="Claim Bonus"
+        confirmLabel="Claim"
+        onConfirm={executeConfirmedAction}
+        onCancel={() => setConfirmAction(null)}
+        isLoading={isClaiming}
+      >
+        <div className="space-y-2">
+          <p>You are about to claim a bonus reward for:</p>
+          <dl className="bg-gray-50 rounded-lg p-3 space-y-1">
+            <div className="flex justify-between">
+              <dt className="text-gray-500">Habit</dt>
+              <dd className="font-medium text-gray-900">{habit.name}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-gray-500">Final Streak</dt>
+              <dd className="font-medium text-gray-900">{habit.currentStreak} days</dd>
+            </div>
+          </dl>
+          <p className="text-xs text-amber-600">
+            This action is irreversible and will incur a gas fee.
+          </p>
+        </div>
+      </ConfirmationDialog>
     </div>
   );
 }
