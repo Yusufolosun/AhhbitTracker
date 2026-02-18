@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useWallet } from '../context/WalletContext';
 import { shortenAddress, formatSTX } from '../utils/formatting';
+import { ThemeToggle } from './ThemeToggle';
 
 const NAV_LINKS = [
   { href: '#dashboard', label: 'Dashboard' },
@@ -22,7 +23,7 @@ export function Header() {
   }, []);
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -46,8 +47,9 @@ export function Header() {
             ))}
           </nav>
 
-          {/* Wallet + Mobile Toggle */}
+          {/* Wallet + Theme + Mobile Toggle */}
           <div className="flex items-center space-x-4">
+            <ThemeToggle />
             {walletState.isConnected ? (
               <>
                 <div className="hidden sm:flex items-center space-x-2 px-4 py-2 bg-gray-100 rounded-lg">

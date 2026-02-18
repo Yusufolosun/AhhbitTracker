@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WalletProvider, useWallet } from './context/WalletContext';
 import { TransactionProvider } from './context/TransactionContext';
 import { ToastProvider } from './context/ToastContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
@@ -85,15 +86,17 @@ function AppContent() {
 export function App() {
   return (
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <WalletProvider>
-          <TransactionProvider>
-            <ToastProvider>
-              <AppContent />
-            </ToastProvider>
-          </TransactionProvider>
-        </WalletProvider>
-      </QueryClientProvider>
+      <ThemeProvider>
+        <QueryClientProvider client={queryClient}>
+          <WalletProvider>
+            <TransactionProvider>
+              <ToastProvider>
+                <AppContent />
+              </ToastProvider>
+            </TransactionProvider>
+          </WalletProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }
