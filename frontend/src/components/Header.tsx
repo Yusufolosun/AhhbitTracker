@@ -2,16 +2,19 @@ import { useState, useCallback } from 'react';
 import { useWallet } from '../context/WalletContext';
 import { shortenAddress, formatSTX } from '../utils/formatting';
 import { ThemeToggle } from './ThemeToggle';
+import { useHashRoute } from '../hooks/useHashRoute';
 
 const NAV_LINKS = [
   { href: '#dashboard', label: 'Dashboard' },
   { href: '#habits', label: 'My Habits' },
+  { href: '#create-habit', label: 'New Habit' },
   { href: '#pool', label: 'Pool' },
   { href: 'https://github.com/Yusufolosun/AhhbitTracker#readme', label: 'Docs', external: true },
 ];
 
 export function Header() {
   const { walletState, connect, disconnect } = useWallet();
+  const { route } = useHashRoute();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const toggleMenu = useCallback(() => {
@@ -35,16 +38,23 @@ export function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="text-gray-700 hover:text-primary-500 transition-colors"
-                {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-              >
-                {link.label}
-              </a>
-            ))}
+            {NAV_LINKS.map((link) => {
+              const isActive = !link.external && link.href === `#${route}`;
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className={`transition-colors ${
+                    isActive
+                      ? 'text-primary-500 font-semibold'
+                      : 'text-gray-700 dark:text-gray-300 hover:text-primary-500'
+                  }`}
+                  {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                >
+                  {link.label}
+                </a>
+              );
+            })}
           </nav>
 
           {/* Wallet + Theme + Mobile Toggle */}
