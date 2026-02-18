@@ -20,19 +20,16 @@ export const useHabits = () => {
     queryFn: async () => {
       if (!walletState.address) return [];
       const result = await contractService.getUserHabits(walletState.address);
-      console.log('getUserHabits result:', result);
 
       // Parse habit IDs from result
       // get-user-habits returns: { habit-ids: (list) }
       if (result.value && result.value['habit-ids']) {
         const habitIds = result.value['habit-ids'].value || [];
-        console.log('Habit IDs:', habitIds);
 
         // Fetch each habit's details
         const habitPromises = habitIds.map(async (id: any) => {
           const habitId = parseInt(id.value);
           const habitData = await contractService.getHabit(habitId);
-          console.log(`Habit ${habitId} data:`, habitData);
 
           // Check if optional value exists (habitData.value will be the tuple)
           if (habitData.value && habitData.value.value) {
@@ -53,7 +50,6 @@ export const useHabits = () => {
         });
 
         const habitsData = await Promise.all(habitPromises);
-        console.log('Fetched habits:', habitsData);
         return habitsData.filter((h): h is Habit => h !== null);
       }
 
@@ -74,7 +70,6 @@ export const useHabits = () => {
     queryFn: async () => {
       if (!walletState.address) return null;
       const result = await contractService.getUserStats(walletState.address);
-      console.log('getUserStats result:', result);
 
       // get-user-stats returns a response type
       if (result.success && result.value && result.value.value) {
