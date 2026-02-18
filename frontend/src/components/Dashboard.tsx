@@ -35,7 +35,27 @@ export function Dashboard({ habits }: DashboardProps) {
         <p className="text-gray-600">Track your habit-building progress</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Empty state — first-time user onboarding */}
+      {habits.length === 0 ? (
+        <div className="card text-center py-12">
+          <svg className="mx-auto w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">No habits yet</h3>
+          <p className="text-gray-500 max-w-md mx-auto">
+            Create your first on-chain habit below. Stake STX, check in daily, and earn
+            rewards from the forfeited pool when you stay consistent.
+          </p>
+          <a
+            href="#create-habit"
+            className="inline-block mt-6 btn-primary"
+          >
+            Create Your First Habit
+          </a>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
           title="Total Habits"
           value={stats.total}
@@ -99,6 +119,8 @@ export function Dashboard({ habits }: DashboardProps) {
             </div>
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );
