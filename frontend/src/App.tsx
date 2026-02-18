@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { emitRateLimitEvent } from './components/RateLimitBanner';
 import { WalletProvider, useWallet } from './context/WalletContext';
 import { TransactionProvider } from './context/TransactionContext';
 import { ToastProvider } from './context/ToastContext';
@@ -12,6 +13,7 @@ import { HabitForm } from './components/HabitForm';
 import { HabitList } from './components/HabitList';
 import { PoolDisplay } from './components/PoolDisplay';
 import { TransactionTracker } from './components/TransactionTracker';
+import { RateLimitBanner } from './components/RateLimitBanner';
 import { ToastContainer } from './components/ToastContainer';
 import { useHabits } from './hooks/useHabits';
 import { useHashRoute } from './hooks/useHashRoute';
@@ -22,7 +24,16 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      retry: 1,
+      retry: (failureCount, error: any) => {
+        // Stop retrying after 3 attempts
+        if (failureCount >= 3) return false;
+        // Detect 429 and emit rate-limit event for the banner
+        if (error?.status === 429 || error?.message?.includes('429')) {
+          const retryAfter = parseInt(error?.headers?.get?.('Retry-After') || '30', 10);
+          emitRateLimitEvent(retryAfter);
+        }
+        return true;
+      },
       staleTime: 30000, // 30 seconds
     },
   },
@@ -52,6 +63,7 @@ function AppContent() {
       </a>
 
       <Header />
+      <RateLimitBanner />
 
       <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
