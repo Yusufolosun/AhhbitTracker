@@ -7,9 +7,11 @@ export const NETWORK = isDev
   ? createNetwork({ network: 'mainnet', client: { baseUrl: `${window.location.origin}/api/stacks` } })
   : STACKS_MAINNET;
 
-// Contract Configuration
-export const CONTRACT_ADDRESS = 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193';
-export const CONTRACT_NAME = 'habit-tracker';
+// Contract Configuration — override via VITE_CONTRACT_ADDRESS / VITE_CONTRACT_NAME
+export const CONTRACT_ADDRESS =
+  import.meta.env.VITE_CONTRACT_ADDRESS ?? 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193';
+export const CONTRACT_NAME =
+  import.meta.env.VITE_CONTRACT_NAME ?? 'habit-tracker';
 
 // Contract Constants
 export const MIN_STAKE_AMOUNT = 100000; // 0.1 STX in microSTX
