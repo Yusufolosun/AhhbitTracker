@@ -3,12 +3,10 @@ import {
   uintCV,
   stringUtf8CV,
   principalCV,
-  callReadOnlyFunction,
+  fetchCallReadOnlyFunction,
   cvToJSON,
   PostConditionMode,
-  makeStandardSTXPostCondition,
-  FungibleConditionCode,
-  makeContractSTXPostCondition,
+  Pc,
 } from '@stacks/transactions';
 import { CONTRACT_ADDRESS, CONTRACT_NAME, NETWORK } from '../utils/constants';
 import { walletService } from './walletService';
@@ -26,11 +24,7 @@ export const contractService = {
 
     // Post-condition: User must transfer exactly the stake amount to the contract
     const postConditions = [
-      makeStandardSTXPostCondition(
-        userAddress,
-        FungibleConditionCode.Equal,
-        stakeAmount
-      ),
+      Pc.principal(userAddress).willSendEq(stakeAmount).ustx(),
     ];
 
     return new Promise((resolve, reject) => {
@@ -84,12 +78,7 @@ export const contractService = {
 
     // Post-condition: Contract must transfer at least 0 STX (actual amount determined by contract)
     const postConditions = [
-      makeContractSTXPostCondition(
-        CONTRACT_ADDRESS,
-        CONTRACT_NAME,
-        FungibleConditionCode.GreaterEqual,
-        0
-      ),
+      Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`).willSendGte(0).ustx(),
     ];
 
     return openContractCall({
@@ -118,12 +107,7 @@ export const contractService = {
 
     // Post-condition: Contract must transfer at least 0 STX (actual amount determined by contract)
     const postConditions = [
-      makeContractSTXPostCondition(
-        CONTRACT_ADDRESS,
-        CONTRACT_NAME,
-        FungibleConditionCode.GreaterEqual,
-        0
-      ),
+      Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`).willSendGte(0).ustx(),
     ];
 
     return openContractCall({
@@ -145,7 +129,7 @@ export const contractService = {
    * Get habit details
    */
   async getHabit(habitId: number): Promise<any> {
-    const result = await callReadOnlyFunction({
+    const result = await fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
       functionName: 'get-habit',
@@ -161,7 +145,7 @@ export const contractService = {
    * Get user habits
    */
   async getUserHabits(userAddress: string): Promise<any> {
-    const result = await callReadOnlyFunction({
+    const result = await fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
       functionName: 'get-user-habits',
@@ -177,7 +161,7 @@ export const contractService = {
    * Get habit streak
    */
   async getHabitStreak(habitId: number): Promise<number> {
-    const result = await callReadOnlyFunction({
+    const result = await fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
       functionName: 'get-habit-streak',
@@ -194,7 +178,7 @@ export const contractService = {
    * Get forfeited pool balance
    */
   async getPoolBalance(): Promise<number> {
-    const result = await callReadOnlyFunction({
+    const result = await fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
       functionName: 'get-pool-balance',
@@ -211,7 +195,7 @@ export const contractService = {
    * Get user stats
    */
   async getUserStats(userAddress: string): Promise<any> {
-    const result = await callReadOnlyFunction({
+    const result = await fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
       functionName: 'get-user-stats',
