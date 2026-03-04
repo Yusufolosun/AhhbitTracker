@@ -54,7 +54,7 @@ export function HabitCard({ habit }: HabitCardProps) {
                 ? 'bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-400'
                 : 'bg-surface-100 text-surface-600 dark:bg-surface-700 dark:text-surface-400'
               }`}>
-              {habit.isActive ? '🟢 Active' : habit.isCompleted ? '✅ Completed' : '⚫ Inactive'}
+              {habit.isActive ? 'Active' : habit.isCompleted ? 'Completed' : 'Inactive'}
             </span>
           </div>
         </div>

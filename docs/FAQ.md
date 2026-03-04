@@ -262,17 +262,17 @@ No. Only you (the owner) can check in or withdraw from your habits.
 ### What are the error codes?
 
 **Common Error Codes:**
-- `(err u100)` - ERR-UNAUTHORIZED: You don't have permission for this action
-- `(err u101)` - ERR-HABIT-NOT-FOUND: Habit ID doesn't exist
-- `(err u102)` - ERR-INSUFFICIENT-STAKE: Stake amount too low (minimum 0.1 STX)
-- `(err u103)` - ERR-NOT-HABIT-OWNER: You're trying to check in on someone else's habit
-- `(err u104)` - ERR-HABIT-NOT-ACTIVE: Habit was deactivated
+- `(err u100)` - ERR-NOT-AUTHORIZED: You don't have permission for this action
+- `(err u101)` - ERR-INVALID-STAKE-AMOUNT: Stake amount too low (minimum 0.1 STX)
+- `(err u102)` - ERR-INVALID-HABIT-NAME: Habit name empty or too long (max 50 characters)
+- `(err u103)` - ERR-HABIT-NOT-FOUND: Habit ID doesn't exist
+- `(err u104)` - ERR-NOT-HABIT-OWNER: You're not the owner of this habit
 - `(err u105)` - ERR-ALREADY-CHECKED-IN: You already checked in or just created the habit
-- `(err u106)` - ERR-ALREADY-COMPLETED: Habit finished, use complete-habit to collect
-- `(err u107)` - ERR-INSUFFICIENT-STREAK: Need 7+ days to withdraw/complete
-- `(err u108)` - ERR-STREAK-BROKEN: Missed check-in window, stake forfeited
-- `(err u109)` - ERR-TRANSFER-FAILED: STX transfer issue
-- `(err u110)` - ERR-INVALID-NAME: Habit name too long (max 50 characters)
+- `(err u106)` - ERR-CHECK-IN-WINDOW-EXPIRED: Missed 24-hour window, stake forfeited
+- `(err u107)` - ERR-INSUFFICIENT-STREAK: Need 7+ consecutive check-ins to withdraw
+- `(err u108)` - ERR-HABIT-ALREADY-COMPLETED: Habit already completed
+- `(err u109)` - ERR-POOL-INSUFFICIENT-BALANCE: Not enough STX in forfeited pool
+- `(err u110)` - ERR-TRANSFER-FAILED: STX transfer issue
 
 **Troubleshooting Tip:** Use `get-habit` to check habit status before transactions.
 

@@ -25,9 +25,9 @@ if (!habitName) {
 const result = validateHabitName(habitName);
 
 if (result.valid) {
-  console.log('✅ Valid habit name');
+  console.log('[OK] Valid habit name');
 } else {
-  console.log(`❌ Invalid: ${result.error}`);
+  console.log(`[FAIL] Invalid: ${result.error}`);
   process.exit(1);
 }
 

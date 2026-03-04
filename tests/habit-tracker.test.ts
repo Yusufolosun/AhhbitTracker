@@ -159,7 +159,8 @@ describe("AhhbitTracker Contract", () => {
         "last-check-in-block": Cl.uint(simnet.blockHeight),
         "created-at-block": Cl.uint(simnet.blockHeight),
         "is-active": Cl.bool(true),
-        "is-completed": Cl.bool(false)
+        "is-completed": Cl.bool(false),
+        "bonus-claimed": Cl.bool(false)
       }));
     });
 
@@ -354,7 +355,8 @@ describe("AhhbitTracker Contract", () => {
         "last-check-in-block": Cl.uint(simnet.blockHeight),
         "created-at-block": Cl.uint(simnet.blockHeight),
         "is-active": Cl.bool(true),
-        "is-completed": Cl.bool(false)
+        "is-completed": Cl.bool(false),
+        "bonus-claimed": Cl.bool(false)
       });
       expect(result.result).toEqual(Cl.some(expectedRecord));
     });

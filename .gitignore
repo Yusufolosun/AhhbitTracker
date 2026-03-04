@@ -40,7 +40,6 @@ secrets/
 .cache/
 .clarinet/
 costs-reports.json
-deployments/
 
 # ============================================
 # NODE & DEPENDENCIES
@@ -49,7 +48,6 @@ node_modules/
 .pnpm-store/
 .yarn/
 .npm/
-package-lock.json
 yarn.lock
 pnpm-lock.yaml
 

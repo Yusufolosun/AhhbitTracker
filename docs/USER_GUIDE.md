@@ -108,10 +108,10 @@ Users who successfully complete habits can claim a share of the pool:
 ### Choose Achievable Habits
 
 Start with habits you can realistically maintain daily:
-- ✅ "10-minute walk"
-- ✅ "Read one page"
-- ❌ "Run a marathon"
-- ❌ "Read entire book"
+- Good: "10-minute walk"
+- Good: "Read one page"
+- Avoid: "Run a marathon"
+- Avoid: "Read entire book"
 
 ### Set Meaningful Stakes
 

@@ -17,8 +17,8 @@ async function deployContract() {
   console.log("Contract size:", contractSource.length, "bytes");
   
   console.log("\nDeployment checklist:");
-  console.log("✓ Contract source loaded");
-  console.log("✓ Network configured");
+  console.log("[OK] Contract source loaded");
+  console.log("[OK] Network configured");
   console.log("- Waiting for manual deployment via Clarinet");
 }
 

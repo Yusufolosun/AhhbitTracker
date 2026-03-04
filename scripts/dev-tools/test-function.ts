@@ -25,10 +25,10 @@ async function testReadOnlyFunction(
     console.log("Result:");
     console.log(JSON.stringify(result, null, 2));
     console.log();
-    console.log("✅ Function call successful");
+    console.log("[OK] Function call successful");
     
   } catch (error: any) {
-    console.log("❌ Error:", error.message);
+    console.log("[FAIL] Error:", error.message);
   }
 }
 

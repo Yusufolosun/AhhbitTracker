@@ -186,7 +186,7 @@ None
 
 #### Clarity (Smart Contracts)
 ```clarity
-;; ✅ Good
+;; Good
 (define-public (my-function (param uint))
   (let
     (
@@ -196,7 +196,7 @@ None
   )
 )
 
-;; ❌ Bad
+;; Bad
 (define-public (my-function (param uint))(ok (some-calculation param)))
 ```
 
@@ -208,7 +208,7 @@ None
 
 #### TypeScript
 ```typescript
-// ✅ Good
+// Good
 async function createHabit(
   name: string,
   stakeAmount: number
@@ -223,7 +223,7 @@ async function createHabit(
   return txId;
 }
 
-// ❌ Bad
+// Bad
 async function createHabit(n, s) {
   return await submitTransaction(...);
 }
@@ -237,14 +237,14 @@ async function createHabit(n, s) {
 
 #### Markdown
 ```markdown
-✅ Good:
+Good:
 # Heading 1
 ## Heading 2
 
 - List item
 - List item
 
-❌ Bad:
+Bad:
 #Heading 1
 ##Heading 2
 
@@ -378,4 +378,4 @@ By contributing, you agree that your contributions will be licensed under the MI
 
 Every contribution, no matter how small, helps make AhhbitTracker better.
 
-We appreciate your time and effort! 🙏
+We appreciate your time and effort!

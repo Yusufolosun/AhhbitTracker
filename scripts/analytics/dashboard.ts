@@ -9,19 +9,19 @@ async function generateDashboard() {
   console.log();
   
   // Pool balance
-  console.log("📊 FORFEITED POOL");
+  console.log("FORFEITED POOL");
   console.log("-".repeat(70));
   await trackPoolBalance();
   console.log();
   
   // User activity
-  console.log("👥 USER ACTIVITY (7 DAYS)");
+  console.log("USER ACTIVITY (7 DAYS)");
   console.log("-".repeat(70));
   await analyzeUserActivity(7);
   console.log();
   
   // Sample streak analysis (habits 1-10)
-  console.log("🔥 STREAK ANALYSIS");
+  console.log("STREAK ANALYSIS");
   console.log("-".repeat(70));
   const habitIds = Array.from({ length: 10 }, (_, i) => i + 1);
   await analyzeStreaks(habitIds);

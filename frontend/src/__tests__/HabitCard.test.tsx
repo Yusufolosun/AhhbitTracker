@@ -40,6 +40,6 @@ describe('HabitCard', () => {
 
   it('shows active status', () => {
     render(<HabitCard habit={mockHabit} />);
-    expect(screen.getByText('🟢 Active')).toBeDefined();
+    expect(screen.getByText('Active')).toBeDefined();
   });
 });

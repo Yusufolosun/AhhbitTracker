@@ -6,7 +6,7 @@ Security guidelines for AhhbitTracker developers and users.
 
 ### Immutability
 
-**Status:** ✅ Contract is immutable after deployment
+**Status:** Contract is immutable after deployment
 
 **What this means:**
 - No admin functions to modify rules
@@ -25,26 +25,26 @@ Security guidelines for AhhbitTracker developers and users.
 
 ### Self-Audit Checklist
 
-**Access Control:** ✅
+**Access Control:** Verified
 - Only owners can check in their habits
 - Only owners can withdraw their stakes
 - No privileged admin functions
 
-**Reentrancy:** ✅
+**Reentrancy:** Verified
 - No external calls before state updates
 - STX transfers use built-in functions
 - No recursion risks
 
-**Integer Overflow:** ✅
+**Integer Overflow:** Verified
 - Clarity has built-in overflow protection
 - All arithmetic operations safe
 
-**Denial of Service:** ✅
+**Denial of Service:** Verified
 - No unbounded loops
 - No user-controllable gas consumption
 - Constant-time operations
 
-**Front-Running:** ⚠️
+**Front-Running:** Low Risk
 - Check-in timing could be front-run
 - Mitigation: Transaction ordering doesn't affect fairness
 - Impact: Low
@@ -57,14 +57,14 @@ Security guidelines for AhhbitTracker developers and users.
 
 **Private Key Management:**
 
-❌ **NEVER:**
+**NEVER:**
 - Share private keys
 - Store keys in plain text
 - Commit keys to git
 - Send keys via email/chat
 - Screenshot keys
 
-✅ **ALWAYS:**
+**ALWAYS:**
 - Use hardware wallets when possible
 - Backup seed phrases offline
 - Store in encrypted format
@@ -143,14 +143,14 @@ settings/Mainnet.toml
 
 **Input Validation:**
 ```typescript
-// ✅ Good
+// Good
 function validateHabitName(name: string): boolean {
   if (!name || name.length === 0) return false;
   if (name.length > 50) return false;
   return true;
 }
 
-// ❌ Bad
+// Bad
 function createHabit(name: string) {
   // No validation - trusts user input
 }
@@ -158,7 +158,7 @@ function createHabit(name: string) {
 
 **Error Handling:**
 ```typescript
-// ✅ Good
+// Good
 try {
   const result = await createHabit(name, stake);
   if ('error' in result) {
@@ -169,7 +169,7 @@ try {
   console.error('Unexpected error:', error);
 }
 
-// ❌ Bad
+// Bad
 const result = await createHabit(name, stake);
 // No error handling
 ```
@@ -182,13 +182,13 @@ const result = await createHabit(name, stake);
 
 **Use trusted endpoints:**
 
-✅ **Recommended:**
+**Recommended:**
 ```typescript
 const network = new StacksMainnet();
 // Uses: https://api.mainnet.hiro.so
 ```
 
-❌ **Avoid:**
+**Avoid:**
 - Random public endpoints
 - Unverified third-party APIs
 - HTTP (non-HTTPS) endpoints
@@ -199,13 +199,13 @@ const network = new StacksMainnet();
 
 **Respect API limits:**
 ```typescript
-// ✅ Good - with delay
+// Good - with delay
 for (let i = 0; i < 10; i++) {
   await createHabit(...);
   await sleep(2000); // 2 second delay
 }
 
-// ❌ Bad - will be rate limited
+// Bad - will be rate limited
 for (let i = 0; i < 10; i++) {
   await createHabit(...); // No delay
 }

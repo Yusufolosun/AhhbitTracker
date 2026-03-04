@@ -15,11 +15,11 @@ async function verifyDeployment() {
   console.log(`Deployer: https://explorer.hiro.so/address/${CONTRACT_ADDRESS}?chain=mainnet`);
   console.log();
   console.log("Verification Steps:");
-  console.log("1. ✅ Contract deployed and confirmed");
-  console.log("2. ✅ Contract address updated in codebase");
-  console.log("3. ✅ Explorer link verified");
-  console.log("4. ✅ Documentation updated");
-  console.log("5. ⏳ Awaiting first user interaction");
+  console.log("1. [OK] Contract deployed and confirmed");
+  console.log("2. [OK] Contract address updated in codebase");
+  console.log("3. [OK] Explorer link verified");
+  console.log("4. [OK] Documentation updated");
+  console.log("5. [..] Awaiting first user interaction");
   console.log();
   console.log("Contract Configuration:");
   console.log("- Minimum stake: 100,000 microSTX (0.1 STX)");

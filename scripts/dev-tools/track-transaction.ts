@@ -18,7 +18,7 @@ async function trackTransaction(txId: string) {
     console.log(`Status: ${data.tx_status}`);
     
     if (data.tx_status === 'success') {
-      console.log("✅ Transaction confirmed!");
+      console.log("[OK] Transaction confirmed!");
       console.log();
       console.log("Details:");
       console.log(`  Block: ${data.block_height}`);
@@ -29,7 +29,7 @@ async function trackTransaction(txId: string) {
       console.log(`  https://explorer.hiro.so/txid/${txId}?chain=mainnet`);
       break;
     } else if (data.tx_status === 'abort_by_response' || data.tx_status === 'abort_by_post_condition') {
-      console.log("❌ Transaction failed");
+      console.log("[FAIL] Transaction failed");
       console.log(`Reason: ${data.tx_status}`);
       break;
     }
