@@ -1,7 +1,7 @@
 # AhhbitTracker
 
 <p align="center">
-  <img src="public/logos/full-logo-dark.jpg" alt="AhhbitTracker" width="320" />
+  <img src="frontend/public/logos/full-logo-dark.jpg" alt="AhhbitTracker" width="320" />
 </p>
 
 <p align="center">
