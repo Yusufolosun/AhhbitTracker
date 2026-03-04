@@ -187,3 +187,6 @@ scripts/wallet-keys.txt
 # Catch-all: any file whose name contains raw key material patterns
 **/*-private-key.json
 **/*_private_key*
+
+# Vite config compilation cache (auto-generated, never commit)
+frontend/vite.config.ts.timestamp-*.mjs
