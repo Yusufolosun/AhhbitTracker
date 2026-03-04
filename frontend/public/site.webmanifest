@@ -1,0 +1,27 @@
+{
+  "name": "AhhbitTracker",
+  "short_name": "AhhbitTracker",
+  "description": "Build better habits with blockchain accountability. Stake STX, check in daily, earn rewards on Stacks.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1F2A37",
+  "theme_color": "#1F2A37",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

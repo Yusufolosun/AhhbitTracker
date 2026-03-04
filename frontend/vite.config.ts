@@ -1,8 +1,18 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 
+function htmlEnvPlugin(): Plugin {
+  return {
+    name: 'html-env-fallback',
+    transformIndexHtml(html) {
+      const appUrl = process.env.VITE_APP_URL || 'https://ahhbittracker.vercel.app';
+      return html.replace(/%VITE_APP_URL%/g, appUrl);
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), htmlEnvPlugin()],
   // Prevent Vite from clearing the terminal on startup.
   // Without this, the "Local: http://localhost:…" URL disappears on
   // Windows terminals (Git Bash / MINGW64) because the ANSI clear-screen
