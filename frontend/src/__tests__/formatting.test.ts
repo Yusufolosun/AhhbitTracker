@@ -55,6 +55,6 @@ describe('blocksToTime', () => {
   });
 
   it('returns days for large block counts', () => {
-    expect(blocksToTime(144)).toBe('1 days');
+    expect(blocksToTime(144)).toBe('1 day');
   });
 });

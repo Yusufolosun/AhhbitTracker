@@ -1,0 +1,65 @@
+{
+  "name": "stx-utils",
+  "version": "1.0.0",
+  "description": "Lightweight utilities for Stacks (STX) dApp development — formatting, validation, address helpers, block-time estimation, and more.",
+  "author": "Yusufolosun",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yusufolosun/AhhbitTracker",
+    "directory": "packages/stx-utils"
+  },
+  "homepage": "https://github.com/Yusufolosun/AhhbitTracker/tree/main/packages/stx-utils",
+  "bugs": {
+    "url": "https://github.com/Yusufolosun/AhhbitTracker/issues"
+  },
+  "keywords": [
+    "stacks",
+    "stx",
+    "clarity",
+    "blockchain",
+    "dapp",
+    "web3",
+    "microSTX",
+    "formatting",
+    "validation",
+    "address",
+    "block-time",
+    "explorer",
+    "hiro"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^2.1.0"
+  }
+}

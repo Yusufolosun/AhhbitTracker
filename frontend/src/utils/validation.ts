@@ -1,33 +1,19 @@
+/**
+ * Re-export validation utilities from the stx-utils package.
+ * Wraps the generic validators to preserve the existing API
+ * (validateHabitName / validateStakeAmount).
+ */
+import { validateName, validateStake } from 'stx-utils';
 import { MIN_STAKE_AMOUNT, MAX_HABIT_NAME_LENGTH } from './constants';
 
-/**
- * Validate habit name
- */
 export function validateHabitName(name: string): string | null {
-  if (!name || name.trim().length === 0) {
-    return 'Habit name cannot be empty';
-  }
-  
-  if (name.length > MAX_HABIT_NAME_LENGTH) {
+  const err = validateName(name, MAX_HABIT_NAME_LENGTH);
+  if (err === 'Name cannot be empty') return 'Habit name cannot be empty';
+  if (err?.includes('too long'))
     return `Habit name too long (max ${MAX_HABIT_NAME_LENGTH} characters)`;
-  }
-  
-  return null;
+  return err;
 }
 
-/**
- * Validate stake amount
- */
 export function validateStakeAmount(stx: number): string | null {
-  if (isNaN(stx) || stx <= 0) {
-    return 'Stake amount must be positive';
-  }
-  
-  const microSTX = stx * 1000000;
-  
-  if (microSTX < MIN_STAKE_AMOUNT) {
-    return `Minimum stake is ${MIN_STAKE_AMOUNT / 1000000} STX`;
-  }
-  
-  return null;
+  return validateStake(stx, MIN_STAKE_AMOUNT);
 }
