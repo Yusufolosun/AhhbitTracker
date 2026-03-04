@@ -8,30 +8,40 @@ const RESOURCE_LINKS = [
   { label: 'Documentation', href: `${REPO_URL}#readme` },
   { label: 'User Guide', href: `${REPO_URL}/blob/main/docs/USER_GUIDE.md` },
   { label: 'FAQ', href: `${REPO_URL}/blob/main/docs/FAQ.md` },
-  { label: 'API Reference', href: `${REPO_URL}/blob/main/docs/API_REFERENCE.md` },
 ];
 
 export function Footer() {
   return (
-    <footer className="bg-white border-t border-gray-200 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <footer className="bg-white dark:bg-surface-950 border-t border-surface-200 dark:border-surface-700 mt-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="text-lg font-bold text-primary-500 mb-4">AhhbitTracker</h3>
-            <p className="text-sm text-gray-600">
-              Build better habits with blockchain accountability.
+            <div className="flex items-center gap-3 mb-4">
+              <img
+                src="/logos/icon-only-dark.jpg"
+                alt="AhhbitTracker"
+                className="h-8 w-8 rounded-lg"
+              />
+              <span className="text-lg font-bold">
+                <span className="text-primary-500">Ahhbit</span>
+                <span className="text-surface-900 dark:text-white">Tracker</span>
+              </span>
+            </div>
+            <p className="text-sm text-surface-600 dark:text-surface-400 leading-relaxed">
+              On-chain habit tracking with accountability.
+              Stake STX, build streaks, earn rewards.
             </p>
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-4">Resources</h4>
-            <ul className="space-y-2 text-sm text-gray-600">
+            <h4 className="text-sm font-semibold text-surface-900 dark:text-white mb-4 uppercase tracking-wider">Resources</h4>
+            <ul className="space-y-2.5">
               {RESOURCE_LINKS.map((link) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-primary-500 transition-colors"
+                    className="text-sm text-surface-600 dark:text-surface-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
                   >
                     {link.label}
                   </a>
@@ -40,24 +50,29 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-gray-900 mb-4">Contract</h4>
+            <h4 className="text-sm font-semibold text-surface-900 dark:text-white mb-4 uppercase tracking-wider">Smart Contract</h4>
             <a
               href={EXPLORER_CONTRACT_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-gray-600 font-mono break-all hover:text-primary-500 transition-colors"
+              className="text-xs text-surface-500 dark:text-surface-400 font-mono break-all hover:text-primary-500 dark:hover:text-primary-400 transition-colors leading-relaxed"
             >
-              SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker
+              SP1M46...habit-tracker
             </a>
+            <p className="text-xs text-surface-400 dark:text-surface-500 mt-2">
+              Deployed on Stacks Mainnet
+            </p>
           </div>
         </div>
-        <div className="mt-8 pt-8 border-t border-gray-200 text-center text-sm text-gray-500">
-          <p>© {new Date().getFullYear()} AhhbitTracker. Built on Stacks.</p>
+        <div className="mt-10 pt-6 border-t border-surface-200 dark:border-surface-800 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-surface-500 dark:text-surface-400">
+            &copy; {new Date().getFullYear()} AhhbitTracker. Built on Stacks.
+          </p>
           <a
             href={REPO_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block mt-2 text-gray-400 hover:text-primary-500 transition-colors"
+            className="text-sm text-surface-400 hover:text-primary-500 dark:hover:text-primary-400 transition-colors"
           >
             GitHub
           </a>

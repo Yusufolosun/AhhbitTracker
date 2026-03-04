@@ -10,7 +10,6 @@ const NAV_LINKS = [
   { href: '#habits', label: 'My Habits' },
   { href: '#create-habit', label: 'New Habit' },
   { href: '#pool', label: 'Pool' },
-  { href: 'https://github.com/Yusufolosun/AhhbitTracker#readme', label: 'Docs', external: true },
 ];
 
 export function Header() {
@@ -27,30 +26,35 @@ export function Header() {
   }, []);
 
   return (
-    <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+    <header className="bg-white dark:bg-surface-950 border-b border-surface-200 dark:border-surface-700 sticky top-0 z-50 backdrop-blur-sm bg-white/90 dark:bg-surface-950/90">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-primary-500">
-              AhhbitTracker
-            </h1>
-          </div>
+          <a href="#dashboard" className="flex items-center gap-3 group">
+            <img
+              src="/logos/icon-only-dark.jpg"
+              alt="AhhbitTracker"
+              className="h-9 w-9 rounded-lg"
+            />
+            <span className="text-xl font-bold">
+              <span className="text-primary-500">Ahhbit</span>
+              <span className="text-surface-900 dark:text-white">Tracker</span>
+            </span>
+          </a>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex items-center space-x-1">
             {NAV_LINKS.map((link) => {
-              const isActive = !link.external && link.href === `#${route}`;
+              const isActive = link.href === `#${route}`;
               return (
                 <a
                   key={link.href}
                   href={link.href}
-                  className={`transition-colors ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isActive
-                      ? 'text-primary-500 font-semibold'
-                      : 'text-gray-700 dark:text-gray-300 hover:text-primary-500'
+                      ? 'text-primary-500 bg-primary-50 dark:bg-primary-500/10'
+                      : 'text-surface-600 dark:text-surface-400 hover:text-primary-500 hover:bg-surface-100 dark:hover:bg-surface-800'
                   }`}
-                  {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                 >
                   {link.label}
                 </a>
@@ -59,40 +63,37 @@ export function Header() {
           </nav>
 
           {/* Wallet + Theme + Mobile Toggle */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             <ThemeToggle />
             {walletState.isConnected ? (
               <>
-                <div className="hidden sm:flex items-center space-x-2 px-4 py-2 bg-gray-100 rounded-lg">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 bg-surface-100 dark:bg-surface-800 rounded-lg border border-surface-200 dark:border-surface-700">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
                   <a
                     href={`${EXPLORER_ADDRESS_URL}${walletState.address!}?chain=mainnet`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm font-medium text-gray-700 hover:text-primary-500 transition-colors"
+                    className="text-sm font-medium text-surface-700 dark:text-surface-300 hover:text-primary-500 transition-colors"
                     title="View on Stacks Explorer"
                   >
                     {shortenAddress(walletState.address!)}
                   </a>
                   {walletState.balance > 0 && (
-                    <span className="text-xs text-gray-500 border-l border-gray-300 pl-2">
+                    <span className="text-xs text-surface-500 border-l border-surface-300 dark:border-surface-600 pl-2">
                       {formatSTX(walletState.balance)} STX
                     </span>
                   )}
                 </div>
                 <button
                   onClick={disconnect}
-                  className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                  className="text-sm text-surface-500 hover:text-primary-500 dark:text-surface-400 dark:hover:text-primary-400 transition-colors"
                   aria-label="Disconnect wallet"
                 >
                   Disconnect
                 </button>
               </>
             ) : (
-              <button
-                onClick={connect}
-                className="btn-primary"
-              >
+              <button onClick={connect} className="btn-primary text-sm px-4 py-2">
                 Connect Wallet
               </button>
             )}
@@ -100,16 +101,16 @@ export function Header() {
             {/* Mobile menu toggle */}
             <button
               onClick={toggleMenu}
-              className="md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
+              className="md:hidden p-2 rounded-lg text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"
               aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
               aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               ) : (
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               )}
@@ -120,27 +121,33 @@ export function Header() {
 
       {/* Mobile Navigation */}
       {mobileMenuOpen && (
-        <nav className="md:hidden border-t border-gray-200 bg-white animate-fade-in">
+        <nav className="md:hidden border-t border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-950 animate-fade-in">
           <div className="px-4 py-3 space-y-1">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={closeMenu}
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-primary-500 hover:bg-gray-50 transition-colors"
-                {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-              >
-                {link.label}
-              </a>
-            ))}
+            {NAV_LINKS.map((link) => {
+              const isActive = link.href === `#${route}`;
+              return (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={closeMenu}
+                  className={`block px-3 py-2.5 rounded-lg text-base font-medium transition-colors ${
+                    isActive
+                      ? 'text-primary-500 bg-primary-50 dark:bg-primary-500/10'
+                      : 'text-surface-700 dark:text-surface-300 hover:text-primary-500 hover:bg-surface-100 dark:hover:bg-surface-800'
+                  }`}
+                >
+                  {link.label}
+                </a>
+              );
+            })}
           </div>
 
           {/* Mobile wallet info */}
           {walletState.isConnected && (
-            <div className="px-4 py-3 border-t border-gray-100 sm:hidden">
+            <div className="px-4 py-3 border-t border-surface-200 dark:border-surface-700 sm:hidden">
               <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-sm font-medium text-gray-700">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full" />
+                <span className="text-sm font-medium text-surface-700 dark:text-surface-300">
                   {shortenAddress(walletState.address!)}
                 </span>
               </div>
