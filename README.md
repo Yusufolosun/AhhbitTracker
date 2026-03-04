@@ -1,225 +1,151 @@
 # AhhbitTracker
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Stacks](https://img.shields.io/badge/Stacks-Mainnet-5546FF)](https://www.stacks.co/)
 [![Clarity](https://img.shields.io/badge/Clarity-v2-blue)](https://docs.stacks.co/clarity)
-[![Frontend](https://img.shields.io/badge/Frontend-React%2018-61DAFB)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6)](https://www.typescriptlang.org/)
+[![React](https://img.shields.io/badge/React-18-61DAFB)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6)](https://www.typescriptlang.org/)
+[![Tests](https://img.shields.io/badge/Tests-29%2F29%20passing-brightgreen)](#testing)
 
-Build lasting habits with blockchain accountability. Stake STX, track streaks, earn rewards.
-
-## 🚀 Live Application
-
-**Frontend:** Full React dApp with wallet integration  
-**Contract:** `SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker`  
-**Status:** 🟢 Production Ready - Mainnet Deployment  
-**Explorer:** [View on Stacks Explorer](https://explorer.hiro.so/txid/SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker?chain=mainnet)
+> Build lasting habits with blockchain accountability. Stake STX, check in daily, earn rewards.
 
 ## Overview
 
-AhhbitTracker leverages blockchain technology to create financial accountability for habit formation. Users stake STX tokens on daily habits, check in every 24 hours to maintain streaks, and earn rewards from a shared pool of forfeited stakes.
+AhhbitTracker is a decentralized habit-tracking dApp on the [Stacks](https://www.stacks.co/) blockchain. Users stake STX as a financial commitment to daily habits. Miss a day — your stake is forfeited to the shared pool. Complete a 7-day streak — reclaim your stake and earn bonuses from other users' forfeited stakes.
 
-**Current Stats:**
-- ✅ 4 Active Habits Tracked
-- ✅ 1.30 STX Currently Staked
-- ✅ Full Frontend Integration Complete
-- ✅ Security Audited
+**Live contract:** [`SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker`](https://explorer.hiro.so/txid/SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker?chain=mainnet)
 
-## ✨ Features
+## How It Works
 
-### Core Functionality
-- 💰 **Habit Staking** - Minimum 0.1 STX commitment per habit
-- ⏰ **Daily Check-ins** - 24-hour window (144 blocks) for accountability
-- 🔥 **Streak Tracking** - Visual progress monitoring
-- 💸 **Stake Withdrawal** - Reclaim your stake after 7-day completion
-- 🎁 **Bonus Pool** - Earn from forfeited stakes of failed habits
+1. **Stake** — Create a habit and deposit ≥ 0.1 STX as your commitment
+2. **Check In** — Record each daily completion within the 24-hour window (~144 Stacks blocks)
+3. **Streak** — Maintain a 7-day streak to unlock withdrawal
+4. **Withdraw** — Reclaim your stake and claim your share of the bonus pool
 
-### User Experience
-- 🔐 **Wallet Integration** - Leather, Xverse, Asigna support
-- 📊 **Dashboard Analytics** - Real-time habit statistics
-- ⚡ **Transaction Confirmation** - Smart retry and cache invalidation
-- 🎨 **Modern UI** - Tailwind CSS responsive design
-- 🛡️ **Security** - Post-condition validation for all STX transfers
+Missed check-ins slash the habit: your stake is sent to the shared bonus pool, distributed to users who completed their streaks.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
-### Smart Contract
-- **Language:** Clarity 2.0
-- **Network:** Stacks Mainnet
-- **Testing:** Vitest 2.1.8 + Clarinet SDK (29/29 tests passing)
-- **Security:** Post-condition mode: Deny
+| Layer | Technology |
+|---|---|
+| Smart Contract | Clarity 2.0 · Stacks Mainnet |
+| Frontend | React 18 · TypeScript · Vite 5 · Tailwind CSS 3 |
+| State Management | @tanstack/react-query 5 |
+| Wallet Integration | @stacks/connect 7 (Leather · Xverse · Asigna) |
+| Testing | Vitest + Clarinet SDK |
+| Deployment | Vercel |
 
-### Frontend
-- **Framework:** React 18.2.0 + TypeScript 5.9.3
-- **Build Tool:** Vite 4.5.14
-- **Styling:** Tailwind CSS 3.4.0
-- **State:** @tanstack/react-query 5.62.11
-- **Blockchain:** @stacks/connect 7.0.0, @stacks/transactions 6.18.0
-- **Network:** StacksMainnet
+## Local Development
 
-## 🚀 Getting Started
-
-### Prerequisites
+**Prerequisites:** Node.js ≥ 18, [Clarinet CLI](https://docs.hiro.so/clarinet/getting-started)
 
 ```bash
-# Required
-- Node.js >= 18.x
-- npm or pnpm
-- Clarinet CLI (for contract development)
-- Stacks wallet (Leather, Xverse, or Asigna)
-```
-
-### Installation
-
-```bash
-# Clone repository
-git clone https://github.com/yourusername/AhhbitTracker.git
+# Clone
+git clone https://github.com/Yusufolosun/AhhbitTracker.git
 cd AhhbitTracker
 
-# Install dependencies
+# Install root dependencies (contract testing)
 npm install
 
-# Install frontend dependencies
+# Install and start frontend
 cd frontend
+cp .env.example .env.local   # see Environment Variables below
 npm install
-```
-
-### Development
-
-```bash
-# Terminal 1: Run contract tests
-npm test
-
-# Terminal 2: Start frontend dev server
-cd frontend
-npm run dev
-# Opens at http://localhost:3000
-
-# OR node node_modules/vite/bin/vite.js
+npm run dev                  # → http://localhost:3000
 ```
 
 ### Testing
 
 ```bash
-# Run all contract tests (29 tests)
+# Run all 29 contract tests
 npm test
 
-# Check contract syntax
+# Check Clarity contract syntax
 clarinet check
-
-# Run specific test file
-npm test -- habit-tracker.test.ts
 ```
 
-### Build for Production
+### Production Build
 
 ```bash
-# Build frontend
 cd frontend
-npm run build
-# Output in frontend/dist/
-
-# Deploy contract (see docs/DEPLOYMENT.md)
-clarinet deployments apply -p deployments/default.mainnet-plan.yaml
+npm run build    # output → frontend/dist/
+npm run preview  # preview the production build locally
 ```
 
-## 📋 Contract Functions
+## Environment Variables
+
+Copy `frontend/.env.example` to `frontend/.env.local` before running locally. **Never commit `.env.local`.**
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `VITE_CONTRACT_ADDRESS` | No | `SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193` | Deployed contract principal |
+| `VITE_CONTRACT_NAME` | No | `habit-tracker` | Contract name |
+
+## Deploy to Vercel
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FYusufolosun%2FAhhbitTracker&root=frontend)
+
+1. Import the repository in [Vercel](https://vercel.com)
+2. Set **Root Directory** → `frontend`
+3. Build settings are auto-detected from `frontend/vercel.json`
+4. Add any environment variable overrides from `frontend/.env.example`
+
+All client-side routing is handled by the SPA rewrite rule in `vercel.json`. No additional server configuration required.
+
+## Contract Reference
+
+**Address:** `SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193`
+**Network:** Stacks Mainnet
+**Explorer:** [View on Hiro Explorer](https://explorer.hiro.so/txid/SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker?chain=mainnet)
 
 ### Public Functions
 
-| Function | Description | Parameters | Returns |
-|----------|-------------|------------|---------|
-| `create-habit` | Create new habit with stake | `name: string-utf8, stake: uint` | `(response uint uint)` |
-| `check-in` | Record daily check-in | `habit-id: uint` | `(response uint uint)` |
-| `withdraw-stake` | Withdraw stake after 7-day streak | `habit-id: uint` | `(response uint uint)` |
-| `claim-bonus` | Claim bonus from forfeited pool | `habit-id: uint` | `(response uint uint)` |
-| `slash-habit` | Forfeit expired habits to pool | `habit-id: uint` | `(response uint uint)` |
+| Function | Parameters | Description |
+|---|---|---|
+| `create-habit` | `name: string-utf8`, `stake: uint` | Create a habit with STX stake |
+| `check-in` | `habit-id: uint` | Record today's check-in |
+| `withdraw-stake` | `habit-id: uint` | Reclaim stake after 7-day streak |
+| `claim-bonus` | `habit-id: uint` | Claim share of forfeited pool |
+| `slash-habit` | `habit-id: uint` | Forfeit an expired habit to the pool |
 
 ### Read-Only Functions
 
-| Function | Description | Returns |
-|----------|-------------|---------|
-| `get-habit` | Retrieve habit details | `(optional habit-tuple)` |
-| `get-user-habits` | Get user's habit list | `(tuple (habit-ids (list uint)))` |
-| `get-habit-streak` | Get current streak | `(response uint uint)` |
-| `get-pool-balance` | Get forfeited pool balance | `(response uint uint)` |
-| `get-total-habits` | Get total habits created | `(response uint uint)` |
-| `get-user-stats` | Get user statistics | `(response stats-tuple uint)` |
+| Function | Returns |
+|---|---|
+| `get-habit` | Full habit record |
+| `get-user-habits` | List of habit IDs owned by a principal |
+| `get-habit-streak` | Current streak count |
+| `get-pool-balance` | Total forfeited STX in the shared pool |
+| `get-user-stats` | Aggregated stats per principal |
 
-### Habit Data Structure
+Full reference → [`docs/API_REFERENCE.md`](docs/API_REFERENCE.md)
 
-```clarity
-{
-  owner: principal,
-  name: (string-utf8 50),
-  stake-amount: uint,
-  current-streak: uint,
-  last-check-in-block: uint,
-  created-at-block: uint,
-  is-active: bool,
-  is-completed: bool
-}
-```
+## Security
 
-## 🔐 Security Features
+- Post-condition validation on every STX transfer — transactions revert if amounts do not match
+- Authorization checks: only the habit owner can check in, withdraw, or claim
+- Input validation: name length, minimum stake, check-in timing enforced on-chain
+- No private keys, mnemonics, or secrets in this repository
 
-- ✅ **Post-Condition Validation** - All STX transfers validated before execution
-- ✅ **Authorization Checks** - Only habit owners can check-in/withdraw
-- ✅ **Input Validation** - Name length, stake amount, window timing
-- ✅ **Reentrancy Protection** - State changes before external calls
-- ✅ **Security Audit** - Comprehensive audit completed (see SECURITY_AUDIT_REPORT.md)
-- ✅ **Zero Vulnerabilities** - No private keys or sensitive data in repository
+See [`docs/SECURITY.md`](docs/SECURITY.md) for the full security model.
 
-## 📚 Documentation
+## Documentation
 
-### Core Documentation
-- [Architecture Overview](docs/ARCHITECTURE.md)
-- [Smart Contract Design](docs/SMART_CONTRACT_DESIGN.md)
-- [Frontend Integration Guide](docs/INTEGRATION_GUIDE.md)
-- [API Reference](docs/API_REFERENCE.md)
+| Document | Description |
+|---|---|
+| [Architecture](docs/ARCHITECTURE.md) | System design and data flow |
+| [API Reference](docs/API_REFERENCE.md) | All contract functions and error codes |
+| [Integration Guide](docs/INTEGRATION_GUIDE.md) | Connecting a custom frontend |
+| [User Guide](docs/USER_GUIDE.md) | End-user walkthrough |
+| [Tutorial](docs/TUTORIAL.md) | Step-by-step for first-time users |
+| [FAQ](docs/FAQ.md) | Common questions |
+| [Security](docs/SECURITY.md) | Security model |
+| [Deployment](docs/DEPLOYMENT.md) | Contract deployment guide |
 
-### Development Guides
-- [Deployment Guide](docs/DEPLOYMENT.md)
-- [Post-Deployment Checklist](docs/POST_DEPLOYMENT.md)
-- [Testing Guide](docs/TESTING_GUIDE.md)
-- [Contribution Guide](CONTRIBUTING.md)
+## Contributing
 
-### Additional Resources
-- [Security Audit Report](SECURITY_AUDIT_REPORT.md)
-- [FAQ](docs/FAQ.md)
-- [Troubleshooting](docs/TROUBLESHOOTING.md)
-- [Roadmap](docs/ROADMAP.md)
+Pull requests are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a PR.
 
-## 🤝 Contributing
+## License
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📊 Project Status
-
-- **Smart Contract:** ✅ Deployed to Mainnet
-- **Frontend:** ✅ Production Ready
-- **Testing:** ✅ 29/29 Tests Passing
-- **Security:** ✅ Audited
-- **Documentation:** ✅ Complete
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Built on [Stacks](https://www.stacks.co/) blockchain
-- Powered by [Clarity](https://clarity-lang.org/) smart contracts
-- UI components inspired by modern web3 design patterns
-
----
-
-**Made with ❤️ for the Stacks community**
-
-
+[MIT](LICENSE) © [Yusufolosun](https://github.com/Yusufolosun)
