@@ -31,18 +31,20 @@ export function Dashboard({ habits }: DashboardProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Dashboard</h2>
-        <p className="text-gray-600">Track your habit-building progress</p>
+        <h2 className="text-2xl font-bold text-surface-900 dark:text-white mb-2">Dashboard</h2>
+        <p className="text-surface-600 dark:text-surface-400">Track your habit-building progress</p>
       </div>
 
       {/* Empty state — first-time user onboarding */}
       {habits.length === 0 ? (
         <div className="card text-center py-12">
-          <svg className="mx-auto w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">No habits yet</h3>
-          <p className="text-gray-500 max-w-md mx-auto">
+          <div className="w-16 h-16 bg-primary-100 dark:bg-primary-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-surface-800 dark:text-white mb-2">No habits yet</h3>
+          <p className="text-surface-500 dark:text-surface-400 max-w-md mx-auto">
             Create your first on-chain habit below. Stake STX, check in daily, and earn
             rewards from the forfeited pool when you stay consistent.
           </p>
@@ -102,18 +104,18 @@ export function Dashboard({ habits }: DashboardProps) {
       </div>
 
       {stats.completed > 0 && (
-        <div className="card bg-green-50 border-green-200">
+        <div className="card bg-emerald-50 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-green-900">
+              <p className="text-sm font-medium text-emerald-900 dark:text-emerald-300">
                 Congratulations! You've completed {stats.completed} habit{stats.completed > 1 ? 's' : ''}!
               </p>
-              <p className="text-xs text-green-700 mt-1">
+              <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-1">
                 Don't forget to claim your bonuses from the forfeited pool.
               </p>
             </div>

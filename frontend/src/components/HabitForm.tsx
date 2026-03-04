@@ -44,13 +44,13 @@ export function HabitForm() {
 
   return (
     <div className="card">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">
+      <h2 className="text-xl font-bold text-surface-900 dark:text-white mb-4">
         Create New Habit
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="name" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
             Habit Name
           </label>
           <input
@@ -65,13 +65,13 @@ export function HabitForm() {
             disabled={isCreatingHabit}
             aria-describedby={error ? 'form-error' : undefined}
           />
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
             {name.length}/50 characters
           </p>
         </div>
 
         <div>
-          <label htmlFor="stake" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="stake" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
             Stake Amount (STX)
           </label>
           <input
@@ -86,7 +86,7 @@ export function HabitForm() {
             required
             disabled={isCreatingHabit}
           />
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
             Minimum: 0.1 STX
           </p>
         </div>
@@ -113,9 +113,9 @@ export function HabitForm() {
         </button>
       </form>
 
-      <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-        <p className="text-sm text-blue-800">
-          💡 <strong>Tip:</strong> Choose a realistic daily habit. You'll need to check in every 24 hours!
+      <div className="mt-4 p-4 bg-primary-50 dark:bg-primary-500/10 rounded-lg border border-primary-200 dark:border-primary-500/20">
+        <p className="text-sm text-primary-800 dark:text-primary-300">
+          <strong>Tip:</strong> Choose a realistic daily habit. You'll need to check in every 24 hours!
         </p>
       </div>
     </div>

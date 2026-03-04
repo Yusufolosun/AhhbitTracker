@@ -40,19 +40,19 @@ export function HabitCard({ habit }: HabitCardProps) {
   const canClaimBonus = habit.isCompleted;
 
   return (
-    <div className="card hover:shadow-md transition-shadow">
+    <div className="card hover:shadow-md transition-all duration-200 hover:border-primary-500/30 dark:hover:border-primary-500/20">
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-gray-900 mb-1">
+          <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-1">
             {habit.name}
           </h3>
           <div className="flex items-center space-x-2">
             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${habit.isActive
-              ? 'bg-green-100 text-green-800'
+              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-400'
               : habit.isCompleted
-                ? 'bg-blue-100 text-blue-800'
-                : 'bg-gray-100 text-gray-800'
+                ? 'bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-400'
+                : 'bg-surface-100 text-surface-600 dark:bg-surface-700 dark:text-surface-400'
               }`}>
               {habit.isActive ? '🟢 Active' : habit.isCompleted ? '✅ Completed' : '⚫ Inactive'}
             </span>
@@ -71,14 +71,14 @@ export function HabitCard({ habit }: HabitCardProps) {
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
-          <p className="text-xs text-gray-500">Stake</p>
-          <p className="text-sm font-semibold text-gray-900">
+          <p className="text-xs text-surface-500 dark:text-surface-400">Stake</p>
+          <p className="text-sm font-semibold text-surface-900 dark:text-white">
             {formatSTX(habit.stakeAmount)} STX
           </p>
         </div>
         <div>
-          <p className="text-xs text-gray-500">Last Check-in</p>
-          <p className="text-sm font-semibold text-gray-900" title={`Block ${habit.lastCheckInBlock}`}>
+          <p className="text-xs text-surface-500 dark:text-surface-400">Last Check-in</p>
+          <p className="text-sm font-semibold text-surface-900 dark:text-white" title={`Block ${habit.lastCheckInBlock}`}>
             {currentBlock
               ? blocksAgo(currentBlock, habit.lastCheckInBlock)
               : `Block ${habit.lastCheckInBlock}`}
@@ -120,12 +120,12 @@ export function HabitCard({ habit }: HabitCardProps) {
       </div>
 
       {/* Contract link */}
-      <div className="mt-3 pt-3 border-t border-gray-200 text-right">
+      <div className="mt-3 pt-3 border-t border-surface-200 dark:border-surface-700 text-right">
         <a
           href={`${EXPLORER_ADDRESS_URL}${CONTRACT_ADDRESS}.${CONTRACT_NAME}?chain=mainnet`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs text-gray-400 hover:text-primary-500 transition-colors"
+          className="text-xs text-surface-400 hover:text-primary-500 transition-colors"
         >
           View contract on Explorer &rarr;
         </a>
@@ -133,16 +133,16 @@ export function HabitCard({ habit }: HabitCardProps) {
 
       {/* Progress Indicator */}
       {habit.isActive && (
-        <div className="mt-4 pt-4 border-t border-gray-200">
+        <div className="mt-4 pt-4 border-t border-surface-200 dark:border-surface-700">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-gray-600">Progress to Withdrawal</span>
-            <span className="text-xs font-medium text-gray-900">
+            <span className="text-xs text-surface-600 dark:text-surface-400">Progress to Withdrawal</span>
+            <span className="text-xs font-medium text-surface-900 dark:text-white">
               {habit.currentStreak}/{MIN_STREAK_FOR_WITHDRAWAL} days
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-surface-200 dark:bg-surface-700 rounded-full h-2">
             <div
-              className="bg-primary-500 h-2 rounded-full transition-all duration-300"
+              className="bg-primary-500 h-2 rounded-full transition-all duration-500"
               style={{ width: `${Math.min((habit.currentStreak / MIN_STREAK_FOR_WITHDRAWAL) * 100, 100)}%` }}
             ></div>
           </div>
@@ -160,18 +160,18 @@ export function HabitCard({ habit }: HabitCardProps) {
       >
         <div className="space-y-2">
           <p>You are about to withdraw your stake from:</p>
-          <dl className="bg-gray-50 rounded-lg p-3 space-y-1">
+          <dl className="bg-surface-50 dark:bg-surface-700 rounded-lg p-3 space-y-1">
             <div className="flex justify-between">
-              <dt className="text-gray-500">Habit</dt>
-              <dd className="font-medium text-gray-900">{habit.name}</dd>
+              <dt className="text-surface-500 dark:text-surface-400">Habit</dt>
+              <dd className="font-medium text-surface-900 dark:text-white">{habit.name}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-gray-500">Stake</dt>
-              <dd className="font-medium text-gray-900">{formatSTX(habit.stakeAmount)} STX</dd>
+              <dt className="text-surface-500 dark:text-surface-400">Stake</dt>
+              <dd className="font-medium text-surface-900 dark:text-white">{formatSTX(habit.stakeAmount)} STX</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-gray-500">Current Streak</dt>
-              <dd className="font-medium text-gray-900">{habit.currentStreak} days</dd>
+              <dt className="text-surface-500 dark:text-surface-400">Current Streak</dt>
+              <dd className="font-medium text-surface-900 dark:text-white">{habit.currentStreak} days</dd>
             </div>
           </dl>
           <p className="text-xs text-amber-600">
@@ -191,14 +191,14 @@ export function HabitCard({ habit }: HabitCardProps) {
       >
         <div className="space-y-2">
           <p>You are about to claim a bonus reward for:</p>
-          <dl className="bg-gray-50 rounded-lg p-3 space-y-1">
+          <dl className="bg-surface-50 dark:bg-surface-700 rounded-lg p-3 space-y-1">
             <div className="flex justify-between">
-              <dt className="text-gray-500">Habit</dt>
-              <dd className="font-medium text-gray-900">{habit.name}</dd>
+              <dt className="text-surface-500 dark:text-surface-400">Habit</dt>
+              <dd className="font-medium text-surface-900 dark:text-white">{habit.name}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-gray-500">Final Streak</dt>
-              <dd className="font-medium text-gray-900">{habit.currentStreak} days</dd>
+              <dt className="text-surface-500 dark:text-surface-400">Final Streak</dt>
+              <dd className="font-medium text-surface-900 dark:text-white">{habit.currentStreak} days</dd>
             </div>
           </dl>
           <p className="text-xs text-amber-600">
