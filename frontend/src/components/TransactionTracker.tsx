@@ -12,23 +12,23 @@ export function TransactionTracker() {
       {transactions.map((tx) => (
         <div
           key={tx.txId}
-          className="bg-white border border-gray-200 rounded-lg shadow-lg p-4 animate-fade-in"
+          className="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-lg shadow-lg p-4 animate-slide-in"
         >
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
               <div className="flex items-center space-x-2 mb-1">
-                <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <div className="w-2 h-2 bg-primary-400 rounded-full animate-pulse"></div>
+                <p className="text-sm font-medium text-surface-900 dark:text-white truncate">
                   {formatFunctionName(tx.functionName)}
                 </p>
               </div>
-              <p className="text-xs text-gray-500 truncate" title={tx.txId}>
+              <p className="text-xs text-surface-500 dark:text-surface-400 truncate" title={tx.txId}>
                 {shortenTxId(tx.txId)}
               </p>
             </div>
             <button
               onClick={() => dismissTransaction(tx.txId)}
-              className="ml-2 text-gray-400 hover:text-gray-600 transition-colors"
+              className="ml-2 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300 transition-colors"
               aria-label="Dismiss notification"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -38,7 +38,7 @@ export function TransactionTracker() {
           </div>
 
           <div className="mt-2 flex items-center justify-between">
-            <span className="text-xs text-yellow-600 font-medium">
+            <span className="text-xs text-primary-600 dark:text-primary-400 font-medium">
               Submitted — waiting for confirmation
             </span>
             <a

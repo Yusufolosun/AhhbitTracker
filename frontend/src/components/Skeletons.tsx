@@ -57,7 +57,7 @@ export function HabitCardSkeleton() {
 /** A skeleton matching the PoolDisplay card */
 export function PoolSkeleton() {
   return (
-    <div className="card bg-gradient-to-br from-primary-50 to-primary-100 border-primary-200 animate-pulse">
+    <div className="card bg-gradient-to-br from-primary-50 to-primary-100 border-primary-200 dark:from-primary-500/10 dark:to-primary-500/5 dark:border-primary-500/20 animate-pulse">
       <div className="flex items-center justify-between">
         <div className="space-y-2 flex-1">
           <div className="h-3 w-32 bg-primary-200 rounded" />
