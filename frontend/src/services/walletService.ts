@@ -12,7 +12,7 @@ export const walletService = {
     showConnect({
       appDetails: {
         name: 'AhhbitTracker',
-        icon: window.location.origin + '/logo.svg',
+        icon: window.location.origin + '/logos/icon-only-dark.jpg',
       },
       redirectTo: '/',
       onFinish: (payload) => {

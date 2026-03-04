@@ -47,14 +47,14 @@ function AppContent() {
 
   if (!walletState.isConnected) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
+      <div className="min-h-screen flex items-center justify-center bg-surface-50 dark:bg-surface-900 px-4">
         <WalletConnect />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen flex flex-col bg-surface-50 dark:bg-surface-900">
       {/* Skip to content link for keyboard/screen-reader users */}
       <a
         href="#main-content"
@@ -89,7 +89,7 @@ function AppContent() {
 
           {route === 'habits' && (
             <section id="habits">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">My Habits</h2>
+              <h2 className="text-2xl font-bold text-surface-900 dark:text-white mb-6">My Habits</h2>
               <HabitList habits={habits} loading={isLoadingHabits} />
             </section>
           )}

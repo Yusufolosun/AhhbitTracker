@@ -38,7 +38,7 @@ export const contractService = {
         postConditionMode: PostConditionMode.Deny,
         appDetails: {
           name: 'AhhbitTracker',
-          icon: window.location.origin + '/logo.svg',
+          icon: window.location.origin + '/logos/icon-only-dark.jpg',
         },
         onFinish: (data) => {
           resolve(data.txId);
@@ -62,7 +62,7 @@ export const contractService = {
       network: NETWORK,
       appDetails: {
         name: 'AhhbitTracker',
-        icon: window.location.origin + '/logo.svg',
+        icon: window.location.origin + '/logos/icon-only-dark.jpg',
       },
     });
   },
@@ -91,7 +91,7 @@ export const contractService = {
       postConditionMode: PostConditionMode.Deny,
       appDetails: {
         name: 'AhhbitTracker',
-        icon: window.location.origin + '/logo.svg',
+        icon: window.location.origin + '/logos/icon-only-dark.jpg',
       },
     });
   },
@@ -120,7 +120,7 @@ export const contractService = {
       postConditionMode: PostConditionMode.Deny,
       appDetails: {
         name: 'AhhbitTracker',
-        icon: window.location.origin + '/logo.svg',
+        icon: window.location.origin + '/logos/icon-only-dark.jpg',
       },
     });
   },
