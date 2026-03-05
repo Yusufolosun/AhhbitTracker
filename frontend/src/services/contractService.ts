@@ -11,6 +11,11 @@ import {
 import { CONTRACT_ADDRESS, CONTRACT_NAME, NETWORK } from '../utils/constants';
 import { walletService } from './walletService';
 
+const appDetails = {
+  name: 'AhhbitTracker',
+  icon: window.location.origin + '/logos/icon-only-dark.jpg',
+};
+
 export const contractService = {
   /**
    * Create a new habit
@@ -36,10 +41,8 @@ export const contractService = {
         network: NETWORK,
         postConditions,
         postConditionMode: PostConditionMode.Deny,
-        appDetails: {
-          name: 'AhhbitTracker',
-          icon: window.location.origin + '/logos/icon-only-dark.jpg',
-        },
+        appDetails,
+        userSession: walletService.getUserSession(),
         onFinish: (data) => {
           resolve(data.txId);
         },
@@ -60,10 +63,8 @@ export const contractService = {
       functionName: 'check-in',
       functionArgs: [uintCV(habitId)],
       network: NETWORK,
-      appDetails: {
-        name: 'AhhbitTracker',
-        icon: window.location.origin + '/logos/icon-only-dark.jpg',
-      },
+      appDetails,
+      userSession: walletService.getUserSession(),
     });
   },
 
@@ -89,10 +90,8 @@ export const contractService = {
       network: NETWORK,
       postConditions,
       postConditionMode: PostConditionMode.Deny,
-      appDetails: {
-        name: 'AhhbitTracker',
-        icon: window.location.origin + '/logos/icon-only-dark.jpg',
-      },
+      appDetails,
+      userSession: walletService.getUserSession(),
     });
   },
 
@@ -118,10 +117,8 @@ export const contractService = {
       network: NETWORK,
       postConditions,
       postConditionMode: PostConditionMode.Deny,
-      appDetails: {
-        name: 'AhhbitTracker',
-        icon: window.location.origin + '/logos/icon-only-dark.jpg',
-      },
+      appDetails,
+      userSession: walletService.getUserSession(),
     });
   },
 
