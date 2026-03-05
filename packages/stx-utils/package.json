@@ -1,5 +1,5 @@
 {
-  "name": "@rexaors/stx-utils",
+  "name": "@yusufolosun/stx-utils",
   "version": "1.1.0",
   "description": "Lightweight utilities for Stacks (STX) dApp development — formatting, validation, address helpers, block-time estimation, and more.",
   "author": "Yusufolosun",
