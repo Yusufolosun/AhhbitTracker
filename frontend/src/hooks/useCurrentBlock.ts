@@ -8,7 +8,7 @@ import { useQuery } from '@tanstack/react-query';
  */
 async function fetchCurrentBlock(): Promise<number> {
   const isDev = typeof import.meta !== 'undefined' && import.meta.env?.DEV;
-  const baseUrl = isDev ? `${typeof window !== 'undefined' ? window.location.origin : ''}/api/stacks` : 'https://api.hiro.so';
+  const baseUrl = isDev ? `${typeof window !== 'undefined' ? window.location.origin : ''}/api/stacks` : 'https://api.mainnet.hiro.so';
   const res = await fetch(`${baseUrl}/v2/info`);
   if (!res.ok) throw new Error('Failed to fetch block height');
   const data = await res.json();
