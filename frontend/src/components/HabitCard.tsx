@@ -45,6 +45,7 @@ export function HabitCard({ habit }: HabitCardProps) {
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-1">
+            <span className="text-xs font-normal text-surface-400 dark:text-surface-500 mr-1.5">#{habit.habitId}</span>
             {habit.name}
           </h3>
           <div className="flex items-center space-x-2">
@@ -127,7 +128,7 @@ export function HabitCard({ habit }: HabitCardProps) {
           rel="noopener noreferrer"
           className="text-xs text-surface-400 hover:text-primary-500 transition-colors"
         >
-          View contract on Explorer &rarr;
+          View on Stacks Explorer &rarr;
         </a>
       </div>
 
