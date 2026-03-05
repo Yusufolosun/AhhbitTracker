@@ -18,6 +18,9 @@ jobs:
       - run: npm ci
       - name: Audit root dependencies
         run: npm audit --audit-level=high || true
+      - name: Build stx-utils
+        working-directory: packages/stx-utils
+        run: npm ci && npm run build
       - name: Audit frontend dependencies
         working-directory: frontend
-        run: npm ci && npm audit --audit-level=high || true
+        run: npm install --ignore-scripts && npm audit --audit-level=high || true
