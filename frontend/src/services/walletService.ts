@@ -6,10 +6,9 @@ const userSession = new UserSession({ appConfig });
 
 export const walletService = {
   /**
-   * Connect wallet — always shows wallet picker modal
+   * Connect wallet — shows picker if no wallet was previously selected
    */
   connect: (onFinish?: (payload: any) => void) => {
-    clearSelectedProviderId();
     showConnect({
       appDetails: {
         name: 'AhhbitTracker',
