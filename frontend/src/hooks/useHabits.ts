@@ -159,9 +159,9 @@ export const useHabits = () => {
 
     // Mutations
     createHabit: createHabitMutation.mutateAsync,
-    checkIn: checkInMutation.mutate,
-    withdrawStake: withdrawStakeMutation.mutate,
-    claimBonus: claimBonusMutation.mutate,
+    checkIn: checkInMutation.mutateAsync,
+    withdrawStake: withdrawStakeMutation.mutateAsync,
+    claimBonus: claimBonusMutation.mutateAsync,
 
     // Mutation states
     isCreatingHabit: createHabitMutation.isPending,

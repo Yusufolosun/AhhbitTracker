@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { HabitCard } from '../components/HabitCard';
+import { ToastProvider } from '../context/ToastContext';
 import { Habit } from '../types/habit';
 
 // Mock the useHabits hook used by HabitCard
@@ -34,17 +35,17 @@ const mockHabit: Habit = {
 
 describe('HabitCard', () => {
   it('renders habit name', () => {
-    render(<HabitCard habit={mockHabit} />);
+    render(<ToastProvider><HabitCard habit={mockHabit} /></ToastProvider>);
     expect(screen.getByText('Morning Exercise')).toBeDefined();
   });
 
   it('displays current streak', () => {
-    render(<HabitCard habit={mockHabit} />);
+    render(<ToastProvider><HabitCard habit={mockHabit} /></ToastProvider>);
     expect(screen.getByText('5')).toBeDefined();
   });
 
   it('shows active status', () => {
-    render(<HabitCard habit={mockHabit} />);
+    render(<ToastProvider><HabitCard habit={mockHabit} /></ToastProvider>);
     expect(screen.getByText('Active')).toBeDefined();
   });
 });

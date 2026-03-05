@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Habit } from '../types/habit';
 import { useHabits } from '../hooks/useHabits';
+import { useToast } from '../context/ToastContext';
 import { formatSTX, blocksAgo } from '../utils/formatting';
 import { useCurrentBlock } from '../hooks/useCurrentBlock';
 import { MIN_STREAK_FOR_WITHDRAWAL, CONTRACT_ADDRESS, CONTRACT_NAME, EXPLORER_ADDRESS_URL } from '../utils/constants';
@@ -12,11 +13,21 @@ interface HabitCardProps {
 
 export function HabitCard({ habit }: HabitCardProps) {
   const { checkIn, withdrawStake, claimBonus, isCheckingIn, isWithdrawing, isClaiming } = useHabits();
+  const { showToast } = useToast();
   const [confirmAction, setConfirmAction] = useState<'withdraw' | 'claim' | null>(null);
   const currentBlock = useCurrentBlock();
 
-  const handleCheckIn = () => {
-    checkIn(habit.habitId);
+  const handleCheckIn = async () => {
+    try {
+      await checkIn(habit.habitId);
+      showToast('Check-in signed! It will update once confirmed on-chain.', 'success');
+    } catch (err: any) {
+      if (err.message === 'Transaction cancelled') {
+        showToast('Check-in was cancelled.', 'error');
+      } else {
+        showToast(err.message || 'Check-in failed', 'error');
+      }
+    }
   };
 
   const handleWithdraw = () => {
@@ -27,13 +38,24 @@ export function HabitCard({ habit }: HabitCardProps) {
     setConfirmAction('claim');
   };
 
-  const executeConfirmedAction = () => {
-    if (confirmAction === 'withdraw') {
-      withdrawStake({ habitId: habit.habitId, stakeAmount: habit.stakeAmount });
-    } else if (confirmAction === 'claim') {
-      claimBonus(habit.habitId);
-    }
+  const executeConfirmedAction = async () => {
+    const action = confirmAction;
     setConfirmAction(null);
+    try {
+      if (action === 'withdraw') {
+        await withdrawStake({ habitId: habit.habitId, stakeAmount: habit.stakeAmount });
+        showToast('Withdrawal signed! Your STX will return once confirmed on-chain.', 'success');
+      } else if (action === 'claim') {
+        await claimBonus(habit.habitId);
+        showToast('Bonus claim signed! It will arrive once confirmed on-chain.', 'success');
+      }
+    } catch (err: any) {
+      if (err.message === 'Transaction cancelled') {
+        showToast('Transaction was cancelled.', 'error');
+      } else {
+        showToast(err.message || 'Transaction failed', 'error');
+      }
+    }
   };
 
   const canWithdraw = habit.currentStreak >= MIN_STREAK_FOR_WITHDRAWAL && habit.isActive;
