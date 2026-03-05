@@ -5,7 +5,7 @@ function htmlEnvPlugin(): Plugin {
   return {
     name: 'html-env-fallback',
     transformIndexHtml(html) {
-      const appUrl = process.env.VITE_APP_URL || 'https://ahhbittracker.vercel.app';
+      const appUrl = process.env.VITE_APP_URL || 'https://ahhbit-tracker.vercel.app';
       return html.replace(/%VITE_APP_URL%/g, appUrl);
     },
   };
