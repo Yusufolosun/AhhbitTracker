@@ -158,7 +158,7 @@ export const useHabits = () => {
     habitsError,
 
     // Mutations
-    createHabit: createHabitMutation.mutate,
+    createHabit: createHabitMutation.mutateAsync,
     checkIn: checkInMutation.mutate,
     withdrawStake: withdrawStakeMutation.mutate,
     claimBonus: claimBonusMutation.mutate,

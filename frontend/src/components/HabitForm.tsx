@@ -31,14 +31,17 @@ export function HabitForm() {
 
     try {
       const stakeAmount = toMicroSTX(stakeNum);
-      createHabit({ name, stakeAmount });
-      
-      // Reset form and show success toast
+      await createHabit({ name, stakeAmount });
+
       setName('');
       setStake('0.1');
-      showToast('Habit created! It will appear once the transaction confirms.', 'success');
+      showToast('Transaction signed! Your habit will appear once confirmed on-chain.', 'success');
     } catch (err: any) {
-      showToast(err.message || 'Failed to create habit', 'error');
+      if (err.message === 'Transaction cancelled') {
+        showToast('Transaction was cancelled.', 'error');
+      } else {
+        showToast(err.message || 'Failed to create habit', 'error');
+      }
     }
   };
 
