@@ -15,6 +15,11 @@ vi.mock('../hooks/useHabits', () => ({
   }),
 }));
 
+// Mock useCurrentBlock so it returns a deterministic value
+vi.mock('../hooks/useCurrentBlock', () => ({
+  useCurrentBlock: () => 200,
+}));
+
 const mockHabit: Habit = {
   habitId: 1,
   name: 'Morning Exercise',

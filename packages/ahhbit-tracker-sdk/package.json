@@ -1,0 +1,68 @@
+{
+  "name": "ahhbit-tracker-sdk",
+  "version": "1.0.0",
+  "description": "TypeScript SDK for interacting with the AhhbitTracker smart contract on Stacks blockchain — typed transaction builders, read-only queries, and post-condition helpers.",
+  "author": "Yusufolosun",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yusufolosun/AhhbitTracker",
+    "directory": "packages/ahhbit-tracker-sdk"
+  },
+  "homepage": "https://github.com/Yusufolosun/AhhbitTracker/tree/main/packages/ahhbit-tracker-sdk",
+  "bugs": {
+    "url": "https://github.com/Yusufolosun/AhhbitTracker/issues"
+  },
+  "keywords": [
+    "stacks",
+    "stx",
+    "clarity",
+    "blockchain",
+    "smart-contract",
+    "sdk",
+    "habit-tracker",
+    "dapp",
+    "web3",
+    "ahhbittracker"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "@stacks/network": ">=6.0.0",
+    "@stacks/transactions": ">=6.0.0"
+  },
+  "devDependencies": {
+    "@stacks/network": "^7.3.1",
+    "@stacks/transactions": "^7.2.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^2.1.0"
+  }
+}

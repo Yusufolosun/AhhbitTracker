@@ -2,9 +2,9 @@ import { STACKS_MAINNET, createNetwork } from '@stacks/network';
 
 // Network Configuration
 // In development, use Vite proxy to avoid CORS issues with Hiro API
-const isDev = import.meta.env.DEV;
+const isDev = typeof import.meta !== 'undefined' && import.meta.env?.DEV;
 export const NETWORK = isDev
-  ? createNetwork({ network: 'mainnet', client: { baseUrl: `${window.location.origin}/api/stacks` } })
+  ? createNetwork({ network: 'mainnet', client: { baseUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/api/stacks` } })
   : STACKS_MAINNET;
 
 // Contract Configuration — override via VITE_CONTRACT_ADDRESS / VITE_CONTRACT_NAME

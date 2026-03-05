@@ -9,6 +9,8 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/Yusufolosun/AhhbitTracker/actions/workflows/ci.yml"><img src="https://github.com/Yusufolosun/AhhbitTracker/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://www.npmjs.com/package/stx-utils"><img src="https://img.shields.io/npm/v/stx-utils?color=F15A22&label=stx-utils" alt="stx-utils on npm" /></a>
   <a href="https://explorer.hiro.so/txid/SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker?chain=mainnet"><img src="https://img.shields.io/badge/Stacks-Mainnet-F15A22" alt="Stacks Mainnet" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
   <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18-61DAFB" alt="React 18" /></a>
@@ -61,9 +63,17 @@ npm run dev                  # → http://localhost:3000
 ### Testing
 
 ```bash
-npm test              # Run contract tests
+npm test              # Run contract + stx-utils tests (111 tests)
+cd frontend && npm test   # Run frontend tests (30 tests)
 clarinet check        # Validate Clarity syntax
 ```
+
+### Packages
+
+| Package | Description |
+|---|---|
+| [`stx-utils`](packages/stx-utils/) | Zero-dependency utility library for Stacks — formatting, validation, block math, address helpers |
+| [`ahhbit-tracker-sdk`](packages/ahhbit-tracker-sdk/) | Typed SDK for the AhhbitTracker contract — transaction builders, read-only queries, post-conditions |
 
 ### Production Build
 
