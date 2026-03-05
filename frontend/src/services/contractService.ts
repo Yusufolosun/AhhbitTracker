@@ -1,4 +1,4 @@
-import { openContractCall } from '@stacks/connect';
+import { showContractCall } from '@stacks/connect';
 import {
   uintCV,
   stringUtf8CV,
@@ -33,7 +33,7 @@ export const contractService = {
     ];
 
     return new Promise((resolve, reject) => {
-      openContractCall({
+      showContractCall({
         contractAddress: CONTRACT_ADDRESS,
         contractName: CONTRACT_NAME,
         functionName: 'create-habit',
@@ -57,7 +57,7 @@ export const contractService = {
    * Check in to a habit
    */
   async checkIn(habitId: number): Promise<void> {
-    return openContractCall({
+    return showContractCall({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
       functionName: 'check-in',
@@ -82,7 +82,7 @@ export const contractService = {
       Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`).willSendEq(stakeAmount).ustx(),
     ];
 
-    return openContractCall({
+    return showContractCall({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
       functionName: 'withdraw-stake',
@@ -109,7 +109,7 @@ export const contractService = {
       Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`).willSendGte(1).ustx(),
     ];
 
-    return openContractCall({
+    return showContractCall({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
       functionName: 'claim-bonus',
