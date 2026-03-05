@@ -1,4 +1,4 @@
-import { AppConfig, UserSession, showConnect } from '@stacks/connect';
+import { AppConfig, UserSession, showConnect, clearSelectedProviderId } from '@stacks/connect';
 import { NETWORK } from '../utils/constants';
 
 const appConfig = new AppConfig(['store_write', 'publish_data']);
@@ -6,9 +6,10 @@ const userSession = new UserSession({ appConfig });
 
 export const walletService = {
   /**
-   * Connect wallet
+   * Connect wallet — always shows wallet picker modal
    */
   connect: (onFinish?: (payload: any) => void) => {
+    clearSelectedProviderId();
     showConnect({
       appDetails: {
         name: 'AhhbitTracker',
@@ -28,6 +29,7 @@ export const walletService = {
    * Disconnect wallet
    */
   disconnect: () => {
+    clearSelectedProviderId();
     userSession.signUserOut();
   },
 
