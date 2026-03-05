@@ -45,7 +45,7 @@ jobs:
         with:
           node-version: '20'
           registry-url: 'https://npm.pkg.github.com'
-          scope: '@yusufolosun'
+          scope: '@rexaors'
 
       - run: npm ci
       - run: npm run build

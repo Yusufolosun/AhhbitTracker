@@ -12,4 +12,4 @@ export {
   blocksAgo,
   formatDate,
   timeAgo,
-} from '@yusufolosun/stx-utils';
+} from '@rexaors/stx-utils';

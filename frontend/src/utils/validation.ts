@@ -3,7 +3,7 @@
  * Wraps the generic validators to preserve the existing API
  * (validateHabitName / validateStakeAmount).
  */
-import { validateName, validateStake } from '@yusufolosun/stx-utils';
+import { validateName, validateStake } from '@rexaors/stx-utils';
 import { MIN_STAKE_AMOUNT, MAX_HABIT_NAME_LENGTH } from './constants';
 
 export function validateHabitName(name: string): string | null {
