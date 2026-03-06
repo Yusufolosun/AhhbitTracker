@@ -28,8 +28,13 @@ export function fromDecimal(decimal: number): number {
   return Math.round(decimal * BPS_DIVISOR);
 }
 
-/** Apply basis points to an amount (bigint). Returns floored result. */
+/** Apply basis points to an amount (bigint). Returns floored result.
+ * @param basisPoints — must be a non-negative integer (0–10000)
+ */
 export function apply(amount: bigint, basisPoints: number): bigint {
+  if (!Number.isInteger(basisPoints) || basisPoints < 0) {
+    throw new RangeError(`basisPoints must be a non-negative integer, got ${basisPoints}`);
+  }
   return (amount * BigInt(basisPoints)) / BigInt(BPS_DIVISOR);
 }
 

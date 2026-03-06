@@ -103,4 +103,25 @@ describe('tokenAmount', () => {
       }
     });
   });
+
+  describe('edge cases', () => {
+    it('fromHuman handles leading/trailing whitespace', () => {
+      expect(tokenAmount.fromHuman('  1.5  ', 6)).toBe(1_500_000n);
+    });
+
+    it('fromHuman handles multiple decimal points by using first two parts', () => {
+      // split('.') takes first two parts, drops the rest — not a crash
+      expect(tokenAmount.fromHuman('1.2.3', 6)).toBe(1_200_000n);
+    });
+
+    it('handles very large amounts', () => {
+      const huge = '999999999999999999';
+      const raw = tokenAmount.fromHuman(huge, 6);
+      expect(tokenAmount.toHuman(raw, 6)).toBe(huge);
+    });
+
+    it('scale handles zero amount', () => {
+      expect(tokenAmount.scale(0n, 6, 18)).toBe(0n);
+    });
+  });
 });

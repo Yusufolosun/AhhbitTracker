@@ -13,6 +13,9 @@
  * Example: aprToApy(10, 365) → ~10.5156
  */
 export function aprToApy(apr: number, compoundsPerYear: number): number {
+  if (compoundsPerYear <= 0) {
+    throw new RangeError(`compoundsPerYear must be positive, got ${compoundsPerYear}`);
+  }
   const rate = apr / 100;
   return ((1 + rate / compoundsPerYear) ** compoundsPerYear - 1) * 100;
 }
@@ -26,6 +29,9 @@ export function aprToApy(apr: number, compoundsPerYear: number): number {
  * @returns APR as a percentage
  */
 export function apyToApr(apy: number, compoundsPerYear: number): number {
+  if (compoundsPerYear <= 0) {
+    throw new RangeError(`compoundsPerYear must be positive, got ${compoundsPerYear}`);
+  }
   const rate = apy / 100;
   return compoundsPerYear * ((1 + rate) ** (1 / compoundsPerYear) - 1) * 100;
 }
@@ -54,6 +60,9 @@ export function compoundedReturn(
   compoundsPerYear: number,
   years: number,
 ): number {
+  if (compoundsPerYear <= 0) {
+    throw new RangeError(`compoundsPerYear must be positive, got ${compoundsPerYear}`);
+  }
   const rate = apr / 100;
   return principal * (1 + rate / compoundsPerYear) ** (compoundsPerYear * years);
 }

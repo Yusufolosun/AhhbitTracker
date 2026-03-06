@@ -33,6 +33,9 @@ const BPS_DIVISOR = 10_000n;
  * Example: onInput(1_000_000n, 30) → { fee: 3_000n, net: 997_000n }
  */
 export function onInput(amount: bigint, bps: number): FeeResult {
+  if (!Number.isInteger(bps) || bps < 0 || bps > 10_000) {
+    throw new RangeError(`bps must be an integer 0–10000, got ${bps}`);
+  }
   const fee = (amount * BigInt(bps)) / BPS_DIVISOR;
   return { fee, net: amount - fee };
 }
@@ -45,6 +48,9 @@ export function onInput(amount: bigint, bps: number): FeeResult {
  * Example: onOutput(997_000n, 30) → { fee: 3_009n, gross: 1_000_009n }
  */
 export function onOutput(amount: bigint, bps: number): GrossFeeResult {
+  if (!Number.isInteger(bps) || bps < 0 || bps >= 10_000) {
+    throw new RangeError(`bps must be an integer 0–9999, got ${bps}`);
+  }
   const denom = BPS_DIVISOR - BigInt(bps);
   // ceiling division: (a + b - 1) / b
   const gross = (amount * BPS_DIVISOR + denom - 1n) / denom;
@@ -67,6 +73,9 @@ export function onOutput(amount: bigint, bps: number): GrossFeeResult {
  *   → first 1M charged at 50 bps, remaining 500K charged at 30 bps
  */
 export function tiered(amount: bigint, tiers: FeeTier[]): FeeResult {
+  if (!tiers.length) {
+    throw new Error('At least one fee tier is required');
+  }
   let remaining = amount;
   let totalFee = 0n;
   let prev = 0n;

@@ -1,12 +1,28 @@
-# defikit
+# @yusufolosun/defikit
 
 Lightweight, zero-dependency DeFi math utilities for TypeScript and JavaScript.
 
 Basis points, fees, slippage, AMM math, token amounts, and yield calculations — the formulas every DeFi project reimplements from scratch.
 
-**11.6 kB** gzipped. Works in Node.js, browsers, and any chain.
+**13.6 kB** package size. Works in Node.js, browsers, and any chain.
 
 ## Install
+
+**From npm:**
+
+```bash
+npm install @yusufolosun/defikit
+```
+
+**From GitHub Packages:**
+
+Add to your project's `.npmrc`:
+
+```
+@yusufolosun:registry=https://npm.pkg.github.com
+```
+
+Then:
 
 ```bash
 npm install @yusufolosun/defikit
@@ -41,7 +57,7 @@ fees.onInput(1_000_000n, 30)
 
 // Fee-on-output: how much gross input yields a desired net
 fees.onOutput(997_000n, 30)
-// → { fee: 3_009n, gross: 1_000_009n }
+// → { fee: 3_000n, gross: 1_000_000n }
 
 // Tiered fee schedule
 fees.tiered(1_500_000n, [

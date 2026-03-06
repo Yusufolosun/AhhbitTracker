@@ -78,6 +78,12 @@ describe('amm.constantProduct', () => {
       const impact = constantProduct.priceImpact(1_000n, reserveIn, reserveOut);
       expect(impact).toBeLessThan(10); // < 0.1%
     });
+
+    it('large trade approaches MAX impact', () => {
+      // Trade size = reserve size → ~50% impact (5000 bps)
+      const impact = constantProduct.priceImpact(reserveIn, reserveIn, reserveOut);
+      expect(impact).toBe(5000);
+    });
   });
 
   describe('spotPrice', () => {
@@ -126,5 +132,11 @@ describe('impermanentLoss', () => {
   it('returns 0 for invalid ratio', () => {
     expect(impermanentLoss(0)).toBe(0);
     expect(impermanentLoss(-1)).toBe(0);
+  });
+
+  it('handles extreme price ratios', () => {
+    // 100x price increase — massive IL
+    const il = impermanentLoss(100);
+    expect(il).toBeLessThan(-0.4); // > 40% loss
   });
 });

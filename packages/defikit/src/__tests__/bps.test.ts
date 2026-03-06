@@ -51,4 +51,19 @@ describe('bps', () => {
       expect(bps.toPercent(bps.fromPercent(pct))).toBeCloseTo(pct);
     }
   });
+
+  it('throws on negative basisPoints', () => {
+    expect(() => bps.apply(1_000_000n, -1)).toThrow(RangeError);
+    expect(() => bps.complement(1_000_000n, -30)).toThrow(RangeError);
+  });
+
+  it('throws on non-integer basisPoints', () => {
+    expect(() => bps.apply(1_000_000n, 0.5)).toThrow(RangeError);
+    expect(() => bps.apply(1_000_000n, NaN)).toThrow(RangeError);
+  });
+
+  it('handles MAX bps (100%)', () => {
+    expect(bps.apply(1_000_000n, bps.MAX)).toBe(1_000_000n);
+    expect(bps.complement(1_000_000n, bps.MAX)).toBe(0n);
+  });
 });

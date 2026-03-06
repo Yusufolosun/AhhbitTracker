@@ -35,4 +35,15 @@ describe('slippage', () => {
     // Actual > expected = favorable
     expect(slippage.fromAmounts(1_000n, 1_010n)).toBe(-100);
   });
+
+  it('handles 100% slippage tolerance', () => {
+    expect(slippage.minOutput(1_000_000n, 10_000)).toBe(0n);
+  });
+
+  it('handles large amounts without overflow', () => {
+    const large = 10n ** 30n; // trillion-scale
+    const min = slippage.minOutput(large, 50);
+    expect(min).toBeLessThan(large);
+    expect(min).toBeGreaterThan(0n);
+  });
 });

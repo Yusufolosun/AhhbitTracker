@@ -20,6 +20,14 @@ describe('yieldMath', () => {
     it('with 1 compound per year, APY equals APR', () => {
       expect(yieldMath.aprToApy(10, 1)).toBeCloseTo(10, 10);
     });
+
+    it('throws on zero compoundsPerYear', () => {
+      expect(() => yieldMath.aprToApy(10, 0)).toThrow(RangeError);
+    });
+
+    it('throws on negative compoundsPerYear', () => {
+      expect(() => yieldMath.aprToApy(10, -1)).toThrow(RangeError);
+    });
   });
 
   describe('apyToApr', () => {
@@ -33,6 +41,10 @@ describe('yieldMath', () => {
       const apy = yieldMath.aprToApy(originalApr, 365);
       const recoveredApr = yieldMath.apyToApr(apy, 365);
       expect(recoveredApr).toBeCloseTo(originalApr, 8);
+    });
+
+    it('throws on zero compoundsPerYear', () => {
+      expect(() => yieldMath.apyToApr(10, 0)).toThrow(RangeError);
     });
   });
 
@@ -58,6 +70,10 @@ describe('yieldMath', () => {
       const result = yieldMath.compoundedReturn(1000, 10, 1, 2);
       // Simple compounding: 1000 * 1.1 * 1.1 = 1210
       expect(result).toBeCloseTo(1210, 5);
+    });
+
+    it('throws on zero compoundsPerYear', () => {
+      expect(() => yieldMath.compoundedReturn(1000, 10, 0, 1)).toThrow(RangeError);
     });
   });
 });

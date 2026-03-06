@@ -38,6 +38,18 @@ describe('fees', () => {
         }
       }
     });
+
+    it('throws on negative bps', () => {
+      expect(() => fees.onInput(1_000_000n, -1)).toThrow(RangeError);
+    });
+
+    it('throws on non-integer bps', () => {
+      expect(() => fees.onInput(1_000_000n, 0.5)).toThrow(RangeError);
+    });
+
+    it('throws on bps > 10000', () => {
+      expect(() => fees.onInput(1_000_000n, 10_001)).toThrow(RangeError);
+    });
   });
 
   describe('onOutput', () => {
@@ -54,6 +66,14 @@ describe('fees', () => {
       const result = fees.onOutput(1_000_000n, 0);
       expect(result.gross).toBe(1_000_000n);
       expect(result.fee).toBe(0n);
+    });
+
+    it('throws on bps >= 10000', () => {
+      expect(() => fees.onOutput(1_000_000n, 10_000)).toThrow(RangeError);
+    });
+
+    it('throws on negative bps', () => {
+      expect(() => fees.onOutput(1_000_000n, -1)).toThrow(RangeError);
     });
   });
 
@@ -93,6 +113,10 @@ describe('fees', () => {
         { threshold: 0n, bps: 25 },
       ]);
       expect(result.fee + result.net).toBe(1_234_567n);
+    });
+
+    it('throws on empty tiers array', () => {
+      expect(() => fees.tiered(1_000_000n, [])).toThrow('At least one fee tier is required');
     });
   });
 });
