@@ -1,9 +1,12 @@
 {
-  "name": "defikit",
+  "name": "@yusufolosun/defikit",
   "version": "1.0.0",
   "description": "Lightweight, zero-dependency DeFi math utilities — basis points, fees, slippage, AMM math, token amounts, and yield calculations.",
   "author": "Yusuf Olosun",
   "license": "MIT",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

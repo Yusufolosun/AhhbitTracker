@@ -9,7 +9,7 @@ Basis points, fees, slippage, AMM math, token amounts, and yield calculations �
 ## Install
 
 ```bash
-npm install defikit
+npm install @yusufolosun/defikit
 ```
 
 ## Modules
@@ -17,7 +17,7 @@ npm install defikit
 ### bps — Basis Point Conversions
 
 ```typescript
-import { bps } from 'defikit';
+import { bps } from '@yusufolosun/defikit';
 
 bps.toPercent(30)          // 0.3    (30 bps → 0.3%)
 bps.toDecimal(30)          // 0.003  (30 bps → multiplier)
@@ -33,7 +33,7 @@ bps.MAX // 10_000 (100%)
 ### fees — Protocol Fee Calculations
 
 ```typescript
-import { fees } from 'defikit';
+import { fees } from '@yusufolosun/defikit';
 
 // Fee-on-input: deduct fee from input amount
 fees.onInput(1_000_000n, 30)
@@ -54,7 +54,7 @@ fees.tiered(1_500_000n, [
 ### slippage — Slippage Tolerance
 
 ```typescript
-import { slippage } from 'defikit';
+import { slippage } from '@yusufolosun/defikit';
 
 slippage.minOutput(1_000_000n, 50)    // 995_000n (0.5% tolerance)
 slippage.maxInput(1_000_000n, 50)     // 1_005_000n
@@ -66,7 +66,7 @@ slippage.fromAmounts(1000n, 995n)     // 50 (realized slip in bps)
 ### amm — Constant-Product AMM Math
 
 ```typescript
-import { amm } from 'defikit';
+import { amm } from '@yusufolosun/defikit';
 
 const reserveIn  = 1_000_000_000n; // 1000 tokens (6 decimals)
 const reserveOut = 2_000_000_000n; // 2000 tokens
@@ -99,7 +99,7 @@ amm.impermanentLoss(0.5)  // -0.05719 (symmetric)
 ### tokenAmount — Precision-Safe Token Amounts
 
 ```typescript
-import { tokenAmount } from 'defikit';
+import { tokenAmount } from '@yusufolosun/defikit';
 
 // Human-readable → raw integer (no floating-point errors)
 tokenAmount.fromHuman('1.5', 6)     // 1_500_000n
@@ -119,7 +119,7 @@ tokenAmount.scale(1_500_000n, 6, 18) // 1_500_000_000_000_000_000n
 ### yieldMath — APR / APY Conversions
 
 ```typescript
-import { yieldMath } from 'defikit';
+import { yieldMath } from '@yusufolosun/defikit';
 
 // APR → APY with compounding frequency
 yieldMath.aprToApy(10, 365)  // 10.5156 (daily compounding)
