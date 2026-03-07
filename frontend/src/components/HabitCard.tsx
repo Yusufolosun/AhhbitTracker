@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { Habit } from '../types/habit';
 import { useHabits } from '../hooks/useHabits';
 import { useToast } from '../context/ToastContext';
-import { formatSTX, blocksAgo } from '../utils/formatting';
+import { formatSTX, blocksAgo, blocksToTime } from '../utils/formatting';
 import { useCurrentBlock } from '../hooks/useCurrentBlock';
 import { MIN_STREAK_FOR_WITHDRAWAL, CONTRACT_ADDRESS, CONTRACT_NAME, EXPLORER_ADDRESS_URL } from '../utils/constants';
 import { ConfirmationDialog } from './ConfirmationDialog';
+import { getCheckInWindowState, getBlocksRemaining, isEligibleToWithdraw } from '../utils/habitStatus';
 
 interface HabitCardProps {
   habit: Habit;
@@ -58,11 +59,29 @@ export function HabitCard({ habit }: HabitCardProps) {
     }
   };
 
-  const canWithdraw = habit.currentStreak >= MIN_STREAK_FOR_WITHDRAWAL && habit.isActive;
+  const windowState = getCheckInWindowState(habit, currentBlock);
+  const canWithdraw = isEligibleToWithdraw(habit);
   const canClaimBonus = habit.isCompleted;
+  const blocksRemaining = currentBlock !== null ? getBlocksRemaining(habit, currentBlock) : null;
+
+  const getBadge = () => {
+    if (habit.isCompleted) return { label: 'Completed', className: 'bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-400' };
+    if (!habit.isActive && !habit.isCompleted) return { label: 'Forfeited', className: 'bg-surface-100 text-surface-600 dark:bg-surface-700 dark:text-surface-400' };
+    if (windowState === 'expired') return { label: 'Window Expired', className: 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-400' };
+    if (windowState === 'urgent') return { label: 'Expiring Soon', className: 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-400' };
+    return { label: 'Active', className: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-400' };
+  };
+
+  const badge = getBadge();
 
   return (
-    <div className="card hover:shadow-md transition-all duration-200 hover:border-primary-500/30 dark:hover:border-primary-500/20">
+    <div className={`card hover:shadow-md transition-all duration-200 ${
+      windowState === 'expired'
+        ? 'border-red-300 dark:border-red-500/30 hover:border-red-400 dark:hover:border-red-500/40'
+        : windowState === 'urgent'
+          ? 'border-amber-300 dark:border-amber-500/30 hover:border-amber-400 dark:hover:border-amber-500/40'
+          : 'hover:border-primary-500/30 dark:hover:border-primary-500/20'
+    }`}>
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
@@ -71,14 +90,14 @@ export function HabitCard({ habit }: HabitCardProps) {
             {habit.name}
           </h3>
           <div className="flex items-center space-x-2">
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${habit.isActive
-              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-400'
-              : habit.isCompleted
-                ? 'bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-400'
-                : 'bg-surface-100 text-surface-600 dark:bg-surface-700 dark:text-surface-400'
-              }`}>
-              {habit.isActive ? 'Active' : habit.isCompleted ? 'Completed' : 'Inactive'}
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badge.className}`}>
+              {badge.label}
             </span>
+            {canWithdraw && windowState !== 'expired' && (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-400">
+                Ready to Withdraw
+              </span>
+            )}
           </div>
         </div>
 
@@ -90,6 +109,30 @@ export function HabitCard({ habit }: HabitCardProps) {
           <div className="text-xs text-gray-500">day streak</div>
         </div>
       </div>
+
+      {/* Window expired warning */}
+      {windowState === 'expired' && (
+        <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 dark:bg-red-500/10 dark:border-red-500/20">
+          <p className="text-sm font-medium text-red-800 dark:text-red-300">
+            Check-in window has expired
+          </p>
+          <p className="text-xs text-red-600 dark:text-red-400 mt-1">
+            Your {formatSTX(habit.stakeAmount)} STX stake will be forfeited to the pool. This habit cannot be recovered.
+          </p>
+        </div>
+      )}
+
+      {/* Urgent window warning */}
+      {windowState === 'urgent' && blocksRemaining !== null && (
+        <div className="mb-4 p-3 rounded-lg bg-amber-50 border border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/20">
+          <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
+            ~{blocksToTime(blocksRemaining)} remaining to check in
+          </p>
+          <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+            Check in soon or your {formatSTX(habit.stakeAmount)} STX stake will be forfeited.
+          </p>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4 mb-4">
@@ -111,7 +154,7 @@ export function HabitCard({ habit }: HabitCardProps) {
 
       {/* Actions */}
       <div className="flex flex-col space-y-2">
-        {habit.isActive && (
+        {habit.isActive && windowState !== 'expired' && (
           <button
             onClick={handleCheckIn}
             disabled={isCheckingIn}
