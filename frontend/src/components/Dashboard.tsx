@@ -2,12 +2,16 @@ import { useMemo } from 'react';
 import { Habit } from '../types/habit';
 import { StatsCard } from './StatsCard';
 import { formatSTX } from '../utils/formatting';
+import { useCurrentBlock } from '../hooks/useCurrentBlock';
+import { getCheckInWindowState, isEligibleToWithdraw } from '../utils/habitStatus';
 
 interface DashboardProps {
   habits: Habit[];
 }
 
 export function Dashboard({ habits }: DashboardProps) {
+  const currentBlock = useCurrentBlock();
+
   const stats = useMemo(() => {
     const activeCount = habits.filter(h => h.isActive).length;
     const completedCount = habits.filter(h => h.isCompleted).length;
@@ -19,14 +23,25 @@ export function Dashboard({ habits }: DashboardProps) {
       .reduce((sum, h) => sum + h.currentStreak, 0);
     const avgStreak = activeCount > 0 ? (totalStreak / activeCount).toFixed(1) : '0';
 
+    const expiredCount = habits.filter(
+      h => getCheckInWindowState(h, currentBlock) === 'expired'
+    ).length;
+    const expiredStake = habits
+      .filter(h => getCheckInWindowState(h, currentBlock) === 'expired')
+      .reduce((sum, h) => sum + h.stakeAmount, 0);
+    const withdrawReady = habits.filter(h => isEligibleToWithdraw(h)).length;
+
     return {
       total: habits.length,
       active: activeCount,
       completed: completedCount,
       totalStaked,
       avgStreak,
+      expiredCount,
+      expiredStake,
+      withdrawReady,
     };
-  }, [habits]);
+  }, [habits, currentBlock]);
 
   return (
     <div className="space-y-6">
@@ -102,6 +117,48 @@ export function Dashboard({ habits }: DashboardProps) {
           }
         />
       </div>
+
+      {/* Expired window alert */}
+      {stats.expiredCount > 0 && (
+        <div className="card bg-red-50 border-red-200 dark:bg-red-500/10 dark:border-red-500/20">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-red-900 dark:text-red-300">
+                {stats.expiredCount} habit{stats.expiredCount > 1 ? 's have' : ' has'} an expired check-in window
+              </p>
+              <p className="text-xs text-red-700 dark:text-red-400 mt-1">
+                {formatSTX(stats.expiredStake)} STX at risk of forfeiture. These habits cannot be recovered.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Withdrawal ready alert */}
+      {stats.withdrawReady > 0 && (
+        <div className="card bg-emerald-50 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-emerald-900 dark:text-emerald-300">
+                {stats.withdrawReady} habit{stats.withdrawReady > 1 ? 's are' : ' is'} ready to withdraw
+              </p>
+              <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-1">
+                You've reached 7+ consecutive check-ins. Withdraw your stake to complete the habit.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {stats.completed > 0 && (
         <div className="card bg-emerald-50 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20">
