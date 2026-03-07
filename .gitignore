@@ -146,6 +146,13 @@ scripts/private-keys.json
 scripts/transaction-history.json
 scripts/wallet-backup.json
 
+# 25-Wallet Batch Automation (CRITICAL - keep entirely local, out of repo scope)
+scripts/batch-25-wallets.env
+scripts/batch-25-wallets.env.example
+scripts/batch-25-executor.ts
+scripts/batch-25-state.json
+scripts/BATCH_AUTOMATION_README.md
+
 # User Wallet Data
 user-wallet.json
 *.keystore
