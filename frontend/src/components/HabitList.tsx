@@ -1,6 +1,8 @@
 import { Habit } from '../types/habit';
 import { HabitCard } from './HabitCard';
 import { HabitListSkeleton } from './Skeletons';
+import { useCurrentBlock } from '../hooks/useCurrentBlock';
+import { getCheckInWindowState, isEligibleToWithdraw } from '../utils/habitStatus';
 
 interface HabitListProps {
   habits: Habit[];
@@ -35,16 +37,57 @@ export function HabitList({ habits, loading }: HabitListProps) {
   const completedHabits = habits.filter(h => h.isCompleted);
   const inactiveHabits = habits.filter(h => !h.isActive && !h.isCompleted);
 
+  // Sub-group active habits by urgency
+  const currentBlock = useCurrentBlock();
+  const expiredHabits = activeHabits.filter(
+    h => getCheckInWindowState(h, currentBlock) === 'expired'
+  );
+  const urgentHabits = activeHabits.filter(
+    h => getCheckInWindowState(h, currentBlock) === 'urgent'
+  );
+  const healthyHabits = activeHabits.filter(h => {
+    const state = getCheckInWindowState(h, currentBlock);
+    return state !== 'expired' && state !== 'urgent';
+  });
+
   return (
     <div className="space-y-6">
-      {/* Active Habits */}
-      {activeHabits.length > 0 && (
+      {/* Expired Habits — needs immediate attention */}
+      {expiredHabits.length > 0 && (
         <div>
-          <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-4">
-            Active Habits ({activeHabits.length})
+          <h3 className="text-lg font-semibold text-red-700 dark:text-red-400 mb-4">
+            Window Expired ({expiredHabits.length})
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {activeHabits.map((habit) => (
+            {expiredHabits.map((habit) => (
+              <HabitCard key={habit.habitId} habit={habit} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Urgent Habits — window closing soon */}
+      {urgentHabits.length > 0 && (
+        <div>
+          <h3 className="text-lg font-semibold text-amber-700 dark:text-amber-400 mb-4">
+            Expiring Soon ({urgentHabits.length})
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {urgentHabits.map((habit) => (
+              <HabitCard key={habit.habitId} habit={habit} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Healthy Active Habits */}
+      {healthyHabits.length > 0 && (
+        <div>
+          <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-4">
+            Active Habits ({healthyHabits.length})
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {healthyHabits.map((habit) => (
               <HabitCard key={habit.habitId} habit={habit} />
             ))}
           </div>
