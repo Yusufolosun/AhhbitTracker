@@ -19,9 +19,10 @@ export function useCurrentBlock(): number | null {
   const { data } = useQuery({
     queryKey: ['currentBlock'],
     queryFn: fetchCurrentBlock,
-    staleTime: 300_000, // 5 minutes
+    staleTime: 120_000, // 2 minutes — keep in sync with habit data freshness
+    refetchInterval: 120_000,
+    refetchOnWindowFocus: true,
     retry: 2,
-    refetchOnWindowFocus: false,
   });
 
   return data ?? null;

@@ -130,46 +130,12 @@ fix_encoding.py
 # Clarinet settings (network configs)
 settings/*.toml
 
-# ============================================
-# TRANSACTION AUTOMATION (CRITICAL - Keep local only)
-# ============================================
-# Automation scripts and guides (private, not for public repo)
-MULTI_WALLET_AUTOMATION.md
-scripts/transaction-executor.env
-scripts/execute-40-transactions-enhanced.ts
-scripts/dry-run-test.ts
-scripts/extract-wallet-keys.ts
-scripts/tsconfig.scripts.json
-scripts/transaction-results.json
-scripts/.wallet-config
-scripts/private-keys.json
-scripts/transaction-history.json
-scripts/wallet-backup.json
-
-# 25-Wallet Batch Automation (CRITICAL - keep entirely local, out of repo scope)
-scripts/batch-25-wallets.env
-scripts/batch-25-wallets.env.example
-scripts/batch-25-executor.ts
-scripts/batch-25-state.json
-scripts/BATCH_AUTOMATION_README.md
-
-# User Wallet Data
+scripts/test/
+scripts/test2/
 user-wallet.json
 *.keystore
 *.pem
 *.key
-
-# Transaction Logs
-transaction-logs/
-*.tx.log
-tx-history-*.json
-
-# Test Wallets
-test-wallet-*.json
-scripts/*-private-key.txt
-scripts/.wallet-*
-
-
 
 # ============================================
 # ANALYTICS DATA
@@ -177,20 +143,14 @@ scripts/.wallet-*
 scripts/analytics/pool-history.json
 scripts/analytics/*.data.json
 
-# ============================================
-# TRANSACTION AUTOMATION - ADDITIONAL SECURITY
-# ============================================
-# Any .env file inside scripts/ (dot-prefixed or not)
 scripts/.env*
 scripts/*.env
 scripts/wallet-keys.txt
 **/mnemonic*.txt
 **/private-key*.txt
-# Any backup / export of secrets regardless of location
 **/*credentials*
 **/*secrets*
 **/*.bak
-# Catch-all: any file whose name contains raw key material patterns
 **/*-private-key.json
 **/*_private_key*
 

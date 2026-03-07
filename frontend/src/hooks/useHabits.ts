@@ -57,6 +57,8 @@ export const useHabits = () => {
     },
     enabled: !!walletState.address,
     staleTime: 120000, // 2 minutes - reduces API calls to stay under Hiro rate limits
+    refetchOnWindowFocus: true,
+    refetchInterval: 120000, // re-poll every 2 min to pick up external state changes
     retry: 3,
     retryDelay: (attempt) => Math.min(15000 * Math.pow(2, attempt - 1), 60000),
   });
