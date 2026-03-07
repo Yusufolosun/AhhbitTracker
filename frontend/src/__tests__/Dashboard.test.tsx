@@ -8,6 +8,11 @@ vi.mock('../utils/formatting', () => ({
   formatSTX: (v: number) => (v / 1000000).toFixed(2),
 }));
 
+// Mock useCurrentBlock so Dashboard can derive window state
+vi.mock('../hooks/useCurrentBlock', () => ({
+  useCurrentBlock: () => 200,
+}));
+
 const activeHabit: Habit = {
   habitId: 1,
   name: 'Morning Run',
