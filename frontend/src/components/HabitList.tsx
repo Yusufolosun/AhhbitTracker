@@ -2,7 +2,7 @@ import { Habit } from '../types/habit';
 import { HabitCard } from './HabitCard';
 import { HabitListSkeleton } from './Skeletons';
 import { useCurrentBlock } from '../hooks/useCurrentBlock';
-import { getCheckInWindowState, isEligibleToWithdraw } from '../utils/habitStatus';
+import { getCheckInWindowState } from '../utils/habitStatus';
 
 interface HabitListProps {
   habits: Habit[];
