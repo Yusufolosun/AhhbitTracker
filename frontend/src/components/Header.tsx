@@ -13,7 +13,7 @@ const NAV_LINKS = [
 ];
 
 export function Header() {
-  const { walletState, connect, disconnect } = useWallet();
+  const { walletState, connect, disconnect, isBalanceLoading } = useWallet();
   const { route } = useHashRoute();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -78,7 +78,11 @@ export function Header() {
                   >
                     {shortenAddress(walletState.address!)}
                   </a>
-                  {walletState.balance > 0 && (
+                  {isBalanceLoading ? (
+                    <span className="text-xs text-surface-400 border-l border-surface-300 dark:border-surface-600 pl-2 animate-pulse">
+                      Loading…
+                    </span>
+                  ) : walletState.balance > 0 && (
                     <span className="text-xs text-surface-500 border-l border-surface-300 dark:border-surface-600 pl-2">
                       {formatSTX(walletState.balance)} STX
                     </span>
