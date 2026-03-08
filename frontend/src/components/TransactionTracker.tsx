@@ -1,4 +1,5 @@
 import { useTransactions } from '../context/TransactionContext';
+import type { TrackedTransaction } from '../context/TransactionContext';
 
 export function TransactionTracker() {
   const { transactions, dismissTransaction, getExplorerUrl } = useTransactions();
@@ -12,12 +13,12 @@ export function TransactionTracker() {
       {transactions.map((tx) => (
         <div
           key={tx.txId}
-          className="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-lg shadow-lg p-4 animate-slide-in"
+          className={`bg-white dark:bg-surface-800 border rounded-lg shadow-lg p-4 animate-slide-in ${statusBorderClass(tx.status)}`}
         >
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
               <div className="flex items-center space-x-2 mb-1">
-                <div className="w-2 h-2 bg-primary-400 rounded-full animate-pulse"></div>
+                <StatusDot status={tx.status} />
                 <p className="text-sm font-medium text-surface-900 dark:text-white truncate">
                   {formatFunctionName(tx.functionName)}
                 </p>
@@ -38,9 +39,7 @@ export function TransactionTracker() {
           </div>
 
           <div className="mt-2 flex items-center justify-between">
-            <span className="text-xs text-primary-600 dark:text-primary-400 font-medium">
-              Submitted — waiting for confirmation
-            </span>
+            <StatusLabel status={tx.status} />
             <a
               href={getExplorerUrl(tx.txId)}
               target="_blank"
@@ -54,6 +53,45 @@ export function TransactionTracker() {
       ))}
     </div>
   );
+}
+
+function StatusDot({ status }: { status: TrackedTransaction['status'] }) {
+  const colorClass =
+    status === 'confirmed'
+      ? 'bg-emerald-500'
+      : status === 'failed'
+        ? 'bg-red-500'
+        : 'bg-primary-400 animate-pulse';
+
+  return <div className={`w-2 h-2 rounded-full ${colorClass}`} />;
+}
+
+function StatusLabel({ status }: { status: TrackedTransaction['status'] }) {
+  if (status === 'confirmed') {
+    return (
+      <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+        Confirmed
+      </span>
+    );
+  }
+  if (status === 'failed') {
+    return (
+      <span className="text-xs text-red-600 dark:text-red-400 font-medium">
+        Failed
+      </span>
+    );
+  }
+  return (
+    <span className="text-xs text-primary-600 dark:text-primary-400 font-medium">
+      Submitted — waiting for confirmation
+    </span>
+  );
+}
+
+function statusBorderClass(status: TrackedTransaction['status']): string {
+  if (status === 'confirmed') return 'border-emerald-200 dark:border-emerald-800';
+  if (status === 'failed') return 'border-red-200 dark:border-red-800';
+  return 'border-surface-200 dark:border-surface-700';
 }
 
 function shortenTxId(txId: string): string {
