@@ -7,7 +7,7 @@ import { Habit, UserStats } from '../types/habit';
  * Custom hook for managing habits
  */
 export const useHabits = () => {
-  const { walletState } = useWallet();
+  const { walletState, refreshBalance } = useWallet();
   const queryClient = useQueryClient();
 
   // Fetch user habits
@@ -108,11 +108,13 @@ export const useHabits = () => {
       // Invalidate queries to refetch data after transaction confirmation
       queryClient.invalidateQueries({ queryKey: ['habits', walletState.address] });
       queryClient.invalidateQueries({ queryKey: ['userStats', walletState.address] });
+      refreshBalance();
 
       // Refetch again after additional delay to ensure blockchain state is updated
       setTimeout(() => {
         queryClient.invalidateQueries({ queryKey: ['habits', walletState.address] });
         queryClient.invalidateQueries({ queryKey: ['userStats', walletState.address] });
+        refreshBalance();
       }, 5000); // Additional 5 second delay
     },
   });
@@ -134,6 +136,7 @@ export const useHabits = () => {
       queryClient.invalidateQueries({ queryKey: ['habits', walletState.address] });
       queryClient.invalidateQueries({ queryKey: ['userStats', walletState.address] });
       queryClient.invalidateQueries({ queryKey: ['poolBalance'] });
+      refreshBalance();
     },
   });
 
@@ -143,6 +146,7 @@ export const useHabits = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['habits', walletState.address] });
       queryClient.invalidateQueries({ queryKey: ['poolBalance'] });
+      refreshBalance();
     },
   });
 
