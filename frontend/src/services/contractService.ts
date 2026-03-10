@@ -11,6 +11,16 @@ import {
 import { CONTRACT_ADDRESS, CONTRACT_NAME, NETWORK } from '../utils/constants';
 import { walletService } from './walletService';
 
+/** Races a promise against a 10-second timeout so API calls don't hang. */
+function withTimeout<T>(promise: Promise<T>, ms = 10_000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('API request timed out')), ms),
+    ),
+  ]);
+}
+
 const appDetails = {
   name: 'AhhbitTracker',
   icon: window.location.origin + '/logos/icon-only-dark.jpg',
@@ -126,14 +136,14 @@ export const contractService = {
    * Get habit details
    */
   async getHabit(habitId: number): Promise<any> {
-    const result = await fetchCallReadOnlyFunction({
+    const result = await withTimeout(fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
       functionName: 'get-habit',
       functionArgs: [uintCV(habitId)],
       network: NETWORK,
       senderAddress: CONTRACT_ADDRESS,
-    });
+    }));
 
     return cvToJSON(result);
   },
@@ -142,14 +152,14 @@ export const contractService = {
    * Get user habits
    */
   async getUserHabits(userAddress: string): Promise<any> {
-    const result = await fetchCallReadOnlyFunction({
+    const result = await withTimeout(fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
       functionName: 'get-user-habits',
       functionArgs: [principalCV(userAddress)],
       network: NETWORK,
       senderAddress: CONTRACT_ADDRESS,
-    });
+    }));
 
     return cvToJSON(result);
   },
@@ -158,14 +168,14 @@ export const contractService = {
    * Get habit streak
    */
   async getHabitStreak(habitId: number): Promise<number> {
-    const result = await fetchCallReadOnlyFunction({
+    const result = await withTimeout(fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
       functionName: 'get-habit-streak',
       functionArgs: [uintCV(habitId)],
       network: NETWORK,
       senderAddress: CONTRACT_ADDRESS,
-    });
+    }));
 
     const json = cvToJSON(result);
     return json.type === 'ok' ? parseInt(json.value.value) : 0;
@@ -175,14 +185,14 @@ export const contractService = {
    * Get forfeited pool balance
    */
   async getPoolBalance(): Promise<number> {
-    const result = await fetchCallReadOnlyFunction({
+    const result = await withTimeout(fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
       functionName: 'get-pool-balance',
       functionArgs: [],
       network: NETWORK,
       senderAddress: CONTRACT_ADDRESS,
-    });
+    }));
 
     const json = cvToJSON(result);
     return parseInt(json.value.value);
@@ -192,14 +202,14 @@ export const contractService = {
    * Get user stats
    */
   async getUserStats(userAddress: string): Promise<any> {
-    const result = await fetchCallReadOnlyFunction({
+    const result = await withTimeout(fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
       functionName: 'get-user-stats',
       functionArgs: [principalCV(userAddress)],
       network: NETWORK,
       senderAddress: CONTRACT_ADDRESS,
-    });
+    }));
 
     return cvToJSON(result);
   },

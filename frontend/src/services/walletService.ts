@@ -68,11 +68,19 @@ export const walletService = {
       ? `${window.location.origin}/api/stacks`
       : 'https://api.mainnet.hiro.so';
     const url = `${baseUrl}/v2/accounts/${address}`;
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch balance: ${response.status}`);
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10_000);
+
+    try {
+      const response = await fetch(url, { signal: controller.signal });
+      if (!response.ok) {
+        throw new Error(`Failed to fetch balance: ${response.status}`);
+      }
+      const data = await response.json();
+      return parseInt(data.balance, 10);
+    } finally {
+      clearTimeout(timeout);
     }
-    const data = await response.json();
-    return parseInt(data.balance, 10);
   },
 };
