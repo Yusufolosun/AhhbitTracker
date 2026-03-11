@@ -93,6 +93,20 @@ describe("AhhbitTracker Contract", () => {
       expect(result.result).toBeOk(Cl.uint(1));
     });
 
+    it("should reject stake above maximum (100 STX)", () => {
+      const aboveMax = 100_000_001; // 100 STX + 1 microSTX
+      const result = createHabit(user1, VALID_HABIT_NAME, aboveMax);
+
+      expect(result.result).toBeErr(Cl.uint(113)); // ERR-STAKE-TOO-HIGH
+    });
+
+    it("should accept stake at exactly maximum (100 STX)", () => {
+      const exactMax = 100_000_000; // 100 STX
+      const result = createHabit(user1, VALID_HABIT_NAME, exactMax);
+
+      expect(result.result).toBeOk(Cl.uint(1));
+    });
+
     it("should reject empty habit name", () => {
       const result = createHabit(user1, "", MIN_STAKE);
 
