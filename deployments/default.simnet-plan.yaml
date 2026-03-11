@@ -66,6 +66,11 @@ plan:
         - emulated-contract-publish:
             contract-name: habit-tracker
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: contracts/habit-tracker.clar
+            path: "contracts\\habit-tracker.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
+            contract-name: habit-streak-reward
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: "contracts\\habit-streak-reward.clar"
             clarity-version: 2
       epoch: "2.5"

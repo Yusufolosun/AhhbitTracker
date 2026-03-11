@@ -35,7 +35,6 @@
 (define-constant ERR-ALREADY-CLAIMED (err u202))
 (define-constant ERR-INSUFFICIENT-STREAK (err u203))
 (define-constant ERR-INSUFFICIENT-FUNDS (err u204))
-(define-constant ERR-TRANSFER-FAILED (err u205))
 (define-constant ERR-HABIT-NOT-FOUND (err u206))
 (define-constant ERR-NOT-HABIT-OWNER (err u207))
 (define-constant ERR-INVALID-AMOUNT (err u208))
@@ -85,7 +84,7 @@
 ;; PUBLIC FUNCTIONS
 ;; ============================================
 
-;; Fund the reward pool — anyone can contribute
+;; Fund the reward pool - anyone can contribute
 ;; @param amount: STX amount in microSTX to add
 ;; @returns: new pool balance
 (define-public (fund-reward-pool (amount uint))
