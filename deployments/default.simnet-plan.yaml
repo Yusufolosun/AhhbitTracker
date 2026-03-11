@@ -69,6 +69,11 @@ plan:
             path: "contracts\\habit-tracker.clar"
             clarity-version: 2
         - emulated-contract-publish:
+            contract-name: habit-accountability-group
+            emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
+            path: "contracts\\habit-accountability-group.clar"
+            clarity-version: 2
+        - emulated-contract-publish:
             contract-name: habit-streak-reward
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
             path: "contracts\\habit-streak-reward.clar"

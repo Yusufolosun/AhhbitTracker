@@ -15,8 +15,6 @@
 ;; CONSTANTS
 ;; ============================================
 
-(define-constant CONTRACT-OWNER tx-sender)
-
 ;; Group size limits
 (define-constant MAX-GROUP-SIZE u10)
 
@@ -26,9 +24,6 @@
 
 ;; Minimum stake to create or join a group
 (define-constant MIN-STAKE-AMOUNT u100000)    ;; 0.1 STX
-
-;; Maximum groups per user
-(define-constant MAX-USER-GROUPS u20)
 
 ;; ============================================
 ;; ERROR CODES (300 range)
