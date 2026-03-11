@@ -164,6 +164,16 @@ describe("AhhbitTracker Contract", () => {
       }));
     });
 
+    it("should return ERR-HABIT-LIMIT-REACHED when user exceeds 100 habits", () => {
+      for (let i = 0; i < 100; i++) {
+        const r = createHabit(user1, `Habit ${i + 1}`, MIN_STAKE);
+        expect(r.result).toBeOk(Cl.uint(i + 1));
+      }
+
+      const overflow = createHabit(user1, "Habit 101", MIN_STAKE);
+      expect(overflow.result).toBeErr(Cl.uint(112)); // ERR-HABIT-LIMIT-REACHED
+    });
+
   });
 
   describe("check-in function", () => {
