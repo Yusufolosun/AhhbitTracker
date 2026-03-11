@@ -48,6 +48,7 @@
 (define-constant ERR-POOL-INSUFFICIENT-BALANCE (err u109))
 (define-constant ERR-TRANSFER-FAILED (err u110))
 (define-constant ERR-BONUS-ALREADY-CLAIMED (err u111))
+(define-constant ERR-HABIT-LIMIT-REACHED (err u112))
 
 ;; ============================================
 ;; DATA STRUCTURES
@@ -177,7 +178,7 @@
       existing-habits
         (map-set user-habits
           { user: caller }
-          { habit-ids: (unwrap! (as-max-len? (append (get habit-ids existing-habits) habit-id) u100) ERR-HABIT-NOT-FOUND) }
+          { habit-ids: (unwrap! (as-max-len? (append (get habit-ids existing-habits) habit-id) u100) ERR-HABIT-LIMIT-REACHED) }
         )
       ;; First habit for this user
       (map-set user-habits
