@@ -514,4 +514,116 @@ describe("AhhbitTracker Contract", () => {
 
   });
 
+  describe("edge cases & regression", () => {
+
+    it("should allow withdrawal even after check-in window expired (race condition)", () => {
+      // A user with streak >= 7 who missed their window can still withdraw
+      // before someone slashes them. This is by design.
+      const result = createHabit(user1, "Exercise", MIN_STAKE);
+      const id = Number((result.result as any).value.value);
+
+      for (let i = 0; i < 7; i++) {
+        checkIn(user1, id);
+        simnet.mineEmptyBlocks(10);
+      }
+
+      // Expire the window
+      simnet.mineEmptyBlocks(200);
+
+      // Withdraw BEFORE anyone slashes — should succeed
+      const withdrawResult = withdrawStake(user1, id);
+      expect(withdrawResult.result).toBeOk(Cl.uint(MIN_STAKE));
+    });
+
+    it("should reject withdrawal after slash even if streak was sufficient", () => {
+      const result = createHabit(user1, "Exercise", MIN_STAKE);
+      const id = Number((result.result as any).value.value);
+
+      for (let i = 0; i < 7; i++) {
+        checkIn(user1, id);
+        simnet.mineEmptyBlocks(10);
+      }
+
+      simnet.mineEmptyBlocks(200);
+
+      // Slashed first
+      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(id)], user2);
+
+      // Withdrawal after slash should fail
+      const withdrawResult = withdrawStake(user1, id);
+      expect(withdrawResult.result).toBeErr(Cl.uint(108)); // ERR-HABIT-ALREADY-COMPLETED
+    });
+
+    it("should not allow slash on already-slashed habit", () => {
+      const result = createHabit(user1, "Exercise", MIN_STAKE);
+      const id = Number((result.result as any).value.value);
+
+      checkIn(user1, id);
+      simnet.mineEmptyBlocks(150);
+
+      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(id)], user2);
+
+      // Double slash should fail
+      const result2 = simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(id)], user2);
+      expect(result2.result).toBeErr(Cl.uint(108)); // ERR-HABIT-ALREADY-COMPLETED
+    });
+
+    it("should reject check-in for nonexistent habit", () => {
+      const result = checkIn(user1, 99999);
+      expect(result.result).toBeErr(Cl.uint(103)); // ERR-HABIT-NOT-FOUND
+    });
+
+    it("should reject slash for nonexistent habit", () => {
+      const result = simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(99999)], user1);
+      expect(result.result).toBeErr(Cl.uint(103)); // ERR-HABIT-NOT-FOUND
+    });
+
+    it("should reject slash when check-in window has not expired", () => {
+      const result = createHabit(user1, "Exercise", MIN_STAKE);
+      const id = Number((result.result as any).value.value);
+
+      // No blocks mined, window is still open
+      const slashResult = simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(id)], user2);
+      expect(slashResult.result).toBeErr(Cl.uint(100)); // ERR-NOT-AUTHORIZED
+    });
+
+    it("should not allow double bonus claim", () => {
+      // Fund the pool
+      const failHabit = createHabit(user2, "Will fail", MIN_STAKE * 10);
+      const failId = Number((failHabit.result as any).value.value);
+      checkIn(user2, failId);
+      simnet.mineEmptyBlocks(150);
+      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(failId)], user1);
+
+      // Complete a habit
+      const h1 = createHabit(user1, "Good Habit", MIN_STAKE);
+      const id1 = Number((h1.result as any).value.value);
+      for (let i = 0; i < 7; i++) {
+        checkIn(user1, id1);
+        simnet.mineEmptyBlocks(10);
+      }
+      withdrawStake(user1, id1);
+
+      // First claim succeeds
+      const claim1 = simnet.callPublicFn("habit-tracker", "claim-bonus", [Cl.uint(id1)], user1);
+      expect(claim1.result).toEqual(Cl.ok(expect.anything()));
+
+      // Second claim fails
+      const claim2 = simnet.callPublicFn("habit-tracker", "claim-bonus", [Cl.uint(id1)], user1);
+      expect(claim2.result).toEqual(Cl.error(Cl.uint(111))); // ERR-BONUS-ALREADY-CLAIMED
+    });
+
+    it("should return get-pool-balance correctly after slashing", () => {
+      const result = createHabit(user1, "Exercise", MIN_STAKE);
+      const id = Number((result.result as any).value.value);
+
+      checkIn(user1, id);
+      simnet.mineEmptyBlocks(150);
+      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(id)], user2);
+
+      const poolResult = simnet.callReadOnlyFn("habit-tracker", "get-pool-balance", [], deployer);
+      expect(poolResult.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE)));
+    });
+  });
+
 });
