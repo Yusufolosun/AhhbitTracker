@@ -96,7 +96,7 @@
       event: "reward-pool-funded",
       funder: tx-sender,
       amount: amount,
-      new-balance: (+ (var-get reward-pool-balance) amount)
+      new-balance: (var-get reward-pool-balance)
     })
     (ok (var-get reward-pool-balance))
   )

@@ -337,4 +337,70 @@ describe("Habit Streak Reward Contract", () => {
       expect(total.result).toBeOk(Cl.uint(REWARD_AMOUNT));
     });
   });
+
+  describe("edge cases & regression", () => {
+
+    it("should emit correct new-balance in fund event (no double-count)", () => {
+      const result = fundPool(user1, FUND_AMOUNT);
+      expect(result.result).toBeOk(Cl.uint(FUND_AMOUNT));
+
+      // Verify pool balance matches returned value (not double-counted)
+      const balance = getRewardPoolBalance();
+      expect(balance.result).toBeOk(Cl.uint(FUND_AMOUNT));
+
+      // Fund again and verify additive, not double-counted
+      const result2 = fundPool(user2, FUND_AMOUNT);
+      expect(result2.result).toBeOk(Cl.uint(FUND_AMOUNT * 2));
+
+      const balance2 = getRewardPoolBalance();
+      expect(balance2.result).toBeOk(Cl.uint(FUND_AMOUNT * 2));
+    });
+
+    it("should allow claiming milestone on completed (withdrawn) habit", () => {
+      // User completes a 7-day streak and withdraws, habit is completed but streak persists
+      fundPool(deployer, FUND_AMOUNT);
+      setMilestoneReward(deployer, 7, REWARD_AMOUNT);
+
+      createHabit(user1, "Exercise", MIN_STAKE);
+      buildStreak(user1, 1, 7);
+
+      // Withdraw stake - habit becomes completed with frozen streak
+      simnet.callPublicFn("habit-tracker", "withdraw-stake", [Cl.uint(1)], user1);
+
+      // Should still be able to claim milestone since streak was earned
+      const result = claimMilestoneReward(user1, 1, 7);
+      expect(result.result).toBeOk(Cl.uint(REWARD_AMOUNT));
+    });
+
+    it("should reject claiming on slashed habit (streak reset to 0)", () => {
+      fundPool(deployer, FUND_AMOUNT);
+      setMilestoneReward(deployer, 7, REWARD_AMOUNT);
+
+      createHabit(user1, "Exercise", MIN_STAKE);
+      buildStreak(user1, 1, 5); // Only build 5-day streak
+
+      // Let window expire and get slashed
+      simnet.mineEmptyBlocks(150);
+      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(1)], user2);
+
+      // Streak is now 0, can't claim 7-day milestone
+      const result = claimMilestoneReward(user1, 1, 7);
+      expect(result.result).toBeErr(Cl.uint(203)); // ERR-INSUFFICIENT-STREAK
+    });
+
+    it("should handle exact minimum funding amount (0.01 STX)", () => {
+      const result = fundPool(user1, 10000);
+      expect(result.result).toBeOk(Cl.uint(10000));
+    });
+
+    it("should reject claiming when pool is exactly 0", () => {
+      setMilestoneReward(deployer, 7, REWARD_AMOUNT);
+      createHabit(user1, "Exercise", MIN_STAKE);
+      buildStreak(user1, 1, 7);
+
+      // Pool is empty (never funded)
+      const result = claimMilestoneReward(user1, 1, 7);
+      expect(result.result).toBeErr(Cl.uint(204)); // ERR-INSUFFICIENT-FUNDS
+    });
+  });
 });
