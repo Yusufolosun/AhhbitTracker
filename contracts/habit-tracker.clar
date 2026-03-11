@@ -19,6 +19,10 @@
 ;; Minimum: 0.1 STX = 100,000 microSTX
 (define-constant MIN-STAKE-AMOUNT u100000)
 
+;; Maximum stake allowed (in microSTX)
+;; 100 STX = 100,000,000 microSTX
+(define-constant MAX-STAKE-AMOUNT u100000000)
+
 ;; Maximum habit name length
 (define-constant MAX-HABIT-NAME-LENGTH u50)
 
@@ -49,6 +53,7 @@
 (define-constant ERR-TRANSFER-FAILED (err u110))
 (define-constant ERR-BONUS-ALREADY-CLAIMED (err u111))
 (define-constant ERR-HABIT-LIMIT-REACHED (err u112))
+(define-constant ERR-STAKE-TOO-HIGH (err u113))
 
 ;; ============================================
 ;; DATA STRUCTURES
@@ -150,6 +155,7 @@
     )
     ;; Validate stake amount
     (asserts! (>= stake-amount MIN-STAKE-AMOUNT) ERR-INVALID-STAKE-AMOUNT)
+    (asserts! (<= stake-amount MAX-STAKE-AMOUNT) ERR-STAKE-TOO-HIGH)
     
     ;; Validate habit name
     (asserts! (is-valid-habit-name name) ERR-INVALID-HABIT-NAME)
