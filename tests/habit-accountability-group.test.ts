@@ -556,4 +556,177 @@ describe("Habit Accountability Group Contract", () => {
       expect(share.result).toBeOk(Cl.uint(GROUP_STAKE));
     });
   });
+
+  describe("edge cases & regression", () => {
+
+    it("should reject joining an expired group", () => {
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createHabit(user2, "Reading", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
+
+      // Mine past the group end block
+      simnet.mineEmptyBlocks(GROUP_DURATION + 10);
+
+      // user2 tries to join expired group
+      const result = joinGroup(user2, 1, 2);
+      expect(result.result).toBeErr(Cl.uint(305)); // ERR-GROUP-NOT-ACTIVE
+    });
+
+    it("should reject joining at exactly the end block", () => {
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createHabit(user2, "Reading", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
+
+      // Mine exactly to the end block (each callPublicFn mines 1 block,
+      // so we need to account for the blocks already mined by create/join calls)
+      simnet.mineEmptyBlocks(GROUP_DURATION);
+
+      const result = joinGroup(user2, 1, 2);
+      expect(result.result).toBeErr(Cl.uint(305)); // ERR-GROUP-NOT-ACTIVE
+    });
+
+    it("should reject creating group with slashed (inactive) habit", () => {
+      createHabit(user1, "Exercise", MIN_STAKE);
+
+      // Build a check-in then let it expire and get slashed
+      simnet.mineEmptyBlocks(1);
+      simnet.callPublicFn("habit-tracker", "check-in", [Cl.uint(1)], user1);
+      simnet.mineEmptyBlocks(150);
+      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(1)], user2);
+
+      // Try to create a group with the slashed habit
+      const result = createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
+      expect(result.result).toBeErr(Cl.uint(312)); // ERR-INVALID-HABIT
+    });
+
+    it("should reject creating group with completed (withdrawn) habit", () => {
+      createHabit(user1, "Exercise", MIN_STAKE);
+      buildStreak(user1, 1, 7);
+
+      // Withdraw stake - habit becomes completed, is-active = false
+      simnet.callPublicFn("habit-tracker", "withdraw-stake", [Cl.uint(1)], user1);
+
+      const result = createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
+      expect(result.result).toBeErr(Cl.uint(312)); // ERR-INVALID-HABIT
+    });
+
+    it("should reject joining group with slashed habit", () => {
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createHabit(user2, "Reading", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
+
+      // Slash user2's habit
+      simnet.mineEmptyBlocks(1);
+      simnet.callPublicFn("habit-tracker", "check-in", [Cl.uint(2)], user2);
+      simnet.mineEmptyBlocks(150);
+      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(2)], user3);
+
+      // Try to join with slashed habit
+      const result = joinGroup(user2, 1, 2);
+      expect(result.result).toBeErr(Cl.uint(312)); // ERR-INVALID-HABIT
+    });
+
+    it("should reject joining group with completed habit", () => {
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createHabit(user2, "Reading", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
+
+      // Complete user2's habit
+      buildStreak(user2, 2, 7);
+      simnet.callPublicFn("habit-tracker", "withdraw-stake", [Cl.uint(2)], user2);
+
+      const result = joinGroup(user2, 1, 2);
+      expect(result.result).toBeErr(Cl.uint(312)); // ERR-INVALID-HABIT
+    });
+
+    it("should require at least 1 check-in for minimum-duration groups", () => {
+      // Minimum group: 144 blocks (1 day)
+      // required_days = 144/144 = 1, threshold = max(1/2, 1) = 1
+      // Member with streak 0 should FAIL (this was the zero-threshold bug)
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createHabit(user2, "Reading", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1); // 144-block group
+      joinGroup(user2, 1, 2);
+
+      // Don't build any streak for user2
+      simnet.mineEmptyBlocks(GROUP_DURATION);
+
+      // user2 has streak 0 - should be settled as failed
+      const result = settleMember(deployer, 1, user2);
+      expect(result.result).toBeOk(Cl.bool(false));
+    });
+
+    it("should succeed settlement with streak 1 for minimum-duration groups", () => {
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createHabit(user2, "Reading", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
+      joinGroup(user2, 1, 2);
+
+      // Build 1 check-in for both
+      buildStreak(user1, 1, 1);
+      buildStreak(user2, 2, 1);
+
+      simnet.mineEmptyBlocks(GROUP_DURATION);
+
+      // Both should succeed with streak 1 >= threshold 1
+      const result1 = settleMember(deployer, 1, user1);
+      expect(result1.result).toBeOk(Cl.bool(true));
+
+      const result2 = settleMember(deployer, 1, user2);
+      expect(result2.result).toBeOk(Cl.bool(true));
+    });
+
+    it("should apply correct threshold for multi-day groups", () => {
+      // 10-day group: required=10, threshold=max(10/2,1)=5
+      const tenDayDuration = 1440;
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createHabit(user2, "Reading", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, tenDayDuration, 1);
+      joinGroup(user2, 1, 2);
+
+      // user1 builds streak of 4 (below threshold of 5)
+      buildStreak(user1, 1, 4);
+      // user2 builds streak of 5 (meets threshold of 5)
+      buildStreak(user2, 2, 5);
+
+      simnet.mineEmptyBlocks(tenDayDuration);
+
+      // user1 should fail (streak 4 < 5)
+      const result1 = settleMember(deployer, 1, user1);
+      expect(result1.result).toBeOk(Cl.bool(false));
+
+      // user2 should succeed (streak 5 >= 5)
+      const result2 = settleMember(deployer, 1, user2);
+      expect(result2.result).toBeOk(Cl.bool(true));
+    });
+
+    it("should handle 3-member group where 1 succeeds and takes all", () => {
+      const longDuration = 1440;
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createHabit(user2, "Reading", MIN_STAKE);
+      createHabit(user3, "Coding", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, longDuration, 1);
+      joinGroup(user2, 1, 2);
+      joinGroup(user3, 1, 3);
+
+      // Only user1 builds enough streak
+      buildStreak(user1, 1, 5);
+
+      simnet.mineEmptyBlocks(longDuration);
+
+      settleMember(deployer, 1, user1);
+      settleMember(deployer, 1, user2);
+      settleMember(deployer, 1, user3);
+
+      // user1 gets the entire pool (3 STX)
+      const result = claimGroupReward(user1, 1);
+      expect(result.result).toBeOk(Cl.uint(GROUP_STAKE * 3));
+
+      // user2 and user3 can't claim
+      const result2 = claimGroupReward(user2, 1);
+      expect(result2.result).toBeErr(Cl.uint(311)); // ERR-NOT-ELIGIBLE
+      const result3 = claimGroupReward(user3, 1);
+      expect(result3.result).toBeErr(Cl.uint(311)); // ERR-NOT-ELIGIBLE
+    });
+  });
 });

@@ -118,6 +118,9 @@
     ;; Verify caller owns the habit
     (asserts! (is-eq caller (get owner habit-data)) ERR-NOT-AUTHORIZED)
 
+    ;; Verify habit is still active
+    (asserts! (get is-active habit-data) ERR-INVALID-HABIT)
+
     ;; Validate stake
     (asserts! (>= stake-amount MIN-STAKE-AMOUNT) ERR-INVALID-STAKE)
 
@@ -200,8 +203,14 @@
     ;; Verify caller owns the habit
     (asserts! (is-eq caller (get owner habit-data)) ERR-NOT-AUTHORIZED)
 
+    ;; Verify habit is still active
+    (asserts! (get is-active habit-data) ERR-INVALID-HABIT)
+
     ;; Group must be active
     (asserts! (get is-active group) ERR-GROUP-NOT-ACTIVE)
+
+    ;; Group must not have expired
+    (asserts! (< block-height (get end-block group)) ERR-GROUP-NOT-ACTIVE)
 
     ;; Group must not be full
     (asserts! (< (get member-count group) MAX-GROUP-SIZE) ERR-GROUP-FULL)
@@ -280,6 +289,8 @@
       (streak (get current-streak habit-data))
       (duration-blocks (- (get end-block group) (get start-block group)))
       (required-days (/ duration-blocks u144))
+      (half-required (/ required-days u2))
+      (threshold (if (> half-required u0) half-required u1))
     )
     ;; Group duration must have ended
     (asserts! (>= block-height (get end-block group)) ERR-GROUP-STILL-ACTIVE)
@@ -291,8 +302,8 @@
     (asserts! (not (get is-successful member-data)) ERR-ALREADY-SETTLED)
     (asserts! (not (get has-claimed member-data)) ERR-ALREADY-SETTLED)
 
-    ;; Evaluate: member needs at least half the required streak days
-    (if (>= streak (/ required-days u2))
+    ;; Evaluate: member needs at least half the required streak days (min 1)
+    (if (>= streak threshold)
       (begin
         ;; Mark as successful
         (map-set group-members
