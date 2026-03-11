@@ -33,6 +33,10 @@
 ;; Minimum streak required for withdrawal
 (define-constant MIN-STREAK-FOR-WITHDRAWAL u7)
 
+;; Bonus distribution: 1% of pool per claim, capped at 1 STX
+(define-constant BONUS-DIVISOR u100)
+(define-constant MAX-BONUS-AMOUNT u1000000)
+
 ;; Contract owner
 (define-constant CONTRACT-OWNER tx-sender)
 
@@ -351,8 +355,9 @@
       (caller tx-sender)
       (habit (unwrap! (map-get? habits { habit-id: habit-id }) ERR-HABIT-NOT-FOUND))
       (pool-balance (var-get forfeited-pool-balance))
-      ;; Simple bonus calculation: 10% of pool per completed habit
-      (bonus-amount (/ pool-balance u10))
+      ;; Bonus: 1% of pool, capped at MAX-BONUS-AMOUNT (1 STX)
+      (raw-bonus (/ pool-balance BONUS-DIVISOR))
+      (bonus-amount (if (<= raw-bonus MAX-BONUS-AMOUNT) raw-bonus MAX-BONUS-AMOUNT))
     )
     ;; Verify caller is habit owner
     (asserts! (is-eq caller (get owner habit)) ERR-NOT-HABIT-OWNER)
@@ -363,7 +368,8 @@
     ;; Verify bonus has not already been claimed for this habit
     (asserts! (not (get bonus-claimed habit)) ERR-BONUS-ALREADY-CLAIMED)
     
-    ;; Verify pool has sufficient balance
+    ;; Verify pool has sufficient balance and bonus is non-zero
+    (asserts! (> bonus-amount u0) ERR-POOL-INSUFFICIENT-BALANCE)
     (asserts! (>= pool-balance bonus-amount) ERR-POOL-INSUFFICIENT-BALANCE)
     
     ;; Transfer bonus from pool to user

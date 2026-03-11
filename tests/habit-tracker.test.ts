@@ -9,6 +9,7 @@ const user3 = accounts.get("wallet_3")!;
 
 // Test Helpers
 const MIN_STAKE = 100000; // 0.1 STX in microSTX
+const MAX_STAKE_AMOUNT = 100_000_000; // 100 STX in microSTX
 const VALID_HABIT_NAME = "Daily Exercise";
 const MAX_NAME_LENGTH = 50;
 
@@ -396,8 +397,70 @@ describe("AhhbitTracker Contract", () => {
 
       // 4. Claim bonus
       const result = simnet.callPublicFn("habit-tracker", "claim-bonus", [Cl.uint(id1)], user1);
-      // Pool had MIN_STAKE * 10. 10% is MIN_STAKE
-      expect(result.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE)));
+      // Pool had MIN_STAKE * 10 (1 STX). 1% = MIN_STAKE / 10 = 10000
+      expect(result.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE / 10)));
+    });
+
+    it("should distribute nearly equal bonuses to consecutive claimants", () => {
+      // Fund the pool: slash a 1 STX habit
+      const failHabit = createHabit(user3, "Will fail", MIN_STAKE * 10);
+      const failId = Number((failHabit.result as any).value.value);
+      checkIn(user3, failId);
+      simnet.mineEmptyBlocks(150);
+      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(failId)], user3);
+      // Pool = 1,000,000 microSTX (1 STX)
+
+      // User1 completes a habit
+      const h1 = createHabit(user1, "Habit A", MIN_STAKE);
+      const id1 = Number((h1.result as any).value.value);
+      for (let i = 0; i < 7; i++) { checkIn(user1, id1); simnet.mineEmptyBlocks(10); }
+      withdrawStake(user1, id1);
+
+      // User2 completes a habit
+      const h2 = createHabit(user2, "Habit B", MIN_STAKE);
+      const id2 = Number((h2.result as any).value.value);
+      for (let i = 0; i < 7; i++) { checkIn(user2, id2); simnet.mineEmptyBlocks(10); }
+      withdrawStake(user2, id2);
+
+      // Both claim — bonuses should be within ~1% of each other
+      const claim1 = simnet.callPublicFn("habit-tracker", "claim-bonus", [Cl.uint(id1)], user1);
+      const claim2 = simnet.callPublicFn("habit-tracker", "claim-bonus", [Cl.uint(id2)], user2);
+
+      const bonus1 = Number((claim1.result as any).value.value);
+      const bonus2 = Number((claim2.result as any).value.value);
+
+      // With 1% per claim, the spread between first and second is ~1%
+      // bonus1 = pool / 100, bonus2 = (pool - bonus1) / 100
+      expect(bonus1).toBeGreaterThan(0);
+      expect(bonus2).toBeGreaterThan(0);
+      // Difference should be less than 2% (much better than old 10%)
+      expect((bonus1 - bonus2) / bonus1).toBeLessThan(0.02);
+    });
+
+    it("should cap bonus at MAX-BONUS-AMOUNT (1 STX)", () => {
+      // Fund pool with two large slashed stakes to exceed 100 STX
+      const fail1 = createHabit(user2, "Big stake 1", MAX_STAKE_AMOUNT);
+      const fid1 = Number((fail1.result as any).value.value);
+      checkIn(user2, fid1);
+      simnet.mineEmptyBlocks(150);
+      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(fid1)], user1);
+
+      const fail2 = createHabit(user3, "Big stake 2", MAX_STAKE_AMOUNT);
+      const fid2 = Number((fail2.result as any).value.value);
+      checkIn(user3, fid2);
+      simnet.mineEmptyBlocks(150);
+      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(fid2)], user1);
+      // Pool = 200 STX. 1% = 2 STX > MAX-BONUS-AMOUNT (1 STX)
+
+      // User1 completes a habit and claims
+      const h1 = createHabit(user1, "Capped habit", MIN_STAKE);
+      const cid = Number((h1.result as any).value.value);
+      for (let i = 0; i < 7; i++) { checkIn(user1, cid); simnet.mineEmptyBlocks(10); }
+      withdrawStake(user1, cid);
+
+      const result = simnet.callPublicFn("habit-tracker", "claim-bonus", [Cl.uint(cid)], user1);
+      // Should be capped at 1 STX = 1,000,000 microSTX
+      expect(result.result).toEqual(Cl.ok(Cl.uint(1_000_000)));
     });
 
     it("should reject bonus claim by non-owner", () => {
