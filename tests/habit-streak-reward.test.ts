@@ -6,7 +6,7 @@ const deployer = accounts.get("deployer")!;
 const user1 = accounts.get("wallet_1")!;
 const user2 = accounts.get("wallet_2")!;
 
-const MIN_STAKE = 100_000;
+const MIN_STAKE = 20_000;
 const FUND_AMOUNT = 10_000_000; // 10 STX
 const REWARD_AMOUNT = 500_000; // 0.5 STX per milestone
 

@@ -7,7 +7,7 @@ import {
   parseContractPrincipal,
 } from '../src/address';
 
-const MAINNET_ADDR = 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193';
+const MAINNET_ADDR = 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z';
 const TESTNET_ADDR = 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5';
 const CONTRACT = `${MAINNET_ADDR}.habit-tracker-v2`;
 
@@ -64,7 +64,7 @@ describe('getAddressNetwork', () => {
 
 describe('shortenAddress', () => {
   it('shortens a standard Stacks address', () => {
-    expect(shortenAddress(MAINNET_ADDR)).toBe('SP1M46...G193');
+    expect(shortenAddress(MAINNET_ADDR)).toBe('SP1N38...MP8Z');
   });
 
   it('returns empty string for falsy input', () => {
@@ -76,7 +76,7 @@ describe('shortenAddress', () => {
   });
 
   it('supports custom slice sizes', () => {
-    expect(shortenAddress(MAINNET_ADDR, 4, 3)).toBe('SP1M...193');
+    expect(shortenAddress(MAINNET_ADDR, 4, 3)).toBe('SP1N...P8Z');
   });
 });
 

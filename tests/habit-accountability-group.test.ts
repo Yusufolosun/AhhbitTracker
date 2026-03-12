@@ -7,7 +7,7 @@ const user1 = accounts.get("wallet_1")!;
 const user2 = accounts.get("wallet_2")!;
 const user3 = accounts.get("wallet_3")!;
 
-const MIN_STAKE = 100_000; // 0.1 STX
+const MIN_STAKE = 20_000; // 0.02 STX
 const GROUP_STAKE = 1_000_000; // 1 STX
 const GROUP_DURATION = 144; // ~1 day in blocks
 

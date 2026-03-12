@@ -23,7 +23,7 @@
 (define-constant MAX-GROUP-DURATION u12960)   ;; ~90 days
 
 ;; Minimum stake to create or join a group
-(define-constant MIN-STAKE-AMOUNT u100000)    ;; 0.1 STX
+(define-constant MIN-STAKE-AMOUNT u20000)     ;; 0.02 STX
 
 ;; ============================================
 ;; ERROR CODES (300 range)

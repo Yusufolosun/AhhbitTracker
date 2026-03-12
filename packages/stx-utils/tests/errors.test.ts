@@ -30,6 +30,6 @@ describe('getErrorRegistry', () => {
   it('returns a plain object of all codes', () => {
     const reg = getErrorRegistry();
     expect(typeof reg).toBe('object');
-    expect(reg[101]).toBe('Stake amount too low (minimum 0.1 STX)');
+    expect(reg[101]).toBe('Stake amount too low (minimum 0.02 STX)');
   });
 });

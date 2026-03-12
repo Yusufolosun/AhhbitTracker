@@ -9,7 +9,7 @@ import {
 import { MAINNET_CONTRACT } from '../src/constants';
 import { PostConditionMode } from '@stacks/transactions';
 
-const SENDER = 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193';
+const SENDER = 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z';
 const CUSTOM: { contractAddress: string; contractName: string } = {
   contractAddress: 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5',
   contractName: 'custom-tracker',

@@ -8,7 +8,7 @@ const user2 = accounts.get("wallet_2")!;
 const user3 = accounts.get("wallet_3")!;
 
 // Test Helpers
-const MIN_STAKE = 100000; // 0.1 STX in microSTX
+const MIN_STAKE = 20000; // 0.02 STX in microSTX
 const MAX_STAKE_AMOUNT = 100_000_000; // 100 STX in microSTX
 const VALID_HABIT_NAME = "Daily Exercise";
 const MAX_NAME_LENGTH = 50;

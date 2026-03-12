@@ -46,7 +46,7 @@ describe('validateStakeAmount', () => {
     expect(validateStakeAmount(0.01)).toContain('Minimum stake');
   });
 
-  it('accepts exact minimum stake (0.1 STX)', () => {
-    expect(validateStakeAmount(0.1)).toBeNull();
+  it('accepts exact minimum stake (0.02 STX)', () => {
+    expect(validateStakeAmount(0.02)).toBeNull();
   });
 });

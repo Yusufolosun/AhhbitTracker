@@ -49,8 +49,8 @@ describe('validateStake', () => {
     expect(validateStake(0.01)).toContain('Minimum stake');
   });
 
-  it('accepts exact minimum (0.1 STX)', () => {
-    expect(validateStake(0.1)).toBeNull();
+  it('accepts exact minimum (0.02 STX)', () => {
+    expect(validateStake(0.02)).toBeNull();
   });
 
   it('respects custom minimum', () => {
@@ -62,7 +62,7 @@ describe('validateStake', () => {
 describe('validatePrincipal', () => {
   it('accepts valid mainnet address', () => {
     expect(
-      validatePrincipal('SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193'),
+      validatePrincipal('SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z'),
     ).toBeNull();
   });
 
@@ -75,7 +75,7 @@ describe('validatePrincipal', () => {
   it('accepts valid contract principal', () => {
     expect(
       validatePrincipal(
-        'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker-v2',
+        'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2',
       ),
     ).toBeNull();
   });
@@ -90,7 +90,7 @@ describe('validatePrincipal', () => {
 
   it('rejects invalid contract name', () => {
     expect(
-      validatePrincipal('SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.123bad'),
+      validatePrincipal('SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.123bad'),
     ).toBe('Invalid contract name');
   });
 });

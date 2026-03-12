@@ -36,8 +36,8 @@ describe('toMicroSTX', () => {
 
 describe('shortenAddress', () => {
   it('shortens a standard Stacks address', () => {
-    const addr = 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193';
-    expect(shortenAddress(addr)).toBe('SP1M46...G193');
+    const addr = 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z';
+    expect(shortenAddress(addr)).toBe('SP1N38...MP8Z');
   });
 
   it('returns empty string for falsy input', () => {

@@ -12,13 +12,13 @@ import {
 describe('constants', () => {
   it('exports mainnet contract identifiers', () => {
     expect(MAINNET_CONTRACT.contractAddress).toBe(
-      'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193',
+      'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
     );
-    expect(MAINNET_CONTRACT.contractName).toBe('habit-tracker');
+    expect(MAINNET_CONTRACT.contractName).toBe('habit-tracker-v2');
   });
 
   it('matches on-chain constant values', () => {
-    expect(MIN_STAKE_AMOUNT).toBe(100_000);
+    expect(MIN_STAKE_AMOUNT).toBe(20_000);
     expect(MAX_HABIT_NAME_LENGTH).toBe(50);
     expect(CHECK_IN_WINDOW).toBe(144);
     expect(MIN_STREAK_FOR_WITHDRAWAL).toBe(7);

@@ -98,7 +98,7 @@ import {
 
 describe('address edge cases', () => {
   it('isValidAddress rejects lowercase stacks address', () => {
-    expect(isValidAddress('sp1m46w6cvgamh3zjd3tkmy5kcy48hwazk0dyg193')).toBe(false);
+    expect(isValidAddress('sp1n3809w9cbwwx04kn3tcqhp8a9gn520bd4jmp8z')).toBe(false);
   });
 
   it('isValidAddress rejects address with only 37 chars after prefix', () => {
@@ -147,7 +147,7 @@ describe('address edge cases', () => {
   });
 
   it('shortenAddress handles contract principals', () => {
-    const cp = 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker';
+    const cp = 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker';
     const result = shortenAddress(cp);
     expect(result).toContain('...');
     expect(result.length).toBeLessThan(cp.length);
@@ -304,8 +304,8 @@ describe('validation edge cases', () => {
     expect(validatePrincipal('sp' + 'a'.repeat(39))).not.toBeNull();
   });
 
-  it('DEFAULT_MIN_STAKE is 100_000', () => {
-    expect(DEFAULT_MIN_STAKE).toBe(100_000);
+  it('DEFAULT_MIN_STAKE is 20_000', () => {
+    expect(DEFAULT_MIN_STAKE).toBe(20_000);
   });
 
   it('DEFAULT_MAX_NAME_LENGTH is 50', () => {

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { txUrl, addressUrl, contractUrl } from '../src/explorer';
 
-const ADDR = 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193';
+const ADDR = 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z';
 const TX = '0xabc123';
 const CONTRACT = `${ADDR}.habit-tracker-v2`;
 
