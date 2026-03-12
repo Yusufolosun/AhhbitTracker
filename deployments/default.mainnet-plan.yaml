@@ -16,3 +16,20 @@ plan:
             anchor-block-only: true
             clarity-version: 2
       epoch: "2.5"
+    - id: 1
+      transactions:
+        - contract-publish:
+            contract-name: habit-streak-reward
+            expected-sender: SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193
+            cost: 1500000
+            path: "contracts\\habit-streak-reward.clar"
+            anchor-block-only: true
+            clarity-version: 2
+        - contract-publish:
+            contract-name: habit-accountability-group
+            expected-sender: SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193
+            cost: 3000000
+            path: "contracts\\habit-accountability-group.clar"
+            anchor-block-only: true
+            clarity-version: 2
+      epoch: "2.5"

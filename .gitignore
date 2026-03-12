@@ -15,12 +15,22 @@ settings/Devnet.toml
 # ============================================
 # Contains API keys, wallet seeds, RPC endpoints
 .env
+**/.env
 .env.local
 .env.production
 .env.development
 .env.staging
 .env.*.local
 .env.test
+
+# Frontend env overrides (patterns without slash match in all subdirs)
+frontend/.env
+frontend/.env.local
+frontend/.env.production
+frontend/.env.development
+frontend/.env.staging
+frontend/.env.*.local
+frontend/.env.test
 
 # ============================================
 # WALLET & PRIVATE KEYS (CRITICAL)
@@ -33,6 +43,12 @@ private-keys.txt
 wallet-backup.json
 mnemonic.txt
 secrets/
+
+# Catch-all for any local key/secret config files in any directory
+**/.env.local
+**/.env.*.local
+**/local.env
+**/local.*.env
 
 # ============================================
 # CLARINET GENERATED FILES
@@ -144,7 +160,9 @@ scripts/analytics/pool-history.json
 scripts/analytics/*.data.json
 
 scripts/.env*
+scripts/**/.env*
 scripts/*.env
+scripts/**/*.env
 scripts/wallet-keys.txt
 **/mnemonic*.txt
 **/private-key*.txt
@@ -153,6 +171,9 @@ scripts/wallet-keys.txt
 **/*.bak
 **/*-private-key.json
 **/*_private_key*
+**/*wallet*keys*
+**/*key*export*
+**/*key*backup*
 
 # ============================================
 # STACKS WALLET & KEY FILES (EXTENDED)
