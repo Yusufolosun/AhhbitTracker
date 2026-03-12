@@ -1,7 +1,7 @@
 {
   "name": "@yusufolosun/stx-utils",
-  "version": "1.1.0",
-  "description": "Lightweight utilities for Stacks (STX) dApp development — formatting, validation, address helpers, block-time estimation, and more.",
+  "version": "2.0.0",
+  "description": "Lightweight, zero-dependency utilities for Stacks (STX) dApp development — formatting, validation, addresses, Clarity decoding, PoX stacking, memos, and more.",
   "author": "Yusufolosun",
   "license": "MIT",
   "repository": {
@@ -26,8 +26,16 @@
     "address",
     "block-time",
     "explorer",
-    "hiro"
+    "hiro",
+    "pox",
+    "stacking",
+    "memo",
+    "clarity-value",
+    "sip-005"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -47,7 +55,8 @@
   "files": [
     "dist",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "sideEffects": false,
   "scripts": {
