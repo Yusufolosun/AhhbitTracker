@@ -1,11 +1,10 @@
-import { describe, expect, it, beforeEach } from "vitest";
+import { describe, expect, it } from "vitest";
 import { Cl } from "@stacks/transactions";
 
 const accounts = simnet.getAccounts();
 const deployer = accounts.get("deployer")!;
 const user1 = accounts.get("wallet_1")!;
 const user2 = accounts.get("wallet_2")!;
-const user3 = accounts.get("wallet_3")!;
 
 const MIN_STAKE = 100_000;
 const FUND_AMOUNT = 10_000_000; // 10 STX

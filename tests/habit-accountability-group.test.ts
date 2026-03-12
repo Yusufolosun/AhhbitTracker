@@ -729,4 +729,326 @@ describe("Habit Accountability Group Contract", () => {
       expect(result3.result).toBeErr(Cl.uint(311)); // ERR-NOT-ELIGIBLE
     });
   });
+
+  describe("finalize-group", () => {
+
+    it("should finalize a group after it ends", () => {
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
+
+      simnet.mineEmptyBlocks(GROUP_DURATION);
+
+      const result = simnet.callPublicFn(
+        "habit-accountability-group", "finalize-group",
+        [Cl.uint(1)], deployer
+      );
+      expect(result.result).toBeOk(Cl.bool(true));
+
+      // Verify group is now settled and inactive (new joins should fail)
+      createHabit(user2, "Reading", MIN_STAKE);
+      const joinResult = joinGroup(user2, 1, 2);
+      expect(joinResult.result).toBeErr(Cl.uint(305)); // ERR-GROUP-NOT-ACTIVE
+    });
+
+    it("should reject finalize before group ends", () => {
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
+
+      const result = simnet.callPublicFn(
+        "habit-accountability-group", "finalize-group",
+        [Cl.uint(1)], deployer
+      );
+      expect(result.result).toBeErr(Cl.uint(306)); // ERR-GROUP-STILL-ACTIVE
+    });
+
+    it("should reject double finalize", () => {
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
+
+      simnet.mineEmptyBlocks(GROUP_DURATION);
+
+      simnet.callPublicFn(
+        "habit-accountability-group", "finalize-group",
+        [Cl.uint(1)], deployer
+      );
+
+      const result = simnet.callPublicFn(
+        "habit-accountability-group", "finalize-group",
+        [Cl.uint(1)], deployer
+      );
+      expect(result.result).toBeErr(Cl.uint(309)); // ERR-ALREADY-SETTLED
+    });
+
+    it("should allow anyone to finalize", () => {
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
+
+      simnet.mineEmptyBlocks(GROUP_DURATION);
+
+      // user3 (non-member) can finalize
+      const result = simnet.callPublicFn(
+        "habit-accountability-group", "finalize-group",
+        [Cl.uint(1)], user3
+      );
+      expect(result.result).toBeOk(Cl.bool(true));
+    });
+
+    it("should prevent new member settlement after finalization", () => {
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createHabit(user2, "Reading", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
+      joinGroup(user2, 1, 2);
+
+      buildStreak(user1, 1, 1);
+      simnet.mineEmptyBlocks(GROUP_DURATION);
+
+      // Settle user1, then finalize
+      settleMember(deployer, 1, user1);
+      simnet.callPublicFn(
+        "habit-accountability-group", "finalize-group",
+        [Cl.uint(1)], deployer
+      );
+
+      // user2 settlement should fail - group is no longer active
+      const result = settleMember(deployer, 1, user2);
+      expect(result.result).toBeErr(Cl.uint(305)); // ERR-GROUP-NOT-ACTIVE
+    });
+
+    it("should reject finalize for nonexistent group", () => {
+      const result = simnet.callPublicFn(
+        "habit-accountability-group", "finalize-group",
+        [Cl.uint(999)], deployer
+      );
+      expect(result.result).toBeErr(Cl.uint(301)); // ERR-GROUP-NOT-FOUND
+    });
+  });
+
+  describe("refund-failed-group", () => {
+
+    it("should refund all members when everyone fails", () => {
+      const longDuration = 1440;
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createHabit(user2, "Reading", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, longDuration, 1);
+      joinGroup(user2, 1, 2);
+
+      // Nobody builds enough streak
+      simnet.mineEmptyBlocks(longDuration);
+
+      // Settle both as failed
+      settleMember(deployer, 1, user1);
+      settleMember(deployer, 1, user2);
+
+      // Finalize
+      simnet.callPublicFn(
+        "habit-accountability-group", "finalize-group",
+        [Cl.uint(1)], deployer
+      );
+
+      // Both members get refunded
+      const refund1 = simnet.callPublicFn(
+        "habit-accountability-group", "refund-failed-group",
+        [Cl.uint(1), Cl.principal(user1)], deployer
+      );
+      expect(refund1.result).toBeOk(Cl.uint(GROUP_STAKE));
+
+      const refund2 = simnet.callPublicFn(
+        "habit-accountability-group", "refund-failed-group",
+        [Cl.uint(1), Cl.principal(user2)], deployer
+      );
+      expect(refund2.result).toBeOk(Cl.uint(GROUP_STAKE));
+    });
+
+    it("should reject refund when there are successful members", () => {
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createHabit(user2, "Reading", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
+      joinGroup(user2, 1, 2);
+
+      buildStreak(user1, 1, 1);
+      simnet.mineEmptyBlocks(GROUP_DURATION);
+
+      // user1 succeeds, user2 fails
+      settleMember(deployer, 1, user1);
+      settleMember(deployer, 1, user2);
+
+      // Finalize
+      simnet.callPublicFn(
+        "habit-accountability-group", "finalize-group",
+        [Cl.uint(1)], deployer
+      );
+
+      // Refund should fail - successful-count > 0
+      const result = simnet.callPublicFn(
+        "habit-accountability-group", "refund-failed-group",
+        [Cl.uint(1), Cl.principal(user2)], deployer
+      );
+      expect(result.result).toBeErr(Cl.uint(311)); // ERR-NOT-ELIGIBLE
+    });
+
+    it("should reject refund before finalization", () => {
+      const longDuration = 1440;
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, longDuration, 1);
+
+      simnet.mineEmptyBlocks(longDuration);
+      settleMember(deployer, 1, user1);
+
+      // Group not finalized yet → is-settled = false
+      const result = simnet.callPublicFn(
+        "habit-accountability-group", "refund-failed-group",
+        [Cl.uint(1), Cl.principal(user1)], deployer
+      );
+      expect(result.result).toBeErr(Cl.uint(306)); // ERR-GROUP-STILL-ACTIVE
+    });
+
+    it("should reject double refund", () => {
+      const longDuration = 1440;
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, longDuration, 1);
+
+      simnet.mineEmptyBlocks(longDuration);
+      settleMember(deployer, 1, user1);
+
+      simnet.callPublicFn(
+        "habit-accountability-group", "finalize-group",
+        [Cl.uint(1)], deployer
+      );
+
+      // First refund works
+      simnet.callPublicFn(
+        "habit-accountability-group", "refund-failed-group",
+        [Cl.uint(1), Cl.principal(user1)], deployer
+      );
+
+      // Second refund fails
+      const result = simnet.callPublicFn(
+        "habit-accountability-group", "refund-failed-group",
+        [Cl.uint(1), Cl.principal(user1)], deployer
+      );
+      expect(result.result).toBeErr(Cl.uint(310)); // ERR-ALREADY-CLAIMED
+    });
+
+    it("should reject refund for non-member", () => {
+      const longDuration = 1440;
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, longDuration, 1);
+
+      simnet.mineEmptyBlocks(longDuration);
+      settleMember(deployer, 1, user1);
+
+      simnet.callPublicFn(
+        "habit-accountability-group", "finalize-group",
+        [Cl.uint(1)], deployer
+      );
+
+      const result = simnet.callPublicFn(
+        "habit-accountability-group", "refund-failed-group",
+        [Cl.uint(1), Cl.principal(user2)], deployer
+      );
+      expect(result.result).toBeErr(Cl.uint(304)); // ERR-NOT-MEMBER
+    });
+
+    it("should allow anyone to trigger refund for a member", () => {
+      const longDuration = 1440;
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, longDuration, 1);
+
+      simnet.mineEmptyBlocks(longDuration);
+      settleMember(deployer, 1, user1);
+
+      simnet.callPublicFn(
+        "habit-accountability-group", "finalize-group",
+        [Cl.uint(1)], deployer
+      );
+
+      // user3 (non-member) triggers refund for user1
+      const result = simnet.callPublicFn(
+        "habit-accountability-group", "refund-failed-group",
+        [Cl.uint(1), Cl.principal(user1)], user3
+      );
+      expect(result.result).toBeOk(Cl.uint(GROUP_STAKE));
+    });
+
+    it("should return correct STX to each member in 3-person all-fail scenario", () => {
+      const longDuration = 1440;
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createHabit(user2, "Reading", MIN_STAKE);
+      createHabit(user3, "Coding", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, longDuration, 1);
+      joinGroup(user2, 1, 2);
+      joinGroup(user3, 1, 3);
+
+      // Nobody builds streak
+      simnet.mineEmptyBlocks(longDuration);
+
+      settleMember(deployer, 1, user1);
+      settleMember(deployer, 1, user2);
+      settleMember(deployer, 1, user3);
+
+      simnet.callPublicFn(
+        "habit-accountability-group", "finalize-group",
+        [Cl.uint(1)], deployer
+      );
+
+      // All 3 members get GROUP_STAKE back
+      const r1 = simnet.callPublicFn(
+        "habit-accountability-group", "refund-failed-group",
+        [Cl.uint(1), Cl.principal(user1)], deployer
+      );
+      expect(r1.result).toBeOk(Cl.uint(GROUP_STAKE));
+
+      const r2 = simnet.callPublicFn(
+        "habit-accountability-group", "refund-failed-group",
+        [Cl.uint(1), Cl.principal(user2)], deployer
+      );
+      expect(r2.result).toBeOk(Cl.uint(GROUP_STAKE));
+
+      const r3 = simnet.callPublicFn(
+        "habit-accountability-group", "refund-failed-group",
+        [Cl.uint(1), Cl.principal(user3)], deployer
+      );
+      expect(r3.result).toBeOk(Cl.uint(GROUP_STAKE));
+    });
+
+    it("should complete full lifecycle: create → join → settle all fail → finalize → refund", () => {
+      const longDuration = 1440;
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createHabit(user2, "Reading", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, longDuration, 1);
+      joinGroup(user2, 1, 2);
+
+      simnet.mineEmptyBlocks(longDuration);
+
+      // Settle both as failed
+      const s1 = settleMember(deployer, 1, user1);
+      expect(s1.result).toBeOk(Cl.bool(false));
+      const s2 = settleMember(deployer, 1, user2);
+      expect(s2.result).toBeOk(Cl.bool(false));
+
+      // claim-group-reward should fail (no successful members)
+      const claim = claimGroupReward(user1, 1);
+      expect(claim.result).toBeErr(Cl.uint(311)); // ERR-NOT-ELIGIBLE
+
+      // Finalize
+      const fin = simnet.callPublicFn(
+        "habit-accountability-group", "finalize-group",
+        [Cl.uint(1)], deployer
+      );
+      expect(fin.result).toBeOk(Cl.bool(true));
+
+      // Refund both
+      const r1 = simnet.callPublicFn(
+        "habit-accountability-group", "refund-failed-group",
+        [Cl.uint(1), Cl.principal(user1)], deployer
+      );
+      expect(r1.result).toBeOk(Cl.uint(GROUP_STAKE));
+
+      const r2 = simnet.callPublicFn(
+        "habit-accountability-group", "refund-failed-group",
+        [Cl.uint(1), Cl.principal(user2)], deployer
+      );
+      expect(r2.result).toBeOk(Cl.uint(GROUP_STAKE));
+    });
+  });
 });

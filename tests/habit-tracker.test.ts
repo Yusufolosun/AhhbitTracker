@@ -279,14 +279,22 @@ describe("AhhbitTracker Contract", () => {
       expect(result.result).toBeOk(Cl.uint(2));
     });
 
-    it("should reject check-in 1 block past the window (145 elapsed)", () => {
+    it("should auto-slash check-in 1 block past the window (145 elapsed)", () => {
       // checkIn at block N → mine 144 empty blocks → next checkIn at N+145
-      // elapsed = 145 > CHECK-IN-WINDOW(144) → ERR-CHECK-IN-WINDOW-EXPIRED
+      // elapsed = 145 > CHECK-IN-WINDOW(144) → auto-slash returns (ok u0)
       checkIn(user1, habitId);
       simnet.mineEmptyBlocks(144);
 
       const result = checkIn(user1, habitId);
-      expect(result.result).toBeErr(Cl.uint(106));
+      expect(result.result).toBeOk(Cl.uint(0));
+
+      // Verify stake moved to pool
+      const pool = simnet.getDataVar("habit-tracker", "forfeited-pool-balance");
+      expect(pool).toBeUint(MIN_STAKE);
+
+      // Verify habit is inactive (further check-in fails)
+      const result2 = checkIn(user1, habitId);
+      expect(result2.result).toBeErr(Cl.uint(108));
     });
 
     it("should forfeit stake when check-in window expires via slashing", () => {
@@ -623,6 +631,113 @@ describe("AhhbitTracker Contract", () => {
 
       const poolResult = simnet.callReadOnlyFn("habit-tracker", "get-pool-balance", [], deployer);
       expect(poolResult.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE)));
+    });
+  });
+
+  describe("auto-slash behavior", () => {
+
+    it("should auto-slash when owner calls check-in after window expires", () => {
+      const result = createHabit(user1, "Exercise", MIN_STAKE);
+      const id = Number((result.result as any).value.value);
+
+      checkIn(user1, id);
+      simnet.mineEmptyBlocks(200);
+
+      // Owner tries to check in too late - auto-slash fires
+      const result2 = checkIn(user1, id);
+      expect(result2.result).toBeOk(Cl.uint(0));
+
+      // Habit is now inactive (further check-in fails with ERR-HABIT-ALREADY-COMPLETED)
+      const result3 = checkIn(user1, id);
+      expect(result3.result).toBeErr(Cl.uint(108));
+
+      // Streak was reset to 0
+      const streakResult = simnet.callReadOnlyFn("habit-tracker", "get-habit-streak", [Cl.uint(id)], deployer);
+      expect(streakResult.result).toBeOk(Cl.uint(0));
+    });
+
+    it("should move stake to pool on auto-slash", () => {
+      const result = createHabit(user1, "Exercise", MIN_STAKE * 5);
+      const id = Number((result.result as any).value.value);
+
+      checkIn(user1, id);
+      simnet.mineEmptyBlocks(150);
+
+      checkIn(user1, id); // triggers auto-slash
+      const poolAfter = simnet.getDataVar("habit-tracker", "forfeited-pool-balance");
+
+      expect(poolAfter).toBeUint(MIN_STAKE * 5);
+    });
+
+    it("should prevent further check-ins after auto-slash", () => {
+      const result = createHabit(user1, "Exercise", MIN_STAKE);
+      const id = Number((result.result as any).value.value);
+
+      checkIn(user1, id);
+      simnet.mineEmptyBlocks(150);
+
+      // First expired check-in auto-slashes
+      checkIn(user1, id);
+
+      // Second check-in should fail - habit is inactive
+      const result3 = checkIn(user1, id);
+      expect(result3.result).toBeErr(Cl.uint(108)); // ERR-HABIT-ALREADY-COMPLETED
+    });
+
+    it("should prevent withdrawal after auto-slash", () => {
+      const result = createHabit(user1, "Exercise", MIN_STAKE);
+      const id = Number((result.result as any).value.value);
+
+      // Build streak then let window expire
+      for (let i = 0; i < 7; i++) {
+        checkIn(user1, id);
+        simnet.mineEmptyBlocks(10);
+      }
+      simnet.mineEmptyBlocks(200);
+
+      // Auto-slash via check-in
+      const slashResult = checkIn(user1, id);
+      expect(slashResult.result).toBeOk(Cl.uint(0));
+
+      // Withdrawal should fail - habit was auto-slashed
+      const withdrawResult = withdrawStake(user1, id);
+      expect(withdrawResult.result).toBeErr(Cl.uint(108));
+    });
+
+    it("should still allow external slash-habit for habits where owner never returns", () => {
+      const result = createHabit(user1, "Exercise", MIN_STAKE);
+      const id = Number((result.result as any).value.value);
+
+      checkIn(user1, id);
+      simnet.mineEmptyBlocks(200);
+
+      // External actor slashes (owner never calls check-in again)
+      const slashResult = simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(id)], user2);
+      expect(slashResult.result).toBeOk(Cl.bool(true));
+
+      const pool = simnet.getDataVar("habit-tracker", "forfeited-pool-balance");
+      expect(pool).toBeUint(MIN_STAKE);
+    });
+
+    it("should auto-slash with high streak (streak resets to 0)", () => {
+      const result = createHabit(user1, "Exercise", MIN_STAKE);
+      const id = Number((result.result as any).value.value);
+
+      // Build a good streak
+      for (let i = 0; i < 5; i++) {
+        checkIn(user1, id);
+        simnet.mineEmptyBlocks(10);
+      }
+
+      // Let window expire
+      simnet.mineEmptyBlocks(200);
+
+      const slashResult = checkIn(user1, id);
+      expect(slashResult.result).toBeOk(Cl.uint(0));
+
+      // Streak resets to 0
+      const streakResult = simnet.callReadOnlyFn("habit-tracker", "get-habit-streak", [Cl.uint(id)], deployer);
+      expect(streakResult.result).toBeOk(Cl.uint(0));
     });
   });
 
