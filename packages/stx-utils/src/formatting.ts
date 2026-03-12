@@ -58,3 +58,17 @@ export function formatSTXWithUnit(microSTX: number): string {
   }
   return `${formatSTX(microSTX)} STX`;
 }
+
+/**
+ * Format microSTX as a compact display string with K/M/B suffixes.
+ *
+ * @param microSTX - Amount in microSTX.
+ * @returns Compact string, e.g. `"1.0K STX"`, `"2.5M STX"`.
+ */
+export function formatSTXCompact(microSTX: number): string {
+  const stx = microSTX / MICRO_PER_STX;
+  if (stx >= 1_000_000_000) return `${(stx / 1_000_000_000).toFixed(1)}B STX`;
+  if (stx >= 1_000_000) return `${(stx / 1_000_000).toFixed(1)}M STX`;
+  if (stx >= 1_000) return `${(stx / 1_000).toFixed(1)}K STX`;
+  return `${stx.toFixed(2)} STX`;
+}
