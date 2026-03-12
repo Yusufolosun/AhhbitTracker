@@ -16,8 +16,8 @@
 
 ;; Minimum stake required (in microSTX)
 ;; 1 STX = 1,000,000 microSTX
-;; Minimum: 0.1 STX = 100,000 microSTX
-(define-constant MIN-STAKE-AMOUNT u100000)
+;; Minimum: 0.02 STX = 20,000 microSTX
+(define-constant MIN-STAKE-AMOUNT u20000)
 
 ;; Maximum stake allowed (in microSTX)
 ;; 100 STX = 100,000,000 microSTX
@@ -144,7 +144,7 @@
 
 ;; Create a new habit with stake
 ;; @param name: Habit description (max 50 characters)
-;; @param stake-amount: Amount to stake in microSTX (min 0.1 STX)
+;; @param stake-amount: Amount to stake in microSTX (min 0.02 STX)
 ;; @returns: habit-id on success, error code on failure
 (define-public (create-habit (name (string-utf8 50)) (stake-amount uint))
   (let

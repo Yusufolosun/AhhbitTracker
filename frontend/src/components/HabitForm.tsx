@@ -84,13 +84,13 @@ export function HabitForm() {
             placeholder="0.1"
             value={stake}
             onChange={(e) => setStake(e.target.value)}
-            min="0.1"
-            step="0.1"
+            min="0.02"
+            step="0.01"
             required
             disabled={isCreatingHabit}
           />
           <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-            Minimum: 0.1 STX
+            Minimum: 0.02 STX
           </p>
         </div>
 

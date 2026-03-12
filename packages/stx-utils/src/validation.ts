@@ -7,8 +7,8 @@
 
 import { MICRO_PER_STX } from './formatting';
 
-/** Default minimum stake (0.1 STX in microSTX). */
-export const DEFAULT_MIN_STAKE = 100_000;
+/** Default minimum stake (0.02 STX in microSTX). */
+export const DEFAULT_MIN_STAKE = 20_000;
 
 /** Default maximum name length (Clarity `string-utf8` cap). */
 export const DEFAULT_MAX_NAME_LENGTH = 50;

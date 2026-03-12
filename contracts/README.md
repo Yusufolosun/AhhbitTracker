@@ -103,7 +103,7 @@ Gets aggregated statistics for a user.
 
 ## Constants
 
-- `MIN-STAKE-AMOUNT`: 100,000 microSTX (0.1 STX)
+- `MIN-STAKE-AMOUNT`: 20,000 microSTX (0.02 STX)
 - `MAX-HABIT-NAME-LENGTH`: 50 characters
 - `CHECK-IN-WINDOW`: 144 blocks (~24 hours)
 - `MIN-STREAK-FOR-WITHDRAWAL`: 7 days

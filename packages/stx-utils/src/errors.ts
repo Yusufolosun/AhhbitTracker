@@ -12,7 +12,7 @@
  */
 const registry = new Map<number, string>([
   [100, 'Not authorized'],
-  [101, 'Stake amount too low (minimum 0.1 STX)'],
+  [101, 'Stake amount too low (minimum 0.02 STX)'],
   [102, 'Invalid name (max 50 characters)'],
   [103, 'Item not found'],
   [104, 'Not the owner'],
