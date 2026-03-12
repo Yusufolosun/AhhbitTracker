@@ -11,6 +11,7 @@ export {
   toMicroSTX,
   toSTX,
   formatSTXWithUnit,
+  formatSTXCompact,
 } from './formatting';
 
 // Address utilities
@@ -50,4 +51,28 @@ export { formatDate, timeAgo } from './time';
 
 // Explorer URLs
 export type { Network } from './explorer';
-export { txUrl, addressUrl, contractUrl } from './explorer';
+export { txUrl, addressUrl, contractUrl, blockUrl, apiUrl } from './explorer';
+
+// Clarity value decoder
+export { decodeClarityValue, unwrapResponse, extractValue } from './clarity';
+export type { ClarityValue } from './clarity';
+
+// Memo encoder/decoder
+export {
+  MEMO_MAX_BYTES,
+  encodeMemo,
+  decodeMemo,
+  memoToHex,
+  memoFromHex,
+} from './memo';
+
+// PoX stacking helpers
+export {
+  BLOCKS_PER_CYCLE,
+  POX_START_HEIGHT,
+  blockToCycle,
+  cycleToBlock,
+  cycleProgress,
+  blocksUntilNextCycle,
+  isInPreparePhase,
+} from './stacking';
