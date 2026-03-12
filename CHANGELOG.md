@@ -5,6 +5,24 @@ All notable changes to AhhbitTracker will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-02-18
+
+### Changed
+
+- **Mainnet redeployment** to new deployer address `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z`
+- Minimum stake reduced from 0.1 STX to 0.02 STX across all contracts
+- All 3 contracts deployed: `habit-tracker-v2`, `habit-streak-reward`, `habit-accountability-group`
+
+### Deployment
+
+- **Deployer:** `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z`
+- **habit-tracker-v2:** [Explorer](https://explorer.hiro.so/txid/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2?chain=mainnet)
+- **habit-streak-reward:** [Explorer](https://explorer.hiro.so/txid/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-streak-reward?chain=mainnet)
+- **habit-accountability-group:** [Explorer](https://explorer.hiro.so/txid/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-accountability-group?chain=mainnet)
+- **Previous deployment (deprecated):** `SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker-v2`
+
+---
+
 ## [1.0.1] - 2026-02-17
 
 ### Added
@@ -87,13 +105,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Environment templates
 - Git workflow and contribution guidelines
 
-### Contract Details
+### Contract Details (Previous Deployment — Deprecated)
 
 - **Address:** `SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker-v2`
 - **Deployment Cost:** ~0.12 STX
 - **Network:** Stacks Mainnet
 - **Language:** Clarity v2
 - **Epoch:** 2.5
+
+> **Note:** This deployment has been superseded by `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z` — see [1.1.0].
 
 ### Security
 
@@ -104,7 +124,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Known Limitations
 
-- Minimum stake: 0.1 STX
+- Minimum stake: 0.02 STX
 - Check-in window: 144 blocks (~24 hours)
 - Minimum withdrawal streak: 7 days
 - Maximum habits per user: 100

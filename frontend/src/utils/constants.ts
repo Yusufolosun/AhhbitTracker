@@ -9,12 +9,12 @@ export const NETWORK = isDev
 
 // Contract Configuration — override via VITE_CONTRACT_ADDRESS / VITE_CONTRACT_NAME
 export const CONTRACT_ADDRESS =
-  import.meta.env.VITE_CONTRACT_ADDRESS ?? 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193';
+  import.meta.env.VITE_CONTRACT_ADDRESS ?? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z';
 export const CONTRACT_NAME =
   import.meta.env.VITE_CONTRACT_NAME ?? 'habit-tracker-v2';
 
 // Contract Constants
-export const MIN_STAKE_AMOUNT = 100000; // 0.1 STX in microSTX
+export const MIN_STAKE_AMOUNT = 20000; // 0.02 STX in microSTX
 export const MAX_HABIT_NAME_LENGTH = 50;
 export const CHECK_IN_WINDOW = 144; // blocks (~24 hours)
 export const MIN_STREAK_FOR_WITHDRAWAL = 7;
@@ -22,7 +22,7 @@ export const MIN_STREAK_FOR_WITHDRAWAL = 7;
 // Error Codes
 export const ERROR_CODES: Record<number, string> = {
   100: 'Not authorized',
-  101: 'Stake amount too low (minimum 0.1 STX)',
+  101: 'Stake amount too low (minimum 0.02 STX)',
   102: 'Invalid habit name (max 50 characters)',
   103: 'Habit not found',
   104: 'You do not own this habit',

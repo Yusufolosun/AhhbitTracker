@@ -25,7 +25,7 @@ AhhbitTracker is a decentralized application on the Stacks blockchain that helps
 ### What do I need?
 
 - Stacks wallet (Leather, Xverse, or Asigna recommended)
-- Minimum 0.1 STX for stake
+- Minimum 0.02 STX for stake
 - Additional STX for transaction fees (~0.5 STX for 7-day completion)
 
 ### How do I create a wallet?
@@ -263,7 +263,7 @@ No. Only you (the owner) can check in or withdraw from your habits.
 
 **Common Error Codes:**
 - `(err u100)` - ERR-NOT-AUTHORIZED: You don't have permission for this action
-- `(err u101)` - ERR-INVALID-STAKE-AMOUNT: Stake amount too low (minimum 0.1 STX)
+- `(err u101)` - ERR-INVALID-STAKE-AMOUNT: Stake amount too low (minimum 0.02 STX)
 - `(err u102)` - ERR-INVALID-HABIT-NAME: Habit name empty or too long (max 50 characters)
 - `(err u103)` - ERR-HABIT-NOT-FOUND: Habit ID doesn't exist
 - `(err u104)` - ERR-NOT-HABIT-OWNER: You're not the owner of this habit
@@ -284,4 +284,4 @@ No. The contract has no admin functions. It's completely decentralized.
 
 - **GitHub Issues:** https://github.com/Yusufolosun/AhhbitTracker/issues
 - **Documentation:** https://github.com/Yusufolosun/AhhbitTracker/tree/main/docs
-- **Contract Explorer:** https://explorer.hiro.so/txid/SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker-v2?chain=mainnet
+- **Contract Explorer:** https://explorer.hiro.so/txid/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2?chain=mainnet

@@ -70,7 +70,7 @@ import {
 } from 'ahhbit-tracker-sdk';
 
 console.log(MAINNET_CONTRACT);
-// { contractAddress: 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193', contractName: 'habit-tracker-v2' }
+// { contractAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z', contractName: 'habit-tracker-v2' }
 
 console.log(errorMessages[ErrorCode.ALREADY_CHECKED_IN]);
 // 'Already checked in today'

@@ -67,9 +67,9 @@ toMicroSTX(2.5);                 // 2_500_000
 formatSTXCompact(1_500_000_000); // "1.5K STX"
 
 // Addresses
-shortenAddress('SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193');
+shortenAddress('SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z');
 // → "SP1M46...G193"
-isValidAddress('SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193'); // true
+isValidAddress('SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z'); // true
 
 // Block time
 blocksToTime(144);   // "1 day"
@@ -77,7 +77,7 @@ blocksAgo(1000, 994); // "~1h ago"
 
 // Validation
 validateStake(0.5);  // null (valid)
-validateStake(0.01); // "Minimum stake is 0.1 STX"
+validateStake(0.01); // "Minimum stake is 0.02 STX"
 
 // Error decoding
 decodeError(105);    // "Already checked in today"
@@ -142,7 +142,7 @@ blockToCycle(670000); // → 1 (reward cycle number)
 | `validateName(name, maxLength?)` | Validate a Clarity string input |
 | `validateStake(stx, minMicroSTX?)` | Validate stake amount (rejects NaN, Infinity) |
 | `validatePrincipal(principal)` | Validate standard or contract principal |
-| `DEFAULT_MIN_STAKE` | Constant: `100_000` (0.1 STX in microSTX) |
+| `DEFAULT_MIN_STAKE` | Constant: `20_000` (0.02 STX in microSTX) |
 | `DEFAULT_MAX_NAME_LENGTH` | Constant: `50` |
 
 ### Errors

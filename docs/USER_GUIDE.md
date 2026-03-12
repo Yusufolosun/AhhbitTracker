@@ -8,7 +8,7 @@ AhhbitTracker is a blockchain-based habit tracking system that uses financial co
 
 ### 1. Stake STX on Your Habit
 
-When you create a habit, you stake STX tokens as a commitment. The minimum stake is 0.1 STX.
+When you create a habit, you stake STX tokens as a commitment. The minimum stake is 0.02 STX.
 
 **Why stake?** Financial commitment creates real accountability.
 
@@ -32,14 +32,14 @@ Successful users can claim bonuses from the forfeited pool created by users who 
 ### Prerequisites
 
 - Stacks wallet (Leather, Xverse, or Asigna)
-- Minimum 0.1 STX plus transaction fees
+- Minimum 0.02 STX plus transaction fees
 
 ### Creating Your First Habit
 
 1. Connect your Stacks wallet
 2. Click "Create New Habit"
 3. Enter habit name (e.g., "Morning Exercise")
-4. Set your stake amount (minimum 0.1 STX)
+4. Set your stake amount (minimum 0.02 STX)
 5. Confirm the transaction
 
 **Transaction cost:** ~0.15-0.25 STX
@@ -210,7 +210,7 @@ A: All transactions are public on the Stacks blockchain.
 
 ## Getting Help
 
-- **Contract Address:** `SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker-v2`
+- **Contract Address:** `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2`
 - **Documentation:** [GitHub Repository](https://github.com/Yusufolosun/AhhbitTracker)
 - **Issues:** Report bugs via GitHub Issues
 

@@ -4,7 +4,7 @@ Complete reference for all contract functions and data structures.
 
 ## Contract Information
 
-**Address:** `SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker-v2`  
+**Address:** `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2`  
 **Network:** Stacks Mainnet  
 **Language:** Clarity v2  
 **Epoch:** 2.5
@@ -220,7 +220,7 @@ Gets all habit IDs for a user.
 
 **Example:**
 ```clarity
-(contract-call? '.habit-tracker-v2 get-user-habits 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193)
+(contract-call? '.habit-tracker-v2 get-user-habits 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z)
 ;; Returns: (some {habit-ids: (list u1 u2 u3)})
 ```
 
@@ -300,7 +300,7 @@ Gets aggregated statistics for a user.
 
 **Example:**
 ```clarity
-(contract-call? '.habit-tracker-v2 get-user-stats 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193)
+(contract-call? '.habit-tracker-v2 get-user-stats 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z)
 ;; Returns: (ok {total-habits: u3, habit-ids: (list u1 u2 u3)})
 ```
 
@@ -311,7 +311,7 @@ Gets aggregated statistics for a user.
 ## Constants
 
 ### MIN-STAKE-AMOUNT
-**Value:** `u100000` (0.1 STX in microSTX)  
+**Value:** `u20000` (0.02 STX in microSTX)  
 **Description:** Minimum stake required to create a habit
 
 ### MAX-HABIT-NAME-LENGTH
@@ -497,7 +497,7 @@ import { openContractCall } from '@stacks/connect';
 import { uintCV, stringUtf8CV } from '@stacks/transactions';
 
 const txOptions = {
-  contractAddress: 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193',
+  contractAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
   contractName: 'habit-tracker-v2',
   functionName: 'create-habit',
   functionArgs: [
@@ -529,6 +529,6 @@ No built-in rate limiting. Frontend should implement:
 
 ## Support
 
-- **Contract Explorer:** https://explorer.hiro.so/txid/SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker-v2?chain=mainnet
+- **Contract Explorer:** https://explorer.hiro.so/txid/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2?chain=mainnet
 - **Documentation:** https://github.com/Yusufolosun/AhhbitTracker
 - **Issues:** https://github.com/Yusufolosun/AhhbitTracker/issues

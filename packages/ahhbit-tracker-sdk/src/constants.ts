@@ -2,12 +2,12 @@ import type { ContractId } from './types';
 
 /** Default mainnet contract deployment. */
 export const MAINNET_CONTRACT: ContractId = {
-  contractAddress: 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193',
+  contractAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
   contractName: 'habit-tracker-v2',
 };
 
-/** Minimum stake in microSTX (0.1 STX). */
-export const MIN_STAKE_AMOUNT = 100_000;
+/** Minimum stake in microSTX (0.02 STX). */
+export const MIN_STAKE_AMOUNT = 20_000;
 
 /** Maximum habit name length (UTF-8 characters). */
 export const MAX_HABIT_NAME_LENGTH = 50;
@@ -39,7 +39,7 @@ export type ErrorCodeValue = (typeof ErrorCode)[keyof typeof ErrorCode];
 /** Maps error code to human-readable message. */
 export const errorMessages: Record<ErrorCodeValue, string> = {
   [ErrorCode.NOT_AUTHORIZED]: 'Not authorized',
-  [ErrorCode.INVALID_STAKE_AMOUNT]: 'Stake must be at least 0.1 STX',
+  [ErrorCode.INVALID_STAKE_AMOUNT]: 'Stake must be at least 0.02 STX',
   [ErrorCode.INVALID_HABIT_NAME]: 'Habit name must be 1-50 characters',
   [ErrorCode.HABIT_NOT_FOUND]: 'Habit not found',
   [ErrorCode.NOT_HABIT_OWNER]: 'Only the habit owner can perform this action',

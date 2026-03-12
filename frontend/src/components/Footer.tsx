@@ -2,7 +2,7 @@
 
 const REPO_URL = 'https://github.com/Yusufolosun/AhhbitTracker';
 const EXPLORER_CONTRACT_URL =
-  'https://explorer.hiro.so/txid/SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker?chain=mainnet';
+  'https://explorer.hiro.so/txid/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2?chain=mainnet';
 
 const RESOURCE_LINKS = [
   { label: 'Documentation', href: `${REPO_URL}#readme` },

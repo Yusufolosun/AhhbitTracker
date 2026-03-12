@@ -20,13 +20,13 @@ ts-node scripts/dev-tools/test-function.ts get-forfeited-pool-balance
 ### Nonce Checker
 Get current nonce for address:
 ```bash
-ts-node scripts/dev-tools/get-nonce.ts SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193
+ts-node scripts/dev-tools/get-nonce.ts SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z
 ```
 
 ### Balance Checker
 Check STX balance:
 ```bash
-ts-node scripts/dev-tools/check-balance.ts SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193
+ts-node scripts/dev-tools/check-balance.ts SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z
 ```
 
 ### Transaction Tracker

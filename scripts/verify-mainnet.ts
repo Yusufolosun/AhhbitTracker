@@ -1,4 +1,4 @@
-const CONTRACT_ADDRESS = "SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193";
+const CONTRACT_ADDRESS = "SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z";
 const CONTRACT_NAME = "habit-tracker-v2";
 const NETWORK_API = "https://api.mainnet.hiro.so";
 
@@ -22,7 +22,7 @@ async function verifyDeployment() {
   console.log("5. [..] Awaiting first user interaction");
   console.log();
   console.log("Contract Configuration:");
-  console.log("- Minimum stake: 100,000 microSTX (0.1 STX)");
+  console.log("- Minimum stake: 20,000 microSTX (0.02 STX)");
   console.log("- Check-in window: 144 blocks (~24 hours)");
   console.log("- Minimum withdrawal streak: 7 days");
   console.log("- Maximum habit name: 50 characters");
