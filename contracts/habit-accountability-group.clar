@@ -60,7 +60,8 @@
     is-active: bool,
     is-settled: bool,
     total-staked: uint,
-    successful-count: uint
+    successful-count: uint,
+    settled-count: uint
   }
 )
 
@@ -143,7 +144,8 @@
         is-active: true,
         is-settled: false,
         total-staked: stake-amount,
-        successful-count: u0
+        successful-count: u0,
+        settled-count: u0
       }
     )
 
@@ -310,11 +312,12 @@
           { group-id: group-id, member: member }
           (merge member-data { is-successful: true })
         )
-        ;; Increment successful count
+        ;; Increment successful count and settled count
         (map-set groups
           { group-id: group-id }
           (merge group {
-            successful-count: (+ (get successful-count group) u1)
+            successful-count: (+ (get successful-count group) u1),
+            settled-count: (+ (get settled-count group) u1)
           })
         )
         (print {
@@ -330,6 +333,13 @@
         (map-set group-members
           { group-id: group-id, member: member }
           (merge member-data { has-claimed: true })
+        )
+        ;; Increment settled count
+        (map-set groups
+          { group-id: group-id }
+          (merge group {
+            settled-count: (+ (get settled-count group) u1)
+          })
         )
         (print {
           event: "member-settled-failed",
@@ -361,6 +371,9 @@
     )
     ;; Group must have ended
     (asserts! (>= block-height (get end-block group)) ERR-GROUP-STILL-ACTIVE)
+
+    ;; Group must be finalized (all members settled)
+    (asserts! (get is-settled group) ERR-GROUP-STILL-ACTIVE)
 
     ;; Caller must be settled as successful
     (asserts! (get is-successful member-data) ERR-NOT-ELIGIBLE)
@@ -463,6 +476,9 @@
 
     ;; Group must still be active (not already finalized)
     (asserts! (not (get is-settled group)) ERR-ALREADY-SETTLED)
+
+    ;; All members must have been settled before finalization
+    (asserts! (is-eq (get settled-count group) (get member-count group)) ERR-NOT-ELIGIBLE)
 
     ;; Mark group as settled and inactive
     (map-set groups
