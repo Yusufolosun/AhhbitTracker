@@ -37,9 +37,6 @@
 (define-constant BONUS-DIVISOR u100)
 (define-constant MAX-BONUS-AMOUNT u1000000)
 
-;; Contract owner
-(define-constant CONTRACT-OWNER tx-sender)
-
 ;; ============================================
 ;; ERROR CODES
 ;; ============================================
@@ -50,11 +47,9 @@
 (define-constant ERR-HABIT-NOT-FOUND (err u103))
 (define-constant ERR-NOT-HABIT-OWNER (err u104))
 (define-constant ERR-ALREADY-CHECKED-IN (err u105))
-(define-constant ERR-CHECK-IN-WINDOW-EXPIRED (err u106))
 (define-constant ERR-INSUFFICIENT-STREAK (err u107))
 (define-constant ERR-HABIT-ALREADY-COMPLETED (err u108))
 (define-constant ERR-POOL-INSUFFICIENT-BALANCE (err u109))
-(define-constant ERR-TRANSFER-FAILED (err u110))
 (define-constant ERR-BONUS-ALREADY-CLAIMED (err u111))
 (define-constant ERR-HABIT-LIMIT-REACHED (err u112))
 (define-constant ERR-STAKE-TOO-HIGH (err u113))
@@ -213,7 +208,7 @@
 
 ;; Daily check-in for habit
 ;; @param habit-id: ID of the habit to check in
-;; @returns: current streak on success, error on failure
+;; @returns: current streak on success (u0 if auto-slashed), error on failure
 (define-public (check-in (habit-id uint))
   (let
     (
@@ -221,7 +216,6 @@
       (habit (unwrap! (map-get? habits { habit-id: habit-id }) ERR-HABIT-NOT-FOUND))
       (last-check-in (get last-check-in-block habit))
       (current-streak (get current-streak habit))
-      (stake-amount (get stake-amount habit))
     )
     ;; Verify caller is habit owner
     (asserts! (is-eq caller (get owner habit)) ERR-NOT-HABIT-OWNER)
@@ -252,8 +246,26 @@
         })
         (ok (+ current-streak u1))
       )
-      ;; Missed window: return error (use slash-habit to forfeit)
-      ERR-CHECK-IN-WINDOW-EXPIRED
+      ;; Missed window: auto-slash - forfeit stake and deactivate
+      (begin
+        (var-set forfeited-pool-balance
+          (+ (var-get forfeited-pool-balance) (get stake-amount habit)))
+        (map-set habits
+          { habit-id: habit-id }
+          (merge habit {
+            current-streak: u0,
+            is-active: false
+          })
+        )
+        (print {
+          event: "habit-auto-slashed",
+          habit-id: habit-id,
+          owner: caller,
+          amount: (get stake-amount habit),
+          block: block-height
+        })
+        (ok u0)
+      )
     )
   )
 )
