@@ -15,7 +15,7 @@ const MAX_NAME_LENGTH = 50;
 
 function createHabit(caller: string, name: string, stake: number) {
   return simnet.callPublicFn(
-    "habit-tracker",
+    "habit-tracker-v2",
     "create-habit",
     [Cl.stringUtf8(name), Cl.uint(stake)],
     caller
@@ -24,7 +24,7 @@ function createHabit(caller: string, name: string, stake: number) {
 
 function checkIn(caller: string, habitId: number) {
   return simnet.callPublicFn(
-    "habit-tracker",
+    "habit-tracker-v2",
     "check-in",
     [Cl.uint(habitId)],
     caller
@@ -33,7 +33,7 @@ function checkIn(caller: string, habitId: number) {
 
 function withdrawStake(caller: string, habitId: number) {
   return simnet.callPublicFn(
-    "habit-tracker",
+    "habit-tracker-v2",
     "withdraw-stake",
     [Cl.uint(habitId)],
     caller
@@ -42,7 +42,7 @@ function withdrawStake(caller: string, habitId: number) {
 
 function getHabit(habitId: number) {
   return simnet.callReadOnlyFn(
-    "habit-tracker",
+    "habit-tracker-v2",
     "get-habit",
     [Cl.uint(habitId)],
     deployer
@@ -289,7 +289,7 @@ describe("AhhbitTracker Contract", () => {
       expect(result.result).toBeOk(Cl.uint(0));
 
       // Verify stake moved to pool
-      const pool = simnet.getDataVar("habit-tracker", "forfeited-pool-balance");
+      const pool = simnet.getDataVar("habit-tracker-v2", "forfeited-pool-balance");
       expect(pool).toBeUint(MIN_STAKE);
 
       // Verify habit is inactive (further check-in fails)
@@ -302,10 +302,10 @@ describe("AhhbitTracker Contract", () => {
       simnet.mineEmptyBlocks(150);
 
       // User2 slashes user1's expired habit
-      const result = simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(habitId)], user2);
+      const result = simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(habitId)], user2);
       expect(result.result).toBeOk(Cl.bool(true));
 
-      const poolBalance = simnet.getDataVar("habit-tracker", "forfeited-pool-balance");
+      const poolBalance = simnet.getDataVar("habit-tracker-v2", "forfeited-pool-balance");
       expect(poolBalance).toBeUint(MIN_STAKE);
     });
 
@@ -315,7 +315,7 @@ describe("AhhbitTracker Contract", () => {
         checkIn(user1, habitId);
         simnet.mineEmptyBlocks(10);
       }
-      simnet.callPublicFn("habit-tracker", "withdraw-stake", [Cl.uint(habitId)], user1);
+      simnet.callPublicFn("habit-tracker-v2", "withdraw-stake", [Cl.uint(habitId)], user1);
 
       const result = checkIn(user1, habitId);
       expect(result.result).toBeErr(Cl.uint(108)); // ERR-HABIT-ALREADY-COMPLETED
@@ -324,7 +324,7 @@ describe("AhhbitTracker Contract", () => {
     it("should reject check-in to a slashed (inactive) habit", () => {
       checkIn(user1, habitId);
       simnet.mineEmptyBlocks(150);
-      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(habitId)], user2);
+      simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(habitId)], user2);
 
       const result = checkIn(user1, habitId);
       expect(result.result).toBeErr(Cl.uint(108)); // ERR-HABIT-ALREADY-COMPLETED (inactive)
@@ -346,28 +346,28 @@ describe("AhhbitTracker Contract", () => {
         simnet.mineEmptyBlocks(10);
       }
 
-      const result = simnet.callPublicFn("habit-tracker", "withdraw-stake", [Cl.uint(habitId)], user1);
+      const result = simnet.callPublicFn("habit-tracker-v2", "withdraw-stake", [Cl.uint(habitId)], user1);
       expect(result.result).toBeOk(Cl.uint(MIN_STAKE));
     });
 
     it("should reject withdrawal by non-owner", () => {
-      const result = simnet.callPublicFn("habit-tracker", "withdraw-stake", [Cl.uint(habitId)], user2);
+      const result = simnet.callPublicFn("habit-tracker-v2", "withdraw-stake", [Cl.uint(habitId)], user2);
       expect(result.result).toBeErr(Cl.uint(104)); // ERR-NOT-HABIT-OWNER
     });
 
     it("should reject withdrawal if streak is insufficient", () => {
       checkIn(user1, habitId);
 
-      const result = simnet.callPublicFn("habit-tracker", "withdraw-stake", [Cl.uint(habitId)], user1);
+      const result = simnet.callPublicFn("habit-tracker-v2", "withdraw-stake", [Cl.uint(habitId)], user1);
       expect(result.result).toBeErr(Cl.uint(107)); // ERR-INSUFFICIENT-STREAK
     });
 
     it("should reject withdrawal after stake is slashed", () => {
       checkIn(user1, habitId);
       simnet.mineEmptyBlocks(150);
-      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(habitId)], user2);
+      simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(habitId)], user2);
 
-      const result = simnet.callPublicFn("habit-tracker", "withdraw-stake", [Cl.uint(habitId)], user1);
+      const result = simnet.callPublicFn("habit-tracker-v2", "withdraw-stake", [Cl.uint(habitId)], user1);
       expect(result.result).toBeErr(Cl.uint(108)); // ERR-HABIT-ALREADY-COMPLETED (inactive)
     });
 
@@ -387,7 +387,7 @@ describe("AhhbitTracker Contract", () => {
       const id2 = Number((h2.result as any).value.value);
       checkIn(user2, id2);
       simnet.mineEmptyBlocks(150); // Mines blocks, pushing height to ~152
-      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(id2)], user2);
+      simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(id2)], user2);
 
       // 2. Create User1's habit AFTER blocks are mined
       const res1 = createHabit(user1, VALID_HABIT_NAME, MIN_STAKE * 10);
@@ -400,11 +400,11 @@ describe("AhhbitTracker Contract", () => {
         simnet.mineEmptyBlocks(10);
       }
 
-      const resW = simnet.callPublicFn("habit-tracker", "withdraw-stake", [Cl.uint(id1)], user1);
+      const resW = simnet.callPublicFn("habit-tracker-v2", "withdraw-stake", [Cl.uint(id1)], user1);
       expect(resW.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE * 10)));
 
       // 4. Claim bonus
-      const result = simnet.callPublicFn("habit-tracker", "claim-bonus", [Cl.uint(id1)], user1);
+      const result = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(id1)], user1);
       // Pool had MIN_STAKE * 10 (1 STX). 1% = MIN_STAKE / 10 = 10000
       expect(result.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE / 10)));
     });
@@ -415,7 +415,7 @@ describe("AhhbitTracker Contract", () => {
       const failId = Number((failHabit.result as any).value.value);
       checkIn(user3, failId);
       simnet.mineEmptyBlocks(150);
-      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(failId)], user3);
+      simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(failId)], user3);
       // Pool = 1,000,000 microSTX (1 STX)
 
       // User1 completes a habit
@@ -431,8 +431,8 @@ describe("AhhbitTracker Contract", () => {
       withdrawStake(user2, id2);
 
       // Both claim — bonuses should be within ~1% of each other
-      const claim1 = simnet.callPublicFn("habit-tracker", "claim-bonus", [Cl.uint(id1)], user1);
-      const claim2 = simnet.callPublicFn("habit-tracker", "claim-bonus", [Cl.uint(id2)], user2);
+      const claim1 = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(id1)], user1);
+      const claim2 = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(id2)], user2);
 
       const bonus1 = Number((claim1.result as any).value.value);
       const bonus2 = Number((claim2.result as any).value.value);
@@ -451,13 +451,13 @@ describe("AhhbitTracker Contract", () => {
       const fid1 = Number((fail1.result as any).value.value);
       checkIn(user2, fid1);
       simnet.mineEmptyBlocks(150);
-      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(fid1)], user1);
+      simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(fid1)], user1);
 
       const fail2 = createHabit(user3, "Big stake 2", MAX_STAKE_AMOUNT);
       const fid2 = Number((fail2.result as any).value.value);
       checkIn(user3, fid2);
       simnet.mineEmptyBlocks(150);
-      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(fid2)], user1);
+      simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(fid2)], user1);
       // Pool = 200 STX. 1% = 2 STX > MAX-BONUS-AMOUNT (1 STX)
 
       // User1 completes a habit and claims
@@ -466,13 +466,13 @@ describe("AhhbitTracker Contract", () => {
       for (let i = 0; i < 7; i++) { checkIn(user1, cid); simnet.mineEmptyBlocks(10); }
       withdrawStake(user1, cid);
 
-      const result = simnet.callPublicFn("habit-tracker", "claim-bonus", [Cl.uint(cid)], user1);
+      const result = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(cid)], user1);
       // Should be capped at 1 STX = 1,000,000 microSTX
       expect(result.result).toEqual(Cl.ok(Cl.uint(1_000_000)));
     });
 
     it("should reject bonus claim by non-owner", () => {
-      const result = simnet.callPublicFn("habit-tracker", "claim-bonus", [Cl.uint(habitId)], user2);
+      const result = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(habitId)], user2);
       expect(result.result).toEqual(Cl.error(Cl.uint(104))); // ERR-NOT-HABIT-OWNER
     });
 
@@ -487,7 +487,7 @@ describe("AhhbitTracker Contract", () => {
     });
 
     it("should return correct habit details", () => {
-      const result = simnet.callReadOnlyFn("habit-tracker", "get-habit", [Cl.uint(habitId)], deployer);
+      const result = simnet.callReadOnlyFn("habit-tracker-v2", "get-habit", [Cl.uint(habitId)], deployer);
       // result.result is Some({ data: { ... } })
       const expectedRecord = Cl.tuple({
         owner: Cl.principal(user1),
@@ -504,7 +504,7 @@ describe("AhhbitTracker Contract", () => {
     });
 
     it("should return correct user habits", () => {
-      const result = simnet.callReadOnlyFn("habit-tracker", "get-user-habits", [Cl.principal(user1)], deployer);
+      const result = simnet.callReadOnlyFn("habit-tracker-v2", "get-user-habits", [Cl.principal(user1)], deployer);
       // result.result is a TupleValue: { habit-ids: list }
       // Using a more standard comparison to avoid property access issues
       const expectedTuple = Cl.tuple({
@@ -516,7 +516,7 @@ describe("AhhbitTracker Contract", () => {
 
     it("should return correct streak", () => {
       checkIn(user1, habitId);
-      const result = simnet.callReadOnlyFn("habit-tracker", "get-habit-streak", [Cl.uint(habitId)], deployer);
+      const result = simnet.callReadOnlyFn("habit-tracker-v2", "get-habit-streak", [Cl.uint(habitId)], deployer);
       expect(result.result).toEqual(Cl.ok(Cl.uint(1)));
     });
 
@@ -555,7 +555,7 @@ describe("AhhbitTracker Contract", () => {
       simnet.mineEmptyBlocks(200);
 
       // Slashed first
-      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(id)], user2);
+      simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(id)], user2);
 
       // Withdrawal after slash should fail
       const withdrawResult = withdrawStake(user1, id);
@@ -569,10 +569,10 @@ describe("AhhbitTracker Contract", () => {
       checkIn(user1, id);
       simnet.mineEmptyBlocks(150);
 
-      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(id)], user2);
+      simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(id)], user2);
 
       // Double slash should fail
-      const result2 = simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(id)], user2);
+      const result2 = simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(id)], user2);
       expect(result2.result).toBeErr(Cl.uint(108)); // ERR-HABIT-ALREADY-COMPLETED
     });
 
@@ -582,7 +582,7 @@ describe("AhhbitTracker Contract", () => {
     });
 
     it("should reject slash for nonexistent habit", () => {
-      const result = simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(99999)], user1);
+      const result = simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(99999)], user1);
       expect(result.result).toBeErr(Cl.uint(103)); // ERR-HABIT-NOT-FOUND
     });
 
@@ -591,7 +591,7 @@ describe("AhhbitTracker Contract", () => {
       const id = Number((result.result as any).value.value);
 
       // No blocks mined, window is still open
-      const slashResult = simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(id)], user2);
+      const slashResult = simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(id)], user2);
       expect(slashResult.result).toBeErr(Cl.uint(100)); // ERR-NOT-AUTHORIZED
     });
 
@@ -601,7 +601,7 @@ describe("AhhbitTracker Contract", () => {
       const failId = Number((failHabit.result as any).value.value);
       checkIn(user2, failId);
       simnet.mineEmptyBlocks(150);
-      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(failId)], user1);
+      simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(failId)], user1);
 
       // Complete a habit
       const h1 = createHabit(user1, "Good Habit", MIN_STAKE);
@@ -613,11 +613,11 @@ describe("AhhbitTracker Contract", () => {
       withdrawStake(user1, id1);
 
       // First claim succeeds
-      const claim1 = simnet.callPublicFn("habit-tracker", "claim-bonus", [Cl.uint(id1)], user1);
+      const claim1 = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(id1)], user1);
       expect(claim1.result).toEqual(Cl.ok(expect.anything()));
 
       // Second claim fails
-      const claim2 = simnet.callPublicFn("habit-tracker", "claim-bonus", [Cl.uint(id1)], user1);
+      const claim2 = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(id1)], user1);
       expect(claim2.result).toEqual(Cl.error(Cl.uint(111))); // ERR-BONUS-ALREADY-CLAIMED
     });
 
@@ -627,9 +627,9 @@ describe("AhhbitTracker Contract", () => {
 
       checkIn(user1, id);
       simnet.mineEmptyBlocks(150);
-      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(id)], user2);
+      simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(id)], user2);
 
-      const poolResult = simnet.callReadOnlyFn("habit-tracker", "get-pool-balance", [], deployer);
+      const poolResult = simnet.callReadOnlyFn("habit-tracker-v2", "get-pool-balance", [], deployer);
       expect(poolResult.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE)));
     });
   });
@@ -652,7 +652,7 @@ describe("AhhbitTracker Contract", () => {
       expect(result3.result).toBeErr(Cl.uint(108));
 
       // Streak was reset to 0
-      const streakResult = simnet.callReadOnlyFn("habit-tracker", "get-habit-streak", [Cl.uint(id)], deployer);
+      const streakResult = simnet.callReadOnlyFn("habit-tracker-v2", "get-habit-streak", [Cl.uint(id)], deployer);
       expect(streakResult.result).toBeOk(Cl.uint(0));
     });
 
@@ -664,7 +664,7 @@ describe("AhhbitTracker Contract", () => {
       simnet.mineEmptyBlocks(150);
 
       checkIn(user1, id); // triggers auto-slash
-      const poolAfter = simnet.getDataVar("habit-tracker", "forfeited-pool-balance");
+      const poolAfter = simnet.getDataVar("habit-tracker-v2", "forfeited-pool-balance");
 
       expect(poolAfter).toBeUint(MIN_STAKE * 5);
     });
@@ -712,10 +712,10 @@ describe("AhhbitTracker Contract", () => {
       simnet.mineEmptyBlocks(200);
 
       // External actor slashes (owner never calls check-in again)
-      const slashResult = simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(id)], user2);
+      const slashResult = simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(id)], user2);
       expect(slashResult.result).toBeOk(Cl.bool(true));
 
-      const pool = simnet.getDataVar("habit-tracker", "forfeited-pool-balance");
+      const pool = simnet.getDataVar("habit-tracker-v2", "forfeited-pool-balance");
       expect(pool).toBeUint(MIN_STAKE);
     });
 
@@ -736,7 +736,7 @@ describe("AhhbitTracker Contract", () => {
       expect(slashResult.result).toBeOk(Cl.uint(0));
 
       // Streak resets to 0
-      const streakResult = simnet.callReadOnlyFn("habit-tracker", "get-habit-streak", [Cl.uint(id)], deployer);
+      const streakResult = simnet.callReadOnlyFn("habit-tracker-v2", "get-habit-streak", [Cl.uint(id)], deployer);
       expect(streakResult.result).toBeOk(Cl.uint(0));
     });
   });
@@ -745,7 +745,7 @@ describe("AhhbitTracker Contract", () => {
 
     it("should return empty list for user with no habits", () => {
       const result = simnet.callReadOnlyFn(
-        "habit-tracker", "get-expired-habits",
+        "habit-tracker-v2", "get-expired-habits",
         [Cl.principal(user3)], deployer
       );
       expect(result.result).toBeOk(Cl.list([]));
@@ -756,7 +756,7 @@ describe("AhhbitTracker Contract", () => {
       checkIn(user1, 1);
 
       const result = simnet.callReadOnlyFn(
-        "habit-tracker", "get-expired-habits",
+        "habit-tracker-v2", "get-expired-habits",
         [Cl.principal(user1)], deployer
       );
       // Habit 1 is within check-in window -> returns u0
@@ -771,7 +771,7 @@ describe("AhhbitTracker Contract", () => {
       simnet.mineEmptyBlocks(150);
 
       const result = simnet.callReadOnlyFn(
-        "habit-tracker", "get-expired-habits",
+        "habit-tracker-v2", "get-expired-habits",
         [Cl.principal(user1)], deployer
       );
       // Habit 1 has expired check-in window -> returns habit-id 1
@@ -784,10 +784,10 @@ describe("AhhbitTracker Contract", () => {
 
       // Let window expire and slash
       simnet.mineEmptyBlocks(150);
-      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(1)], user2);
+      simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(1)], user2);
 
       const result = simnet.callReadOnlyFn(
-        "habit-tracker", "get-expired-habits",
+        "habit-tracker-v2", "get-expired-habits",
         [Cl.principal(user1)], deployer
       );
       // Habit 1 is inactive (slashed) -> returns u0
@@ -807,14 +807,14 @@ describe("AhhbitTracker Contract", () => {
       simnet.mineEmptyBlocks(150);
 
       // Slash habit 1 (becomes inactive)
-      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(1)], user2);
+      simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(1)], user2);
 
       // Create habit 3 and check in (within window)
       createHabit(user1, "Coding", MIN_STAKE);
       checkIn(user1, 3);
 
       const result = simnet.callReadOnlyFn(
-        "habit-tracker", "get-expired-habits",
+        "habit-tracker-v2", "get-expired-habits",
         [Cl.principal(user1)], deployer
       );
       // Habit 1: slashed (inactive) -> u0

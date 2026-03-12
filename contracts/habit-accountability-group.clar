@@ -3,7 +3,7 @@
 ;; ============================================
 ;;
 ;; Users form accountability groups where each member stakes STX and
-;; commits a habit from the habit-tracker contract. After the group
+;; commits a habit from the habit-tracker-v2 contract. After the group
 ;; duration ends, members who maintained their streak share the
 ;; entire pool. Failed members forfeit their stake to those who
 ;; succeeded.
@@ -106,14 +106,14 @@
 ;; Create a new accountability group
 ;; @param stake-amount: STX each member must stake (in microSTX)
 ;; @param duration: group duration in blocks
-;; @param habit-id: creator's habit from habit-tracker
+;; @param habit-id: creator's habit from habit-tracker-v2
 ;; @returns: group-id on success
 (define-public (create-group (stake-amount uint) (duration uint) (habit-id uint))
   (let
     (
       (group-id (get-next-group-id))
       (caller tx-sender)
-      (habit-data (unwrap! (contract-call? .habit-tracker get-habit habit-id)
+      (habit-data (unwrap! (contract-call? .habit-tracker-v2 get-habit habit-id)
                            ERR-INVALID-HABIT))
     )
     ;; Verify caller owns the habit
@@ -190,7 +190,7 @@
 
 ;; Join an existing accountability group
 ;; @param group-id: group to join
-;; @param habit-id: member's habit from habit-tracker
+;; @param habit-id: member's habit from habit-tracker-v2
 ;; @returns: ok true on success
 (define-public (join-group (group-id uint) (habit-id uint))
   (let
@@ -198,7 +198,7 @@
       (caller tx-sender)
       (group (unwrap! (map-get? groups { group-id: group-id })
                       ERR-GROUP-NOT-FOUND))
-      (habit-data (unwrap! (contract-call? .habit-tracker get-habit habit-id)
+      (habit-data (unwrap! (contract-call? .habit-tracker-v2 get-habit habit-id)
                            ERR-INVALID-HABIT))
       (stake-amount (get stake-amount group))
     )
@@ -285,7 +285,7 @@
       (member-data (unwrap! (map-get? group-members
                     { group-id: group-id, member: member })
                     ERR-NOT-MEMBER))
-      (habit-data (unwrap! (contract-call? .habit-tracker get-habit
+      (habit-data (unwrap! (contract-call? .habit-tracker-v2 get-habit
                     (get habit-id member-data))
                     ERR-INVALID-HABIT))
       (streak (get current-streak habit-data))

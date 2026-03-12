@@ -14,7 +14,7 @@ const GROUP_DURATION = 144; // ~1 day in blocks
 // Habit-tracker helpers
 function createHabit(caller: string, name: string, stake: number) {
   return simnet.callPublicFn(
-    "habit-tracker",
+    "habit-tracker-v2",
     "create-habit",
     [Cl.stringUtf8(name), Cl.uint(stake)],
     caller
@@ -23,7 +23,7 @@ function createHabit(caller: string, name: string, stake: number) {
 
 function checkIn(caller: string, habitId: number) {
   return simnet.callPublicFn(
-    "habit-tracker",
+    "habit-tracker-v2",
     "check-in",
     [Cl.uint(habitId)],
     caller
@@ -634,9 +634,9 @@ describe("Habit Accountability Group Contract", () => {
 
       // Build a check-in then let it expire and get slashed
       simnet.mineEmptyBlocks(1);
-      simnet.callPublicFn("habit-tracker", "check-in", [Cl.uint(1)], user1);
+      simnet.callPublicFn("habit-tracker-v2", "check-in", [Cl.uint(1)], user1);
       simnet.mineEmptyBlocks(150);
-      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(1)], user2);
+      simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(1)], user2);
 
       // Try to create a group with the slashed habit
       const result = createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
@@ -648,7 +648,7 @@ describe("Habit Accountability Group Contract", () => {
       buildStreak(user1, 1, 7);
 
       // Withdraw stake - habit becomes completed, is-active = false
-      simnet.callPublicFn("habit-tracker", "withdraw-stake", [Cl.uint(1)], user1);
+      simnet.callPublicFn("habit-tracker-v2", "withdraw-stake", [Cl.uint(1)], user1);
 
       const result = createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
       expect(result.result).toBeErr(Cl.uint(312)); // ERR-INVALID-HABIT
@@ -661,9 +661,9 @@ describe("Habit Accountability Group Contract", () => {
 
       // Slash user2's habit
       simnet.mineEmptyBlocks(1);
-      simnet.callPublicFn("habit-tracker", "check-in", [Cl.uint(2)], user2);
+      simnet.callPublicFn("habit-tracker-v2", "check-in", [Cl.uint(2)], user2);
       simnet.mineEmptyBlocks(150);
-      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(2)], user3);
+      simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(2)], user3);
 
       // Try to join with slashed habit
       const result = joinGroup(user2, 1, 2);
@@ -677,7 +677,7 @@ describe("Habit Accountability Group Contract", () => {
 
       // Complete user2's habit
       buildStreak(user2, 2, 7);
-      simnet.callPublicFn("habit-tracker", "withdraw-stake", [Cl.uint(2)], user2);
+      simnet.callPublicFn("habit-tracker-v2", "withdraw-stake", [Cl.uint(2)], user2);
 
       const result = joinGroup(user2, 1, 2);
       expect(result.result).toBeErr(Cl.uint(312)); // ERR-INVALID-HABIT

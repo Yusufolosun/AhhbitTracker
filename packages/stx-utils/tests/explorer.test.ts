@@ -3,7 +3,7 @@ import { txUrl, addressUrl, contractUrl } from '../src/explorer';
 
 const ADDR = 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193';
 const TX = '0xabc123';
-const CONTRACT = `${ADDR}.habit-tracker`;
+const CONTRACT = `${ADDR}.habit-tracker-v2`;
 
 describe('txUrl', () => {
   it('builds mainnet URL by default', () => {

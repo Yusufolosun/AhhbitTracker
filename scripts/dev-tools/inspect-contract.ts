@@ -2,7 +2,7 @@ import { StacksMainnet } from "@stacks/network";
 
 const NETWORK = new StacksMainnet();
 const CONTRACT_ADDRESS = "SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193";
-const CONTRACT_NAME = "habit-tracker";
+const CONTRACT_NAME = "habit-tracker-v2";
 
 async function inspectContract() {
   console.log("Contract Inspector");

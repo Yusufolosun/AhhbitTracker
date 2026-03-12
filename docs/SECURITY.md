@@ -78,7 +78,7 @@ Security guidelines for AhhbitTracker developers and users.
 
 1. **Verify contract address**
    ```
-   SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker
+   SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker-v2
    ```
 
 2. **Check function name** matches intention

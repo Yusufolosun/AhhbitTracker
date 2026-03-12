@@ -25,7 +25,7 @@ export function isValidAddress(address: string): boolean {
 
 /**
  * Check whether a string is a valid contract principal
- * (e.g. `SP1M46…G193.habit-tracker`).
+ * (e.g. `SP1M46…G193.habit-tracker-v2`).
  */
 export function isContractPrincipal(address: string): boolean {
   if (!address) return false;
@@ -68,7 +68,7 @@ export function shortenAddress(
 /**
  * Extract the deployer address and contract name from a contract principal.
  *
- * @param principal - E.g. `"SP1M46…G193.habit-tracker"`.
+ * @param principal - E.g. `"SP1M46…G193.habit-tracker-v2"`.
  * @returns Tuple `[address, contractName]`, or `null` if invalid.
  */
 export function parseContractPrincipal(

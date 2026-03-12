@@ -1,7 +1,7 @@
 import { Cl } from "@stacks/transactions";
 
 const CONTRACT_ADDRESS = "ST1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK1GA0CF0";
-const CONTRACT_NAME = "habit-tracker";
+const CONTRACT_NAME = "habit-tracker-v2";
 const NETWORK_API = "https://api.testnet.hiro.so";
 
 console.log("AhhbitTracker Testnet Interaction");

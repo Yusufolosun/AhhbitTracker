@@ -11,7 +11,7 @@ export const NETWORK = isDev
 export const CONTRACT_ADDRESS =
   import.meta.env.VITE_CONTRACT_ADDRESS ?? 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193';
 export const CONTRACT_NAME =
-  import.meta.env.VITE_CONTRACT_NAME ?? 'habit-tracker';
+  import.meta.env.VITE_CONTRACT_NAME ?? 'habit-tracker-v2';
 
 // Contract Constants
 export const MIN_STAKE_AMOUNT = 100000; // 0.1 STX in microSTX

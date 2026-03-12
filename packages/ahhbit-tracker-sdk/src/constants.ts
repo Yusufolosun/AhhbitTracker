@@ -3,7 +3,7 @@ import type { ContractId } from './types';
 /** Default mainnet contract deployment. */
 export const MAINNET_CONTRACT: ContractId = {
   contractAddress: 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193',
-  contractName: 'habit-tracker',
+  contractName: 'habit-tracker-v2',
 };
 
 /** Minimum stake in microSTX (0.1 STX). */

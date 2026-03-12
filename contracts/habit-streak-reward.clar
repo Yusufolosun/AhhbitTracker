@@ -5,7 +5,7 @@
 ;; Companion contract for AhhbitTracker that rewards users who reach
 ;; streak milestones (7, 14, 30, 60, 90 days). Anyone can fund the
 ;; reward pool, and the contract owner configures reward tiers.
-;; Claims are verified against the habit-tracker contract on-chain.
+;; Claims are verified against the habit-tracker-v2 contract on-chain.
 ;;
 ;; Version: 1.0.0
 ;; ============================================
@@ -131,7 +131,7 @@
   (let
     (
       (caller tx-sender)
-      (habit-data (unwrap! (contract-call? .habit-tracker get-habit habit-id)
+      (habit-data (unwrap! (contract-call? .habit-tracker-v2 get-habit habit-id)
                            ERR-HABIT-NOT-FOUND))
       (streak (get current-streak habit-data))
       (reward-data (unwrap! (map-get? milestone-rewards { milestone: milestone })

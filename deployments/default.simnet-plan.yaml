@@ -63,9 +63,9 @@ plan:
   - id: 0
     transactions:
     - transaction-type: emulated-contract-publish
-      contract-name: habit-tracker
+      contract-name: habit-tracker-v2
       emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-      path: contracts/habit-tracker.clar
+      path: contracts/habit-tracker-v2.clar
       clarity-version: 2
     - transaction-type: emulated-contract-publish
       contract-name: habit-accountability-group

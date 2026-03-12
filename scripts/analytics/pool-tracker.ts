@@ -4,7 +4,7 @@ import * as fs from "fs";
 
 const NETWORK = new StacksMainnet();
 const CONTRACT_ADDRESS = "SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193";
-const CONTRACT_NAME = "habit-tracker";
+const CONTRACT_NAME = "habit-tracker-v2";
 
 interface PoolSnapshot {
   timestamp: number;
