@@ -44,7 +44,7 @@ export function validateStake(
   stx: number,
   minMicroSTX: number = DEFAULT_MIN_STAKE,
 ): string | null {
-  if (isNaN(stx) || stx <= 0) {
+  if (isNaN(stx) || !Number.isFinite(stx) || stx <= 0) {
     return 'Stake amount must be positive';
   }
   const micro = stx * MICRO_PER_STX;
