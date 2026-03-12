@@ -16,7 +16,8 @@ export type Network = 'mainnet' | 'testnet';
  * @param network - `"mainnet"` or `"testnet"` (default: `"mainnet"`).
  */
 export function txUrl(txId: string, network: Network = 'mainnet'): string {
-  return `${EXPLORER_BASE}/txid/${txId}?chain=${network}`;
+  const normalizedId = /^0x/i.test(txId) ? txId : `0x${txId}`;
+  return `${EXPLORER_BASE}/txid/${normalizedId}?chain=${network}`;
 }
 
 /**
@@ -39,4 +40,31 @@ export function contractUrl(
   network: Network = 'mainnet',
 ): string {
   return `${EXPLORER_BASE}/txid/${principal}?chain=${network}`;
+}
+
+/**
+ * Build an explorer URL for a block.
+ *
+ * @param blockHash - The block hash (hex string).
+ * @param network   - `"mainnet"` or `"testnet"` (default: `"mainnet"`).
+ */
+export function blockUrl(
+  blockHash: string,
+  network: Network = 'mainnet',
+): string {
+  return `${EXPLORER_BASE}/block/${blockHash}?chain=${network}`;
+}
+
+const API_BASE: Record<Network, string> = {
+  mainnet: 'https://stacks-node-api.mainnet.stacks.co',
+  testnet: 'https://stacks-node-api.testnet.stacks.co',
+};
+
+/**
+ * Return the Stacks API base URL for a given network.
+ *
+ * @param network - `"mainnet"` or `"testnet"` (default: `"mainnet"`).
+ */
+export function apiUrl(network: Network = 'mainnet'): string {
+  return API_BASE[network];
 }
