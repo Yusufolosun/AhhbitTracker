@@ -397,6 +397,93 @@
   )
 )
 
+;; Refund stake when ALL members in a group failed
+;; Returns each member's original stake. Anyone can trigger this.
+;; Failed members are marked with has-claimed=true by settle-member.
+;; Refund uses is-successful as a "refunded" flag to prevent double-refund.
+;; @param group-id: the group to refund
+;; @param member: the member to refund
+;; @returns: refund amount on success
+(define-public (refund-failed-group (group-id uint) (member principal))
+  (let
+    (
+      (group (unwrap! (map-get? groups { group-id: group-id })
+                      ERR-GROUP-NOT-FOUND))
+      (member-data (unwrap! (map-get? group-members
+                    { group-id: group-id, member: member })
+                    ERR-NOT-MEMBER))
+      (stake-amount (get stake-amount group))
+    )
+    ;; Group must have ended
+    (asserts! (>= block-height (get end-block group)) ERR-GROUP-STILL-ACTIVE)
+
+    ;; Group must be settled (is-settled = true) with zero successful members
+    (asserts! (get is-settled group) ERR-GROUP-STILL-ACTIVE)
+    (asserts! (is-eq (get successful-count group) u0) ERR-NOT-ELIGIBLE)
+
+    ;; Member must have been settled as failed (has-claimed = true from settle-member)
+    (asserts! (get has-claimed member-data) ERR-NOT-ELIGIBLE)
+
+    ;; Member must not have already been refunded (is-successful used as refund flag)
+    (asserts! (not (get is-successful member-data)) ERR-ALREADY-CLAIMED)
+
+    ;; Transfer original stake back to member
+    (try! (as-contract (stx-transfer? stake-amount tx-sender member)))
+
+    ;; Mark as refunded (is-successful = true prevents double refund)
+    (map-set group-members
+      { group-id: group-id, member: member }
+      (merge member-data { is-successful: true })
+    )
+
+    (print {
+      event: "group-refund-claimed",
+      group-id: group-id,
+      member: member,
+      amount: stake-amount
+    })
+
+    (ok stake-amount)
+  )
+)
+
+;; Finalize a group after all members have been settled
+;; Marks the group as settled. Anyone can call this.
+;; Required before refund-failed-group can be used.
+;; @param group-id: the group to finalize
+;; @returns: ok true on success
+(define-public (finalize-group (group-id uint))
+  (let
+    (
+      (group (unwrap! (map-get? groups { group-id: group-id })
+                      ERR-GROUP-NOT-FOUND))
+    )
+    ;; Group must have ended
+    (asserts! (>= block-height (get end-block group)) ERR-GROUP-STILL-ACTIVE)
+
+    ;; Group must still be active (not already finalized)
+    (asserts! (not (get is-settled group)) ERR-ALREADY-SETTLED)
+
+    ;; Mark group as settled and inactive
+    (map-set groups
+      { group-id: group-id }
+      (merge group {
+        is-settled: true,
+        is-active: false
+      })
+    )
+
+    (print {
+      event: "group-finalized",
+      group-id: group-id,
+      successful-count: (get successful-count group),
+      member-count: (get member-count group)
+    })
+
+    (ok true)
+  )
+)
+
 ;; ============================================
 ;; READ-ONLY FUNCTIONS
 ;; ============================================
