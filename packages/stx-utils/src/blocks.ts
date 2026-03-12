@@ -19,6 +19,7 @@ export const BLOCKS_PER_DAY = 144;
  * @returns Human-readable duration, e.g. `"30 minutes"`, `"2 hours"`, `"3 days"`.
  */
 export function blocksToTime(blocks: number): string {
+  if (blocks <= 0) return '0 minutes';
   const minutes = blocks * 10;
   if (minutes < 60) return `${minutes} minutes`;
   const hours = Math.floor(minutes / 60);
