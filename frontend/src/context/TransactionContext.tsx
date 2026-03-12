@@ -32,6 +32,8 @@ interface TransactionProviderProps {
 
 const TX_POLL_INTERVAL = 15_000; // 15 seconds
 const TX_POLL_TIMEOUT = 30 * 60_000; // stop polling after 30 minutes
+const TX_AUTO_DISMISS_DELAY = 60_000; // auto-dismiss confirmed/failed after 60s
+const TX_MAX_ENTRIES = 20; // keep at most 20 transactions in state
 
 /**
  * Fetch transaction status from the Hiro API.
@@ -86,7 +88,7 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
         timestamp: Date.now(),
       },
       ...prev,
-    ]);
+    ].slice(0, TX_MAX_ENTRIES));
   }, []);
 
   const dismissTransaction = useCallback((txId: string) => {
@@ -150,6 +152,22 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
       }
     };
   }, [transactions.filter((tx) => tx.status === 'pending').map((tx) => tx.txId).join(',')]);
+
+  // Auto-dismiss confirmed/failed transactions after TX_AUTO_DISMISS_DELAY
+  useEffect(() => {
+    const settled = transactions.filter((tx) => tx.status !== 'pending');
+    if (settled.length === 0) return;
+
+    const timers = settled.map((tx) => {
+      const elapsed = Date.now() - tx.timestamp;
+      const remaining = Math.max(TX_AUTO_DISMISS_DELAY - elapsed, 0);
+      return setTimeout(() => {
+        setTransactions((prev) => prev.filter((t) => t.txId !== tx.txId));
+      }, remaining);
+    });
+
+    return () => timers.forEach(clearTimeout);
+  }, [transactions.filter((tx) => tx.status !== 'pending').map((tx) => tx.txId).join(',')]);
 
   return (
     <TransactionContext.Provider
