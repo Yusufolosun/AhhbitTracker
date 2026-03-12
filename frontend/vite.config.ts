@@ -24,7 +24,7 @@ export default defineConfig({
     host: 'localhost',
     proxy: {
       '/api/stacks': {
-        target: 'https://api.mainnet.hiro.so',
+        target: process.env.VITE_STACKS_API_URL || 'https://api.mainnet.hiro.so',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/stacks/, ''),
         secure: true,
