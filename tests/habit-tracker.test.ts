@@ -741,4 +741,87 @@ describe("AhhbitTracker Contract", () => {
     });
   });
 
+  describe("get-expired-habits", () => {
+
+    it("should return empty list for user with no habits", () => {
+      const result = simnet.callReadOnlyFn(
+        "habit-tracker", "get-expired-habits",
+        [Cl.principal(user3)], deployer
+      );
+      expect(result.result).toBeOk(Cl.list([]));
+    });
+
+    it("should return u0 for active habit within check-in window", () => {
+      createHabit(user1, "Exercise", MIN_STAKE);
+      checkIn(user1, 1);
+
+      const result = simnet.callReadOnlyFn(
+        "habit-tracker", "get-expired-habits",
+        [Cl.principal(user1)], deployer
+      );
+      // Habit 1 is within check-in window -> returns u0
+      expect(result.result).toBeOk(Cl.list([Cl.uint(0)]));
+    });
+
+    it("should return habit-id for expired active habit", () => {
+      createHabit(user1, "Exercise", MIN_STAKE);
+      checkIn(user1, 1);
+
+      // Mine past the check-in window (144 blocks)
+      simnet.mineEmptyBlocks(150);
+
+      const result = simnet.callReadOnlyFn(
+        "habit-tracker", "get-expired-habits",
+        [Cl.principal(user1)], deployer
+      );
+      // Habit 1 has expired check-in window -> returns habit-id 1
+      expect(result.result).toBeOk(Cl.list([Cl.uint(1)]));
+    });
+
+    it("should return u0 for inactive (slashed) habit even if expired", () => {
+      createHabit(user1, "Exercise", MIN_STAKE);
+      checkIn(user1, 1);
+
+      // Let window expire and slash
+      simnet.mineEmptyBlocks(150);
+      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(1)], user2);
+
+      const result = simnet.callReadOnlyFn(
+        "habit-tracker", "get-expired-habits",
+        [Cl.principal(user1)], deployer
+      );
+      // Habit 1 is inactive (slashed) -> returns u0
+      expect(result.result).toBeOk(Cl.list([Cl.uint(0)]));
+    });
+
+    it("should return mixed results for multiple habits", () => {
+      // Create 2 habits
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createHabit(user1, "Reading", MIN_STAKE);
+
+      // Check in on both
+      checkIn(user1, 1);
+      checkIn(user1, 2);
+
+      // Mine past window - both expire
+      simnet.mineEmptyBlocks(150);
+
+      // Slash habit 1 (becomes inactive)
+      simnet.callPublicFn("habit-tracker", "slash-habit", [Cl.uint(1)], user2);
+
+      // Create habit 3 and check in (within window)
+      createHabit(user1, "Coding", MIN_STAKE);
+      checkIn(user1, 3);
+
+      const result = simnet.callReadOnlyFn(
+        "habit-tracker", "get-expired-habits",
+        [Cl.principal(user1)], deployer
+      );
+      // Habit 1: slashed (inactive) -> u0
+      // Habit 2: active + expired -> u2
+      // Habit 3: active + within window -> u0
+      expect(result.result).toBeOk(Cl.list([Cl.uint(0), Cl.uint(2), Cl.uint(0)]));
+    });
+  });
+
 });

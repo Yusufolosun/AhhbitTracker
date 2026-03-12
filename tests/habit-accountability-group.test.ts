@@ -94,6 +94,15 @@ function getMemberGroups(member: string) {
   );
 }
 
+function finalizeGroup(caller: string, groupId: number) {
+  return simnet.callPublicFn(
+    "habit-accountability-group",
+    "finalize-group",
+    [Cl.uint(groupId)],
+    caller
+  );
+}
+
 function buildStreak(caller: string, habitId: number, days: number) {
   for (let i = 0; i < days; i++) {
     simnet.mineEmptyBlocks(1);
@@ -127,6 +136,7 @@ describe("Habit Accountability Group Contract", () => {
         "is-settled": Cl.bool(false),
         "total-staked": Cl.uint(GROUP_STAKE),
         "successful-count": Cl.uint(0),
+        "settled-count": Cl.uint(0),
       }));
     });
 
@@ -392,6 +402,9 @@ describe("Habit Accountability Group Contract", () => {
       settleMember(deployer, 1, user1);
       settleMember(deployer, 1, user2);
 
+      // Finalize group (all members settled)
+      finalizeGroup(deployer, 1);
+
       // user1 is sole successful member, gets entire pool
       const result = claimGroupReward(user1, 1);
       expect(result.result).toBeOk(Cl.uint(GROUP_STAKE * 2));
@@ -410,6 +423,9 @@ describe("Habit Accountability Group Contract", () => {
 
       settleMember(deployer, 1, user1);
       settleMember(deployer, 1, user2);
+
+      // Finalize group (all members settled)
+      finalizeGroup(deployer, 1);
 
       // Each gets half
       const result1 = claimGroupReward(user1, 1);
@@ -434,6 +450,9 @@ describe("Habit Accountability Group Contract", () => {
       settleMember(deployer, 1, user1);
       settleMember(deployer, 1, user2);
 
+      // Finalize group (all members settled)
+      finalizeGroup(deployer, 1);
+
       const result = claimGroupReward(user2, 1);
       expect(result.result).toBeErr(Cl.uint(311)); // ERR-NOT-ELIGIBLE
     });
@@ -446,6 +465,7 @@ describe("Habit Accountability Group Contract", () => {
       simnet.mineEmptyBlocks(GROUP_DURATION);
 
       settleMember(deployer, 1, user1);
+      finalizeGroup(deployer, 1);
       claimGroupReward(user1, 1);
 
       const result = claimGroupReward(user1, 1);
@@ -460,6 +480,26 @@ describe("Habit Accountability Group Contract", () => {
       expect(result.result).toBeErr(Cl.uint(306)); // ERR-GROUP-STILL-ACTIVE
     });
 
+    it("should reject claim before finalization", () => {
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createHabit(user2, "Reading", MIN_STAKE);
+
+      const longDuration = 1440;
+      createGroup(user1, GROUP_STAKE, longDuration, 1);
+      joinGroup(user2, 1, 2);
+
+      buildStreak(user1, 1, 5);
+      simnet.mineEmptyBlocks(longDuration);
+
+      // Settle both members but don't finalize
+      settleMember(deployer, 1, user1);
+      settleMember(deployer, 1, user2);
+
+      // Claim should fail - group not finalized
+      const result = claimGroupReward(user1, 1);
+      expect(result.result).toBeErr(Cl.uint(306)); // ERR-GROUP-STILL-ACTIVE
+    });
+
     it("should reject claim from non-member", () => {
       createHabit(user1, "Exercise", MIN_STAKE);
       createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
@@ -468,6 +508,7 @@ describe("Habit Accountability Group Contract", () => {
       simnet.mineEmptyBlocks(GROUP_DURATION);
 
       settleMember(deployer, 1, user1);
+      finalizeGroup(deployer, 1);
 
       const result = claimGroupReward(user2, 1);
       expect(result.result).toBeErr(Cl.uint(304)); // ERR-NOT-MEMBER
@@ -486,6 +527,9 @@ describe("Habit Accountability Group Contract", () => {
 
       settleMember(deployer, 1, user1);
       settleMember(deployer, 1, user2);
+
+      // Finalize group (all members settled)
+      finalizeGroup(deployer, 1);
 
       // user1 is sole successful, gets entire pool (2 STX)
       const balanceBefore = simnet.getAssetsMap().get(user1)?.get("STX") || 0n;
@@ -718,6 +762,9 @@ describe("Habit Accountability Group Contract", () => {
       settleMember(deployer, 1, user2);
       settleMember(deployer, 1, user3);
 
+      // Finalize group (all members settled)
+      finalizeGroup(deployer, 1);
+
       // user1 gets the entire pool (3 STX)
       const result = claimGroupReward(user1, 1);
       expect(result.result).toBeOk(Cl.uint(GROUP_STAKE * 3));
@@ -732,16 +779,16 @@ describe("Habit Accountability Group Contract", () => {
 
   describe("finalize-group", () => {
 
-    it("should finalize a group after it ends", () => {
+    it("should finalize a group after all members settled", () => {
       createHabit(user1, "Exercise", MIN_STAKE);
       createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
 
       simnet.mineEmptyBlocks(GROUP_DURATION);
 
-      const result = simnet.callPublicFn(
-        "habit-accountability-group", "finalize-group",
-        [Cl.uint(1)], deployer
-      );
+      // Must settle all members before finalization
+      settleMember(deployer, 1, user1);
+
+      const result = finalizeGroup(deployer, 1);
       expect(result.result).toBeOk(Cl.bool(true));
 
       // Verify group is now settled and inactive (new joins should fail)
@@ -766,16 +813,10 @@ describe("Habit Accountability Group Contract", () => {
       createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
 
       simnet.mineEmptyBlocks(GROUP_DURATION);
+      settleMember(deployer, 1, user1);
+      finalizeGroup(deployer, 1);
 
-      simnet.callPublicFn(
-        "habit-accountability-group", "finalize-group",
-        [Cl.uint(1)], deployer
-      );
-
-      const result = simnet.callPublicFn(
-        "habit-accountability-group", "finalize-group",
-        [Cl.uint(1)], deployer
-      );
+      const result = finalizeGroup(deployer, 1);
       expect(result.result).toBeErr(Cl.uint(309)); // ERR-ALREADY-SETTLED
     });
 
@@ -784,16 +825,14 @@ describe("Habit Accountability Group Contract", () => {
       createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
 
       simnet.mineEmptyBlocks(GROUP_DURATION);
+      settleMember(deployer, 1, user1);
 
       // user3 (non-member) can finalize
-      const result = simnet.callPublicFn(
-        "habit-accountability-group", "finalize-group",
-        [Cl.uint(1)], user3
-      );
+      const result = finalizeGroup(user3, 1);
       expect(result.result).toBeOk(Cl.bool(true));
     });
 
-    it("should prevent new member settlement after finalization", () => {
+    it("should prevent re-settlement after finalization", () => {
       createHabit(user1, "Exercise", MIN_STAKE);
       createHabit(user2, "Reading", MIN_STAKE);
       createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
@@ -802,24 +841,47 @@ describe("Habit Accountability Group Contract", () => {
       buildStreak(user1, 1, 1);
       simnet.mineEmptyBlocks(GROUP_DURATION);
 
-      // Settle user1, then finalize
+      // Settle both, then finalize
       settleMember(deployer, 1, user1);
-      simnet.callPublicFn(
-        "habit-accountability-group", "finalize-group",
-        [Cl.uint(1)], deployer
-      );
+      settleMember(deployer, 1, user2);
+      finalizeGroup(deployer, 1);
 
-      // user2 settlement should fail - group is no longer active
-      const result = settleMember(deployer, 1, user2);
+      // Re-settlement should fail - group is no longer active
+      const result = settleMember(deployer, 1, user1);
       expect(result.result).toBeErr(Cl.uint(305)); // ERR-GROUP-NOT-ACTIVE
     });
 
     it("should reject finalize for nonexistent group", () => {
-      const result = simnet.callPublicFn(
-        "habit-accountability-group", "finalize-group",
-        [Cl.uint(999)], deployer
-      );
+      const result = finalizeGroup(deployer, 999);
       expect(result.result).toBeErr(Cl.uint(301)); // ERR-GROUP-NOT-FOUND
+    });
+
+    it("should reject finalize when not all members are settled", () => {
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createHabit(user2, "Reading", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
+      joinGroup(user2, 1, 2);
+
+      buildStreak(user1, 1, 1);
+      simnet.mineEmptyBlocks(GROUP_DURATION);
+
+      // Only settle user1, leave user2 unsettled
+      settleMember(deployer, 1, user1);
+
+      // Finalize should fail - settled-count (1) != member-count (2)
+      const result = finalizeGroup(deployer, 1);
+      expect(result.result).toBeErr(Cl.uint(311)); // ERR-NOT-ELIGIBLE
+    });
+
+    it("should reject finalize with zero members settled", () => {
+      createHabit(user1, "Exercise", MIN_STAKE);
+      createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
+
+      simnet.mineEmptyBlocks(GROUP_DURATION);
+
+      // Don't settle anyone
+      const result = finalizeGroup(deployer, 1);
+      expect(result.result).toBeErr(Cl.uint(311)); // ERR-NOT-ELIGIBLE
     });
   });
 
@@ -1026,9 +1088,9 @@ describe("Habit Accountability Group Contract", () => {
       const s2 = settleMember(deployer, 1, user2);
       expect(s2.result).toBeOk(Cl.bool(false));
 
-      // claim-group-reward should fail (no successful members)
+      // claim-group-reward should fail (group not finalized yet)
       const claim = claimGroupReward(user1, 1);
-      expect(claim.result).toBeErr(Cl.uint(311)); // ERR-NOT-ELIGIBLE
+      expect(claim.result).toBeErr(Cl.uint(306)); // ERR-GROUP-STILL-ACTIVE (not finalized)
 
       // Finalize
       const fin = simnet.callPublicFn(
