@@ -466,3 +466,31 @@
 
 ;; Contract is ready for use immediately after deployment
 ;; No initialization function required
+
+;; ============================================
+;; EXPIRED HABIT DETECTION
+;; ============================================
+
+;; Check if a single habit has its check-in window expired
+;; Returns habit-id if expired and active, u0 otherwise
+(define-private (check-habit-expired (habit-id uint))
+  (match (map-get? habits { habit-id: habit-id })
+    habit
+      (if (and (get is-active habit)
+               (not (is-check-in-valid (get last-check-in-block habit))))
+        habit-id
+        u0
+      )
+    u0
+  )
+)
+
+;; Get all expired active habit IDs for a user
+;; Returns a list of habit IDs where the check-in window has passed
+;; Non-expired habits appear as u0 (filter client-side)
+(define-read-only (get-expired-habits (user principal))
+  (match (map-get? user-habits { user: user })
+    user-data (ok (map check-habit-expired (get habit-ids user-data)))
+    (ok (list))
+  )
+)
