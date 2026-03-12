@@ -61,7 +61,9 @@ export function shortenAddress(
   endChars = 4,
 ): string {
   if (!address) return '';
+  if (startChars === 0 && endChars === 0) return '...';
   if (address.length <= startChars + endChars + 3) return address;
+  if (endChars === 0) return `${address.slice(0, startChars)}...`;
   return `${address.slice(0, startChars)}...${address.slice(-endChars)}`;
 }
 
