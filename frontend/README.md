@@ -38,7 +38,7 @@ npm run dev                  # → http://localhost:3000
 | Variable | Default | Description |
 |---|---|---|
 | `VITE_CONTRACT_ADDRESS` | `SP1M46W6...` | Contract principal |
-| `VITE_CONTRACT_NAME` | `habit-tracker` | Contract name |
+| `VITE_CONTRACT_NAME` | `habit-tracker-v2` | Contract name |
 
 See `.env.example` for the full template. Never commit `.env.local`.
 

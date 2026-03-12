@@ -9,10 +9,10 @@ plan:
     - id: 0
       transactions:
         - contract-publish:
-            contract-name: habit-tracker
+            contract-name: habit-tracker-v2
             expected-sender: SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193
             cost: 3506834
-            path: "contracts\\habit-tracker.clar"
+            path: "contracts\\habit-tracker-v2.clar"
             anchor-block-only: true
             clarity-version: 2
       epoch: "2.5"

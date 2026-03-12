@@ -9,7 +9,7 @@ async function deployContract() {
   console.log("Network:", NETWORK.version);
   
   const contractSource = fs.readFileSync(
-    "./contracts/habit-tracker.clar",
+    "./contracts/habit-tracker-v2.clar",
     "utf-8"
   );
   

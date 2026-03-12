@@ -9,7 +9,7 @@ import {
 
 const MAINNET_ADDR = 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193';
 const TESTNET_ADDR = 'ST1SJ3DTE5DN7X54YDH5D64R3BCB6A2AG2ZQ8YPD5';
-const CONTRACT = `${MAINNET_ADDR}.habit-tracker`;
+const CONTRACT = `${MAINNET_ADDR}.habit-tracker-v2`;
 
 describe('isValidAddress', () => {
   it('accepts valid mainnet address', () => {
@@ -83,7 +83,7 @@ describe('shortenAddress', () => {
 describe('parseContractPrincipal', () => {
   it('parses valid contract principal', () => {
     const result = parseContractPrincipal(CONTRACT);
-    expect(result).toEqual([MAINNET_ADDR, 'habit-tracker']);
+    expect(result).toEqual([MAINNET_ADDR, 'habit-tracker-v2']);
   });
 
   it('returns null for standard principal', () => {

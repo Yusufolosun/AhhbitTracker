@@ -4,7 +4,7 @@
 
 Core Clarity smart contract for on-chain habit tracking with staking.
 
-## Contract: habit-tracker.clar
+## Contract: habit-tracker-v2.clar
 
 ### Public Functions
 

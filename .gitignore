@@ -154,5 +154,25 @@ scripts/wallet-keys.txt
 **/*-private-key.json
 **/*_private_key*
 
+# ============================================
+# STACKS WALLET & KEY FILES (EXTENDED)
+# ============================================
+# Catch-all patterns for wallet exports and key material
+**/*.wif
+**/stx-wallet*.json
+**/wallet-export*.json
+**/*-seed-phrase*
+**/*_seed_phrase*
+**/*deployer-key*
+**/*deployer_key*
+**/batch-*-wallets.env
+
+# ============================================
+# RUNTIME & CACHE STATE
+# ============================================
+# Transaction result state files from automation scripts
+scripts/**/batch-*-state.json
+scripts/**/*-results.json
+
 # Vite config compilation cache (auto-generated, never commit)
 frontend/vite.config.ts.timestamp-*.mjs

@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import { contractService } from '../services/contractService';
 import { useWallet } from '../context/WalletContext';
 import { Habit, UserStats } from '../types/habit';
@@ -100,43 +101,93 @@ export const useHabits = () => {
     retryDelay: (attempt) => Math.min(15000 * Math.pow(2, attempt - 1), 60000),
   });
 
+  // Helper: schedule a deferred refetch after the tx has time to mine.
+  // Stacks blocks average ~10 min; we refetch at 30s and 2min as best-effort.
+  const scheduleRefetch = useCallback(
+    (queryKeys: string[][]) => {
+      const invalidate = () => {
+        for (const key of queryKeys) {
+          queryClient.invalidateQueries({ queryKey: key });
+        }
+      };
+      setTimeout(invalidate, 30_000);
+      setTimeout(invalidate, 120_000);
+    },
+    [queryClient],
+  );
+
   // Create habit mutation
   const createHabitMutation = useMutation({
     mutationFn: ({ name, stakeAmount }: { name: string; stakeAmount: number }) =>
       contractService.createHabit(name, stakeAmount),
     onSuccess: () => {
-      // Invalidate queries to refetch data after transaction confirmation
-      queryClient.invalidateQueries({ queryKey: ['habits', walletState.address] });
-      queryClient.invalidateQueries({ queryKey: ['userStats', walletState.address] });
       refreshBalance();
-
-      // Refetch again after additional delay to ensure blockchain state is updated
-      setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: ['habits', walletState.address] });
-        queryClient.invalidateQueries({ queryKey: ['userStats', walletState.address] });
-        refreshBalance();
-      }, 5000); // Additional 5 second delay
+      scheduleRefetch([
+        ['habits', walletState.address!],
+        ['userStats', walletState.address!],
+      ]);
     },
   });
 
-  // Check-in mutation
+  // Check-in mutation with optimistic streak update
   const checkInMutation = useMutation({
     mutationFn: (habitId: number) => contractService.checkIn(habitId),
+    onMutate: async (habitId: number) => {
+      const queryKey = ['habits', walletState.address];
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData<Habit[]>(queryKey);
+      if (previous) {
+        queryClient.setQueryData<Habit[]>(queryKey, (old) =>
+          (old ?? []).map((h) =>
+            h.habitId === habitId
+              ? { ...h, currentStreak: h.currentStreak + 1 }
+              : h
+          )
+        );
+      }
+      return { previous };
+    },
+    onError: (_err, _habitId, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['habits', walletState.address], context.previous);
+      }
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['habits', walletState.address] });
-      queryClient.invalidateQueries({ queryKey: ['userStats', walletState.address] });
+      scheduleRefetch([['habits', walletState.address!], ['userStats', walletState.address!]]);
     },
   });
 
-  // Withdraw stake mutation
+  // Withdraw stake mutation with optimistic update
   const withdrawStakeMutation = useMutation({
     mutationFn: ({ habitId, stakeAmount }: { habitId: number; stakeAmount: number }) =>
       contractService.withdrawStake(habitId, stakeAmount),
+    onMutate: async ({ habitId }) => {
+      const queryKey = ['habits', walletState.address];
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData<Habit[]>(queryKey);
+      if (previous) {
+        queryClient.setQueryData<Habit[]>(queryKey, (old) =>
+          (old ?? []).map((h) =>
+            h.habitId === habitId
+              ? { ...h, isActive: false, isCompleted: true }
+              : h
+          )
+        );
+      }
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['habits', walletState.address], context.previous);
+      }
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['habits', walletState.address] });
-      queryClient.invalidateQueries({ queryKey: ['userStats', walletState.address] });
-      queryClient.invalidateQueries({ queryKey: ['poolBalance'] });
       refreshBalance();
+      scheduleRefetch([
+        ['habits', walletState.address!],
+        ['userStats', walletState.address!],
+        ['poolBalance'],
+      ]);
     },
   });
 
@@ -144,9 +195,8 @@ export const useHabits = () => {
   const claimBonusMutation = useMutation({
     mutationFn: (habitId: number) => contractService.claimBonus(habitId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['habits', walletState.address] });
-      queryClient.invalidateQueries({ queryKey: ['poolBalance'] });
       refreshBalance();
+      scheduleRefetch([['habits', walletState.address!], ['poolBalance']]);
     },
   });
 

@@ -9,7 +9,7 @@ clarinet console --mainnet
 ## Transaction 1: Create First Habit
 
 ```clarity
-(contract-call? 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker 
+(contract-call? 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker-v2 
   create-habit 
   u"Morning Exercise" 
   u100000)
@@ -18,7 +18,7 @@ clarinet console --mainnet
 ## Transaction 2: Create Second Habit
 
 ```clarity
-(contract-call? 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker 
+(contract-call? 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker-v2 
   create-habit 
   u"Daily Reading" 
   u1000000)
@@ -27,7 +27,7 @@ clarinet console --mainnet
 ## Transaction 3: First Check-in
 
 ```clarity
-(contract-call? 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker 
+(contract-call? 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker-v2 
   check-in 
   u1)
 ```
@@ -35,7 +35,7 @@ clarinet console --mainnet
 ## Read-Only Query 4: Get Habit
 
 ```clarity
-(contract-call? 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker 
+(contract-call? 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker-v2 
   get-habit 
   u1)
 ```
@@ -43,7 +43,7 @@ clarinet console --mainnet
 ## Read-Only Query 5: Get User Habits
 
 ```clarity
-(contract-call? 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker 
+(contract-call? 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker-v2 
   get-user-habits 
   'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193)
 ```
@@ -51,14 +51,14 @@ clarinet console --mainnet
 ## Read-Only Query 6: Get Pool Balance
 
 ```clarity
-(contract-call? 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker 
+(contract-call? 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker-v2 
   get-pool-balance)
 ```
 
 ## Read-Only Query 7: Get User Stats
 
 ```clarity
-(contract-call? 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker 
+(contract-call? 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker-v2 
   get-user-stats 
   'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193)
 ```
@@ -66,7 +66,7 @@ clarinet console --mainnet
 ## Transaction 8: Second Check-in (After 144 blocks)
 
 ```clarity
-(contract-call? 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker 
+(contract-call? 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker-v2 
   check-in 
   u1)
 ```
@@ -82,7 +82,7 @@ block-height
 ### Check Contract Balance
 
 ```clarity
-(stx-get-balance 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker)
+(stx-get-balance 'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker-v2)
 ```
 
 ### Check User Balance

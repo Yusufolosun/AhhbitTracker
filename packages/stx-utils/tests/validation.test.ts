@@ -75,7 +75,7 @@ describe('validatePrincipal', () => {
   it('accepts valid contract principal', () => {
     expect(
       validatePrincipal(
-        'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker',
+        'SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker-v2',
       ),
     ).toBeNull();
   });

@@ -32,7 +32,7 @@ export function addressUrl(
 /**
  * Build an explorer URL for a deployed contract.
  *
- * @param principal - Contract principal, e.g. `"SP1M46…G193.habit-tracker"`.
+ * @param principal - Contract principal, e.g. `"SP1M46…G193.habit-tracker-v2"`.
  */
 export function contractUrl(
   principal: string,
