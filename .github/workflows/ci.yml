@@ -28,7 +28,7 @@ jobs:
       - run: npm ci
 
       - name: Run Clarity contract tests
-        run: npm test || echo "::warning::Simnet tests require native WASM — skipped in CI"
+        run: npm test
 
   # ──────────────────────────────────────────────
   # 2. stx-utils package tests
