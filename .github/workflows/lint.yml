@@ -16,4 +16,4 @@ jobs:
           node-version: '20'
       - run: npm ci
       - name: Check Clarity contracts
-        run: npx @hirosystems/clarinet-sdk-wasm check 2>/dev/null || echo "::warning::Clarity check requires native WASM - skipped in CI"
+        run: npx @hirosystems/clarinet-sdk-wasm check
