@@ -27,11 +27,11 @@ export function ConfirmationDialog({
   useEffect(() => {
     if (!open) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onCancel();
+      if (e.key === 'Escape' && !isLoading) onCancel();
     };
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [open, onCancel]);
+  }, [open, onCancel, isLoading]);
 
   // Trap focus inside the dialog
   useEffect(() => {
@@ -52,7 +52,7 @@ export function ConfirmationDialog({
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/50 transition-opacity"
-        onClick={onCancel}
+        onClick={isLoading ? undefined : onCancel}
       />
 
       {/* Dialog */}
