@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { TOAST_DURATION } from '../utils/constants';
 
 interface ToastProps {
   message: string;
@@ -8,7 +9,7 @@ interface ToastProps {
 
 export function Toast({ message, type, onClose }: ToastProps) {
   useEffect(() => {
-    const timer = setTimeout(onClose, 5000);
+    const timer = setTimeout(onClose, TOAST_DURATION);
     return () => clearTimeout(timer);
   }, [onClose]);
 
