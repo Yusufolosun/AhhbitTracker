@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { contractService } from '../services/contractService';
 import { useWallet } from '../context/WalletContext';
 import { Habit, UserStats } from '../types/habit';
@@ -103,6 +103,16 @@ export const useHabits = () => {
 
   // Helper: schedule a deferred refetch after the tx has time to mine.
   // Stacks blocks average ~10 min; we refetch at 30s and 2min as best-effort.
+  // All timers are tracked so they can be cleaned up on unmount.
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  useEffect(() => {
+    return () => {
+      for (const id of timersRef.current) clearTimeout(id);
+      timersRef.current = [];
+    };
+  }, []);
+
   const scheduleRefetch = useCallback(
     (queryKeys: string[][]) => {
       const invalidate = () => {
@@ -110,8 +120,8 @@ export const useHabits = () => {
           queryClient.invalidateQueries({ queryKey: key });
         }
       };
-      setTimeout(invalidate, 30_000);
-      setTimeout(invalidate, 120_000);
+      timersRef.current.push(setTimeout(invalidate, 30_000));
+      timersRef.current.push(setTimeout(invalidate, 120_000));
     },
     [queryClient],
   );
