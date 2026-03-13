@@ -240,7 +240,7 @@ export function HabitCard({ habit }: HabitCardProps) {
               <dd className="font-medium text-surface-900 dark:text-white">{habit.currentStreak} days</dd>
             </div>
           </dl>
-          <p className="text-xs text-amber-600">
+          <p className="text-xs text-amber-600 dark:text-amber-400">
             This action is irreversible and will incur a gas fee.
           </p>
         </div>
@@ -267,7 +267,7 @@ export function HabitCard({ habit }: HabitCardProps) {
               <dd className="font-medium text-surface-900 dark:text-white">{habit.currentStreak} days</dd>
             </div>
           </dl>
-          <p className="text-xs text-amber-600">
+          <p className="text-xs text-amber-600 dark:text-amber-400">
             This action is irreversible and will incur a gas fee.
           </p>
         </div>
