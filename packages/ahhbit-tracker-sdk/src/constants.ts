@@ -32,6 +32,8 @@ export const ErrorCode = {
   POOL_INSUFFICIENT_BALANCE: 109,
   TRANSFER_FAILED: 110,
   BONUS_ALREADY_CLAIMED: 111,
+  HABIT_LIMIT_REACHED: 112,
+  STAKE_TOO_HIGH: 113,
 } as const;
 
 export type ErrorCodeValue = (typeof ErrorCode)[keyof typeof ErrorCode];
@@ -50,4 +52,6 @@ export const errorMessages: Record<ErrorCodeValue, string> = {
   [ErrorCode.POOL_INSUFFICIENT_BALANCE]: 'Pool has insufficient balance',
   [ErrorCode.TRANSFER_FAILED]: 'STX transfer failed',
   [ErrorCode.BONUS_ALREADY_CLAIMED]: 'Bonus already claimed for this habit',
+  [ErrorCode.HABIT_LIMIT_REACHED]: 'Maximum number of habits reached',
+  [ErrorCode.STAKE_TOO_HIGH]: 'Stake amount exceeds the maximum allowed',
 };
