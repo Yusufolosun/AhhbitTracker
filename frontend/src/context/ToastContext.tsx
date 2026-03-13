@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import { TOAST_DURATION } from '../utils/constants';
 
 export interface ToastItem {
   id: string;
@@ -40,13 +39,8 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
     (message: string, type: ToastItem['type']) => {
       const id = `toast-${++toastCounter}`;
       setToasts((prev) => [...prev, { id, message, type }]);
-
-      // Auto-dismiss after configured duration
-      setTimeout(() => {
-        dismissToast(id);
-      }, TOAST_DURATION);
     },
-    [dismissToast]
+    []
   );
 
   return (
