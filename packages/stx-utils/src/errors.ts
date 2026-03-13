@@ -23,6 +23,8 @@ const registry = new Map<number, string>([
   [109, 'Insufficient pool balance'],
   [110, 'Transfer failed'],
   [111, 'Bonus already claimed'],
+  [112, 'Maximum number of habits reached'],
+  [113, 'Stake amount exceeds the maximum allowed'],
 ]);
 
 /**
