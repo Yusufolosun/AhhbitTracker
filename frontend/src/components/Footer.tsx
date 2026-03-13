@@ -1,8 +1,8 @@
-
+import { CONTRACT_ADDRESS, CONTRACT_NAME } from '../utils/constants';
 
 const REPO_URL = 'https://github.com/Yusufolosun/AhhbitTracker';
 const EXPLORER_CONTRACT_URL =
-  'https://explorer.hiro.so/txid/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2?chain=mainnet';
+  `https://explorer.hiro.so/txid/${CONTRACT_ADDRESS}.${CONTRACT_NAME}?chain=mainnet`;
 
 const RESOURCE_LINKS = [
   { label: 'Documentation', href: `${REPO_URL}#readme` },
@@ -57,7 +57,7 @@ export function Footer() {
               rel="noopener noreferrer"
               className="text-xs text-surface-500 dark:text-surface-400 font-mono break-all hover:text-primary-500 dark:hover:text-primary-400 transition-colors leading-relaxed"
             >
-              SP1M46...habit-tracker
+              {CONTRACT_ADDRESS.slice(0, 6)}...{CONTRACT_NAME}
             </a>
             <p className="text-xs text-surface-400 dark:text-surface-500 mt-2">
               Deployed on Stacks Mainnet
