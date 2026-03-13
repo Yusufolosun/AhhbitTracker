@@ -136,11 +136,16 @@ export const useHabits = () => {
       const queryKey = ['habits', walletState.address];
       await queryClient.cancelQueries({ queryKey });
       const previous = queryClient.getQueryData<Habit[]>(queryKey);
+      const currentBlock = queryClient.getQueryData<number>(['currentBlock']);
       if (previous) {
         queryClient.setQueryData<Habit[]>(queryKey, (old) =>
           (old ?? []).map((h) =>
             h.habitId === habitId
-              ? { ...h, currentStreak: h.currentStreak + 1 }
+              ? {
+                  ...h,
+                  currentStreak: h.currentStreak + 1,
+                  ...(currentBlock != null && { lastCheckInBlock: currentBlock }),
+                }
               : h
           )
         );
