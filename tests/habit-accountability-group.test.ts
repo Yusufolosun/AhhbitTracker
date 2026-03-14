@@ -159,12 +159,8 @@ describe("Habit Accountability Group Contract", () => {
       createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
       const balanceAfter = simnet.getAssetsMap().get(user1)?.get("STX") || 0n;
 
-      if (balanceBefore > 0n) {
-        expect(balanceAfter).toBe(balanceBefore - BigInt(GROUP_STAKE));
-      }
-    });
-
-    it("should reject stake below minimum", () => {
+      expect(balanceBefore).toBeGreaterThan(0n);
+      expect(balanceAfter).toBe(balanceBefore - BigInt(GROUP_STAKE));
       createHabit(user1, "Exercise", MIN_STAKE);
       const result = createGroup(user1, MIN_STAKE - 1, GROUP_DURATION, 1);
       expect(result.result).toBeErr(Cl.uint(307)); // ERR-INVALID-STAKE
@@ -275,13 +271,8 @@ describe("Habit Accountability Group Contract", () => {
       joinGroup(user2, 1, 2);
       const balanceAfter = simnet.getAssetsMap().get(user2)?.get("STX") || 0n;
 
-      if (balanceBefore > 0n) {
-        expect(balanceAfter).toBe(balanceBefore - BigInt(GROUP_STAKE));
-      }
-    });
-  });
-
-  describe("settle-member", () => {
+      expect(balanceBefore).toBeGreaterThan(0n);
+      expect(balanceAfter).toBe(balanceBefore - BigInt(GROUP_STAKE));
 
     it("should settle successful member who maintained streak", () => {
       // Create habits and group
@@ -536,9 +527,8 @@ describe("Habit Accountability Group Contract", () => {
       claimGroupReward(user1, 1);
       const balanceAfter = simnet.getAssetsMap().get(user1)?.get("STX") || 0n;
 
-      if (balanceBefore > 0n) {
-        expect(balanceAfter).toBe(balanceBefore + BigInt(GROUP_STAKE * 2));
-      }
+      expect(balanceBefore).toBeGreaterThan(0n);
+      expect(balanceAfter).toBe(balanceBefore + BigInt(GROUP_STAKE * 2));
     });
   });
 

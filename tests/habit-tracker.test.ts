@@ -131,10 +131,8 @@ describe("AhhbitTracker Contract", () => {
 
       const userBalanceAfter = simnet.getAssetsMap().get(user1)?.get("STX") || 0n;
 
-      // If balance tracking is working, verify subtraction
-      if (userBalanceBefore > 0n) {
-        expect(userBalanceAfter).toBe(userBalanceBefore - BigInt(MIN_STAKE));
-      }
+      expect(userBalanceBefore).toBeGreaterThan(0n);
+      expect(userBalanceAfter).toBe(userBalanceBefore - BigInt(MIN_STAKE));
     });
 
     it("should allow user to create multiple habits", () => {
