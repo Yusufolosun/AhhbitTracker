@@ -1103,4 +1103,141 @@ describe("Habit Accountability Group Contract", () => {
       expect(r2.result).toBeOk(Cl.uint(GROUP_STAKE));
     });
   });
+
+  describe("group capacity limits", () => {
+
+    it("should reject join when group reaches max size (u302)", () => {
+      // MAX-GROUP-SIZE is 10: creator counts as member 1, 9 more can join.
+      // The 11th principal must be rejected with ERR-GROUP-FULL.
+      const wallets: string[] = [deployer, user1, user2, user3];
+      for (let i = 4; i <= 15; i++) {
+        const w = accounts.get(`wallet_${i}`);
+        if (w) wallets.push(w);
+      }
+      expect(wallets.length).toBeGreaterThanOrEqual(11);
+
+      // Each participant needs their own habit
+      for (let i = 0; i < 11; i++) {
+        createHabit(wallets[i], `Cap-Habit-${i + 1}`, MIN_STAKE);
+      }
+
+      // Creator starts the group (member-count = 1)
+      const createResult = createGroup(wallets[0], GROUP_STAKE, GROUP_DURATION, 1);
+      expect(createResult.result).toBeOk(Cl.uint(1));
+
+      // Fill remaining 9 slots (members 2 through 10)
+      for (let i = 1; i < 10; i++) {
+        const joinResult = joinGroup(wallets[i], 1, i + 1);
+        expect(joinResult.result).toBeOk(Cl.bool(true));
+      }
+
+      // 11th member should be rejected — group is full
+      const overflow = joinGroup(wallets[10], 1, 11);
+      expect(overflow.result).toBeErr(Cl.uint(302));
+    });
+
+    it("should reject create-group when user reaches 20-group limit (u313)", () => {
+      // member-groups list has max-len u20. A user in 20 groups cannot
+      // create or join another without hitting ERR-GROUP-LIMIT-REACHED.
+      createHabit(user1, "Limit Habit", MIN_STAKE);
+
+      for (let g = 0; g < 20; g++) {
+        const result = createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
+        expect(result.result).toBeOk(Cl.uint(g + 1));
+      }
+
+      // 21st group creation should fail
+      const overflow = createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
+      expect(overflow.result).toBeErr(Cl.uint(313));
+    });
+
+    it("should reject join-group when user reaches 20-group limit (u313)", () => {
+      // Same limit, but tested through the join path instead of create.
+      createHabit(user1, "Joiner Habit", MIN_STAKE);
+      createHabit(user2, "Host Habit", MIN_STAKE);
+      createHabit(deployer, "Extra Host Habit", MIN_STAKE);
+
+      // user2 creates 20 groups (user2 stays at 20 — within the limit)
+      for (let g = 0; g < 20; g++) {
+        createGroup(user2, GROUP_STAKE, GROUP_DURATION, 2);
+      }
+
+      // user1 joins all 20 groups
+      for (let g = 1; g <= 20; g++) {
+        const result = joinGroup(user1, g, 1);
+        expect(result.result).toBeOk(Cl.bool(true));
+      }
+
+      // deployer creates the 21st group
+      createGroup(deployer, GROUP_STAKE, GROUP_DURATION, 3);
+
+      // user1 tries to join — already in 20 groups
+      const overflow = joinGroup(user1, 21, 1);
+      expect(overflow.result).toBeErr(Cl.uint(313));
+    });
+
+    it("should allow exactly 10 members in a group (boundary)", () => {
+      // Verify the 10th join succeeds right at MAX-GROUP-SIZE boundary
+      const wallets: string[] = [deployer, user1, user2, user3];
+      for (let i = 4; i <= 10; i++) {
+        const w = accounts.get(`wallet_${i}`);
+        if (w) wallets.push(w);
+      }
+      expect(wallets.length).toBeGreaterThanOrEqual(10);
+
+      for (let i = 0; i < 10; i++) {
+        createHabit(wallets[i], `Boundary-${i + 1}`, MIN_STAKE);
+      }
+
+      createGroup(wallets[0], GROUP_STAKE, GROUP_DURATION, 1);
+
+      // Members 2 through 10 should all succeed
+      for (let i = 1; i < 10; i++) {
+        const result = joinGroup(wallets[i], 1, i + 1);
+        expect(result.result).toBeOk(Cl.bool(true));
+      }
+
+      // Confirm the group has 10 members
+      const group = getGroup(1);
+      expect(group.result).toBeSome(
+        expect.objectContaining({
+          "member-count": Cl.uint(10),
+        })
+      );
+    });
+
+    it("should track all group-ids in member-groups correctly", () => {
+      createHabit(user1, "Track Habit", MIN_STAKE);
+
+      // Create 3 separate groups and verify the member-groups list grows
+      createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
+      createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
+      createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
+
+      const groups = getMemberGroups(user1);
+      expect(groups.result).toBeTuple({
+        "group-ids": Cl.list([Cl.uint(1), Cl.uint(2), Cl.uint(3)]),
+      });
+    });
+
+    it("should allow exactly 20 groups per user (boundary)", () => {
+      createHabit(user1, "Max Groups", MIN_STAKE);
+
+      // Create exactly 20 groups — should all succeed
+      for (let g = 0; g < 20; g++) {
+        const result = createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
+        expect(result.result).toBeOk(Cl.uint(g + 1));
+      }
+
+      // Verify the member-groups list has all 20 entries
+      const groups = getMemberGroups(user1);
+      const expectedIds = [];
+      for (let i = 1; i <= 20; i++) {
+        expectedIds.push(Cl.uint(i));
+      }
+      expect(groups.result).toBeTuple({
+        "group-ids": Cl.list(expectedIds),
+      });
+    });
+  });
 });

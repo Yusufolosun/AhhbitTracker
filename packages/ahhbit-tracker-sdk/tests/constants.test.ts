@@ -39,6 +39,23 @@ describe('constants', () => {
     expect(ErrorCode.BONUS_ALREADY_CLAIMED).toBe(111);
   });
 
+  it('defines accountability group error codes', () => {
+    expect(ErrorCode.GROUP_NOT_AUTHORIZED).toBe(300);
+    expect(ErrorCode.GROUP_NOT_FOUND).toBe(301);
+    expect(ErrorCode.GROUP_FULL).toBe(302);
+    expect(ErrorCode.ALREADY_GROUP_MEMBER).toBe(303);
+    expect(ErrorCode.NOT_GROUP_MEMBER).toBe(304);
+    expect(ErrorCode.GROUP_NOT_ACTIVE).toBe(305);
+    expect(ErrorCode.GROUP_STILL_ACTIVE).toBe(306);
+    expect(ErrorCode.GROUP_INVALID_STAKE).toBe(307);
+    expect(ErrorCode.GROUP_INVALID_DURATION).toBe(308);
+    expect(ErrorCode.GROUP_ALREADY_SETTLED).toBe(309);
+    expect(ErrorCode.GROUP_ALREADY_CLAIMED).toBe(310);
+    expect(ErrorCode.GROUP_NOT_ELIGIBLE).toBe(311);
+    expect(ErrorCode.GROUP_INVALID_HABIT).toBe(312);
+    expect(ErrorCode.GROUP_LIMIT_REACHED).toBe(313);
+  });
+
   it('has an error message for every error code', () => {
     const codes = Object.values(ErrorCode);
     for (const code of codes) {
