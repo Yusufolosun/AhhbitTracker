@@ -9,6 +9,8 @@ export function WalletConnect() {
         <img
           src="/logos/full-logo-dark.jpg"
           alt="AhhbitTracker"
+          width={95}
+          height={64}
           className="h-16 mx-auto mb-6 rounded-xl"
         />
         <h2 className="text-2xl font-bold text-surface-900 dark:text-white mb-3">

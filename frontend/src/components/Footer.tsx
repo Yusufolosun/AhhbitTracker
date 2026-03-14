@@ -20,6 +20,8 @@ export function Footer() {
               <img
                 src="/logos/icon-only-dark.jpg"
                 alt="AhhbitTracker"
+                width={32}
+                height={32}
                 className="h-8 w-8 rounded-lg"
               />
               <span className="text-lg font-bold">

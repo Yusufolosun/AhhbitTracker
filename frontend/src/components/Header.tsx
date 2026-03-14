@@ -34,6 +34,8 @@ export function Header() {
             <img
               src="/logos/icon-only-dark.jpg"
               alt="AhhbitTracker"
+              width={36}
+              height={36}
               className="h-9 w-9 rounded-lg"
             />
             <span className="text-xl font-bold">
