@@ -125,9 +125,8 @@ describe("Habit Streak Reward Contract", () => {
       fundPool(user1, FUND_AMOUNT);
       const balanceAfter = simnet.getAssetsMap().get(user1)?.get("STX") || 0n;
 
-      if (balanceBefore > 0n) {
-        expect(balanceAfter).toBe(balanceBefore - BigInt(FUND_AMOUNT));
-      }
+      expect(balanceBefore).toBeGreaterThan(0n);
+      expect(balanceAfter).toBe(balanceBefore - BigInt(FUND_AMOUNT));
     });
   });
 
@@ -289,9 +288,8 @@ describe("Habit Streak Reward Contract", () => {
       claimMilestoneReward(user1, 1, 7);
       const balanceAfter = simnet.getAssetsMap().get(user1)?.get("STX") || 0n;
 
-      if (balanceBefore > 0n) {
-        expect(balanceAfter).toBe(balanceBefore + BigInt(REWARD_AMOUNT));
-      }
+      expect(balanceBefore).toBeGreaterThan(0n);
+      expect(balanceAfter).toBe(balanceBefore + BigInt(REWARD_AMOUNT));
     });
   });
 
