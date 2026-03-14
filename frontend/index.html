@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
@@ -34,6 +34,14 @@
     <meta name="twitter:image" content="%VITE_APP_URL%/logos/full-logo-dark.jpg" />
 
     <title>AhhbitTracker — On-Chain Habit Tracking</title>
+
+    <!-- Apply saved theme before first paint to prevent flash -->
+    <script>
+      (function() {
+        var theme = localStorage.getItem('theme');
+        if (theme !== 'light') document.documentElement.classList.add('dark');
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
