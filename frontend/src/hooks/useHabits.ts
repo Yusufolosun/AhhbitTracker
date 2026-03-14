@@ -45,6 +45,7 @@ export const useHabits = () => {
               currentStreak: parseInt(habit['current-streak'].value),
               isActive: habit['is-active'].value,
               isCompleted: habit['is-completed'].value,
+              bonusClaimed: habit['bonus-claimed']?.value ?? false,
             } as Habit;
           }
           return null;

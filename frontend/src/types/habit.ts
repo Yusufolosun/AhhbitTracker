@@ -8,6 +8,7 @@ export interface Habit {
   createdAtBlock: number;
   isActive: boolean;
   isCompleted: boolean;
+  bonusClaimed: boolean;
 }
 
 export interface UserStats {
