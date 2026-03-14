@@ -57,6 +57,19 @@ describe('validateStake', () => {
     expect(validateStake(0.5, 1_000_000)).toContain('Minimum stake');
     expect(validateStake(1.0, 1_000_000)).toBeNull();
   });
+
+  it('rejects amount above maximum when maxMicroSTX is set', () => {
+    // Max 100 STX = 100_000_000 microSTX
+    expect(validateStake(101, 20_000, 100_000_000)).toContain('Maximum stake');
+  });
+
+  it('accepts amount at exactly the maximum', () => {
+    expect(validateStake(100, 20_000, 100_000_000)).toBeNull();
+  });
+
+  it('ignores max check when maxMicroSTX is not provided', () => {
+    expect(validateStake(9999)).toBeNull();
+  });
 });
 
 describe('validatePrincipal', () => {
