@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useId, useRef } from 'react';
 
 interface ConfirmationDialogProps {
   open: boolean;
@@ -22,6 +22,7 @@ export function ConfirmationDialog({
   isLoading = false,
 }: ConfirmationDialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
 
   // Close on Escape key
   useEffect(() => {
@@ -32,6 +33,13 @@ export function ConfirmationDialog({
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [open, onCancel, isLoading]);
+
+  // Lock body scroll while dialog is open
+  useEffect(() => {
+    if (!open) return;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }, [open]);
 
   // Trap focus inside the dialog
   useEffect(() => {
@@ -47,7 +55,7 @@ export function ConfirmationDialog({
       className="fixed inset-0 z-50 flex items-center justify-center"
       role="dialog"
       aria-modal="true"
-      aria-labelledby="confirmation-dialog-title"
+      aria-labelledby={titleId}
     >
       {/* Backdrop */}
       <div
@@ -62,7 +70,7 @@ export function ConfirmationDialog({
         className="relative bg-white dark:bg-surface-800 rounded-xl shadow-xl max-w-md w-full mx-4 p-6 animate-fade-in border border-surface-200 dark:border-surface-700"
       >
         <h2
-          id="confirmation-dialog-title"
+          id={titleId}
           className="text-lg font-semibold text-surface-900 dark:text-white mb-4"
         >
           {title}
