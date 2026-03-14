@@ -20,7 +20,7 @@ export function Toast({ message, type, onClose }: ToastProps) {
   };
 
   return (
-    <div className={`${bgColors[type]} text-white px-6 py-4 rounded-lg shadow-lg animate-fade-in`}>
+    <div className={`${bgColors[type]} text-white px-6 py-4 rounded-lg shadow-lg animate-fade-in pointer-events-auto`}>
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium">{message}</p>
         <button
