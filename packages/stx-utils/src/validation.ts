@@ -37,12 +37,14 @@ export function validateName(
  * Validate an STX stake amount.
  *
  * @param stx         - Amount in STX (not microSTX).
- * @param minMicroSTX - Minimum acceptable amount in microSTX (default: 100 000).
+ * @param minMicroSTX - Minimum acceptable amount in microSTX (default: 20 000).
+ * @param maxMicroSTX - Maximum acceptable amount in microSTX (optional).
  * @returns `null` when valid, or an error message string.
  */
 export function validateStake(
   stx: number,
   minMicroSTX: number = DEFAULT_MIN_STAKE,
+  maxMicroSTX?: number,
 ): string | null {
   if (isNaN(stx) || !Number.isFinite(stx) || stx <= 0) {
     return 'Stake amount must be positive';
@@ -50,6 +52,9 @@ export function validateStake(
   const micro = stx * MICRO_PER_STX;
   if (micro < minMicroSTX) {
     return `Minimum stake is ${minMicroSTX / MICRO_PER_STX} STX`;
+  }
+  if (maxMicroSTX != null && micro > maxMicroSTX) {
+    return `Maximum stake is ${maxMicroSTX / MICRO_PER_STX} STX`;
   }
   return null;
 }
