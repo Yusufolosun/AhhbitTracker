@@ -15,6 +15,7 @@ export const CONTRACT_NAME =
 
 // Contract Constants
 export const MIN_STAKE_AMOUNT = 20000; // 0.02 STX in microSTX
+export const MAX_STAKE_AMOUNT = 100000000; // 100 STX in microSTX
 export const MAX_HABIT_NAME_LENGTH = 50;
 export const CHECK_IN_WINDOW = 144; // blocks (~24 hours)
 export const MIN_STREAK_FOR_WITHDRAWAL = 7;
