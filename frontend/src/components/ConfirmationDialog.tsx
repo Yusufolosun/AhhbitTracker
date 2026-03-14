@@ -34,6 +34,13 @@ export function ConfirmationDialog({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [open, onCancel, isLoading]);
 
+  // Lock body scroll while dialog is open
+  useEffect(() => {
+    if (!open) return;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }, [open]);
+
   // Trap focus inside the dialog
   useEffect(() => {
     if (open && dialogRef.current) {
