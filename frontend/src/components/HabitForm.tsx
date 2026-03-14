@@ -85,12 +85,14 @@ export function HabitForm() {
             value={stake}
             onChange={(e) => setStake(e.target.value)}
             min="0.02"
+            max="100"
             step="0.01"
             required
             disabled={isCreatingHabit}
+            aria-describedby="stake-hint"
           />
-          <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-            Minimum: 0.02 STX
+          <p id="stake-hint" className="mt-1 text-xs text-surface-500 dark:text-surface-400">
+            Min 0.02 STX &middot; Max 100 STX
           </p>
         </div>
 
