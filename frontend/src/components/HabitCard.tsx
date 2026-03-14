@@ -206,7 +206,14 @@ export function HabitCard({ habit }: HabitCardProps) {
               {habit.currentStreak}/{MIN_STREAK_FOR_WITHDRAWAL} days
             </span>
           </div>
-          <div className="w-full bg-surface-200 dark:bg-surface-700 rounded-full h-2">
+          <div
+            className="w-full bg-surface-200 dark:bg-surface-700 rounded-full h-2"
+            role="progressbar"
+            aria-valuenow={Math.min(habit.currentStreak, MIN_STREAK_FOR_WITHDRAWAL)}
+            aria-valuemin={0}
+            aria-valuemax={MIN_STREAK_FOR_WITHDRAWAL}
+            aria-label={`Streak progress: ${habit.currentStreak} of ${MIN_STREAK_FOR_WITHDRAWAL} days`}
+          >
             <div
               className="bg-primary-500 h-2 rounded-full transition-all duration-500"
               style={{ width: `${Math.min((habit.currentStreak / MIN_STREAK_FOR_WITHDRAWAL) * 100, 100)}%` }}
