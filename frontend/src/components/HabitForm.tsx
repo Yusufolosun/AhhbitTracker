@@ -85,6 +85,7 @@ export function HabitForm() {
             value={stake}
             onChange={(e) => setStake(e.target.value)}
             min="0.02"
+            max="100"
             step="0.01"
             required
             disabled={isCreatingHabit}
