@@ -49,4 +49,12 @@ describe('validateStakeAmount', () => {
   it('accepts exact minimum stake (0.02 STX)', () => {
     expect(validateStakeAmount(0.02)).toBeNull();
   });
+
+  it('rejects stake above maximum (100 STX)', () => {
+    expect(validateStakeAmount(101)).toContain('Maximum stake');
+  });
+
+  it('accepts stake at exactly the maximum', () => {
+    expect(validateStakeAmount(100)).toBeNull();
+  });
 });
