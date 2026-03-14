@@ -93,7 +93,7 @@ export const useHabits = () => {
   });
 
   // Fetch pool balance
-  const { data: poolBalance } = useQuery({
+  const { data: poolBalance, error: poolError } = useQuery({
     queryKey: ['poolBalance'],
     queryFn: () => contractService.getPoolBalance(),
     staleTime: 300000, // 5 minutes - pool balance changes infrequently
@@ -227,6 +227,7 @@ export const useHabits = () => {
 
     // Errors
     habitsError,
+    poolError,
 
     // Mutations
     createHabit: createHabitMutation.mutateAsync,
