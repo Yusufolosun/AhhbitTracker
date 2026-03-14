@@ -35,6 +35,21 @@ export const ERROR_CODES: Record<number, string> = {
   111: 'Bonus already claimed for this habit',
   112: 'Maximum number of habits reached',
   113: 'Stake amount exceeds the maximum allowed',
+  // Accountability group errors
+  300: 'Not authorized',
+  301: 'Group not found',
+  302: 'Group is full (max 10 members)',
+  303: 'You are already a member of this group',
+  304: 'You are not a member of this group',
+  305: 'Group is no longer active',
+  306: 'Group period has not ended yet',
+  307: 'Stake amount too low',
+  308: 'Invalid group duration',
+  309: 'Group already settled',
+  310: 'Reward already claimed',
+  311: 'Not eligible for reward',
+  312: 'Invalid or inactive habit',
+  313: 'Group membership limit reached (max 20)',
 };
 
 // UI Constants
