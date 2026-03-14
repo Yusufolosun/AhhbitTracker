@@ -89,8 +89,9 @@ export function HabitForm() {
             step="0.01"
             required
             disabled={isCreatingHabit}
+            aria-describedby="stake-hint"
           />
-          <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
+          <p id="stake-hint" className="mt-1 text-xs text-surface-500 dark:text-surface-400">
             Min 0.02 STX &middot; Max 100 STX
           </p>
         </div>
