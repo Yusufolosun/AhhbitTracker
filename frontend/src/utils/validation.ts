@@ -4,7 +4,7 @@
  * (validateHabitName / validateStakeAmount).
  */
 import { validateName, validateStake } from '@yusufolosun/stx-utils';
-import { MIN_STAKE_AMOUNT, MAX_HABIT_NAME_LENGTH } from './constants';
+import { MIN_STAKE_AMOUNT, MAX_STAKE_AMOUNT, MAX_HABIT_NAME_LENGTH } from './constants';
 
 export function validateHabitName(name: string): string | null {
   const err = validateName(name, MAX_HABIT_NAME_LENGTH);
@@ -15,5 +15,5 @@ export function validateHabitName(name: string): string | null {
 }
 
 export function validateStakeAmount(stx: number): string | null {
-  return validateStake(stx, MIN_STAKE_AMOUNT);
+  return validateStake(stx, MIN_STAKE_AMOUNT, MAX_STAKE_AMOUNT);
 }
