@@ -67,14 +67,22 @@ export const contractService = {
    * Check in to a habit
    */
   async checkIn(habitId: number): Promise<void> {
-    return showContractCall({
-      contractAddress: CONTRACT_ADDRESS,
-      contractName: CONTRACT_NAME,
-      functionName: 'check-in',
-      functionArgs: [uintCV(habitId)],
-      network: NETWORK,
-      appDetails,
-      userSession: walletService.getUserSession(),
+    return new Promise((resolve, reject) => {
+      showContractCall({
+        contractAddress: CONTRACT_ADDRESS,
+        contractName: CONTRACT_NAME,
+        functionName: 'check-in',
+        functionArgs: [uintCV(habitId)],
+        network: NETWORK,
+        appDetails,
+        userSession: walletService.getUserSession(),
+        onFinish: () => {
+          resolve();
+        },
+        onCancel: () => {
+          reject(new Error('Transaction cancelled'));
+        },
+      });
     });
   },
 
@@ -92,16 +100,24 @@ export const contractService = {
       Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`).willSendEq(stakeAmount).ustx(),
     ];
 
-    return showContractCall({
-      contractAddress: CONTRACT_ADDRESS,
-      contractName: CONTRACT_NAME,
-      functionName: 'withdraw-stake',
-      functionArgs: [uintCV(habitId)],
-      network: NETWORK,
-      postConditions,
-      postConditionMode: PostConditionMode.Deny,
-      appDetails,
-      userSession: walletService.getUserSession(),
+    return new Promise((resolve, reject) => {
+      showContractCall({
+        contractAddress: CONTRACT_ADDRESS,
+        contractName: CONTRACT_NAME,
+        functionName: 'withdraw-stake',
+        functionArgs: [uintCV(habitId)],
+        network: NETWORK,
+        postConditions,
+        postConditionMode: PostConditionMode.Deny,
+        appDetails,
+        userSession: walletService.getUserSession(),
+        onFinish: () => {
+          resolve();
+        },
+        onCancel: () => {
+          reject(new Error('Transaction cancelled'));
+        },
+      });
     });
   },
 
@@ -119,16 +135,24 @@ export const contractService = {
       Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`).willSendGte(1).ustx(),
     ];
 
-    return showContractCall({
-      contractAddress: CONTRACT_ADDRESS,
-      contractName: CONTRACT_NAME,
-      functionName: 'claim-bonus',
-      functionArgs: [uintCV(habitId)],
-      network: NETWORK,
-      postConditions,
-      postConditionMode: PostConditionMode.Deny,
-      appDetails,
-      userSession: walletService.getUserSession(),
+    return new Promise((resolve, reject) => {
+      showContractCall({
+        contractAddress: CONTRACT_ADDRESS,
+        contractName: CONTRACT_NAME,
+        functionName: 'claim-bonus',
+        functionArgs: [uintCV(habitId)],
+        network: NETWORK,
+        postConditions,
+        postConditionMode: PostConditionMode.Deny,
+        appDetails,
+        userSession: walletService.getUserSession(),
+        onFinish: () => {
+          resolve();
+        },
+        onCancel: () => {
+          reject(new Error('Transaction cancelled'));
+        },
+      });
     });
   },
 
