@@ -13,10 +13,14 @@ interface HabitCardProps {
 }
 
 export function HabitCard({ habit }: HabitCardProps) {
-  const { checkIn, withdrawStake, claimBonus, poolBalance, isCheckingIn, isWithdrawing, isClaiming } = useHabits();
+  const { checkIn, withdrawStake, claimBonus, poolBalance, pendingCheckIns, pendingWithdrawals, pendingClaims } = useHabits();
   const { showToast } = useToast();
   const [confirmAction, setConfirmAction] = useState<'withdraw' | 'claim' | null>(null);
   const currentBlock = useCurrentBlock();
+
+  const isCheckingIn = pendingCheckIns.has(habit.habitId);
+  const isWithdrawing = pendingWithdrawals.has(habit.habitId);
+  const isClaiming = pendingClaims.has(habit.habitId);
 
   const handleCheckIn = async () => {
     try {

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { contractService } from '../services/contractService';
 import { useWallet } from '../context/WalletContext';
 import { Habit, UserStats } from '../types/habit';
@@ -10,6 +10,12 @@ import { Habit, UserStats } from '../types/habit';
 export const useHabits = () => {
   const { walletState, refreshBalance } = useWallet();
   const queryClient = useQueryClient();
+
+  // Track which habit IDs have in-flight mutations so each card can
+  // independently show its own loading state.
+  const [pendingCheckIns, setPendingCheckIns] = useState<Set<number>>(new Set());
+  const [pendingWithdrawals, setPendingWithdrawals] = useState<Set<number>>(new Set());
+  const [pendingClaims, setPendingClaims] = useState<Set<number>>(new Set());
 
   // Fetch user habits
   const {
@@ -144,6 +150,7 @@ export const useHabits = () => {
   const checkInMutation = useMutation({
     mutationFn: (habitId: number) => contractService.checkIn(habitId),
     onMutate: async (habitId: number) => {
+      setPendingCheckIns((prev) => new Set(prev).add(habitId));
       const queryKey = ['habits', walletState.address];
       await queryClient.cancelQueries({ queryKey });
       const previous = queryClient.getQueryData<Habit[]>(queryKey);
@@ -168,6 +175,13 @@ export const useHabits = () => {
         queryClient.setQueryData(['habits', walletState.address], context.previous);
       }
     },
+    onSettled: (_data, _err, habitId) => {
+      setPendingCheckIns((prev) => {
+        const next = new Set(prev);
+        next.delete(habitId);
+        return next;
+      });
+    },
     onSuccess: () => {
       scheduleRefetch([['habits', walletState.address!], ['userStats', walletState.address!]]);
     },
@@ -178,6 +192,7 @@ export const useHabits = () => {
     mutationFn: ({ habitId, stakeAmount }: { habitId: number; stakeAmount: number }) =>
       contractService.withdrawStake(habitId, stakeAmount),
     onMutate: async ({ habitId }) => {
+      setPendingWithdrawals((prev) => new Set(prev).add(habitId));
       const queryKey = ['habits', walletState.address];
       await queryClient.cancelQueries({ queryKey });
       const previous = queryClient.getQueryData<Habit[]>(queryKey);
@@ -197,6 +212,13 @@ export const useHabits = () => {
         queryClient.setQueryData(['habits', walletState.address], context.previous);
       }
     },
+    onSettled: (_data, _err, { habitId }) => {
+      setPendingWithdrawals((prev) => {
+        const next = new Set(prev);
+        next.delete(habitId);
+        return next;
+      });
+    },
     onSuccess: () => {
       refreshBalance();
       scheduleRefetch([
@@ -210,6 +232,16 @@ export const useHabits = () => {
   // Claim bonus mutation
   const claimBonusMutation = useMutation({
     mutationFn: (habitId: number) => contractService.claimBonus(habitId),
+    onMutate: (habitId: number) => {
+      setPendingClaims((prev) => new Set(prev).add(habitId));
+    },
+    onSettled: (_data, _err, habitId) => {
+      setPendingClaims((prev) => {
+        const next = new Set(prev);
+        next.delete(habitId);
+        return next;
+      });
+    },
     onSuccess: () => {
       refreshBalance();
       scheduleRefetch([['habits', walletState.address!], ['poolBalance']]);
@@ -236,7 +268,12 @@ export const useHabits = () => {
     withdrawStake: withdrawStakeMutation.mutateAsync,
     claimBonus: claimBonusMutation.mutateAsync,
 
-    // Mutation states
+    // Per-habit pending states
+    pendingCheckIns,
+    pendingWithdrawals,
+    pendingClaims,
+
+    // Global mutation states (kept for backward compatibility)
     isCreatingHabit: createHabitMutation.isPending,
     isCheckingIn: checkInMutation.isPending,
     isWithdrawing: withdrawStakeMutation.isPending,
