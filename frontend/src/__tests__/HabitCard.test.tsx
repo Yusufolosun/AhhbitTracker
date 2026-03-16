@@ -10,6 +10,7 @@ vi.mock('../hooks/useHabits', () => ({
     checkIn: vi.fn(),
     withdrawStake: vi.fn(),
     claimBonus: vi.fn(),
+    poolBalance: 50_000_000,
     isCheckingIn: false,
     isWithdrawing: false,
     isClaiming: false,
@@ -31,6 +32,7 @@ const mockHabit: Habit = {
   currentStreak: 5,
   isActive: true,
   isCompleted: false,
+  bonusClaimed: false,
 };
 
 describe('HabitCard', () => {
