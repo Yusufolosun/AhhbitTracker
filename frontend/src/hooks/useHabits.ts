@@ -192,6 +192,7 @@ export const useHabits = () => {
     mutationFn: ({ habitId, stakeAmount }: { habitId: number; stakeAmount: number }) =>
       contractService.withdrawStake(habitId, stakeAmount),
     onMutate: async ({ habitId }) => {
+      setPendingWithdrawals((prev) => new Set(prev).add(habitId));
       const queryKey = ['habits', walletState.address];
       await queryClient.cancelQueries({ queryKey });
       const previous = queryClient.getQueryData<Habit[]>(queryKey);
@@ -210,6 +211,13 @@ export const useHabits = () => {
       if (context?.previous) {
         queryClient.setQueryData(['habits', walletState.address], context.previous);
       }
+    },
+    onSettled: (_data, _err, { habitId }) => {
+      setPendingWithdrawals((prev) => {
+        const next = new Set(prev);
+        next.delete(habitId);
+        return next;
+      });
     },
     onSuccess: () => {
       refreshBalance();
