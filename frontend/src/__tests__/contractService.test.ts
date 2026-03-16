@@ -38,6 +38,7 @@ vi.mock('../utils/constants', () => ({
 
 // Import after mocks are set up
 import { contractService } from '../services/contractService';
+import { walletService } from '../services/walletService';
 
 describe('contractService', () => {
   beforeEach(() => {
@@ -101,6 +102,18 @@ describe('contractService', () => {
       const promise = contractService.claimBonus(1);
       capturedOptions.onCancel();
       await expect(promise).rejects.toThrow('Transaction cancelled');
+    });
+  });
+
+  describe('wallet guard', () => {
+    it('withdrawStake throws when wallet is not connected', async () => {
+      vi.spyOn(walletService, 'getAddress').mockReturnValueOnce(null as any);
+      await expect(contractService.withdrawStake(1, 1_000_000)).rejects.toThrow('Wallet not connected');
+    });
+
+    it('claimBonus throws when wallet is not connected', async () => {
+      vi.spyOn(walletService, 'getAddress').mockReturnValueOnce(null as any);
+      await expect(contractService.claimBonus(1)).rejects.toThrow('Wallet not connected');
     });
   });
 });
