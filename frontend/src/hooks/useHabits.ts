@@ -268,7 +268,12 @@ export const useHabits = () => {
     withdrawStake: withdrawStakeMutation.mutateAsync,
     claimBonus: claimBonusMutation.mutateAsync,
 
-    // Mutation states
+    // Per-habit pending states
+    pendingCheckIns,
+    pendingWithdrawals,
+    pendingClaims,
+
+    // Global mutation states (kept for backward compatibility)
     isCreatingHabit: createHabitMutation.isPending,
     isCheckingIn: checkInMutation.isPending,
     isWithdrawing: withdrawStakeMutation.isPending,
