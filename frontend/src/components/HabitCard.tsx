@@ -274,6 +274,10 @@ export function HabitCard({ habit }: HabitCardProps) {
               <dt className="text-surface-500 dark:text-surface-400">Final Streak</dt>
               <dd className="font-medium text-surface-900 dark:text-white">{habit.currentStreak} days</dd>
             </div>
+            <div className="flex justify-between">
+              <dt className="text-surface-500 dark:text-surface-400">Est. Bonus</dt>
+              <dd className="font-medium text-emerald-600 dark:text-emerald-400">{formatSTX(estimatedBonus)} STX</dd>
+            </div>
           </dl>
           <p className="text-xs text-amber-600 dark:text-amber-400">
             This action is irreversible and will incur a gas fee.
