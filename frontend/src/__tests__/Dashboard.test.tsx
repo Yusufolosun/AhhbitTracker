@@ -95,4 +95,16 @@ describe('Dashboard', () => {
     expect(screen.getByText(/at risk of forfeiture/i)).toBeDefined();
     expect(screen.getByText(/no longer counted as active/i)).toBeDefined();
   });
+
+  it('updates staked and streak subtitles when expired habits exist', () => {
+    render(<Dashboard habits={[activeHabit, expiredHabit]} />);
+    const excludeLabels = screen.getAllByText('Excludes expired habits');
+    expect(excludeLabels.length).toBe(2);
+  });
+
+  it('shows default subtitles when no expired habits', () => {
+    render(<Dashboard habits={[activeHabit]} />);
+    expect(screen.getByText('In active habits')).toBeDefined();
+    expect(screen.getByText('Across active habits')).toBeDefined();
+  });
 });
