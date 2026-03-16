@@ -11,6 +11,12 @@ export const useHabits = () => {
   const { walletState, refreshBalance } = useWallet();
   const queryClient = useQueryClient();
 
+  // Track which habit IDs have in-flight mutations so each card can
+  // independently show its own loading state.
+  const [pendingCheckIns, setPendingCheckIns] = useState<Set<number>>(new Set());
+  const [pendingWithdrawals, setPendingWithdrawals] = useState<Set<number>>(new Set());
+  const [pendingClaims, setPendingClaims] = useState<Set<number>>(new Set());
+
   // Fetch user habits
   const {
     data: habits,
