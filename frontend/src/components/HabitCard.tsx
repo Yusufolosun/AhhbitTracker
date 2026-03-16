@@ -13,7 +13,7 @@ interface HabitCardProps {
 }
 
 export function HabitCard({ habit }: HabitCardProps) {
-  const { checkIn, withdrawStake, claimBonus, isCheckingIn, isWithdrawing, isClaiming } = useHabits();
+  const { checkIn, withdrawStake, claimBonus, poolBalance, isCheckingIn, isWithdrawing, isClaiming } = useHabits();
   const { showToast } = useToast();
   const [confirmAction, setConfirmAction] = useState<'withdraw' | 'claim' | null>(null);
   const currentBlock = useCurrentBlock();
@@ -63,6 +63,7 @@ export function HabitCard({ habit }: HabitCardProps) {
   const canWithdraw = isEligibleToWithdraw(habit);
   const canClaimBonus = habit.isCompleted && !habit.bonusClaimed;
   const blocksRemaining = currentBlock !== null ? getBlocksRemaining(habit, currentBlock) : null;
+  const estimatedBonus = Math.min(Math.floor(poolBalance / 100), 1_000_000);
 
   const getBadge = () => {
     if (habit.isCompleted) return { label: 'Completed', className: 'bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-400' };
@@ -273,7 +274,14 @@ export function HabitCard({ habit }: HabitCardProps) {
               <dt className="text-surface-500 dark:text-surface-400">Final Streak</dt>
               <dd className="font-medium text-surface-900 dark:text-white">{habit.currentStreak} days</dd>
             </div>
+            <div className="flex justify-between">
+              <dt className="text-surface-500 dark:text-surface-400">Est. Bonus</dt>
+              <dd className="font-medium text-emerald-600 dark:text-emerald-400">{formatSTX(estimatedBonus)} STX</dd>
+            </div>
           </dl>
+          <p className="text-xs text-surface-500 dark:text-surface-400">
+            Bonus is 1% of the current pool, capped at 1 STX. The actual amount may differ slightly if the pool changes before confirmation.
+          </p>
           <p className="text-xs text-amber-600 dark:text-amber-400">
             This action is irreversible and will incur a gas fee.
           </p>
