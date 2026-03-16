@@ -74,4 +74,16 @@ describe('HabitCard', () => {
     expect(screen.getByText('Est. Bonus')).toBeDefined();
     expect(screen.getByText('0.50 STX')).toBeDefined();
   });
+
+  it('shows estimate disclaimer in claim dialog', () => {
+    render(<ToastProvider><HabitCard habit={completedHabit} /></ToastProvider>);
+    fireEvent.click(screen.getByText('Claim Bonus'));
+    expect(screen.getByText(/actual amount may differ/i)).toBeDefined();
+  });
+
+  it('hides claim button when bonus already claimed', () => {
+    const claimed = { ...completedHabit, bonusClaimed: true };
+    render(<ToastProvider><HabitCard habit={claimed} /></ToastProvider>);
+    expect(screen.queryByText('Claim Bonus')).toBeNull();
+  });
 });
