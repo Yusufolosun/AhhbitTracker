@@ -13,22 +13,23 @@ export function Dashboard({ habits }: DashboardProps) {
   const currentBlock = useCurrentBlock();
 
   const stats = useMemo(() => {
-    const activeCount = habits.filter(h => h.isActive).length;
-    const completedCount = habits.filter(h => h.isCompleted).length;
-    const totalStaked = habits
-      .filter(h => h.isActive)
-      .reduce((sum, h) => sum + h.stakeAmount, 0);
-    const totalStreak = habits
-      .filter(h => h.isActive)
-      .reduce((sum, h) => sum + h.currentStreak, 0);
-    const avgStreak = activeCount > 0 ? (totalStreak / activeCount).toFixed(1) : '0';
-
     const expiredCount = habits.filter(
       h => getCheckInWindowState(h, currentBlock) === 'expired'
     ).length;
     const expiredStake = habits
       .filter(h => getCheckInWindowState(h, currentBlock) === 'expired')
       .reduce((sum, h) => sum + h.stakeAmount, 0);
+
+    const onChainActive = habits.filter(h => h.isActive).length;
+    const activeCount = onChainActive - expiredCount;
+
+    const completedCount = habits.filter(h => h.isCompleted).length;
+    const activeHabits = habits.filter(
+      h => h.isActive && getCheckInWindowState(h, currentBlock) !== 'expired'
+    );
+    const totalStaked = activeHabits.reduce((sum, h) => sum + h.stakeAmount, 0);
+    const totalStreak = activeHabits.reduce((sum, h) => sum + h.currentStreak, 0);
+    const avgStreak = activeCount > 0 ? (totalStreak / activeCount).toFixed(1) : '0';
     const withdrawReady = habits.filter(h => isEligibleToWithdraw(h)).length;
 
     return {
@@ -86,8 +87,14 @@ export function Dashboard({ habits }: DashboardProps) {
         <StatsCard
           title="Active Habits"
           value={stats.active}
-          subtitle={stats.active > 0 ? 'Keep it up!' : 'Create a habit'}
-          trend={stats.active > 0 ? 'up' : 'neutral'}
+          subtitle={
+            stats.expiredCount > 0
+              ? `${stats.expiredCount} expired`
+              : stats.active > 0
+                ? 'Keep it up!'
+                : 'Create a habit'
+          }
+          trend={stats.expiredCount > 0 ? 'down' : stats.active > 0 ? 'up' : 'neutral'}
           icon={
             <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -98,7 +105,7 @@ export function Dashboard({ habits }: DashboardProps) {
         <StatsCard
           title="Total Staked"
           value={`${formatSTX(stats.totalStaked)} STX`}
-          subtitle="In active habits"
+          subtitle={stats.expiredCount > 0 ? 'Excludes expired habits' : 'In active habits'}
           icon={
             <svg className="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -109,7 +116,7 @@ export function Dashboard({ habits }: DashboardProps) {
         <StatsCard
           title="Avg. Streak"
           value={`${stats.avgStreak} days`}
-          subtitle="Across active habits"
+          subtitle={stats.expiredCount > 0 ? 'Excludes expired habits' : 'Across active habits'}
           icon={
             <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
@@ -132,7 +139,7 @@ export function Dashboard({ habits }: DashboardProps) {
                 {stats.expiredCount} habit{stats.expiredCount > 1 ? 's have' : ' has'} an expired check-in window
               </p>
               <p className="text-xs text-red-700 dark:text-red-400 mt-1">
-                {formatSTX(stats.expiredStake)} STX at risk of forfeiture. These habits cannot be recovered.
+                {formatSTX(stats.expiredStake)} STX at risk of forfeiture. These habits are no longer counted as active.
               </p>
             </div>
           </div>

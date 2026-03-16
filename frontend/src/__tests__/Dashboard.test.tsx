@@ -23,6 +23,7 @@ const activeHabit: Habit = {
   currentStreak: 5,
   isActive: true,
   isCompleted: false,
+  bonusClaimed: false,
 };
 
 const completedHabit: Habit = {
@@ -35,6 +36,21 @@ const completedHabit: Habit = {
   currentStreak: 10,
   isActive: false,
   isCompleted: true,
+  bonusClaimed: false,
+};
+
+// lastCheckInBlock 10, currentBlock 200 → 190 blocks elapsed > 144 → expired
+const expiredHabit: Habit = {
+  habitId: 3,
+  name: 'Meditate',
+  owner: 'SP2ABC123',
+  stakeAmount: 2000000,
+  lastCheckInBlock: 10,
+  createdAtBlock: 5,
+  currentStreak: 3,
+  isActive: true,
+  isCompleted: false,
+  bonusClaimed: false,
 };
 
 describe('Dashboard', () => {
@@ -59,5 +75,36 @@ describe('Dashboard', () => {
   it('does not show completed banner when no completed habits', () => {
     render(<Dashboard habits={[activeHabit]} />);
     expect(screen.queryByText(/completed/i)).toBeNull();
+  });
+
+  it('excludes expired habits from active count', () => {
+    render(<Dashboard habits={[activeHabit, expiredHabit]} />);
+    // 2 habits are isActive on-chain, but 1 has an expired window
+    const activeCard = screen.getByText('Active Habits').closest('.card');
+    expect(activeCard?.textContent).toContain('1');
+    expect(activeCard?.textContent).not.toContain('2');
+  });
+
+  it('shows expired count in active habits subtitle', () => {
+    render(<Dashboard habits={[activeHabit, expiredHabit]} />);
+    expect(screen.getByText('1 expired')).toBeDefined();
+  });
+
+  it('shows expired alert with forfeiture warning', () => {
+    render(<Dashboard habits={[activeHabit, expiredHabit]} />);
+    expect(screen.getByText(/at risk of forfeiture/i)).toBeDefined();
+    expect(screen.getByText(/no longer counted as active/i)).toBeDefined();
+  });
+
+  it('updates staked and streak subtitles when expired habits exist', () => {
+    render(<Dashboard habits={[activeHabit, expiredHabit]} />);
+    const excludeLabels = screen.getAllByText('Excludes expired habits');
+    expect(excludeLabels.length).toBe(2);
+  });
+
+  it('shows default subtitles when no expired habits', () => {
+    render(<Dashboard habits={[activeHabit]} />);
+    expect(screen.getByText('In active habits')).toBeDefined();
+    expect(screen.getByText('Across active habits')).toBeDefined();
   });
 });
