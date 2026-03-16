@@ -13,22 +13,23 @@ export function Dashboard({ habits }: DashboardProps) {
   const currentBlock = useCurrentBlock();
 
   const stats = useMemo(() => {
-    const activeCount = habits.filter(h => h.isActive).length;
-    const completedCount = habits.filter(h => h.isCompleted).length;
-    const totalStaked = habits
-      .filter(h => h.isActive)
-      .reduce((sum, h) => sum + h.stakeAmount, 0);
-    const totalStreak = habits
-      .filter(h => h.isActive)
-      .reduce((sum, h) => sum + h.currentStreak, 0);
-    const avgStreak = activeCount > 0 ? (totalStreak / activeCount).toFixed(1) : '0';
-
     const expiredCount = habits.filter(
       h => getCheckInWindowState(h, currentBlock) === 'expired'
     ).length;
     const expiredStake = habits
       .filter(h => getCheckInWindowState(h, currentBlock) === 'expired')
       .reduce((sum, h) => sum + h.stakeAmount, 0);
+
+    const onChainActive = habits.filter(h => h.isActive).length;
+    const activeCount = onChainActive - expiredCount;
+
+    const completedCount = habits.filter(h => h.isCompleted).length;
+    const activeHabits = habits.filter(
+      h => h.isActive && getCheckInWindowState(h, currentBlock) !== 'expired'
+    );
+    const totalStaked = activeHabits.reduce((sum, h) => sum + h.stakeAmount, 0);
+    const totalStreak = activeHabits.reduce((sum, h) => sum + h.currentStreak, 0);
+    const avgStreak = activeCount > 0 ? (totalStreak / activeCount).toFixed(1) : '0';
     const withdrawReady = habits.filter(h => isEligibleToWithdraw(h)).length;
 
     return {
