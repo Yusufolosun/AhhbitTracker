@@ -86,4 +86,14 @@ describe('HabitCard', () => {
     render(<ToastProvider><HabitCard habit={claimed} /></ToastProvider>);
     expect(screen.queryByText('Claim Bonus')).toBeNull();
   });
+
+  it('withdraw dialog shows stake amount without bonus info', () => {
+    const withdrawable = { ...mockHabit, currentStreak: 7 };
+    render(<ToastProvider><HabitCard habit={withdrawable} /></ToastProvider>);
+    fireEvent.click(screen.getByText('Withdraw Stake'));
+    // "Stake" and "1.00 STX" appear both in the card stats and in the dialog
+    const stakeValues = screen.getAllByText('1.00 STX');
+    expect(stakeValues.length).toBe(2);
+    expect(screen.queryByText('Est. Bonus')).toBeNull();
+  });
 });
