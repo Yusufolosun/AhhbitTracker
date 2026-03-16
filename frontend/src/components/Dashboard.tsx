@@ -139,7 +139,7 @@ export function Dashboard({ habits }: DashboardProps) {
                 {stats.expiredCount} habit{stats.expiredCount > 1 ? 's have' : ' has'} an expired check-in window
               </p>
               <p className="text-xs text-red-700 dark:text-red-400 mt-1">
-                {formatSTX(stats.expiredStake)} STX at risk of forfeiture. These habits cannot be recovered.
+                {formatSTX(stats.expiredStake)} STX at risk of forfeiture. These habits are no longer counted as active.
               </p>
             </div>
           </div>
