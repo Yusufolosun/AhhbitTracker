@@ -63,6 +63,7 @@ export function HabitCard({ habit }: HabitCardProps) {
   const canWithdraw = isEligibleToWithdraw(habit);
   const canClaimBonus = habit.isCompleted && !habit.bonusClaimed;
   const blocksRemaining = currentBlock !== null ? getBlocksRemaining(habit, currentBlock) : null;
+  const estimatedBonus = Math.min(Math.floor(poolBalance / 100), 1_000_000);
 
   const getBadge = () => {
     if (habit.isCompleted) return { label: 'Completed', className: 'bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-400' };
