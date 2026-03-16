@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { contractService } from '../services/contractService';
 import { useWallet } from '../context/WalletContext';
 import { Habit, UserStats } from '../types/habit';
