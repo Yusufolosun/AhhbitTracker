@@ -279,6 +279,9 @@ export function HabitCard({ habit }: HabitCardProps) {
               <dd className="font-medium text-emerald-600 dark:text-emerald-400">{formatSTX(estimatedBonus)} STX</dd>
             </div>
           </dl>
+          <p className="text-xs text-surface-500 dark:text-surface-400">
+            Bonus is 1% of the current pool, capped at 1 STX. The actual amount may differ slightly if the pool changes before confirmation.
+          </p>
           <p className="text-xs text-amber-600 dark:text-amber-400">
             This action is irreversible and will incur a gas fee.
           </p>
