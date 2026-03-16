@@ -44,6 +44,21 @@ describe('contractService', () => {
     capturedOptions = null;
   });
 
+  describe('createHabit', () => {
+    it('resolves with the transaction ID on approval', async () => {
+      const promise = contractService.createHabit('Running', 500_000);
+      expect(capturedOptions).not.toBeNull();
+      capturedOptions.onFinish({ txId: 'tx-create' });
+      await expect(promise).resolves.toBe('tx-create');
+    });
+
+    it('rejects when the user cancels', async () => {
+      const promise = contractService.createHabit('Running', 500_000);
+      capturedOptions.onCancel();
+      await expect(promise).rejects.toThrow('Transaction cancelled');
+    });
+  });
+
   describe('checkIn', () => {
     it('resolves when the user approves the transaction', async () => {
       const promise = contractService.checkIn(1);
