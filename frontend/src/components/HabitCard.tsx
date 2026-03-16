@@ -13,7 +13,7 @@ interface HabitCardProps {
 }
 
 export function HabitCard({ habit }: HabitCardProps) {
-  const { checkIn, withdrawStake, claimBonus, isCheckingIn, isWithdrawing, isClaiming } = useHabits();
+  const { checkIn, withdrawStake, claimBonus, poolBalance, isCheckingIn, isWithdrawing, isClaiming } = useHabits();
   const { showToast } = useToast();
   const [confirmAction, setConfirmAction] = useState<'withdraw' | 'claim' | null>(null);
   const currentBlock = useCurrentBlock();
