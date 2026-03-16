@@ -150,6 +150,7 @@ export const useHabits = () => {
   const checkInMutation = useMutation({
     mutationFn: (habitId: number) => contractService.checkIn(habitId),
     onMutate: async (habitId: number) => {
+      setPendingCheckIns((prev) => new Set(prev).add(habitId));
       const queryKey = ['habits', walletState.address];
       await queryClient.cancelQueries({ queryKey });
       const previous = queryClient.getQueryData<Habit[]>(queryKey);
@@ -173,6 +174,13 @@ export const useHabits = () => {
       if (context?.previous) {
         queryClient.setQueryData(['habits', walletState.address], context.previous);
       }
+    },
+    onSettled: (_data, _err, habitId) => {
+      setPendingCheckIns((prev) => {
+        const next = new Set(prev);
+        next.delete(habitId);
+        return next;
+      });
     },
     onSuccess: () => {
       scheduleRefetch([['habits', walletState.address!], ['userStats', walletState.address!]]);
