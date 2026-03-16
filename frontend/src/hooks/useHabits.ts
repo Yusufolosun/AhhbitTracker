@@ -232,6 +232,16 @@ export const useHabits = () => {
   // Claim bonus mutation
   const claimBonusMutation = useMutation({
     mutationFn: (habitId: number) => contractService.claimBonus(habitId),
+    onMutate: (habitId: number) => {
+      setPendingClaims((prev) => new Set(prev).add(habitId));
+    },
+    onSettled: (_data, _err, habitId) => {
+      setPendingClaims((prev) => {
+        const next = new Set(prev);
+        next.delete(habitId);
+        return next;
+      });
+    },
     onSuccess: () => {
       refreshBalance();
       scheduleRefetch([['habits', walletState.address!], ['poolBalance']]);
