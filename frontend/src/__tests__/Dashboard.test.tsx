@@ -89,4 +89,10 @@ describe('Dashboard', () => {
     render(<Dashboard habits={[activeHabit, expiredHabit]} />);
     expect(screen.getByText('1 expired')).toBeDefined();
   });
+
+  it('shows expired alert with forfeiture warning', () => {
+    render(<Dashboard habits={[activeHabit, expiredHabit]} />);
+    expect(screen.getByText(/at risk of forfeiture/i)).toBeDefined();
+    expect(screen.getByText(/no longer counted as active/i)).toBeDefined();
+  });
 });
