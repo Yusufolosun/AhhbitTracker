@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { HabitCard } from '../components/HabitCard';
 import { ToastProvider } from '../context/ToastContext';
 import { Habit } from '../types/habit';
@@ -22,6 +22,13 @@ vi.mock('../hooks/useCurrentBlock', () => ({
   useCurrentBlock: () => 200,
 }));
 
+// Mock formatSTX so bonus values are predictable in assertions
+vi.mock('../utils/formatting', () => ({
+  formatSTX: (v: number) => (v / 1_000_000).toFixed(2),
+  blocksAgo: () => '10 blocks ago',
+  blocksToTime: () => '~2h',
+}));
+
 const mockHabit: Habit = {
   habitId: 1,
   name: 'Morning Exercise',
@@ -33,6 +40,15 @@ const mockHabit: Habit = {
   isActive: true,
   isCompleted: false,
   bonusClaimed: false,
+};
+
+const completedHabit: Habit = {
+  ...mockHabit,
+  habitId: 2,
+  name: 'Read Daily',
+  isActive: false,
+  isCompleted: true,
+  currentStreak: 10,
 };
 
 describe('HabitCard', () => {
@@ -49,5 +65,13 @@ describe('HabitCard', () => {
   it('shows active status', () => {
     render(<ToastProvider><HabitCard habit={mockHabit} /></ToastProvider>);
     expect(screen.getByText('Active')).toBeDefined();
+  });
+
+  it('displays estimated bonus in claim dialog', () => {
+    render(<ToastProvider><HabitCard habit={completedHabit} /></ToastProvider>);
+    fireEvent.click(screen.getByText('Claim Bonus'));
+    // poolBalance is 50_000_000 → 1% = 500_000 microSTX → formatSTX = "0.50"
+    expect(screen.getByText('Est. Bonus')).toBeDefined();
+    expect(screen.getByText('0.50 STX')).toBeDefined();
   });
 });
