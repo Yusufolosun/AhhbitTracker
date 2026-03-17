@@ -71,6 +71,7 @@
   {
     habit-id: uint,
     joined-at-block: uint,
+    streak-at-join: uint,
     is-successful: bool,
     has-claimed: bool
   }
