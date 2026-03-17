@@ -55,8 +55,13 @@ export const ERROR_CODES: Record<number, string> = {
 
 // UI Constants
 export const TOAST_DURATION = 5000;
-export const POLLING_INTERVAL = 10000; // 10 seconds
-export const CACHE_TIME = 30000; // 30 seconds
+
+// Query polling and cache configuration.
+// Stacks blocks average ~10 min; polling faster than every 2 minutes
+// wastes Hiro API quota without meaningful benefit.
+export const POLLING_INTERVAL = 120_000; // 2 minutes
+export const CACHE_TIME = 120_000;       // 2 minutes
+export const POOL_CACHE_TIME = 300_000;  // 5 minutes — pool balance changes infrequently
 
 // Explorer URLs
 export const EXPLORER_TX_URL = 'https://explorer.hiro.so/txid/';
