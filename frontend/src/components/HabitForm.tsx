@@ -1,18 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useHabits } from '../hooks/useHabits';
 import { useToast } from '../context/ToastContext';
 import { validateHabitName, validateStakeAmount } from '../utils/validation';
 import { toMicroSTX } from '../utils/formatting';
 
+/** How long (ms) the form stays locked after the wallet signs a transaction.
+ *  Long enough to outlive typical mempool propagation; short enough that a
+ *  genuine second habit within the same session isn't blocked forever. */
+const POST_SIGN_LOCK_MS = 45_000;
+
 export function HabitForm() {
   const [name, setName] = useState('');
   const [stake, setStake] = useState('0.1');
   const [error, setError] = useState<string | null>(null);
+  const [lockedUntil, setLockedUntil] = useState<number | null>(null);
+  const lockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { createHabit, isCreatingHabit } = useHabits();
   const { showToast } = useToast();
 
+  /** True from the moment the user clicks submit until either the lock
+   *  expires or the component unmounts. */
+  const isLocked = lockedUntil !== null && Date.now() < lockedUntil;
+  const isDisabled = isCreatingHabit || isLocked;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isDisabled) return;
     setError(null);
 
     // Validate
@@ -35,6 +48,14 @@ export function HabitForm() {
 
       setName('');
       setStake('0.1');
+
+      // Lock the form after the wallet signs so the user can't accidentally
+      // fire a duplicate transaction before the first one confirms on-chain.
+      const until = Date.now() + POST_SIGN_LOCK_MS;
+      setLockedUntil(until);
+      if (lockTimerRef.current) clearTimeout(lockTimerRef.current);
+      lockTimerRef.current = setTimeout(() => setLockedUntil(null), POST_SIGN_LOCK_MS);
+
       showToast('Transaction signed! Your habit will appear once confirmed on-chain.', 'success');
     } catch (err: any) {
       if (err.message === 'Transaction cancelled') {
@@ -44,6 +65,8 @@ export function HabitForm() {
       }
     }
   };
+
+  const secondsLeft = lockedUntil ? Math.ceil((lockedUntil - Date.now()) / 1000) : 0;
 
   return (
     <div className="card">
@@ -65,7 +88,7 @@ export function HabitForm() {
             onChange={(e) => setName(e.target.value)}
             maxLength={50}
             required
-            disabled={isCreatingHabit}
+            disabled={isDisabled}
             aria-describedby={error ? 'form-error' : undefined}
           />
           <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
@@ -88,7 +111,7 @@ export function HabitForm() {
             max="100"
             step="0.01"
             required
-            disabled={isCreatingHabit}
+            disabled={isDisabled}
             aria-describedby="stake-hint"
           />
           <p id="stake-hint" className="mt-1 text-xs text-surface-500 dark:text-surface-400">
@@ -105,12 +128,17 @@ export function HabitForm() {
         <button
           type="submit"
           className="btn-primary w-full"
-          disabled={isCreatingHabit}
+          disabled={isDisabled}
         >
           {isCreatingHabit ? (
             <span className="flex items-center justify-center">
               <div className="spinner w-5 h-5 mr-2"></div>
               Creating Habit...
+            </span>
+          ) : isLocked ? (
+            <span className="flex items-center justify-center">
+              <div className="spinner w-5 h-5 mr-2"></div>
+              Waiting for confirmation... ({secondsLeft}s)
             </span>
           ) : (
             'Create Habit'
