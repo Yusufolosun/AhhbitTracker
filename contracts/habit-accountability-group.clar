@@ -204,6 +204,7 @@
       (habit-data (unwrap! (contract-call? .habit-tracker-v2 get-habit habit-id)
                            ERR-INVALID-HABIT))
       (stake-amount (get stake-amount group))
+      (streak-now (get current-streak habit-data))
     )
     ;; Verify caller owns the habit
     (asserts! (is-eq caller (get owner habit-data)) ERR-NOT-AUTHORIZED)
@@ -228,12 +229,13 @@
     ;; Transfer stake
     (try! (stx-transfer? stake-amount caller (as-contract tx-sender)))
 
-    ;; Register member
+    ;; Register member, recording their streak baseline
     (map-set group-members
       { group-id: group-id, member: caller }
       {
         habit-id: habit-id,
         joined-at-block: block-height,
+        streak-at-join: streak-now,
         is-successful: false,
         has-claimed: false
       }
