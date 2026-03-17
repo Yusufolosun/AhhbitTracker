@@ -293,7 +293,12 @@
       (habit-data (unwrap! (contract-call? .habit-tracker-v2 get-habit
                     (get habit-id member-data))
                     ERR-INVALID-HABIT))
-      (streak (get current-streak habit-data))
+      (current-streak (get current-streak habit-data))
+      ;; Only count streak progress earned during the group period.
+      ;; A pre-existing streak must not count toward the threshold.
+      (streak-delta (if (> current-streak (get streak-at-join member-data))
+                      (- current-streak (get streak-at-join member-data))
+                      u0))
       (duration-blocks (- (get end-block group) (get start-block group)))
       (required-days (/ duration-blocks u144))
       (half-required (/ required-days u2))
@@ -309,8 +314,9 @@
     (asserts! (not (get is-successful member-data)) ERR-ALREADY-SETTLED)
     (asserts! (not (get has-claimed member-data)) ERR-ALREADY-SETTLED)
 
-    ;; Evaluate: member needs at least half the required streak days (min 1)
-    (if (>= streak threshold)
+    ;; Evaluate: member needs to have grown their streak by at least half the
+    ;; required days (min 1) during the group's active window.
+    (if (>= streak-delta threshold)
       (begin
         ;; Mark as successful
         (map-set group-members
@@ -329,7 +335,7 @@
           event: "member-settled-success",
           group-id: group-id,
           member: member,
-          streak: streak
+          streak-delta: streak-delta
         })
         (ok true)
       )
@@ -350,7 +356,7 @@
           event: "member-settled-failed",
           group-id: group-id,
           member: member,
-          streak: streak
+          streak-delta: streak-delta
         })
         (ok false)
       )
