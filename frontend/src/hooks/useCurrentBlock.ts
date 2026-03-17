@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { POLLING_INTERVAL, CACHE_TIME } from '../utils/constants';
 
 /**
  * Fetch the current Stacks block height from the Hiro API.
@@ -27,8 +28,8 @@ export function useCurrentBlock(): number | null {
   const { data } = useQuery({
     queryKey: ['currentBlock'],
     queryFn: fetchCurrentBlock,
-    staleTime: 120_000, // 2 minutes — keep in sync with habit data freshness
-    refetchInterval: 120_000,
+    staleTime: CACHE_TIME,
+    refetchInterval: POLLING_INTERVAL,
     refetchOnWindowFocus: true,
     retry: 2,
   });
