@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { contractService } from '../services/contractService';
 import { useWallet } from '../context/WalletContext';
 import { Habit, UserStats } from '../types/habit';
+import { POLLING_INTERVAL, CACHE_TIME, POOL_CACHE_TIME } from '../utils/constants';
 
 /**
  * Custom hook for managing habits
@@ -64,9 +65,9 @@ export const useHabits = () => {
       return [];
     },
     enabled: !!walletState.address,
-    staleTime: 120000, // 2 minutes - reduces API calls to stay under Hiro rate limits
+    staleTime: CACHE_TIME,
     refetchOnWindowFocus: true,
-    refetchInterval: 120000, // re-poll every 2 min to pick up external state changes
+    refetchInterval: POLLING_INTERVAL,
     retry: 3,
     retryDelay: (attempt) => Math.min(15000 * Math.pow(2, attempt - 1), 60000),
   });
@@ -94,7 +95,7 @@ export const useHabits = () => {
       return null;
     },
     enabled: !!walletState.address,
-    staleTime: 120000,
+    staleTime: CACHE_TIME,
     retry: 3,
     retryDelay: (attempt) => Math.min(15000 * Math.pow(2, attempt - 1), 60000),
   });
@@ -103,7 +104,7 @@ export const useHabits = () => {
   const { data: poolBalance, error: poolError } = useQuery({
     queryKey: ['poolBalance'],
     queryFn: () => contractService.getPoolBalance(),
-    staleTime: 300000, // 5 minutes - pool balance changes infrequently
+    staleTime: POOL_CACHE_TIME,
     retry: 3,
     retryDelay: (attempt) => Math.min(15000 * Math.pow(2, attempt - 1), 60000),
   });
