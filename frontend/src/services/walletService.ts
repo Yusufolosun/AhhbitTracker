@@ -61,6 +61,10 @@ export const walletService = {
   /**
    * Fetch STX balance for an address from the Hiro API.
    * Returns balance in microSTX.
+   *
+   * The Hiro API returns the balance as a decimal string that can exceed
+   * Number.MAX_SAFE_INTEGER for large holders (~1.8B STX ≈ 1.8e15 µSTX).
+   * We parse through BigInt first to avoid silent precision loss.
    */
   fetchBalance: async (address: string): Promise<number> => {
     const isDev = import.meta.env.DEV;
@@ -78,7 +82,14 @@ export const walletService = {
         throw new Error(`Failed to fetch balance: ${response.status}`);
       }
       const data = await response.json();
-      return parseInt(data.balance, 10);
+      const raw = BigInt(data.balance);
+      if (raw > BigInt(Number.MAX_SAFE_INTEGER)) {
+        console.warn(
+          'Balance exceeds Number.MAX_SAFE_INTEGER — display may lose precision:',
+          data.balance,
+        );
+      }
+      return Number(raw);
     } finally {
       clearTimeout(timeout);
     }
