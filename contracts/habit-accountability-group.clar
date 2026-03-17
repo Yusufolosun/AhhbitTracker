@@ -116,6 +116,7 @@
       (caller tx-sender)
       (habit-data (unwrap! (contract-call? .habit-tracker-v2 get-habit habit-id)
                            ERR-INVALID-HABIT))
+      (streak-now (get current-streak habit-data))
     )
     ;; Verify caller owns the habit
     (asserts! (is-eq caller (get owner habit-data)) ERR-NOT-AUTHORIZED)
@@ -150,12 +151,13 @@
       }
     )
 
-    ;; Add creator as first member
+    ;; Add creator as first member, recording their streak baseline
     (map-set group-members
       { group-id: group-id, member: caller }
       {
         habit-id: habit-id,
         joined-at-block: block-height,
+        streak-at-join: streak-now,
         is-successful: false,
         has-claimed: false
       }
