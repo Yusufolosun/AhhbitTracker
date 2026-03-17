@@ -1,5 +1,6 @@
 import { Habit } from '../types/habit';
 import { HabitCard } from './HabitCard';
+import { ErrorBoundary, HabitCardErrorFallback } from './ErrorBoundary';
 import { HabitListSkeleton } from './Skeletons';
 import { useCurrentBlock } from '../hooks/useCurrentBlock';
 import { getCheckInWindowState } from '../utils/habitStatus';
@@ -60,7 +61,9 @@ export function HabitList({ habits, loading }: HabitListProps) {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {expiredHabits.map((habit) => (
-              <HabitCard key={habit.habitId} habit={habit} />
+              <ErrorBoundary key={habit.habitId} fallback={<HabitCardErrorFallback habitId={habit.habitId} />}>
+                <HabitCard habit={habit} />
+              </ErrorBoundary>
             ))}
           </div>
         </div>
@@ -74,7 +77,9 @@ export function HabitList({ habits, loading }: HabitListProps) {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {urgentHabits.map((habit) => (
-              <HabitCard key={habit.habitId} habit={habit} />
+              <ErrorBoundary key={habit.habitId} fallback={<HabitCardErrorFallback habitId={habit.habitId} />}>
+                <HabitCard habit={habit} />
+              </ErrorBoundary>
             ))}
           </div>
         </div>
@@ -88,7 +93,9 @@ export function HabitList({ habits, loading }: HabitListProps) {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {healthyHabits.map((habit) => (
-              <HabitCard key={habit.habitId} habit={habit} />
+              <ErrorBoundary key={habit.habitId} fallback={<HabitCardErrorFallback habitId={habit.habitId} />}>
+                <HabitCard habit={habit} />
+              </ErrorBoundary>
             ))}
           </div>
         </div>
@@ -102,7 +109,9 @@ export function HabitList({ habits, loading }: HabitListProps) {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {completedHabits.map((habit) => (
-              <HabitCard key={habit.habitId} habit={habit} />
+              <ErrorBoundary key={habit.habitId} fallback={<HabitCardErrorFallback habitId={habit.habitId} />}>
+                <HabitCard habit={habit} />
+              </ErrorBoundary>
             ))}
           </div>
         </div>
@@ -116,7 +125,9 @@ export function HabitList({ habits, loading }: HabitListProps) {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 opacity-60">
             {inactiveHabits.map((habit) => (
-              <HabitCard key={habit.habitId} habit={habit} />
+              <ErrorBoundary key={habit.habitId} fallback={<HabitCardErrorFallback habitId={habit.habitId} />}>
+                <HabitCard habit={habit} />
+              </ErrorBoundary>
             ))}
           </div>
         </div>
