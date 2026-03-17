@@ -4,7 +4,9 @@ const ROUTES = ['dashboard', 'pool', 'create-habit', 'habits'] as const;
 export type Route = (typeof ROUTES)[number];
 
 function parseHash(): Route {
-  const raw = window.location.hash.replace('#', '');
+  // Strip any query-string portion before matching so that URLs like
+  // `#habits?tab=completed` still resolve to the 'habits' route.
+  const raw = window.location.hash.replace('#', '').split('?')[0];
   return (ROUTES as readonly string[]).includes(raw) ? (raw as Route) : 'dashboard';
 }
 

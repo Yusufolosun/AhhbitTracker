@@ -2,7 +2,16 @@ import { Habit } from '../types/habit';
 import { HabitCard } from './HabitCard';
 import { HabitListSkeleton } from './Skeletons';
 import { useCurrentBlock } from '../hooks/useCurrentBlock';
+import { useHashParam } from '../hooks/useHashParam';
 import { getCheckInWindowState } from '../utils/habitStatus';
+
+type Tab = 'active' | 'completed' | 'all';
+
+const TABS: { id: Tab; label: string }[] = [
+  { id: 'active', label: 'Active' },
+  { id: 'completed', label: 'Completed' },
+  { id: 'all', label: 'All' },
+];
 
 interface HabitListProps {
   habits: Habit[];
@@ -10,6 +19,9 @@ interface HabitListProps {
 }
 
 export function HabitList({ habits, loading }: HabitListProps) {
+  const [tab, setTab] = useHashParam('tab', 'active') as [Tab, (v: Tab) => void];
+  const currentBlock = useCurrentBlock();
+
   if (loading) {
     return <HabitListSkeleton />;
   }
@@ -32,13 +44,12 @@ export function HabitList({ habits, loading }: HabitListProps) {
     );
   }
 
-  // Separate active and inactive habits
+  // Separate habits by status
   const activeHabits = habits.filter(h => h.isActive);
   const completedHabits = habits.filter(h => h.isCompleted);
   const inactiveHabits = habits.filter(h => !h.isActive && !h.isCompleted);
 
   // Sub-group active habits by urgency
-  const currentBlock = useCurrentBlock();
   const expiredHabits = activeHabits.filter(
     h => getCheckInWindowState(h, currentBlock) === 'expired'
   );
@@ -50,76 +61,194 @@ export function HabitList({ habits, loading }: HabitListProps) {
     return state !== 'expired' && state !== 'urgent';
   });
 
+  const activeCount = activeHabits.length;
+  const completedCount = completedHabits.length + inactiveHabits.length;
+
   return (
     <div className="space-y-6">
-      {/* Expired Habits — needs immediate attention */}
-      {expiredHabits.length > 0 && (
-        <div>
-          <h3 className="text-lg font-semibold text-red-700 dark:text-red-400 mb-4">
-            Window Expired ({expiredHabits.length})
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {expiredHabits.map((habit) => (
-              <HabitCard key={habit.habitId} habit={habit} />
-            ))}
-          </div>
-        </div>
+      {/* Tab bar */}
+      <div className="flex gap-1 border-b border-surface-200 dark:border-surface-700" role="tablist" aria-label="Habit filter">
+        {TABS.map(({ id, label }) => {
+          const count =
+            id === 'active' ? activeCount :
+            id === 'completed' ? completedCount :
+            habits.length;
+          const isSelected = tab === id;
+          return (
+            <button
+              key={id}
+              role="tab"
+              aria-selected={isSelected}
+              onClick={() => setTab(id)}
+              className={[
+                'px-4 py-2 text-sm font-medium rounded-t transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500',
+                isSelected
+                  ? 'border-b-2 border-primary-500 text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-500/10'
+                  : 'text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-white hover:bg-surface-100 dark:hover:bg-surface-800',
+              ].join(' ')}
+            >
+              {label}
+              <span className="ml-1.5 text-xs tabular-nums opacity-70">({count})</span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Active tab */}
+      {tab === 'active' && (
+        <>
+          {expiredHabits.length === 0 && urgentHabits.length === 0 && healthyHabits.length === 0 && (
+            <p className="text-surface-500 dark:text-surface-400 text-sm text-center py-8">
+              No active habits. Head over to <strong>Create Habit</strong> to get started.
+            </p>
+          )}
+
+          {expiredHabits.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold text-red-700 dark:text-red-400 mb-4">
+                Window Expired ({expiredHabits.length})
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {expiredHabits.map((habit) => (
+                  <HabitCard key={habit.habitId} habit={habit} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {urgentHabits.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold text-amber-700 dark:text-amber-400 mb-4">
+                Expiring Soon ({urgentHabits.length})
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {urgentHabits.map((habit) => (
+                  <HabitCard key={habit.habitId} habit={habit} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {healthyHabits.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-4">
+                Active Habits ({healthyHabits.length})
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {healthyHabits.map((habit) => (
+                  <HabitCard key={habit.habitId} habit={habit} />
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
 
-      {/* Urgent Habits — window closing soon */}
-      {urgentHabits.length > 0 && (
-        <div>
-          <h3 className="text-lg font-semibold text-amber-700 dark:text-amber-400 mb-4">
-            Expiring Soon ({urgentHabits.length})
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {urgentHabits.map((habit) => (
-              <HabitCard key={habit.habitId} habit={habit} />
-            ))}
-          </div>
-        </div>
+      {/* Completed tab */}
+      {tab === 'completed' && (
+        <>
+          {completedHabits.length === 0 && inactiveHabits.length === 0 && (
+            <p className="text-surface-500 dark:text-surface-400 text-sm text-center py-8">
+              No completed habits yet — keep going!
+            </p>
+          )}
+
+          {completedHabits.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-4">
+                Completed ({completedHabits.length})
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {completedHabits.map((habit) => (
+                  <HabitCard key={habit.habitId} habit={habit} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {inactiveHabits.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-4">
+                Forfeited ({inactiveHabits.length})
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 opacity-60">
+                {inactiveHabits.map((habit) => (
+                  <HabitCard key={habit.habitId} habit={habit} />
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
 
-      {/* Healthy Active Habits */}
-      {healthyHabits.length > 0 && (
-        <div>
-          <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-4">
-            Active Habits ({healthyHabits.length})
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {healthyHabits.map((habit) => (
-              <HabitCard key={habit.habitId} habit={habit} />
-            ))}
-          </div>
-        </div>
-      )}
+      {/* All tab */}
+      {tab === 'all' && (
+        <>
+          {expiredHabits.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold text-red-700 dark:text-red-400 mb-4">
+                Window Expired ({expiredHabits.length})
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {expiredHabits.map((habit) => (
+                  <HabitCard key={habit.habitId} habit={habit} />
+                ))}
+              </div>
+            </div>
+          )}
 
-      {/* Completed Habits */}
-      {completedHabits.length > 0 && (
-        <div>
-          <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-4">
-            Completed Habits ({completedHabits.length})
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {completedHabits.map((habit) => (
-              <HabitCard key={habit.habitId} habit={habit} />
-            ))}
-          </div>
-        </div>
-      )}
+          {urgentHabits.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold text-amber-700 dark:text-amber-400 mb-4">
+                Expiring Soon ({urgentHabits.length})
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {urgentHabits.map((habit) => (
+                  <HabitCard key={habit.habitId} habit={habit} />
+                ))}
+              </div>
+            </div>
+          )}
 
-      {/* Inactive Habits */}
-      {inactiveHabits.length > 0 && (
-        <div>
-          <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-4">
-            Forfeited Habits ({inactiveHabits.length})
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 opacity-60">
-            {inactiveHabits.map((habit) => (
-              <HabitCard key={habit.habitId} habit={habit} />
-            ))}
-          </div>
-        </div>
+          {healthyHabits.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-4">
+                Active ({healthyHabits.length})
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {healthyHabits.map((habit) => (
+                  <HabitCard key={habit.habitId} habit={habit} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {completedHabits.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-4">
+                Completed ({completedHabits.length})
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {completedHabits.map((habit) => (
+                  <HabitCard key={habit.habitId} habit={habit} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {inactiveHabits.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-4">
+                Forfeited ({inactiveHabits.length})
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 opacity-60">
+                {inactiveHabits.map((habit) => (
+                  <HabitCard key={habit.habitId} habit={habit} />
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
