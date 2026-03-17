@@ -189,23 +189,6 @@ export const contractService = {
   },
 
   /**
-   * Get habit streak
-   */
-  async getHabitStreak(habitId: number): Promise<number> {
-    const result = await withTimeout(fetchCallReadOnlyFunction({
-      contractAddress: CONTRACT_ADDRESS,
-      contractName: CONTRACT_NAME,
-      functionName: 'get-habit-streak',
-      functionArgs: [uintCV(habitId)],
-      network: NETWORK,
-      senderAddress: CONTRACT_ADDRESS,
-    }));
-
-    const json = cvToJSON(result);
-    return json.type === 'ok' ? parseInt(json.value.value) : 0;
-  },
-
-  /**
    * Get forfeited pool balance
    */
   async getPoolBalance(): Promise<number> {
