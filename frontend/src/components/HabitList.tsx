@@ -20,6 +20,8 @@ interface HabitListProps {
 }
 
 export function HabitList({ habits, loading }: HabitListProps) {
+  // Hooks must be called unconditionally — keep them above all early returns
+  // to satisfy the Rules of Hooks (see #124).
   const [tab, setTab] = useHashParam('tab', 'active') as [Tab, (v: Tab) => void];
   const currentBlock = useCurrentBlock();
 
