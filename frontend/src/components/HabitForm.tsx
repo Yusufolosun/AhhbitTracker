@@ -28,8 +28,11 @@ export function HabitForm() {
     if (isDisabled) return;
     setError(null);
 
+    // Trim the name to prevent whitespace-only or leading/trailing spaces
+    const trimmedName = name.trim();
+
     // Validate
-    const nameError = validateHabitName(name);
+    const nameError = validateHabitName(trimmedName);
     if (nameError) {
       setError(nameError);
       return;
@@ -44,7 +47,7 @@ export function HabitForm() {
 
     try {
       const stakeAmount = toMicroSTX(stakeNum);
-      await createHabit({ name, stakeAmount });
+      await createHabit({ name: trimmedName, stakeAmount });
 
       setName('');
       setStake('0.1');
