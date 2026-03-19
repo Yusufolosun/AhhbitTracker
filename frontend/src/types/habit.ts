@@ -32,3 +32,45 @@ export interface WalletState {
   isConnected: boolean;
   balance: number;
 }
+
+// Clarity contract response types for type-safe parsing
+export interface ClarityValue {
+  value: string | number | boolean | ClarityValue | ClarityValue[] | Record<string, ClarityValue>;
+  type?: string;
+}
+
+export interface HabitContractResponse {
+  value?: {
+    value?: {
+      name: ClarityValue;
+      owner: ClarityValue;
+      'stake-amount': ClarityValue;
+      'created-at-block': ClarityValue;
+      'last-check-in-block': ClarityValue;
+      'current-streak': ClarityValue;
+      'is-active': ClarityValue;
+      'is-completed': ClarityValue;
+      'bonus-claimed'?: ClarityValue;
+    };
+  };
+}
+
+export interface UserHabitsContractResponse {
+  value?: {
+    'habit-ids'?: {
+      value?: ClarityValue[];
+    };
+  };
+}
+
+export interface UserStatsContractResponse {
+  success?: boolean;
+  value?: {
+    value?: {
+      'total-habits': ClarityValue;
+      'habit-ids'?: {
+        value?: ClarityValue[];
+      };
+    };
+  };
+}
