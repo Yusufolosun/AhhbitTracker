@@ -1,0 +1,55 @@
+name: Publish defikit
+
+on:
+  push:
+    tags:
+      - 'defikit-v*'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish-npm:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/defikit
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+      - run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  publish-gpr:
+    name: Publish to GitHub Packages
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/defikit
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@yusufolosun'
+
+      - run: npm ci
+      - run: npm run build
+
+      - run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
