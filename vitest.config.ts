@@ -45,6 +45,31 @@ export default defineConfig({
       '**/.{idea,git,cache,output,temp}/**',
       'frontend/src/__tests__/**',
     ],
+    // Coverage configuration
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json-summary', 'html', 'lcov'],
+      include: [
+        'contracts/**/*.clar',
+        'packages/*/src/**/*.ts',
+      ],
+      exclude: [
+        '**/*.test.*',
+        '**/*.spec.*',
+        '**/test/**',
+        '**/tests/**',
+        '**/__tests__/**',
+        '**/node_modules/**',
+        '**/dist/**',
+        'frontend/**', // Frontend has separate coverage config
+      ],
+      thresholds: {
+        lines: 70,
+        functions: 70,
+        branches: 60,
+        statements: 70,
+      },
+    },
   },
 });
 
