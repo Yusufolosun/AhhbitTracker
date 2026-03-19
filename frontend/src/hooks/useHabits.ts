@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { contractService } from '../services/contractService';
 import { useWallet } from '../context/WalletContext';
+import { useTransactions } from '../context/TransactionContext';
 import { Habit, UserStats } from '../types/habit';
 import { POLLING_INTERVAL, CACHE_TIME, POOL_CACHE_TIME } from '../utils/constants';
 
@@ -10,6 +11,7 @@ import { POLLING_INTERVAL, CACHE_TIME, POOL_CACHE_TIME } from '../utils/constant
  */
 export const useHabits = () => {
   const { walletState, refreshBalance } = useWallet();
+  const { addTransaction } = useTransactions();
   const queryClient = useQueryClient();
 
   // Track which habit IDs have in-flight mutations so each card can
@@ -139,7 +141,8 @@ export const useHabits = () => {
   const createHabitMutation = useMutation({
     mutationFn: ({ name, stakeAmount }: { name: string; stakeAmount: number }) =>
       contractService.createHabit(name, stakeAmount),
-    onSuccess: () => {
+    onSuccess: (txId) => {
+      addTransaction(txId, 'create-habit');
       refreshBalance();
       scheduleRefetch([
         ['habits', walletState.address!],
@@ -184,7 +187,8 @@ export const useHabits = () => {
         return next;
       });
     },
-    onSuccess: () => {
+    onSuccess: (txId) => {
+      addTransaction(txId, 'check-in');
       scheduleRefetch([['habits', walletState.address!], ['userStats', walletState.address!]]);
     },
   });
@@ -221,7 +225,8 @@ export const useHabits = () => {
         return next;
       });
     },
-    onSuccess: () => {
+    onSuccess: (txId) => {
+      addTransaction(txId, 'withdraw-stake');
       refreshBalance();
       scheduleRefetch([
         ['habits', walletState.address!],
@@ -244,7 +249,8 @@ export const useHabits = () => {
         return next;
       });
     },
-    onSuccess: () => {
+    onSuccess: (txId) => {
+      addTransaction(txId, 'claim-bonus');
       refreshBalance();
       scheduleRefetch([['habits', walletState.address!], ['poolBalance']]);
     },
@@ -263,7 +269,8 @@ export const useHabits = () => {
         return next;
       });
     },
-    onSuccess: () => {
+    onSuccess: (txId) => {
+      addTransaction(txId, 'slash-habit');
       scheduleRefetch([['habits', walletState.address!], ['poolBalance']]);
     },
   });
