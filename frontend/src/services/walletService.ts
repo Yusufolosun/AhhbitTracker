@@ -8,7 +8,7 @@ export const walletService = {
   /**
    * Connect wallet — shows picker if no wallet was previously selected
    */
-  connect: (onFinish?: (payload: any) => void) => {
+  connect: (onFinish?: (payload: any) => void, onCancel?: () => void) => {
     showConnect({
       appDetails: {
         name: 'AhhbitTracker',
@@ -18,6 +18,11 @@ export const walletService = {
       onFinish: (payload) => {
         if (onFinish) {
           onFinish(payload);
+        }
+      },
+      onCancel: () => {
+        if (onCancel) {
+          onCancel();
         }
       },
       userSession,
