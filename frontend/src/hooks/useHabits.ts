@@ -17,6 +17,7 @@ export const useHabits = () => {
   const [pendingCheckIns, setPendingCheckIns] = useState<Set<number>>(new Set());
   const [pendingWithdrawals, setPendingWithdrawals] = useState<Set<number>>(new Set());
   const [pendingClaims, setPendingClaims] = useState<Set<number>>(new Set());
+  const [pendingSlashes, setPendingSlashes] = useState<Set<number>>(new Set());
 
   // Fetch user habits
   const {
@@ -249,6 +250,24 @@ export const useHabits = () => {
     },
   });
 
+  // Slash habit mutation (finalize expired habits)
+  const slashHabitMutation = useMutation({
+    mutationFn: (habitId: number) => contractService.slashHabit(habitId),
+    onMutate: (habitId: number) => {
+      setPendingSlashes((prev) => new Set(prev).add(habitId));
+    },
+    onSettled: (_data, _err, habitId) => {
+      setPendingSlashes((prev) => {
+        const next = new Set(prev);
+        next.delete(habitId);
+        return next;
+      });
+    },
+    onSuccess: () => {
+      scheduleRefetch([['habits', walletState.address!], ['poolBalance']]);
+    },
+  });
+
   return {
     // Data
     habits: habits || [],
@@ -268,16 +287,19 @@ export const useHabits = () => {
     checkIn: checkInMutation.mutateAsync,
     withdrawStake: withdrawStakeMutation.mutateAsync,
     claimBonus: claimBonusMutation.mutateAsync,
+    slashHabit: slashHabitMutation.mutateAsync,
 
     // Per-habit pending states
     pendingCheckIns,
     pendingWithdrawals,
     pendingClaims,
+    pendingSlashes,
 
     // Global mutation states (kept for backward compatibility)
     isCreatingHabit: createHabitMutation.isPending,
     isCheckingIn: checkInMutation.isPending,
     isWithdrawing: withdrawStakeMutation.isPending,
     isClaiming: claimBonusMutation.isPending,
+    isSlashing: slashHabitMutation.isPending,
   };
 };

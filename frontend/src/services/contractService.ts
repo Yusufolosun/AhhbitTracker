@@ -157,6 +157,30 @@ export const contractService = {
   },
 
   /**
+   * Slash an expired habit (anyone can call this)
+   * Moves the stake from an expired habit into the forfeited pool
+   */
+  async slashHabit(habitId: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      showContractCall({
+        contractAddress: CONTRACT_ADDRESS,
+        contractName: CONTRACT_NAME,
+        functionName: 'slash-habit',
+        functionArgs: [uintCV(habitId)],
+        network: NETWORK,
+        appDetails,
+        userSession: walletService.getUserSession(),
+        onFinish: () => {
+          resolve();
+        },
+        onCancel: () => {
+          reject(new Error('Transaction cancelled'));
+        },
+      });
+    });
+  },
+
+  /**
    * Get habit details
    */
   async getHabit(habitId: number): Promise<any> {
