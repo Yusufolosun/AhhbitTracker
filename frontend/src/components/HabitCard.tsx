@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Habit } from '../types/habit';
 import { useHabits } from '../hooks/useHabits';
+import { useWallet } from '../context/WalletContext';
 import { useToast } from '../context/ToastContext';
 import { formatSTX, blocksAgo, blocksToTime } from '../utils/formatting';
 import { useCurrentBlock } from '../hooks/useCurrentBlock';
@@ -13,14 +14,17 @@ interface HabitCardProps {
 }
 
 export function HabitCard({ habit }: HabitCardProps) {
-  const { checkIn, withdrawStake, claimBonus, poolBalance, pendingCheckIns, pendingWithdrawals, pendingClaims } = useHabits();
+  const { checkIn, withdrawStake, claimBonus, slashHabit, poolBalance, pendingCheckIns, pendingWithdrawals, pendingClaims, pendingSlashes } = useHabits();
   const { showToast } = useToast();
-  const [confirmAction, setConfirmAction] = useState<'withdraw' | 'claim' | null>(null);
+  const { walletState } = useWallet();
+  const [confirmAction, setConfirmAction] = useState<'withdraw' | 'claim' | 'slash' | null>(null);
   const currentBlock = useCurrentBlock();
 
   const isCheckingIn = pendingCheckIns.has(habit.habitId);
   const isWithdrawing = pendingWithdrawals.has(habit.habitId);
   const isClaiming = pendingClaims.has(habit.habitId);
+  const isSlashing = pendingSlashes.has(habit.habitId);
+  const isOwnHabit = walletState.address?.toLowerCase() === habit.owner.toLowerCase();
 
   const handleCheckIn = async () => {
     try {
@@ -43,6 +47,10 @@ export function HabitCard({ habit }: HabitCardProps) {
     setConfirmAction('claim');
   };
 
+  const handleSlashHabit = () => {
+    setConfirmAction('slash');
+  };
+
   const executeConfirmedAction = async () => {
     const action = confirmAction;
     setConfirmAction(null);
@@ -53,6 +61,9 @@ export function HabitCard({ habit }: HabitCardProps) {
       } else if (action === 'claim') {
         await claimBonus(habit.habitId);
         showToast('Bonus claim signed! It will arrive once confirmed on-chain.', 'success');
+      } else if (action === 'slash') {
+        await slashHabit(habit.habitId);
+        showToast('Habit finalized! Stake will be moved to the pool once confirmed on-chain.', 'success');
       }
     } catch (err: any) {
       if (err.message === 'Transaction cancelled') {
@@ -159,7 +170,7 @@ export function HabitCard({ habit }: HabitCardProps) {
 
       {/* Actions */}
       <div className="flex flex-col space-y-2">
-        {habit.isActive && windowState !== 'expired' && (
+        {habit.isActive && windowState !== 'expired' && isOwnHabit && (
           <button
             onClick={handleCheckIn}
             disabled={isCheckingIn}
@@ -169,7 +180,7 @@ export function HabitCard({ habit }: HabitCardProps) {
           </button>
         )}
 
-        {canWithdraw && (
+        {canWithdraw && isOwnHabit && (
           <button
             onClick={handleWithdraw}
             disabled={isWithdrawing}
@@ -179,13 +190,23 @@ export function HabitCard({ habit }: HabitCardProps) {
           </button>
         )}
 
-        {canClaimBonus && (
+        {canClaimBonus && isOwnHabit && (
           <button
             onClick={handleClaimBonus}
             disabled={isClaiming}
             className="btn-secondary w-full"
           >
             {isClaiming ? 'Claiming...' : 'Claim Bonus'}
+          </button>
+        )}
+
+        {windowState === 'expired' && !isOwnHabit && habit.isActive && (
+          <button
+            onClick={handleSlashHabit}
+            disabled={isSlashing}
+            className="btn-secondary w-full"
+          >
+            {isSlashing ? 'Finalizing...' : 'Finalize Expired Habit'}
           </button>
         )}
       </div>
@@ -288,6 +309,40 @@ export function HabitCard({ habit }: HabitCardProps) {
           </p>
           <p className="text-xs text-amber-600 dark:text-amber-400">
             This action is irreversible and will incur a gas fee.
+          </p>
+        </div>
+      </ConfirmationDialog>
+
+      {/* Slash Habit Confirmation Dialog */}
+      <ConfirmationDialog
+        open={confirmAction === 'slash'}
+        title="Finalize Expired Habit"
+        confirmLabel="Finalize"
+        onConfirm={executeConfirmedAction}
+        onCancel={() => setConfirmAction(null)}
+        isLoading={isSlashing}
+      >
+        <div className="space-y-2">
+          <p>You are about to finalize an expired habit. This will move the forfeited stake to the pool:</p>
+          <dl className="bg-surface-50 dark:bg-surface-700 rounded-lg p-3 space-y-1">
+            <div className="flex justify-between">
+              <dt className="text-surface-500 dark:text-surface-400">Habit</dt>
+              <dd className="font-medium text-surface-900 dark:text-white">{habit.name}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-surface-500 dark:text-surface-400">Owner</dt>
+              <dd className="font-medium text-surface-900 dark:text-white truncate max-w-[200px]" title={habit.owner}>{habit.owner}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-surface-500 dark:text-surface-400">Stake Amount</dt>
+              <dd className="font-medium text-surface-900 dark:text-white">{formatSTX(habit.stakeAmount)} STX</dd>
+            </div>
+          </dl>
+          <p className="text-xs text-surface-500 dark:text-surface-400">
+            Anyone can finalize an expired habit. The stake will be added to the forfeited pool for future bonus claims.
+          </p>
+          <p className="text-xs text-amber-600 dark:text-amber-400">
+            This action will incur a gas fee.
           </p>
         </div>
       </ConfirmationDialog>
