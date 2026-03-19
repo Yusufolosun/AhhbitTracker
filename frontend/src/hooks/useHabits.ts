@@ -231,11 +231,29 @@ export const useHabits = () => {
     },
   });
 
-  // Claim bonus mutation
+  // Claim bonus mutation with optimistic update
   const claimBonusMutation = useMutation({
     mutationFn: (habitId: number) => contractService.claimBonus(habitId),
-    onMutate: (habitId: number) => {
+    onMutate: async (habitId: number) => {
       setPendingClaims((prev) => new Set(prev).add(habitId));
+      const queryKey = ['habits', walletState.address];
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData<Habit[]>(queryKey);
+      if (previous) {
+        queryClient.setQueryData<Habit[]>(queryKey, (old) =>
+          (old ?? []).map((h) =>
+            h.habitId === habitId
+              ? { ...h, bonusClaimed: true }
+              : h
+          )
+        );
+      }
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['habits', walletState.address], context.previous);
+      }
     },
     onSettled: (_data, _err, habitId) => {
       setPendingClaims((prev) => {
