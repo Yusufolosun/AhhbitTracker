@@ -30,6 +30,11 @@
 ;; ~144 blocks per day on Stacks (10 min per block)
 (define-constant CHECK-IN-WINDOW u144)
 
+;; Minimum interval between check-ins (in blocks)
+;; ~120 blocks = ~20 hours minimum between check-ins
+;; Prevents streak farming while allowing flexibility for users
+(define-constant MIN-CHECK-IN-INTERVAL u120)
+
 ;; Minimum streak required for withdrawal
 (define-constant MIN-STREAK-FOR-WITHDRAWAL u7)
 
@@ -135,7 +140,7 @@
     (
       (blocks-elapsed (- block-height last-check-in-block))
     )
-    (< blocks-elapsed u1)
+    (< blocks-elapsed MIN-CHECK-IN-INTERVAL)
   )
 )
 
