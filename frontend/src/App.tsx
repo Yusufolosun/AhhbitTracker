@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { lazy, Suspense } from 'react';
 import { emitRateLimitEvent } from './components/RateLimitBanner';
 import { WalletProvider, useWallet } from './context/WalletContext';
 import { TransactionProvider } from './context/TransactionContext';
@@ -8,17 +9,19 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { WalletConnect } from './components/WalletConnect';
-import { Dashboard } from './components/Dashboard';
-import { HabitForm } from './components/HabitForm';
-import { HabitList } from './components/HabitList';
-import { PoolDisplay } from './components/PoolDisplay';
-import { TransactionTracker } from './components/TransactionTracker';
 import { RateLimitBanner } from './components/RateLimitBanner';
 import { ToastContainer } from './components/ToastContainer';
+import { TransactionTracker } from './components/TransactionTracker';
 import { useHabits } from './hooks/useHabits';
 import { DashboardSkeleton } from './components/Skeletons';
 import { useHashRoute } from './hooks/useHashRoute';
 import './styles/global.css';
+
+// Code-split route-level components
+const Dashboard = lazy(() => import('./components/Dashboard').then(m => ({ default: m.Dashboard })));
+const HabitForm = lazy(() => import('./components/HabitForm').then(m => ({ default: m.HabitForm })));
+const HabitList = lazy(() => import('./components/HabitList').then(m => ({ default: m.HabitList })));
+const PoolDisplay = lazy(() => import('./components/PoolDisplay').then(m => ({ default: m.PoolDisplay })));
 
 // Create a react-query client
 const queryClient = new QueryClient({
@@ -68,31 +71,33 @@ function AppContent() {
 
       <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
-          {/* Route-based rendering */}
-          {route === 'dashboard' && (
-            <section id="dashboard">
-              {isLoadingHabits ? <DashboardSkeleton /> : <Dashboard habits={habits} />}
-            </section>
-          )}
+          {/* Route-based rendering with code splitting */}
+          <Suspense fallback={<DashboardSkeleton />}>
+            {route === 'dashboard' && (
+              <section id="dashboard">
+                {isLoadingHabits ? <DashboardSkeleton /> : <Dashboard habits={habits} />}
+              </section>
+            )}
 
-          {route === 'pool' && (
-            <section id="pool">
-              <PoolDisplay />
-            </section>
-          )}
+            {route === 'pool' && (
+              <section id="pool">
+                <PoolDisplay />
+              </section>
+            )}
 
-          {route === 'create-habit' && (
-            <section id="create-habit">
-              <HabitForm />
-            </section>
-          )}
+            {route === 'create-habit' && (
+              <section id="create-habit">
+                <HabitForm />
+              </section>
+            )}
 
-          {route === 'habits' && (
-            <section id="habits">
-              <h2 className="text-2xl font-bold text-surface-900 dark:text-white mb-6">My Habits</h2>
-              <HabitList habits={habits} loading={isLoadingHabits} />
-            </section>
-          )}
+            {route === 'habits' && (
+              <section id="habits">
+                <h2 className="text-2xl font-bold text-surface-900 dark:text-white mb-6">My Habits</h2>
+                <HabitList habits={habits} loading={isLoadingHabits} />
+              </section>
+            )}
+          </Suspense>
         </div>
       </main>
 
