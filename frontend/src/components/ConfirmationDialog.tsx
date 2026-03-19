@@ -43,9 +43,39 @@ export function ConfirmationDialog({
 
   // Trap focus inside the dialog
   useEffect(() => {
-    if (open && dialogRef.current) {
-      dialogRef.current.focus();
-    }
+    if (!open || !dialogRef.current) return;
+
+    const dialog = dialogRef.current;
+    const focusableElements = dialog.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    const firstFocusable = focusableElements[0];
+    const lastFocusable = focusableElements[focusableElements.length - 1];
+
+    // Set initial focus
+    firstFocusable?.focus();
+
+    // Handle Tab key to trap focus
+    const handleTabKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+
+      if (e.shiftKey) {
+        // Shift+Tab: if on first element, wrap to last
+        if (document.activeElement === firstFocusable) {
+          e.preventDefault();
+          lastFocusable?.focus();
+        }
+      } else {
+        // Tab: if on last element, wrap to first
+        if (document.activeElement === lastFocusable) {
+          e.preventDefault();
+          firstFocusable?.focus();
+        }
+      }
+    };
+
+    dialog.addEventListener('keydown', handleTabKey);
+    return () => dialog.removeEventListener('keydown', handleTabKey);
   }, [open]);
 
   if (!open) return null;
