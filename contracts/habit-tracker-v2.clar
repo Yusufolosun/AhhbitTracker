@@ -53,6 +53,7 @@
 (define-constant ERR-BONUS-ALREADY-CLAIMED (err u111))
 (define-constant ERR-HABIT-LIMIT-REACHED (err u112))
 (define-constant ERR-STAKE-TOO-HIGH (err u113))
+(define-constant ERR-HABIT-AUTO-SLASHED (err u114))
 
 ;; ============================================
 ;; DATA STRUCTURES
@@ -208,7 +209,7 @@
 
 ;; Daily check-in for habit
 ;; @param habit-id: ID of the habit to check in
-;; @returns: current streak on success (u0 if auto-slashed), error on failure
+;; @returns: current streak on success, ERR-HABIT-AUTO-SLASHED if window expired
 (define-public (check-in (habit-id uint))
   (let
     (
@@ -264,7 +265,7 @@
           amount: (get stake-amount habit),
           block: block-height
         })
-        (ok u0)
+        ERR-HABIT-AUTO-SLASHED
       )
     )
   )

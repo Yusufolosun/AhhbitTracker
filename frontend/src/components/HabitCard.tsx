@@ -33,6 +33,8 @@ export function HabitCard({ habit }: HabitCardProps) {
     } catch (err: any) {
       if (err.message === 'Transaction cancelled') {
         showToast('Check-in was cancelled.', 'error');
+      } else if (err.message?.includes('u114') || err.message?.includes('ERR-HABIT-AUTO-SLASHED')) {
+        showToast('Your habit was forfeited because the check-in window expired.', 'error');
       } else {
         showToast(err.message || 'Check-in failed', 'error');
       }
