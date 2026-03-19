@@ -81,18 +81,24 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const connect = async () => {
     setIsLoading(true);
     try {
-      walletService.connect(async () => {
-        const address = walletService.getAddress();
-        setWalletState({
-          isConnected: true,
-          address,
-          balance: 0,
-        });
-        if (address) {
-          await fetchAndSetBalance(address);
+      walletService.connect(
+        async () => {
+          const address = walletService.getAddress();
+          setWalletState({
+            isConnected: true,
+            address,
+            balance: 0,
+          });
+          if (address) {
+            await fetchAndSetBalance(address);
+          }
+          setIsLoading(false);
+        },
+        () => {
+          // User cancelled the wallet picker
+          setIsLoading(false);
         }
-        setIsLoading(false);
-      });
+      );
     } catch (error) {
       console.error('Error connecting wallet:', error);
       setIsLoading(false);

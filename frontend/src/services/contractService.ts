@@ -65,8 +65,9 @@ export const contractService = {
 
   /**
    * Check in to a habit
+   * Returns the transaction ID on success for tracking
    */
-  async checkIn(habitId: number): Promise<void> {
+  async checkIn(habitId: number): Promise<string> {
     return new Promise((resolve, reject) => {
       showContractCall({
         contractAddress: CONTRACT_ADDRESS,
@@ -76,8 +77,8 @@ export const contractService = {
         network: NETWORK,
         appDetails,
         userSession: walletService.getUserSession(),
-        onFinish: () => {
-          resolve();
+        onFinish: (data) => {
+          resolve(data.txId);
         },
         onCancel: () => {
           reject(new Error('Transaction cancelled'));
@@ -88,8 +89,9 @@ export const contractService = {
 
   /**
    * Withdraw stake
+   * Returns the transaction ID on success for tracking
    */
-  async withdrawStake(habitId: number, stakeAmount: number): Promise<void> {
+  async withdrawStake(habitId: number, stakeAmount: number): Promise<string> {
     const userAddress = walletService.getAddress();
     if (!userAddress) {
       throw new Error('Wallet not connected');
@@ -111,8 +113,8 @@ export const contractService = {
         postConditionMode: PostConditionMode.Deny,
         appDetails,
         userSession: walletService.getUserSession(),
-        onFinish: () => {
-          resolve();
+        onFinish: (data) => {
+          resolve(data.txId);
         },
         onCancel: () => {
           reject(new Error('Transaction cancelled'));
@@ -123,8 +125,9 @@ export const contractService = {
 
   /**
    * Claim bonus
+   * Returns the transaction ID on success for tracking
    */
-  async claimBonus(habitId: number): Promise<void> {
+  async claimBonus(habitId: number): Promise<string> {
     const userAddress = walletService.getAddress();
     if (!userAddress) {
       throw new Error('Wallet not connected');
@@ -146,8 +149,8 @@ export const contractService = {
         postConditionMode: PostConditionMode.Deny,
         appDetails,
         userSession: walletService.getUserSession(),
-        onFinish: () => {
-          resolve();
+        onFinish: (data) => {
+          resolve(data.txId);
         },
         onCancel: () => {
           reject(new Error('Transaction cancelled'));
@@ -159,8 +162,9 @@ export const contractService = {
   /**
    * Slash an expired habit (anyone can call this)
    * Moves the stake from an expired habit into the forfeited pool
+   * Returns the transaction ID on success for tracking
    */
-  async slashHabit(habitId: number): Promise<void> {
+  async slashHabit(habitId: number): Promise<string> {
     return new Promise((resolve, reject) => {
       showContractCall({
         contractAddress: CONTRACT_ADDRESS,
@@ -170,8 +174,8 @@ export const contractService = {
         network: NETWORK,
         appDetails,
         userSession: walletService.getUserSession(),
-        onFinish: () => {
-          resolve();
+        onFinish: (data) => {
+          resolve(data.txId);
         },
         onCancel: () => {
           reject(new Error('Transaction cancelled'));

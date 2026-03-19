@@ -15,4 +15,5 @@ jobs:
         with:
           node-version: '20'
       - run: npm ci
-      - run: npx vitest run --coverage || echo "::warning::Coverage report requires native WASM - skipped in CI"
+      - name: Run coverage report
+        run: npx vitest run --coverage

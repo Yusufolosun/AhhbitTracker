@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { contractService } from '../services/contractService';
 import { useWallet } from '../context/WalletContext';
+import { useTransactions } from '../context/TransactionContext';
 import {
   Habit,
   UserStats,
@@ -56,6 +57,7 @@ const parseBooleanSafe = (value: unknown, fallback = false): boolean => {
  */
 export const useHabits = () => {
   const { walletState, refreshBalance } = useWallet();
+  const { addTransaction } = useTransactions();
   const queryClient = useQueryClient();
 
   // Track which habit IDs have in-flight mutations so each card can
@@ -194,7 +196,8 @@ export const useHabits = () => {
   const createHabitMutation = useMutation({
     mutationFn: ({ name, stakeAmount }: { name: string; stakeAmount: number }) =>
       contractService.createHabit(name, stakeAmount),
-    onSuccess: () => {
+    onSuccess: (txId) => {
+      addTransaction(txId, 'create-habit');
       refreshBalance();
       scheduleRefetch([
         ['habits', walletState.address!],
@@ -239,7 +242,8 @@ export const useHabits = () => {
         return next;
       });
     },
-    onSuccess: () => {
+    onSuccess: (txId) => {
+      addTransaction(txId, 'check-in');
       scheduleRefetch([['habits', walletState.address!], ['userStats', walletState.address!]]);
     },
   });
@@ -276,7 +280,8 @@ export const useHabits = () => {
         return next;
       });
     },
-    onSuccess: () => {
+    onSuccess: (txId) => {
+      addTransaction(txId, 'withdraw-stake');
       refreshBalance();
       scheduleRefetch([
         ['habits', walletState.address!],
@@ -286,11 +291,29 @@ export const useHabits = () => {
     },
   });
 
-  // Claim bonus mutation
+  // Claim bonus mutation with optimistic update
   const claimBonusMutation = useMutation({
     mutationFn: (habitId: number) => contractService.claimBonus(habitId),
-    onMutate: (habitId: number) => {
+    onMutate: async (habitId: number) => {
       setPendingClaims((prev) => new Set(prev).add(habitId));
+      const queryKey = ['habits', walletState.address];
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData<Habit[]>(queryKey);
+      if (previous) {
+        queryClient.setQueryData<Habit[]>(queryKey, (old) =>
+          (old ?? []).map((h) =>
+            h.habitId === habitId
+              ? { ...h, bonusClaimed: true }
+              : h
+          )
+        );
+      }
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['habits', walletState.address], context.previous);
+      }
     },
     onSettled: (_data, _err, habitId) => {
       setPendingClaims((prev) => {
@@ -299,7 +322,8 @@ export const useHabits = () => {
         return next;
       });
     },
-    onSuccess: () => {
+    onSuccess: (txId) => {
+      addTransaction(txId, 'claim-bonus');
       refreshBalance();
       scheduleRefetch([['habits', walletState.address!], ['poolBalance']]);
     },
@@ -318,7 +342,8 @@ export const useHabits = () => {
         return next;
       });
     },
-    onSuccess: () => {
+    onSuccess: (txId) => {
+      addTransaction(txId, 'slash-habit');
       scheduleRefetch([['habits', walletState.address!], ['poolBalance']]);
     },
   });

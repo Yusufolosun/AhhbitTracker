@@ -9,9 +9,12 @@ interface ToastProps {
 
 export function Toast({ message, type, onClose }: ToastProps) {
   useEffect(() => {
-    const timer = setTimeout(onClose, TOAST_DURATION);
+    // Error toasts stay longer (8 seconds) so users have time to read them
+    // Success/info toasts auto-dismiss after 5 seconds
+    const duration = type === 'error' ? 8000 : TOAST_DURATION;
+    const timer = setTimeout(onClose, duration);
     return () => clearTimeout(timer);
-  }, [onClose]);
+  }, [onClose, type]);
 
   const bgColors = {
     success: 'bg-green-500',
