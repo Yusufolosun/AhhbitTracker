@@ -230,30 +230,34 @@ describe("AhhbitTracker Contract", () => {
 
     it("should increment streak on consecutive check-ins", () => {
       checkIn(user1, habitId);
-      simnet.mineEmptyBlocks(10);
+      simnet.mineEmptyBlocks(120); // MIN-CHECK-IN-INTERVAL
       const result = checkIn(user1, habitId);
 
       expect(result.result).toBeOk(Cl.uint(2));
     });
 
-    it("should prevent duplicate check-in in the same block", () => {
-      // In simnet, each callPublicFn auto-mines a new block, so two calls
-      // are always in separate blocks.  The contract guard
-      // `already-checked-in-today` uses `blocks-elapsed < 1` (same-block),
-      // which can't be triggered here.  We verify the closest testable
-      // scenario: a second check-in 1 block later SUCCEEDS, proving the
-      // guard only blocks same-block duplicates.
+    it("should prevent check-in before minimum interval (120 blocks)", () => {
+      // First check-in succeeds
       const first = checkIn(user1, habitId);
       expect(first.result).toBeOk(Cl.uint(1));
 
-      // Lands in next block → blocks-elapsed = 1 → NOT < 1 → allowed
+      // Try to check in after only 1 block → should fail
+      // blocks-elapsed = 1 < MIN-CHECK-IN-INTERVAL(120) → blocked
       const second = checkIn(user1, habitId);
-      expect(second.result).toBeOk(Cl.uint(2));
+      expect(second.result).toBeErr(Cl.uint(105)); // ERR-ALREADY-CHECKED-IN
     });
 
-    it("should allow check-in 1 block after the previous one", () => {
+    it("should prevent check-in before minimum interval (119 blocks)", () => {
       checkIn(user1, habitId);
-      simnet.mineEmptyBlocks(1);
+      simnet.mineEmptyBlocks(119); // Just under the minimum
+
+      const result = checkIn(user1, habitId);
+      expect(result.result).toBeErr(Cl.uint(105)); // ERR-ALREADY-CHECKED-IN
+    });
+
+    it("should allow check-in at exactly 120 blocks (minimum interval)", () => {
+      checkIn(user1, habitId);
+      simnet.mineEmptyBlocks(120); // Exactly at minimum
 
       const result = checkIn(user1, habitId);
       expect(result.result).toBeOk(Cl.uint(2));
@@ -311,7 +315,7 @@ describe("AhhbitTracker Contract", () => {
       // Setup: Complete streak and withdraw
       for (let i = 0; i < 7; i++) {
         checkIn(user1, habitId);
-        simnet.mineEmptyBlocks(10);
+        simnet.mineEmptyBlocks(120); // MIN-CHECK-IN-INTERVAL
       }
       simnet.callPublicFn("habit-tracker-v2", "withdraw-stake", [Cl.uint(habitId)], user1);
 
@@ -341,7 +345,7 @@ describe("AhhbitTracker Contract", () => {
     it("should allow successful withdrawal after streak", () => {
       for (let i = 0; i < 7; i++) {
         checkIn(user1, habitId);
-        simnet.mineEmptyBlocks(10);
+        simnet.mineEmptyBlocks(120); // MIN-CHECK-IN-INTERVAL
       }
 
       const result = simnet.callPublicFn("habit-tracker-v2", "withdraw-stake", [Cl.uint(habitId)], user1);
@@ -395,7 +399,7 @@ describe("AhhbitTracker Contract", () => {
       for (let i = 0; i < 7; i++) {
         const res = checkIn(user1, id1);
         expect(res.result).toEqual(Cl.ok(Cl.uint(i + 1)));
-        simnet.mineEmptyBlocks(10);
+        simnet.mineEmptyBlocks(120);
       }
 
       const resW = simnet.callPublicFn("habit-tracker-v2", "withdraw-stake", [Cl.uint(id1)], user1);
@@ -419,13 +423,13 @@ describe("AhhbitTracker Contract", () => {
       // User1 completes a habit
       const h1 = createHabit(user1, "Habit A", MIN_STAKE);
       const id1 = Number((h1.result as any).value.value);
-      for (let i = 0; i < 7; i++) { checkIn(user1, id1); simnet.mineEmptyBlocks(10); }
+      for (let i = 0; i < 7; i++) { checkIn(user1, id1); simnet.mineEmptyBlocks(120); }
       withdrawStake(user1, id1);
 
       // User2 completes a habit
       const h2 = createHabit(user2, "Habit B", MIN_STAKE);
       const id2 = Number((h2.result as any).value.value);
-      for (let i = 0; i < 7; i++) { checkIn(user2, id2); simnet.mineEmptyBlocks(10); }
+      for (let i = 0; i < 7; i++) { checkIn(user2, id2); simnet.mineEmptyBlocks(120); }
       withdrawStake(user2, id2);
 
       // Both claim — bonuses should be within ~1% of each other
@@ -461,7 +465,7 @@ describe("AhhbitTracker Contract", () => {
       // User1 completes a habit and claims
       const h1 = createHabit(user1, "Capped habit", MIN_STAKE);
       const cid = Number((h1.result as any).value.value);
-      for (let i = 0; i < 7; i++) { checkIn(user1, cid); simnet.mineEmptyBlocks(10); }
+      for (let i = 0; i < 7; i++) { checkIn(user1, cid); simnet.mineEmptyBlocks(120); }
       withdrawStake(user1, cid);
 
       const result = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(cid)], user1);
@@ -530,7 +534,7 @@ describe("AhhbitTracker Contract", () => {
 
       for (let i = 0; i < 7; i++) {
         checkIn(user1, id);
-        simnet.mineEmptyBlocks(10);
+        simnet.mineEmptyBlocks(120);
       }
 
       // Expire the window
@@ -547,7 +551,7 @@ describe("AhhbitTracker Contract", () => {
 
       for (let i = 0; i < 7; i++) {
         checkIn(user1, id);
-        simnet.mineEmptyBlocks(10);
+        simnet.mineEmptyBlocks(120);
       }
 
       simnet.mineEmptyBlocks(200);
@@ -606,7 +610,7 @@ describe("AhhbitTracker Contract", () => {
       const id1 = Number((h1.result as any).value.value);
       for (let i = 0; i < 7; i++) {
         checkIn(user1, id1);
-        simnet.mineEmptyBlocks(10);
+        simnet.mineEmptyBlocks(120);
       }
       withdrawStake(user1, id1);
 
@@ -689,7 +693,7 @@ describe("AhhbitTracker Contract", () => {
       // Build streak then let window expire
       for (let i = 0; i < 7; i++) {
         checkIn(user1, id);
-        simnet.mineEmptyBlocks(10);
+        simnet.mineEmptyBlocks(120);
       }
       simnet.mineEmptyBlocks(200);
 
@@ -724,7 +728,7 @@ describe("AhhbitTracker Contract", () => {
       // Build a good streak
       for (let i = 0; i < 5; i++) {
         checkIn(user1, id);
-        simnet.mineEmptyBlocks(10);
+        simnet.mineEmptyBlocks(120);
       }
 
       // Let window expire
