@@ -3,7 +3,7 @@
  * Wraps the generic validators to preserve the existing API
  * (validateHabitName / validateStakeAmount).
  */
-import { validateName, validateStake } from '@yusufolosun/stx-utils';
+import { validateName, validateStake, toMicroSTX } from '@yusufolosun/stx-utils';
 import { MIN_STAKE_AMOUNT, MAX_STAKE_AMOUNT, MAX_HABIT_NAME_LENGTH } from './constants';
 
 export function validateHabitName(name: string): string | null {
@@ -15,5 +15,13 @@ export function validateHabitName(name: string): string | null {
 }
 
 export function validateStakeAmount(stx: number): string | null {
-  return validateStake(stx, MIN_STAKE_AMOUNT, MAX_STAKE_AMOUNT);
+  // validateStake v2.0.1 only checks minimum; we add max check here
+  const minErr = validateStake(stx, MIN_STAKE_AMOUNT);
+  if (minErr) return minErr;
+
+  const microSTX = toMicroSTX(stx);
+  if (microSTX > MAX_STAKE_AMOUNT) {
+    return `Maximum stake is ${MAX_STAKE_AMOUNT / 1_000_000} STX`;
+  }
+  return null;
 }

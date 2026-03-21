@@ -56,6 +56,7 @@
     "@stacks/clarinet-sdk": "^3.14.1",
     "@stacks/transactions": "^7.2.0",
     "@types/node": "^25.3.3",
+    "@yusufolosun/stx-utils": "^2.0.1",
     "chokidar-cli": "^3.0.0",
     "dotenv": "^17.3.1",
     "object-hash": "^3.0.0"

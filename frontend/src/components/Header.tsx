@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useWallet } from '../context/WalletContext';
 import { shortenAddress, formatSTX } from '../utils/formatting';
-import { EXPLORER_ADDRESS_URL } from '../utils/constants';
+import { addressUrl } from '@yusufolosun/stx-utils';
 import { ThemeToggle } from './ThemeToggle';
 import { useHashRoute } from '../hooks/useHashRoute';
 
@@ -72,7 +72,7 @@ export function Header() {
                 <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 bg-surface-100 dark:bg-surface-800 rounded-lg border border-surface-200 dark:border-surface-700">
                   <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
                   <a
-                    href={`${EXPLORER_ADDRESS_URL}${walletState.address!}?chain=mainnet`}
+                    href={addressUrl(walletState.address!, 'mainnet')}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-sm font-medium text-surface-700 dark:text-surface-300 hover:text-primary-500 transition-colors"

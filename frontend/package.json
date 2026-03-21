@@ -43,9 +43,9 @@
     "@stacks/network": "^7.3.1",
     "@stacks/transactions": "^7.2.0",
     "@tanstack/react-query": "^5.90.21",
+    "@yusufolosun/stx-utils": "^2.0.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "@yusufolosun/stx-utils": "file:../packages/stx-utils"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo, ReactNode } from 'react';
-import { EXPLORER_TX_URL } from '../utils/constants';
+import { txUrl } from '@yusufolosun/stx-utils';
 
 export interface TrackedTransaction {
   txId: string;
@@ -100,7 +100,7 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
   }, []);
 
   const getExplorerUrl = useCallback((txId: string) => {
-    return `${EXPLORER_TX_URL}${txId}?chain=mainnet`;
+    return txUrl(txId, 'mainnet');
   }, []);
 
   // Memoized keys for useEffect dependencies to avoid complex expressions
