@@ -65,7 +65,7 @@ describe('contractService', () => {
       const promise = contractService.checkIn(1);
       expect(capturedOptions).not.toBeNull();
       capturedOptions.onFinish({ txId: 'tx-abc' });
-      await expect(promise).resolves.toBeUndefined();
+      await expect(promise).resolves.toBe('tx-abc');
     });
 
     it('rejects when the user cancels the transaction', async () => {
@@ -80,7 +80,7 @@ describe('contractService', () => {
       const promise = contractService.withdrawStake(1, 1_000_000);
       expect(capturedOptions).not.toBeNull();
       capturedOptions.onFinish({ txId: 'tx-def' });
-      await expect(promise).resolves.toBeUndefined();
+      await expect(promise).resolves.toBe('tx-def');
     });
 
     it('rejects when the user cancels the transaction', async () => {
@@ -95,7 +95,7 @@ describe('contractService', () => {
       const promise = contractService.claimBonus(1);
       expect(capturedOptions).not.toBeNull();
       capturedOptions.onFinish({ txId: 'tx-ghi' });
-      await expect(promise).resolves.toBeUndefined();
+      await expect(promise).resolves.toBe('tx-ghi');
     });
 
     it('rejects when the user cancels the transaction', async () => {

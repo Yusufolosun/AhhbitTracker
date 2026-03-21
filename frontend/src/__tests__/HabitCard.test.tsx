@@ -2,7 +2,9 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { HabitCard } from '../components/HabitCard';
 import { ToastProvider } from '../context/ToastContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Habit } from '../types/habit';
+import React from 'react';
 
 // Mock the useHabits hook used by HabitCard
 vi.mock('../hooks/useHabits', () => ({
@@ -10,13 +12,32 @@ vi.mock('../hooks/useHabits', () => ({
     checkIn: vi.fn(),
     withdrawStake: vi.fn(),
     claimBonus: vi.fn(),
+    slashHabit: vi.fn(),
     poolBalance: 50_000_000,
     pendingCheckIns: new Set<number>(),
     pendingWithdrawals: new Set<number>(),
     pendingClaims: new Set<number>(),
+    pendingSlashes: new Set<number>(),
     isCheckingIn: false,
     isWithdrawing: false,
     isClaiming: false,
+    isSlashing: false,
+  }),
+}));
+
+// Mock useWallet hook to provide wallet state directly
+vi.mock('../context/WalletContext', () => ({
+  useWallet: () => ({
+    walletState: {
+      isConnected: true,
+      address: 'SP2ABC123',
+      balance: 10_000_000,
+    },
+    connect: vi.fn(),
+    disconnect: vi.fn(),
+    refreshBalance: vi.fn(),
+    isLoading: false,
+    isBalanceLoading: false,
   }),
 }));
 
@@ -54,24 +75,37 @@ const completedHabit: Habit = {
   currentStreak: 10,
 };
 
+// Create a test wrapper with required providers
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: false },
+  },
+});
+
+const TestWrapper = ({ children }: { children: React.ReactNode }) => (
+  <QueryClientProvider client={queryClient}>
+    <ToastProvider>{children}</ToastProvider>
+  </QueryClientProvider>
+);
+
 describe('HabitCard', () => {
   it('renders habit name', () => {
-    render(<ToastProvider><HabitCard habit={mockHabit} /></ToastProvider>);
+    render(<HabitCard habit={mockHabit} />, { wrapper: TestWrapper });
     expect(screen.getByText('Morning Exercise')).toBeDefined();
   });
 
   it('displays current streak', () => {
-    render(<ToastProvider><HabitCard habit={mockHabit} /></ToastProvider>);
+    render(<HabitCard habit={mockHabit} />, { wrapper: TestWrapper });
     expect(screen.getByText('5')).toBeDefined();
   });
 
   it('shows active status', () => {
-    render(<ToastProvider><HabitCard habit={mockHabit} /></ToastProvider>);
+    render(<HabitCard habit={mockHabit} />, { wrapper: TestWrapper });
     expect(screen.getByText('Active')).toBeDefined();
   });
 
   it('displays estimated bonus in claim dialog', () => {
-    render(<ToastProvider><HabitCard habit={completedHabit} /></ToastProvider>);
+    render(<HabitCard habit={completedHabit} />, { wrapper: TestWrapper });
     fireEvent.click(screen.getByText('Claim Bonus'));
     // poolBalance is 50_000_000 → 1% = 500_000 microSTX → formatSTX = "0.50"
     expect(screen.getByText('Est. Bonus')).toBeDefined();
@@ -79,20 +113,20 @@ describe('HabitCard', () => {
   });
 
   it('shows estimate disclaimer in claim dialog', () => {
-    render(<ToastProvider><HabitCard habit={completedHabit} /></ToastProvider>);
+    render(<HabitCard habit={completedHabit} />, { wrapper: TestWrapper });
     fireEvent.click(screen.getByText('Claim Bonus'));
     expect(screen.getByText(/actual amount may differ/i)).toBeDefined();
   });
 
   it('hides claim button when bonus already claimed', () => {
     const claimed = { ...completedHabit, bonusClaimed: true };
-    render(<ToastProvider><HabitCard habit={claimed} /></ToastProvider>);
+    render(<HabitCard habit={claimed} />, { wrapper: TestWrapper });
     expect(screen.queryByText('Claim Bonus')).toBeNull();
   });
 
   it('withdraw dialog shows stake amount without bonus info', () => {
     const withdrawable = { ...mockHabit, currentStreak: 7 };
-    render(<ToastProvider><HabitCard habit={withdrawable} /></ToastProvider>);
+    render(<HabitCard habit={withdrawable} />, { wrapper: TestWrapper });
     fireEvent.click(screen.getByText('Withdraw Stake'));
     // "Stake" and "1.00 STX" appear both in the card stats and in the dialog
     const stakeValues = screen.getAllByText('1.00 STX');
