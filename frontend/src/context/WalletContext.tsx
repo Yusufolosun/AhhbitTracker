@@ -4,7 +4,7 @@ import { WalletState } from '../types/habit';
 
 interface WalletContextType {
   walletState: WalletState;
-  connect: () => Promise<void>;
+  connect: () => void;
   disconnect: () => void;
   refreshBalance: () => Promise<void>;
   isLoading: boolean;
@@ -56,9 +56,9 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     // Check if wallet is already connected on mount
     const checkConnection = async () => {
       try {
-        const isSignedIn = await walletService.isSignedIn();
+        const isSignedIn = walletService.isSignedIn();
         if (isSignedIn) {
-          const address = await walletService.getAddress();
+          const address = walletService.getAddress();
           setWalletState({
             isConnected: true,
             address,
@@ -75,14 +75,14 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
       }
     };
 
-    checkConnection();
+    void checkConnection();
   }, []);
 
-  const connect = async () => {
+  const connect = () => {
     setIsLoading(true);
     try {
       walletService.connect(
-        async () => {
+        (_payload) => {
           const address = walletService.getAddress();
           setWalletState({
             isConnected: true,
@@ -90,7 +90,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
             balance: 0,
           });
           if (address) {
-            await fetchAndSetBalance(address);
+            void fetchAndSetBalance(address);
           }
           setIsLoading(false);
         },
