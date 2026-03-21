@@ -183,7 +183,7 @@ export const useHabits = () => {
     (queryKeys: string[][]) => {
       const invalidate = () => {
         for (const key of queryKeys) {
-          queryClient.invalidateQueries({ queryKey: key });
+          void queryClient.invalidateQueries({ queryKey: key });
         }
       };
       timersRef.current.push(setTimeout(invalidate, 30_000));
@@ -198,7 +198,7 @@ export const useHabits = () => {
       contractService.createHabit(name, stakeAmount),
     onSuccess: (txId) => {
       addTransaction(txId, 'create-habit');
-      refreshBalance();
+      void refreshBalance();
       scheduleRefetch([
         ['habits', walletState.address!],
         ['userStats', walletState.address!],
@@ -282,7 +282,7 @@ export const useHabits = () => {
     },
     onSuccess: (txId) => {
       addTransaction(txId, 'withdraw-stake');
-      refreshBalance();
+      void refreshBalance();
       scheduleRefetch([
         ['habits', walletState.address!],
         ['userStats', walletState.address!],
@@ -324,7 +324,7 @@ export const useHabits = () => {
     },
     onSuccess: (txId) => {
       addTransaction(txId, 'claim-bonus');
-      refreshBalance();
+      void refreshBalance();
       scheduleRefetch([['habits', walletState.address!], ['poolBalance']]);
     },
   });
