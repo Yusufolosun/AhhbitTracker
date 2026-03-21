@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo, ReactNode } from 'react';
 import { EXPLORER_TX_URL } from '../utils/constants';
 
 export interface TrackedTransaction {
@@ -103,6 +103,17 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
     return `${EXPLORER_TX_URL}${txId}?chain=mainnet`;
   }, []);
 
+  // Memoized keys for useEffect dependencies to avoid complex expressions
+  const pendingTxIdsKey = useMemo(
+    () => transactions.filter((tx) => tx.status === 'pending').map((tx) => tx.txId).join(','),
+    [transactions]
+  );
+
+  const settledTxIdsKey = useMemo(
+    () => transactions.filter((tx) => tx.status !== 'pending').map((tx) => tx.txId).join(','),
+    [transactions]
+  );
+
   // Poll pending transactions for confirmation
   useEffect(() => {
     const pollPendingTransactions = async () => {
@@ -140,9 +151,11 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
 
     if (hasPending) {
       // Poll immediately on first pending tx
-      pollPendingTransactions();
+      void pollPendingTransactions();
 
-      intervalRef.current = setInterval(pollPendingTransactions, TX_POLL_INTERVAL);
+      intervalRef.current = setInterval(() => {
+        void pollPendingTransactions();
+      }, TX_POLL_INTERVAL);
     }
 
     return () => {
@@ -151,7 +164,7 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
         intervalRef.current = null;
       }
     };
-  }, [transactions.filter((tx) => tx.status === 'pending').map((tx) => tx.txId).join(',')]);
+  }, [pendingTxIdsKey, transactions]);
 
   // Auto-dismiss confirmed/failed transactions after TX_AUTO_DISMISS_DELAY
   useEffect(() => {
@@ -167,7 +180,7 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
     });
 
     return () => timers.forEach(clearTimeout);
-  }, [transactions.filter((tx) => tx.status !== 'pending').map((tx) => tx.txId).join(',')]);
+  }, [settledTxIdsKey, transactions]);
 
   return (
     <TransactionContext.Provider
