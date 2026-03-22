@@ -167,31 +167,66 @@ If user checks in after 144 blocks from last check-in, streak is broken and stak
 ### Component Structure
 ```
 src/
+├── App.tsx                    # Root with providers and routing
 ├── components/
-│   ├── WalletConnect.tsx       # Wallet connection UI
-│   ├── HabitForm.tsx           # Create new habit form
-│   ├── HabitList.tsx           # Display user's habits
-│   ├── HabitCard.tsx           # Individual habit component
-│   ├── CheckInButton.tsx       # Daily check-in action
-│   ├── StreakCounter.tsx       # Visual streak display
-│   └── HabitCalendar.tsx       # Monthly check-in calendar
+│   ├── ConfirmationDialog.tsx # Modal for destructive actions
+│   ├── Dashboard.tsx          # User statistics overview
+│   ├── ErrorBoundary.tsx      # Error catching component
+│   ├── Footer.tsx             # Site footer with links
+│   ├── HabitCard.tsx          # Individual habit with check-in/withdraw/claim
+│   ├── HabitForm.tsx          # Create new habit form
+│   ├── HabitList.tsx          # Display and filter habits by status
+│   ├── Header.tsx             # Navigation and wallet display
+│   ├── LoadingSpinner.tsx     # Loading indicator
+│   ├── PoolDisplay.tsx        # Forfeited pool balance
+│   ├── RateLimitBanner.tsx    # API rate limit warning
+│   ├── Skeletons.tsx          # Loading placeholders
+│   ├── StatsCard.tsx          # Statistics display card
+│   ├── ThemeToggle.tsx        # Dark/light mode toggle
+│   ├── Toast.tsx              # Notification component
+│   ├── ToastContainer.tsx     # Toast display layer
+│   ├── TransactionTracker.tsx # Pending transaction display
+│   └── WalletConnect.tsx      # Wallet connection screen
+├── context/
+│   ├── ThemeContext.tsx       # Dark/light theme state
+│   ├── ToastContext.tsx       # Notification state management
+│   ├── TransactionContext.tsx # Pending transaction tracking
+│   └── WalletContext.tsx      # Wallet connection state
 ├── hooks/
-│   ├── useWallet.ts            # Wallet state management
-│   ├── useUserHabits.ts        # Fetch user habits
-│   ├── useCheckIn.ts           # Check-in transaction logic
-│   └── useContractRead.ts      # Read-only contract calls
+│   ├── useCurrentBlock.ts     # Current block height polling
+│   ├── useHabits.ts           # Habits data, stats, and mutations
+│   ├── useHashParam.ts        # URL hash parameter state
+│   └── useHashRoute.ts        # Hash-based SPA routing
 ├── services/
-│   ├── contract.ts             # Contract interaction layer
-│   └── wallet.ts               # Wallet connection logic
-└── types/
-    └── habit.ts                # TypeScript interfaces
+│   ├── contractService.ts     # Smart contract interactions
+│   └── walletService.ts       # Wallet connection logic
+├── styles/
+│   └── global.css             # Tailwind layers and custom styles
+├── types/
+│   └── habit.ts               # TypeScript interfaces
+└── utils/
+    ├── constants.ts           # Network and contract configuration
+    ├── formatting.ts          # Value formatting (STX, blocks, time)
+    ├── habitStatus.ts         # Check-in window state calculations
+    └── validation.ts          # Input validation functions
 ```
 
 ### State Management
 
-**Local state:** React hooks + Context API
-**Blockchain state:** Read from contract via API calls
-**User session:** LocalStorage for wallet connection persistence
+**Server State:** React Query (@tanstack/react-query)
+- Handles caching, refetching, and optimistic updates
+- 2-minute polling interval for habits
+- 5-minute cache for pool balance
+
+**UI State:** React Context API
+- WalletContext: Connection and balance
+- TransactionContext: Pending transaction tracking
+- ToastContext: Notifications
+- ThemeContext: Dark/light mode
+
+**URL State:** Hash-based routing
+- useHashRoute for page navigation
+- useHashParam for filter state (e.g., active tab)
 
 ### Transaction Flow
 ```
@@ -230,10 +265,11 @@ User Action (Click) →
 
 ### Performance Optimizations
 
-1. **Batch Reads:** Fetch all user habits in single API call
-2. **Lazy Loading:** Load habit details on-demand
-3. **Client-side Caching:** Cache contract reads with 10-block TTL
-4. **Optimistic UI:** Update UI before transaction confirms
+1. **Code Splitting:** Route-level lazy loading with React.lazy()
+2. **React Query Caching:** 2-minute stale time reduces API calls
+3. **Optimistic Updates:** UI updates immediately, reverts on error
+4. **Skeleton Loading:** Layout-stable loading states prevent CLS
+5. **Memoization:** useMemo for expensive calculations (Dashboard stats)
 
 ## Deployment Strategy
 
@@ -252,6 +288,6 @@ User Action (Click) →
 
 ---
 
-**Version:** 0.1.0  
-**Last Updated:** 2026-02-08  
+**Version:** 1.0.0
+**Last Updated:** 2026-03-22
 **Network:** Stacks Mainnet
