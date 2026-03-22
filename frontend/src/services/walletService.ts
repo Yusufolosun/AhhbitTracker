@@ -1,4 +1,4 @@
-import { AppConfig, UserSession, showConnect, clearSelectedProviderId } from '@stacks/connect';
+import { AppConfig, UserSession, showConnect, clearSelectedProviderId, FinishedAuthData } from '@stacks/connect';
 import { NETWORK } from '../utils/constants';
 
 const appConfig = new AppConfig(['store_write', 'publish_data']);
@@ -8,7 +8,7 @@ export const walletService = {
   /**
    * Connect wallet — shows picker if no wallet was previously selected
    */
-  connect: (onFinish?: (payload: any) => void, onCancel?: () => void) => {
+  connect: (onFinish?: (payload: FinishedAuthData) => void, onCancel?: () => void) => {
     showConnect({
       appDetails: {
         name: 'AhhbitTracker',

@@ -9,6 +9,13 @@ import { toMicroSTX } from '../utils/formatting';
  *  genuine second habit within the same session isn't blocked forever. */
 const POST_SIGN_LOCK_MS = 45_000;
 
+/** Type guard to extract error message from unknown error */
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  return 'An unknown error occurred';
+}
+
 export function HabitForm() {
   const [name, setName] = useState('');
   const [stake, setStake] = useState('0.1');
@@ -60,11 +67,12 @@ export function HabitForm() {
       lockTimerRef.current = setTimeout(() => setLockedUntil(null), POST_SIGN_LOCK_MS);
 
       showToast('Transaction signed! Your habit will appear once confirmed on-chain.', 'success');
-    } catch (err: any) {
-      if (err.message === 'Transaction cancelled') {
+    } catch (err: unknown) {
+      const message = getErrorMessage(err);
+      if (message === 'Transaction cancelled') {
         showToast('Transaction was cancelled.', 'error');
       } else {
-        showToast(err.message || 'Failed to create habit', 'error');
+        showToast(message, 'error');
       }
     }
   };
