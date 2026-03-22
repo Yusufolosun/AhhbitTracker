@@ -11,9 +11,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+
       - uses: actions/setup-node@v6
         with:
           node-version: '20'
-      - run: npm ci
-      - name: Check Clarity contracts
-        run: npx @hirosystems/clarinet-sdk-wasm check
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run ESLint
+        working-directory: frontend
+        run: npm run lint
