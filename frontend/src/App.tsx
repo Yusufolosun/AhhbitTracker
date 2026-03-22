@@ -23,18 +23,33 @@ const HabitForm = lazy(() => import('./components/HabitForm').then(m => ({ defau
 const HabitList = lazy(() => import('./components/HabitList').then(m => ({ default: m.HabitList })));
 const PoolDisplay = lazy(() => import('./components/PoolDisplay').then(m => ({ default: m.PoolDisplay })));
 
+/** API error shape for rate limit detection */
+interface ApiError {
+  status?: number;
+  message?: string;
+  headers?: { get?: (key: string) => string | null };
+}
+
+/** Type guard for checking if an error has API error properties */
+function isApiError(error: unknown): error is ApiError {
+  return typeof error === 'object' && error !== null;
+}
+
 // Create a react-query client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      retry: (failureCount, error: any) => {
+      retry: (failureCount, error: unknown) => {
         // Stop retrying after 3 attempts
         if (failureCount >= 3) return false;
         // Detect 429 and emit rate-limit event for the banner
-        if (error?.status === 429 || error?.message?.includes('429')) {
-          const retryAfter = parseInt(error?.headers?.get?.('Retry-After') || '30', 10);
-          emitRateLimitEvent(retryAfter);
+        if (isApiError(error)) {
+          const is429 = error.status === 429 || error.message?.includes('429');
+          if (is429) {
+            const retryAfter = parseInt(error.headers?.get?.('Retry-After') ?? '30', 10);
+            emitRateLimitEvent(retryAfter);
+          }
         }
         return true;
       },
