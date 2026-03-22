@@ -14,6 +14,13 @@ interface HabitCardProps {
   habit: Habit;
 }
 
+/** Type guard to extract error message from unknown error */
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  return 'An unknown error occurred';
+}
+
 export function HabitCard({ habit }: HabitCardProps) {
   const { checkIn, withdrawStake, claimBonus, slashHabit, poolBalance, pendingCheckIns, pendingWithdrawals, pendingClaims, pendingSlashes } = useHabits();
   const { showToast } = useToast();
@@ -31,13 +38,14 @@ export function HabitCard({ habit }: HabitCardProps) {
     try {
       await checkIn(habit.habitId);
       showToast('Check-in signed! It will update once confirmed on-chain.', 'success');
-    } catch (err: any) {
-      if (err.message === 'Transaction cancelled') {
+    } catch (err: unknown) {
+      const message = getErrorMessage(err);
+      if (message === 'Transaction cancelled') {
         showToast('Check-in was cancelled.', 'error');
-      } else if (err.message?.includes('u114') || err.message?.includes('ERR-HABIT-AUTO-SLASHED')) {
+      } else if (message.includes('u114') || message.includes('ERR-HABIT-AUTO-SLASHED')) {
         showToast('Your habit was forfeited because the check-in window expired.', 'error');
       } else {
-        showToast(err.message || 'Check-in failed', 'error');
+        showToast(message, 'error');
       }
     }
   };
@@ -68,11 +76,12 @@ export function HabitCard({ habit }: HabitCardProps) {
         await slashHabit(habit.habitId);
         showToast('Habit finalized! Stake will be moved to the pool once confirmed on-chain.', 'success');
       }
-    } catch (err: any) {
-      if (err.message === 'Transaction cancelled') {
+    } catch (err: unknown) {
+      const message = getErrorMessage(err);
+      if (message === 'Transaction cancelled') {
         showToast('Transaction was cancelled.', 'error');
       } else {
-        showToast(err.message || 'Transaction failed', 'error');
+        showToast(message, 'error');
       }
     }
   };
