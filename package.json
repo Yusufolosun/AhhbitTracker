@@ -55,6 +55,7 @@
   "dependencies": {
     "@stacks/clarinet-sdk": "^3.14.1",
     "@stacks/transactions": "^7.2.0",
+    "@stacks/wallet-sdk": "^7.2.0",
     "@types/node": "^25.3.3",
     "@yusufolosun/stx-utils": "^2.0.1",
     "chokidar-cli": "^3.0.0",
@@ -63,6 +64,7 @@
   },
   "devDependencies": {
     "@stacks/network": "^7.3.1",
+    "@vitest/coverage-v8": "^4.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18",
