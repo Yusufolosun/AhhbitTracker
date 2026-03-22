@@ -10,6 +10,11 @@ import {
 } from '@stacks/transactions';
 import { CONTRACT_ADDRESS, CONTRACT_NAME, NETWORK } from '../utils/constants';
 import { walletService } from './walletService';
+import type {
+  HabitContractResponse,
+  UserHabitsContractResponse,
+  UserStatsContractResponse,
+} from '../types/habit';
 
 /** Races a promise against a 10-second timeout so API calls don't hang. */
 function withTimeout<T>(promise: Promise<T>, ms = 10_000): Promise<T> {
@@ -187,7 +192,7 @@ export const contractService = {
   /**
    * Get habit details
    */
-  async getHabit(habitId: number): Promise<any> {
+  async getHabit(habitId: number): Promise<HabitContractResponse> {
     const result = await withTimeout(fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
@@ -197,13 +202,13 @@ export const contractService = {
       senderAddress: CONTRACT_ADDRESS,
     }));
 
-    return cvToJSON(result);
+    return cvToJSON(result) as HabitContractResponse;
   },
 
   /**
    * Get user habits
    */
-  async getUserHabits(userAddress: string): Promise<any> {
+  async getUserHabits(userAddress: string): Promise<UserHabitsContractResponse> {
     const result = await withTimeout(fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
@@ -213,7 +218,7 @@ export const contractService = {
       senderAddress: CONTRACT_ADDRESS,
     }));
 
-    return cvToJSON(result);
+    return cvToJSON(result) as UserHabitsContractResponse;
   },
 
   /**
@@ -236,7 +241,7 @@ export const contractService = {
   /**
    * Get user stats
    */
-  async getUserStats(userAddress: string): Promise<any> {
+  async getUserStats(userAddress: string): Promise<UserStatsContractResponse> {
     const result = await withTimeout(fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
@@ -246,6 +251,6 @@ export const contractService = {
       senderAddress: CONTRACT_ADDRESS,
     }));
 
-    return cvToJSON(result);
+    return cvToJSON(result) as UserStatsContractResponse;
   },
 };

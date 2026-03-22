@@ -6,9 +6,6 @@ import { useTransactions } from '../context/TransactionContext';
 import {
   Habit,
   UserStats,
-  HabitContractResponse,
-  UserHabitsContractResponse,
-  UserStatsContractResponse,
 } from '../types/habit';
 import { POLLING_INTERVAL, CACHE_TIME, POOL_CACHE_TIME } from '../utils/constants';
 
@@ -76,9 +73,7 @@ export const useHabits = () => {
     queryKey: ['habits', walletState.address],
     queryFn: async () => {
       if (!walletState.address) return [];
-      const result = (await contractService.getUserHabits(
-        walletState.address
-      )) as UserHabitsContractResponse;
+      const result = await contractService.getUserHabits(walletState.address);
 
       // Parse habit IDs from result
       // get-user-habits returns: { habit-ids: (list) }
@@ -93,7 +88,7 @@ export const useHabits = () => {
             return null;
           }
 
-          const habitData = (await contractService.getHabit(habitId)) as HabitContractResponse;
+          const habitData = await contractService.getHabit(habitId);
 
           // Check if optional value exists (habitData.value will be the tuple)
           if (habitData.value?.value) {
@@ -136,9 +131,7 @@ export const useHabits = () => {
     queryKey: ['userStats', walletState.address],
     queryFn: async () => {
       if (!walletState.address) return null;
-      const result = (await contractService.getUserStats(
-        walletState.address
-      )) as UserStatsContractResponse;
+      const result = await contractService.getUserStats(walletState.address);
 
       // get-user-stats returns a response type
       if (result.success && result.value?.value) {
