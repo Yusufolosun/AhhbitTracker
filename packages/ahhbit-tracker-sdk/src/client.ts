@@ -27,8 +27,14 @@ function contractPrincipal(c: ContractId): string {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseHabit(json: any): Habit | null {
-  if (!json || json.type === 'none') return null;
-  const v = json.value ?? json;
+  // Handle none/null cases - type includes "(optional none)" or value is null
+  if (!json || json.value === null || json.type?.includes('optional none')) return null;
+  // Unwrap optional: some has nested value with tuple inside
+  let v = json.value ?? json;
+  // If v is a tuple wrapper, unwrap to get the actual fields
+  if (v && typeof v === 'object' && v.value && typeof v.value === 'object') {
+    v = v.value;
+  }
   return {
     owner: v.owner?.value ?? v.owner,
     name: v.name?.value ?? v.name,
@@ -62,7 +68,26 @@ function parseUserStats(json: any): UserStats {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function unwrapOkNumber(json: any): number {
-  if (json?.type === 'ok') return Number(json.value.value);
+  // Handle new format with success field: {"type":"(response...)", "success":true, "value":{...}}
+  if (json?.success === true) {
+    const inner = json.value;
+    if (inner && typeof inner === 'object' && 'value' in inner) {
+      return Number(inner.value);
+    }
+    return Number(inner ?? 0);
+  }
+  // Handle old format: {"type":"ok", "value":{...}}
+  if (json?.type === 'ok' || json?.type === 'response_ok') {
+    const inner = json.value;
+    if (inner && typeof inner === 'object' && 'value' in inner) {
+      return Number(inner.value);
+    }
+    return Number(inner ?? 0);
+  }
+  // Direct uint type
+  if (json?.type === 'uint' || json?.type?.includes('uint')) {
+    return Number(json.value ?? 0);
+  }
   return Number(json?.value ?? 0);
 }
 
