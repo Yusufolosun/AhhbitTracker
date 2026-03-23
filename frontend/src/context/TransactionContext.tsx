@@ -84,7 +84,7 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
       {
         txId,
         functionName,
-        status: 'pending',
+        status: 'pending' as const,
         timestamp: Date.now(),
       },
       ...prev,

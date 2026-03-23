@@ -13,6 +13,7 @@ function makeHabit(overrides: Partial<Habit> = {}): Habit {
     currentStreak: 3,
     isActive: true,
     isCompleted: false,
+    bonusClaimed: false,
     ...overrides,
   };
 }

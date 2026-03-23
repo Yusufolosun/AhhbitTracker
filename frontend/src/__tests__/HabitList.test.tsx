@@ -9,7 +9,7 @@ vi.mock('../hooks/useCurrentBlock', () => ({
 }));
 
 vi.mock('../hooks/useHashParam', () => ({
-  useHashParam: (key: string, def: string) => [def, vi.fn()],
+  useHashParam: (_key: string, def: string) => [def, vi.fn()],
 }));
 
 vi.mock('../utils/habitStatus', () => ({
