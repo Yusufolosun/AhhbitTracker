@@ -64,10 +64,11 @@
   },
   "devDependencies": {
     "@stacks/network": "^7.3.1",
-    "@vitest/coverage-v8": "^4.1.0",
+    "@vitest/coverage-v8": "^2.1.9",
+    "jsdom": "^26.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.18",
+    "vitest": "^2.1.9",
     "vitest-environment-clarinet": "^3.0.2"
   }
 }
