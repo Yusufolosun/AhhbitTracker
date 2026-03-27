@@ -141,7 +141,7 @@ Claims bonus from forfeited pool.
 **Errors:**
 - `u103` - ERR-HABIT-NOT-FOUND
 - `u104` - ERR-NOT-HABIT-OWNER
-- `u108` - ERR-HABIT-ALREADY-COMPLETED (must be completed to claim)
+- `u107` - ERR-INSUFFICIENT-STREAK (habit must be completed to claim)
 - `u109` - ERR-POOL-INSUFFICIENT-BALANCE
 - `u110` - ERR-TRANSFER-FAILED
 
