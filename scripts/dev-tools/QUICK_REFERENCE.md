@@ -39,5 +39,5 @@ npm run dev:test get-habit 1
 | get-habit | read | habit-id |
 | get-user-habits | read | user |
 | get-habit-streak | read | habit-id |
-| get-forfeited-pool-balance | read | none |
+| get-pool-balance | read | none |
 | get-user-stats | read | user |
