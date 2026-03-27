@@ -14,7 +14,7 @@ ts-node scripts/dev-tools/inspect-contract.ts
 Test read-only functions:
 ```bash
 ts-node scripts/dev-tools/test-function.ts get-habit 1
-ts-node scripts/dev-tools/test-function.ts get-forfeited-pool-balance
+ts-node scripts/dev-tools/test-function.ts get-pool-balance
 ```
 
 ### Nonce Checker
