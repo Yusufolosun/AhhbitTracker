@@ -53,6 +53,7 @@ User → check-in(habit-id) → Contract
   ├─ Verify habit exists
   ├─ Verify caller is owner
   ├─ Calculate blocks since last check-in
+  ├─ Require blocks elapsed ≥ MIN-CHECK-IN-INTERVAL (120)
   ├─ If > CHECK-IN-WINDOW blocks:
   │   ├─ Mark streak as broken
   │   ├─ Forfeit stake to pool
@@ -97,7 +98,8 @@ User → claim-bonus(habit-id) → Contract
     last-check-in-block: uint,
     created-at-block: uint,
     is-active: bool,
-    is-completed: bool
+    is-completed: bool,
+    bonus-claimed: bool
   }
 }
 ```
@@ -127,6 +129,7 @@ Stacks produces blocks approximately every **10 minutes**.
 
 **Check-in validation:**
 ```
+current-block-height - last-check-in-block ≥ MIN-CHECK-IN-INTERVAL (120 blocks)
 current-block-height - last-check-in-block ≤ CHECK-IN-WINDOW (144 blocks)
 ```
 
