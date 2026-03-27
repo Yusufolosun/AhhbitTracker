@@ -33,7 +33,7 @@ Records daily check-in for a habit.
 - `ERR-HABIT-NOT-FOUND` - Habit doesn't exist
 - `ERR-NOT-HABIT-OWNER` - Caller not owner
 - `ERR-ALREADY-CHECKED-IN` - Already checked in today
-- `ERR-CHECK-IN-WINDOW-EXPIRED` - Missed check-in window
+- `ERR-HABIT-AUTO-SLASHED` - Missed check-in window and stake forfeited
 
 #### withdraw-stake
 Withdraws stake after completing minimum streak.
