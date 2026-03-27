@@ -48,11 +48,11 @@ Purchase STX from:
 
 ### What's the minimum stake?
 
-0.1 STX (100,000 microSTX)
+0.02 STX (20,000 microSTX)
 
 ### Can I stake more?
 
-Yes! There's no maximum. Higher stakes = stronger commitment.
+Yes, up to 100 STX per habit (100,000,000 microSTX). Higher stakes = stronger commitment.
 
 ### How often must I check in?
 
