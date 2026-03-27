@@ -254,13 +254,13 @@ Gets current streak for a habit.
 
 ---
 
-### get-forfeited-pool-balance
+### get-pool-balance
 
 Gets total balance in forfeited pool.
 
 **Signature:**
 ```clarity
-(define-read-only (get-forfeited-pool-balance))
+(define-read-only (get-pool-balance))
 ```
 
 **Parameters:** None
@@ -270,7 +270,7 @@ Gets total balance in forfeited pool.
 
 **Example:**
 ```clarity
-(contract-call? '.habit-tracker-v2 get-forfeited-pool-balance)
+(contract-call? '.habit-tracker-v2 get-pool-balance)
 ;; Returns: (ok u2500000) - Pool has 2.5 STX
 ```
 
