@@ -90,7 +90,7 @@ Gets current streak for a habit.
 **Parameters:** `habit-id` (uint)  
 **Returns:** Streak count
 
-#### get-forfeited-pool-balance
+#### get-pool-balance
 Gets total balance in forfeited pool.
 
 **Returns:** Pool balance in microSTX
