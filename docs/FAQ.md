@@ -220,16 +220,16 @@ No. All blockchain transactions are public. Anyone can see:
 **Common Causes:**
 1. You already checked in today
 2. You just created the habit and tried to check in immediately
-3. Less than 1 block has passed since last check-in
+3. Less than 120 blocks have passed since last check-in
 
 **Solution:**
-- If you just created the habit: Wait at least 10 minutes (1 Stacks block) before first check-in
+- If you just created the habit: Wait at least ~20 hours (120 Stacks blocks) before first check-in
 - If you already checked in: Wait until next day for your next check-in
 - Check the habit details with `get-habit` to see `last-check-in-block`
 
 ### "Window Expired" error
 
-You missed your 24-hour window. Your stake has been forfeited.
+You missed your 24-hour window. Your stake was auto-slashed and moved to the forfeited pool (`err u114`).
 
 ### "Insufficient Streak" error
 
@@ -268,11 +268,14 @@ No. Only you (the owner) can check in or withdraw from your habits.
 - `(err u103)` - ERR-HABIT-NOT-FOUND: Habit ID doesn't exist
 - `(err u104)` - ERR-NOT-HABIT-OWNER: You're not the owner of this habit
 - `(err u105)` - ERR-ALREADY-CHECKED-IN: You already checked in or just created the habit
-- `(err u106)` - ERR-CHECK-IN-WINDOW-EXPIRED: Missed 24-hour window, stake forfeited
 - `(err u107)` - ERR-INSUFFICIENT-STREAK: Need 7+ consecutive check-ins to withdraw
 - `(err u108)` - ERR-HABIT-ALREADY-COMPLETED: Habit already completed
 - `(err u109)` - ERR-POOL-INSUFFICIENT-BALANCE: Not enough STX in forfeited pool
 - `(err u110)` - ERR-TRANSFER-FAILED: STX transfer issue
+- `(err u111)` - ERR-BONUS-ALREADY-CLAIMED: Bonus already claimed for this habit
+- `(err u112)` - ERR-HABIT-LIMIT-REACHED: Maximum habit count reached for this user
+- `(err u113)` - ERR-STAKE-TOO-HIGH: Stake exceeds 100 STX cap
+- `(err u114)` - ERR-HABIT-AUTO-SLASHED: Missed 24-hour window; stake forfeited
 
 **Troubleshooting Tip:** Use `get-habit` to check habit status before transactions.
 
