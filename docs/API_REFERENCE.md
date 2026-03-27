@@ -216,13 +216,12 @@ Gets all habit IDs for a user.
 - `user` (principal): User's address
 
 **Returns:**
-- Success: `(some {habit-ids: (list ...)})` 
-- Not found: `none`
+- Always returns: `{habit-ids: (list 100 uint)}` (empty list for users with no habits)
 
 **Example:**
 ```clarity
 (contract-call? '.habit-tracker-v2 get-user-habits 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z)
-;; Returns: (some {habit-ids: (list u1 u2 u3)})
+;; Returns: {habit-ids: (list u1 u2 u3)}
 ```
 
 **Gas Cost:** Free (read-only)
