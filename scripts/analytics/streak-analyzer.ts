@@ -1,5 +1,5 @@
 import { STACKS_MAINNET } from "@stacks/network";
-import { callReadOnlyFunction, uintCV, cvToJSON } from "@stacks/transactions";
+import { fetchCallReadOnlyFunction, uintCV, cvToJSON } from "@stacks/transactions";
 
 const NETWORK = STACKS_MAINNET;
 const CONTRACT_ADDRESS = "SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z";
@@ -11,7 +11,7 @@ async function analyzeStreaks(habitIds: number[]) {
   
   const streaks = await Promise.all(
     habitIds.map(async (id) => {
-      const result = await callReadOnlyFunction({
+      const result = await fetchCallReadOnlyFunction({
         contractAddress: CONTRACT_ADDRESS,
         contractName: CONTRACT_NAME,
         functionName: "get-habit-streak",
