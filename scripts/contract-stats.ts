@@ -10,7 +10,7 @@ async function getContractStats() {
 
   try {
     // Get pool balance via read-only function call
-    const poolUrl = `${NETWORK_API}/v2/contracts/call-read/${CONTRACT_ADDRESS}/${CONTRACT_NAME}/get-forfeited-pool-balance`;
+    const poolUrl = `${NETWORK_API}/v2/contracts/call-read/${CONTRACT_ADDRESS}/${CONTRACT_NAME}/get-pool-balance`;
     const poolResponse = await fetch(poolUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
