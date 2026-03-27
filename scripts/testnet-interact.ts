@@ -42,7 +42,7 @@ export async function testGetPoolBalance() {
   console.log("\nFetching forfeited pool balance");
   console.log("  Contract:", `${CONTRACT_ADDRESS}.${CONTRACT_NAME}`);
   console.log("\nUse Clarinet console or wallet to execute:");
-  console.log(`(contract-call? '${CONTRACT_ADDRESS}.${CONTRACT_NAME} get-forfeited-pool-balance)`);
+  console.log(`(contract-call? '${CONTRACT_ADDRESS}.${CONTRACT_NAME} get-pool-balance)`);
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
