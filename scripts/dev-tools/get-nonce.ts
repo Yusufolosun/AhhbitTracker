@@ -1,13 +1,13 @@
-import { getNonce } from "@stacks/transactions";
-import { StacksMainnet } from "@stacks/network";
+import { fetchNonce } from "@stacks/transactions";
+import { STACKS_MAINNET } from "@stacks/network";
 
-const NETWORK = new StacksMainnet();
+const NETWORK = STACKS_MAINNET;
 
 async function checkNonce(address: string) {
   console.log(`Checking nonce for: ${address}`);
   console.log("=".repeat(70));
   
-  const nonce = await getNonce(address, NETWORK);
+  const nonce = await fetchNonce({ address, network: NETWORK });
   
   console.log(`Current Nonce: ${nonce}`);
   console.log(`Next Transaction Nonce: ${Number(nonce)}`);
