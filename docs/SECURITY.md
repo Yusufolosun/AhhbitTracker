@@ -184,7 +184,9 @@ const result = await createHabit(name, stake);
 
 **Recommended:**
 ```typescript
-const network = new StacksMainnet();
+import { STACKS_MAINNET } from '@stacks/network';
+
+const network = STACKS_MAINNET;
 // Uses: https://api.mainnet.hiro.so
 ```
 
