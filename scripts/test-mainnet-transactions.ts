@@ -12,7 +12,7 @@ console.log();
 
 console.log("PLANNED TEST TRANSACTIONS:");
 console.log();
-console.log("1. Create Habit - Valid (0.1 STX stake)");
+console.log("1. Create Habit - Valid (0.02 STX stake)");
 console.log("   - Test minimum stake amount");
 console.log("   - Verify habit creation and ID assignment");
 console.log();
@@ -32,7 +32,7 @@ console.log("5. Get User Habits - Read-only Query");
 console.log("   - Test user habit list");
 console.log("   - Verify habit IDs returned");
 console.log();
-console.log("6. Get Forfeited Pool Balance - Read-only Query");
+console.log("6. Get Pool Balance - Read-only Query");
 console.log("   - Test pool balance query");
 console.log("   - Should be 0 initially");
 console.log();
