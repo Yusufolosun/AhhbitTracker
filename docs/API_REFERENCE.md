@@ -65,7 +65,7 @@ Records a daily check-in for a habit.
 - `u103` - ERR-HABIT-NOT-FOUND
 - `u104` - ERR-NOT-HABIT-OWNER
 - `u105` - ERR-ALREADY-CHECKED-IN
-- `u106` - ERR-CHECK-IN-WINDOW-EXPIRED
+- `u114` - ERR-HABIT-AUTO-SLASHED
 - `u108` - ERR-HABIT-ALREADY-COMPLETED
 
 **Example:**
@@ -77,7 +77,7 @@ Records a daily check-in for a habit.
 **Requirements:**
 - Caller must be habit owner
 - Habit must be active
-- Must not have checked in within last 14 blocks
+- Must not have checked in within last 120 blocks (~20 hours)
 - Must check in within 144 blocks of last check-in
 
 **Gas Cost:** ~50,000 microSTX
