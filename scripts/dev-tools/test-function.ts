@@ -1,4 +1,4 @@
-import { callReadOnlyFunction, uintCV, stringUtf8CV, principalCV } from "@stacks/transactions";
+import { fetchCallReadOnlyFunction, uintCV, stringUtf8CV, principalCV } from "@stacks/transactions";
 import { STACKS_MAINNET } from "@stacks/network";
 
 const NETWORK = STACKS_MAINNET;
@@ -13,7 +13,7 @@ async function testReadOnlyFunction(
   console.log("=".repeat(70));
   
   try {
-    const result = await callReadOnlyFunction({
+    const result = await fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
       functionName,
