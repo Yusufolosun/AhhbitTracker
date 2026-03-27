@@ -44,8 +44,8 @@ if (!fn) {
 
 if (fn === 'get-habit' && habitId) {
   testReadOnlyFunction('get-habit', [uintCV(parseInt(habitId))]);
-} else if (fn === 'get-forfeited-pool-balance') {
-  testReadOnlyFunction('get-forfeited-pool-balance', []);
+} else if (fn === 'get-pool-balance') {
+  testReadOnlyFunction('get-pool-balance', []);
 } else {
   console.log("Unsupported function or missing parameters");
 }
