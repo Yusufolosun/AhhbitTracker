@@ -5,9 +5,10 @@
 # and network-specific sensitive data
 Mainnet.toml
 Testnet.toml
+Devnet.toml
 settings/Mainnet.toml
 settings/Testnet.toml
-# Note: Devnet.toml is safe - uses standard Clarinet test mnemonics
+settings/Devnet.toml
 
 # ============================================
 # ENVIRONMENT VARIABLES (CRITICAL)
@@ -143,10 +144,7 @@ fix_encoding.py
 .netlify
 
 # Clarinet settings (network configs)
-settings/Mainnet.toml
-settings/Testnet.toml
-# Note: Allow Devnet.toml as it uses standard Clarinet test mnemonics
-!settings/Devnet.toml
+settings/*.toml
 
 scripts/test/
 scripts/test2/
