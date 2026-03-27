@@ -511,6 +511,7 @@ Use `@stacks/transactions` and `@stacks/connect`:
 ```typescript
 import { openContractCall } from '@stacks/connect';
 import { uintCV, stringUtf8CV } from '@stacks/transactions';
+import { STACKS_MAINNET } from '@stacks/network';
 
 const txOptions = {
   contractAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
@@ -520,7 +521,7 @@ const txOptions = {
     stringUtf8CV('Morning Exercise'),
     uintCV(500000)
   ],
-  network: new StacksMainnet(),
+  network: STACKS_MAINNET,
 };
 
 await openContractCall(txOptions);
@@ -529,7 +530,7 @@ await openContractCall(txOptions);
 ### Rate Limiting
 
 No built-in rate limiting. Frontend should implement:
-- Check-in cooldown (14 blocks minimum)
+- Check-in cooldown (120 blocks minimum)
 - Transaction queue management
 - User-side validation before submission
 
