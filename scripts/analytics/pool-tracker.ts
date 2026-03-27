@@ -1,8 +1,8 @@
-import { StacksMainnet } from "@stacks/network";
+import { STACKS_MAINNET } from "@stacks/network";
 import { callReadOnlyFunction, cvToJSON } from "@stacks/transactions";
 import * as fs from "fs";
 
-const NETWORK = new StacksMainnet();
+const NETWORK = STACKS_MAINNET;
 const CONTRACT_ADDRESS = "SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z";
 const CONTRACT_NAME = "habit-tracker-v2";
 
