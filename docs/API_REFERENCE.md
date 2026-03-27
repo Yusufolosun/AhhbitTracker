@@ -314,6 +314,10 @@ Gets aggregated statistics for a user.
 **Value:** `u20000` (0.02 STX in microSTX)  
 **Description:** Minimum stake required to create a habit
 
+### MAX-STAKE-AMOUNT
+**Value:** `u100000000` (100 STX in microSTX)  
+**Description:** Maximum stake allowed per habit
+
 ### MAX-HABIT-NAME-LENGTH
 **Value:** `u50`  
 **Description:** Maximum characters in habit name
@@ -321,6 +325,10 @@ Gets aggregated statistics for a user.
 ### CHECK-IN-WINDOW
 **Value:** `u144` (blocks)  
 **Description:** Maximum blocks between check-ins (~24 hours)
+
+### MIN-CHECK-IN-INTERVAL
+**Value:** `u120` (blocks)  
+**Description:** Minimum blocks required between check-ins (~20 hours)
 
 ### MIN-STREAK-FOR-WITHDRAWAL
 **Value:** `u7`  
