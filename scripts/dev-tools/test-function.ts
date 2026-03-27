@@ -1,4 +1,4 @@
-import { fetchCallReadOnlyFunction, uintCV, stringUtf8CV, principalCV } from "@stacks/transactions";
+import { fetchCallReadOnlyFunction, uintCV, stringUtf8CV, principalCV, cvToJSON } from "@stacks/transactions";
 import { STACKS_MAINNET } from "@stacks/network";
 
 const NETWORK = STACKS_MAINNET;
@@ -23,7 +23,7 @@ async function testReadOnlyFunction(
     });
     
     console.log("Result:");
-    console.log(JSON.stringify(result, null, 2));
+    console.log(JSON.stringify(cvToJSON(result), null, 2));
     console.log();
     console.log("[OK] Function call successful");
     
