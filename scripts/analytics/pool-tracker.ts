@@ -1,5 +1,5 @@
 import { STACKS_MAINNET } from "@stacks/network";
-import { callReadOnlyFunction, cvToJSON } from "@stacks/transactions";
+import { fetchCallReadOnlyFunction, cvToJSON } from "@stacks/transactions";
 import * as fs from "fs";
 
 const NETWORK = STACKS_MAINNET;
@@ -13,7 +13,7 @@ interface PoolSnapshot {
 }
 
 async function trackPoolBalance() {
-  const result = await callReadOnlyFunction({
+  const result = await fetchCallReadOnlyFunction({
     contractAddress: CONTRACT_ADDRESS,
     contractName: CONTRACT_NAME,
     functionName: "get-pool-balance",
