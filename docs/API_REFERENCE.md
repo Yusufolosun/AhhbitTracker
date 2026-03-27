@@ -188,7 +188,8 @@ Retrieves habit details by ID.
   last-check-in-block: uint,
   created-at-block: uint,
   is-active: bool,
-  is-completed: bool
+  is-completed: bool,
+  bonus-claimed: bool
 }
 ```
 
@@ -365,7 +366,8 @@ Gets aggregated statistics for a user.
   last-check-in-block: uint,
   created-at-block: uint,
   is-active: bool,
-  is-completed: bool
+  is-completed: bool,
+  bonus-claimed: bool
 }
 ```
 
