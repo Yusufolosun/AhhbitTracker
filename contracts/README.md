@@ -104,8 +104,10 @@ Gets aggregated statistics for a user.
 ## Constants
 
 - `MIN-STAKE-AMOUNT`: 20,000 microSTX (0.02 STX)
+- `MAX-STAKE-AMOUNT`: 100,000,000 microSTX (100 STX)
 - `MAX-HABIT-NAME-LENGTH`: 50 characters
 - `CHECK-IN-WINDOW`: 144 blocks (~24 hours)
+- `MIN-CHECK-IN-INTERVAL`: 120 blocks (~20 hours)
 - `MIN-STREAK-FOR-WITHDRAWAL`: 7 days
 
 ## Data Structures
