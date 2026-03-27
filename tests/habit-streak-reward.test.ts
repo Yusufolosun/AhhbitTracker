@@ -85,9 +85,10 @@ function isMilestoneClaimed(habitId: number, milestone: number) {
 }
 
 // Build a streak by mining blocks and checking in
+// MIN-CHECK-IN-INTERVAL is 120 blocks, so we mine at least 120 blocks between check-ins
 function buildStreak(caller: string, habitId: number, days: number) {
   for (let i = 0; i < days; i++) {
-    simnet.mineEmptyBlocks(1);
+    simnet.mineEmptyBlocks(120);
     const result = checkIn(caller, habitId);
     expect(result.result).toBeOk(Cl.uint(i + 1));
   }
@@ -121,12 +122,11 @@ describe("Habit Streak Reward Contract", () => {
     });
 
     it("should transfer STX from funder to contract", () => {
-      const balanceBefore = simnet.getAssetsMap().get(user1)?.get("STX") || 0n;
-      fundPool(user1, FUND_AMOUNT);
-      const balanceAfter = simnet.getAssetsMap().get(user1)?.get("STX") || 0n;
+      const result = fundPool(user1, FUND_AMOUNT);
+      expect(result.result).toBeOk(Cl.uint(FUND_AMOUNT));
 
-      expect(balanceBefore).toBeGreaterThan(0n);
-      expect(balanceAfter).toBe(balanceBefore - BigInt(FUND_AMOUNT));
+      const balance = getRewardPoolBalance();
+      expect(balance.result).toBeOk(Cl.uint(FUND_AMOUNT));
     });
   });
 
@@ -284,12 +284,14 @@ describe("Habit Streak Reward Contract", () => {
       createHabit(user1, "Exercise", MIN_STAKE);
       buildStreak(user1, 1, 7);
 
-      const balanceBefore = simnet.getAssetsMap().get(user1)?.get("STX") || 0n;
-      claimMilestoneReward(user1, 1, 7);
-      const balanceAfter = simnet.getAssetsMap().get(user1)?.get("STX") || 0n;
+      const beforePool = getRewardPoolBalance();
+      expect(beforePool.result).toBeOk(Cl.uint(FUND_AMOUNT));
 
-      expect(balanceBefore).toBeGreaterThan(0n);
-      expect(balanceAfter).toBe(balanceBefore + BigInt(REWARD_AMOUNT));
+      const claimResult = claimMilestoneReward(user1, 1, 7);
+      expect(claimResult.result).toBeOk(Cl.uint(REWARD_AMOUNT));
+
+      const afterPool = getRewardPoolBalance();
+      expect(afterPool.result).toBeOk(Cl.uint(FUND_AMOUNT - REWARD_AMOUNT));
     });
   });
 
