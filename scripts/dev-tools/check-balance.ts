@@ -1,6 +1,6 @@
-import { StacksMainnet } from "@stacks/network";
+import { STACKS_MAINNET } from "@stacks/network";
 
-const NETWORK = new StacksMainnet();
+const NETWORK = STACKS_MAINNET;
 
 async function checkBalance(address: string) {
   console.log(`Checking balance for: ${address}`);
