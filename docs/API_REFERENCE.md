@@ -339,11 +339,14 @@ Gets aggregated statistics for a user.
 | 103 | ERR-HABIT-NOT-FOUND | Habit ID doesn't exist |
 | 104 | ERR-NOT-HABIT-OWNER | Caller doesn't own habit |
 | 105 | ERR-ALREADY-CHECKED-IN | Already checked in today |
-| 106 | ERR-CHECK-IN-WINDOW-EXPIRED | Missed 24hr window |
 | 107 | ERR-INSUFFICIENT-STREAK | Streak too short to withdraw |
 | 108 | ERR-HABIT-ALREADY-COMPLETED | Habit marked complete |
 | 109 | ERR-POOL-INSUFFICIENT-BALANCE | Pool lacks funds |
 | 110 | ERR-TRANSFER-FAILED | STX transfer error |
+| 111 | ERR-BONUS-ALREADY-CLAIMED | Bonus already claimed for this habit |
+| 112 | ERR-HABIT-LIMIT-REACHED | Maximum number of habits reached |
+| 113 | ERR-STAKE-TOO-HIGH | Stake exceeds 100 STX cap |
+| 114 | ERR-HABIT-AUTO-SLASHED | Habit auto-slashed after missed check-in window |
 
 ---
 
