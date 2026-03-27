@@ -64,18 +64,18 @@ Your stake is forfeited to the community pool and your streak resets to zero.
 
 ### Can I check in multiple times per day?
 
-No. The contract prevents check-ins until at least 1 block has passed (~10 minutes on Stacks). This ensures one check-in per block minimum.
+No. The contract prevents check-ins until at least 120 blocks have passed (~20 hours on Stacks).
 
 ### Why can't I check in immediately after creating a habit?
 
-When you create a habit, the contract automatically sets the `last-check-in-block` to the creation block. You must wait at least 1 block (~10 minutes) before your first manual check-in. This prevents:
+When you create a habit, the contract automatically sets the `last-check-in-block` to the creation block. You must wait at least 120 blocks (~20 hours) before your first manual check-in. This prevents:
 - Double-claiming rewards (creation + immediate check-in)
 - Gaming the system
 - Ensures genuine daily habit tracking
 
 **Error code:** If you try, you'll get `(err u105)` - ERR-ALREADY-CHECKED-IN
 
-**Solution:** Wait approximately 10 minutes after creating a habit before your first check-in.
+**Solution:** Wait approximately 20 hours (120 blocks) after creating a habit before your first check-in.
 
 ### How many days for withdrawal?
 
