@@ -348,6 +348,10 @@ Gets aggregated statistics for a user.
 | 113 | ERR-STAKE-TOO-HIGH | Stake exceeds 100 STX cap |
 | 114 | ERR-HABIT-AUTO-SLASHED | Habit auto-slashed after missed check-in window |
 
+Companion contract error ranges:
+- `u200`-`u209` are defined in `habit-streak-reward`
+- `u300`-`u313` are defined in `habit-accountability-group`
+
 ---
 
 ## Data Structures
