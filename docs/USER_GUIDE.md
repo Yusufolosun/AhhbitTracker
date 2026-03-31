@@ -163,7 +163,7 @@ If you complete your habit:
 
 ### "Already Checked In" Error
 
-You've already checked in today. Wait 14+ blocks (~2.4 hours) before next check-in.
+You've already checked in today. Wait 120+ blocks (~20 hours) before next check-in.
 
 ### "Window Expired" Error
 
