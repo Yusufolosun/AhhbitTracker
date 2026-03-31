@@ -39,6 +39,9 @@ export interface TransactionResult {
   error?: string;
 }
 
+/**
+ * Current state of the connected Stacks wallet.
+ */
 export interface WalletState {
   address: string | null;
   isConnected: boolean;
