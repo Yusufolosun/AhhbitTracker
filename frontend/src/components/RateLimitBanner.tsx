@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
  * Banner displayed when Hiro API returns 429 (Too Many Requests).
  * Automatically counts down to the next retry attempt and disappears once
  * the rate limit window has passed.
+ * @component
  */
 export function RateLimitBanner() {
   const [retryAfter, setRetryAfter] = useState<number | null>(null);
