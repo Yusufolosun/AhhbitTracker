@@ -14,6 +14,9 @@ export interface Habit {
   bonusClaimed: boolean;
 }
 
+/**
+ * Aggregated statistics for a user's habits.
+ */
 export interface UserStats {
   totalHabits: number;
   habitIds: number[];
