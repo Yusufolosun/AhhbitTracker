@@ -32,7 +32,10 @@ export function PoolDisplay() {
   }
 
   return (
-    <div className="card bg-gradient-to-br from-primary-50 to-primary-100 border-primary-200 dark:from-primary-500/10 dark:to-primary-500/5 dark:border-primary-500/20">
+    <div
+      className="card bg-gradient-to-br from-primary-50 to-primary-100 border-primary-200 dark:from-primary-500/10 dark:to-primary-500/5 dark:border-primary-500/20"
+      aria-live="polite"
+    >
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-primary-700 dark:text-primary-400 mb-1">
