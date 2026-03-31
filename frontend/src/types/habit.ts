@@ -22,6 +22,9 @@ export interface UserStats {
   habitIds: number[];
 }
 
+/**
+ * Forfeited pool balance in microSTX and STX.
+ */
 export interface PoolBalance {
   balance: number;
   balanceSTX: number;
