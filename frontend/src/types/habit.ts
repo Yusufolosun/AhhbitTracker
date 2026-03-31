@@ -1,3 +1,6 @@
+/**
+ * Represents a habit stored on the Stacks blockchain.
+ */
 export interface Habit {
   habitId: number;
   owner: string;
