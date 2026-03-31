@@ -102,3 +102,9 @@
   white-space: nowrap;
   border-width: 0;
 }
+
+/* Focus visible for keyboard navigation */
+:focus-visible {
+  outline: 2px solid #F15A22;
+  outline-offset: 2px;
+}
