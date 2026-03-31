@@ -134,16 +134,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planned
+### Changed
 
-- Frontend web interface
-- Mobile wallet integration
-- Analytics dashboard
-- Additional read-only query functions
-- Batch operations support
+- GitHub Actions workflows updated to use checkout@v4 and setup-node@v4
+- CodeQL workflow updated to use codeql-action@v3
+- Added WebSocket endpoint to CSP connect-src for real-time updates
+- Font loading optimized with non-blocking strategy
+- Multiple accessibility improvements for screen readers
+
+### Fixed
+
+- Incorrect check-in wait time in user guide (was 14+ blocks, corrected to 120+ blocks)
 
 ---
 
 ## Version History
 
+- **1.1.0** - Mainnet redeployment with reduced minimum stake (2026-02-18)
+- **1.0.1** - Development infrastructure improvements (2026-02-17)
 - **1.0.0** - Initial mainnet release (2026-02-08)
