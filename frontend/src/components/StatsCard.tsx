@@ -1,5 +1,8 @@
 import React from 'react';
 
+/**
+ * A card component displaying a statistic with optional icon and trend indicator.
+ */
 interface StatsCardProps {
   title: string;
   value: string | number;
