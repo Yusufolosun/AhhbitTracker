@@ -30,6 +30,9 @@ export interface PoolBalance {
   balanceSTX: number;
 }
 
+/**
+ * Result of a contract transaction submission.
+ */
 export interface TransactionResult {
   txId: string;
   success: boolean;
