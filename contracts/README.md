@@ -130,4 +130,4 @@ npm test
 
 ## Deployment
 
-See main [Deployment Guide](../docs/DEPLOYMENT.md)
+See main [README](../README.md#deploy-to-vercel) for deployment instructions.
