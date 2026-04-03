@@ -1,3 +1,7 @@
+/**
+ * @module contractService
+ * Service for interacting with the AhhbitTracker smart contract.
+ */
 import { showContractCall } from '@stacks/connect';
 import {
   uintCV,
@@ -16,7 +20,13 @@ import type {
   UserStatsContractResponse,
 } from '../types/habit';
 
-/** Races a promise against a 10-second timeout so API calls don't hang. */
+/**
+ * Races a promise against a timeout to prevent API calls from hanging.
+ *
+ * @param promise - The promise to race
+ * @param ms - Timeout in milliseconds (default: 10000)
+ * @returns The promise result or throws on timeout
+ */
 function withTimeout<T>(promise: Promise<T>, ms = 10_000): Promise<T> {
   return Promise.race([
     promise,
@@ -26,15 +36,24 @@ function withTimeout<T>(promise: Promise<T>, ms = 10_000): Promise<T> {
   ]);
 }
 
+/** Application details for wallet transaction popups. */
 const appDetails = {
   name: 'AhhbitTracker',
   icon: window.location.origin + '/logos/icon-only-dark.jpg',
 };
 
+/**
+ * Contract service for habit tracker operations.
+ * Provides methods for both write operations (transactions) and read-only queries.
+ */
 export const contractService = {
   /**
-   * Create a new habit
-   * Returns the transaction ID on success for tracking
+   * Create a new habit with the specified stake.
+   *
+   * @param name - Habit name (max 50 UTF-8 characters)
+   * @param stakeAmount - Stake amount in microSTX
+   * @returns Transaction ID for tracking
+   * @throws Error if wallet not connected or transaction cancelled
    */
   async createHabit(name: string, stakeAmount: number): Promise<string> {
     const userAddress = walletService.getAddress();
@@ -69,8 +88,11 @@ export const contractService = {
   },
 
   /**
-   * Check in to a habit
-   * Returns the transaction ID on success for tracking
+   * Record a check-in for a habit.
+   *
+   * @param habitId - The habit ID to check in for
+   * @returns Transaction ID for tracking
+   * @throws Error if transaction cancelled
    */
   async checkIn(habitId: number): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -93,8 +115,12 @@ export const contractService = {
   },
 
   /**
-   * Withdraw stake
-   * Returns the transaction ID on success for tracking
+   * Withdraw stake from a completed habit.
+   *
+   * @param habitId - The habit ID to withdraw from
+   * @param stakeAmount - Expected stake amount in microSTX (for post-condition)
+   * @returns Transaction ID for tracking
+   * @throws Error if wallet not connected or transaction cancelled
    */
   async withdrawStake(habitId: number, stakeAmount: number): Promise<string> {
     const userAddress = walletService.getAddress();
@@ -129,8 +155,11 @@ export const contractService = {
   },
 
   /**
-   * Claim bonus
-   * Returns the transaction ID on success for tracking
+   * Claim bonus from the forfeited pool for a streak achievement.
+   *
+   * @param habitId - The habit ID to claim bonus for
+   * @returns Transaction ID for tracking
+   * @throws Error if wallet not connected or transaction cancelled
    */
   async claimBonus(habitId: number): Promise<string> {
     const userAddress = walletService.getAddress();
@@ -165,9 +194,12 @@ export const contractService = {
   },
 
   /**
-   * Slash an expired habit (anyone can call this)
-   * Moves the stake from an expired habit into the forfeited pool
-   * Returns the transaction ID on success for tracking
+   * Slash an expired habit to move its stake to the forfeited pool.
+   * This is a public function that anyone can call.
+   *
+   * @param habitId - The habit ID to slash
+   * @returns Transaction ID for tracking
+   * @throws Error if transaction cancelled
    */
   async slashHabit(habitId: number): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -190,7 +222,10 @@ export const contractService = {
   },
 
   /**
-   * Get habit details
+   * Get details for a specific habit.
+   *
+   * @param habitId - The habit ID to query
+   * @returns Habit data or null if not found
    */
   async getHabit(habitId: number): Promise<HabitContractResponse> {
     const result = await withTimeout(fetchCallReadOnlyFunction({
@@ -206,7 +241,10 @@ export const contractService = {
   },
 
   /**
-   * Get user habits
+   * Get all habits for a user.
+   *
+   * @param userAddress - Stacks address to query
+   * @returns List of habit IDs owned by the user
    */
   async getUserHabits(userAddress: string): Promise<UserHabitsContractResponse> {
     const result = await withTimeout(fetchCallReadOnlyFunction({
@@ -222,7 +260,9 @@ export const contractService = {
   },
 
   /**
-   * Get forfeited pool balance
+   * Get the current forfeited pool balance.
+   *
+   * @returns Pool balance in microSTX
    */
   async getPoolBalance(): Promise<number> {
     const result = await withTimeout(fetchCallReadOnlyFunction({
@@ -239,7 +279,10 @@ export const contractService = {
   },
 
   /**
-   * Get user stats
+   * Get statistics for a user.
+   *
+   * @param userAddress - Stacks address to query
+   * @returns User statistics including total habits and streaks
    */
   async getUserStats(userAddress: string): Promise<UserStatsContractResponse> {
     const result = await withTimeout(fetchCallReadOnlyFunction({
