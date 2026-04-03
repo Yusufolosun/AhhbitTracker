@@ -1,4 +1,21 @@
+# Linguist configuration
 tests/** linguist-vendored
 vitest.config.ts linguist-vendored
-* text=lf
+packages/**/dist/** linguist-vendored
+
+# Line endings
+* text=auto eol=lf
 *.clar text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
