@@ -61,6 +61,14 @@ registerErrors(ERROR_CODES);
 // Re-export for components that need direct access
 export { ERROR_CODES };
 
+// Type for error code lookup
+export type ErrorCode = keyof typeof ERROR_CODES;
+
+// Helper to get error message by code
+export const getErrorMessage = (code: number): string => {
+  return ERROR_CODES[code] || `Unknown error (code: ${code})`;
+};
+
 // UI Constants
 export const TOAST_DURATION = 5000;
 
