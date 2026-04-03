@@ -4,40 +4,37 @@ import {
   getClarinetVitestsArgv,
 } from "@stacks/clarinet-sdk/vitest";
 
-/*
-  In this file, Vitest is configured so that it works seamlessly with Clarinet and the Simnet.
-
-  The `vitest-environment-clarinet` will initialise the clarinet-sdk
-  and make the `simnet` object available globally in the test files.
-
-  `vitestSetupFilePath` points to a file in the `@stacks/clarinet-sdk` package that does two things:
-    - run `before` hooks to initialize the simnet and `after` hooks to collect costs and coverage reports.
-    - load custom vitest matchers to work with Clarity values (such as `expect(...).toBeUint()`)
-
-  The `getClarinetVitestsArgv()` will parse options passed to the command `vitest run --`
-    - vitest run -- --manifest ./Clarinet.toml  # pass a custom path
-    - vitest run -- --coverage --costs          # collect coverage and cost reports
-*/
-
+/**
+ * Vitest configuration for Clarity smart contract tests.
+ *
+ * This config sets up the Clarinet testing environment for running
+ * Clarity tests against a simulated blockchain (Simnet).
+ *
+ * The `vitest-environment-clarinet` will initialize the clarinet-sdk
+ * and make the `simnet` object available globally in the test files.
+ *
+ * `vitestSetupFilePath` points to a file in the `@stacks/clarinet-sdk` package that:
+ *   - Runs `before` hooks to initialize the simnet
+ *   - Runs `after` hooks to collect costs and coverage reports
+ *   - Loads custom vitest matchers for Clarity values (e.g., `expect(...).toBeUint()`)
+ *
+ * The `getClarinetVitestsArgv()` parses CLI options:
+ *   - vitest run -- --manifest ./Clarinet.toml  # custom manifest path
+ *   - vitest run -- --coverage --costs          # collect reports
+ */
 export default defineConfig({
   test: {
-    // use vitest-environment-clarinet for Clarity tests
     environment: "clarinet",
     pool: "forks",
-    // clarinet handles test isolation by resetting the simnet between tests
     isolate: true,
-    // maxWorkers: 1,
     setupFiles: [
       vitestSetupFilePath,
-      // custom setup files can be added here
     ],
     environmentOptions: {
       clarinet: {
         ...getClarinetVitestsArgv(),
-        // add or override options
       },
     },
-    // Exclude frontend tests from default Clarinet environment
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
@@ -45,7 +42,6 @@ export default defineConfig({
       '**/.{idea,git,cache,output,temp}/**',
       'frontend/src/__tests__/**',
     ],
-    // Coverage configuration
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json-summary', 'html', 'lcov'],
@@ -61,7 +57,7 @@ export default defineConfig({
         '**/__tests__/**',
         '**/node_modules/**',
         '**/dist/**',
-        'frontend/**', // Frontend has separate coverage config
+        'frontend/**',
       ],
       thresholds: {
         lines: 70,
@@ -72,5 +68,3 @@ export default defineConfig({
     },
   },
 });
-
-
