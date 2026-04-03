@@ -1,8 +1,8 @@
-import { Cl } from "@stacks/transactions";
+import 'dotenv/config';
 
-const CONTRACT_ADDRESS = "SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z";
-const CONTRACT_NAME = "habit-tracker-v2";
-const NETWORK_API = "https://api.mainnet.hiro.so";
+const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS || "SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z";
+const CONTRACT_NAME = process.env.CONTRACT_NAME || "habit-tracker-v2";
+const NETWORK_API = process.env.STACKS_API_URL || "https://api.mainnet.hiro.so";
 
 console.log("AhhbitTracker Mainnet Interaction");
 console.log("Network: Mainnet");
