@@ -1,6 +1,12 @@
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 
+/**
+ * Custom Vite plugin to inject environment variables into index.html.
+ *
+ * Replaces %VITE_APP_URL% placeholders with the actual app URL,
+ * falling back to the production URL if not set.
+ */
 function htmlEnvPlugin(): Plugin {
   return {
     name: 'html-env-fallback',
@@ -13,14 +19,10 @@ function htmlEnvPlugin(): Plugin {
 
 export default defineConfig({
   plugins: [react(), htmlEnvPlugin()],
-  // Prevent Vite from clearing the terminal on startup.
-  // Without this, the "Local: http://localhost:…" URL disappears on
-  // Windows terminals (Git Bash / MINGW64) because the ANSI clear-screen
-  // sequence is emitted before the URL and the TTY re-renders the prompt.
   clearScreen: false,
   server: {
     port: 3000,
-    strictPort: false,   // fall back to next free port instead of crashing
+    strictPort: false,
     host: 'localhost',
     proxy: {
       '/api/stacks': {
@@ -34,6 +36,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     modulePreload: { polyfill: false },
+    sourcemap: true,
   },
   test: {
     environment: 'jsdom',
@@ -50,8 +53,8 @@ export default defineConfig({
         '**/__tests__/**',
         '**/node_modules/**',
         '**/dist/**',
-        'src/main.tsx', // Entry point, hard to test
-        'src/vite-env.d.ts', // Type definitions
+        'src/main.tsx',
+        'src/vite-env.d.ts',
       ],
       thresholds: {
         lines: 70,
