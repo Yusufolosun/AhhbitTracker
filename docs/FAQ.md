@@ -111,7 +111,7 @@ A shared pool of STX from users who missed their check-ins.
 
 ### How do I claim bonuses?
 
-After completing a habit (7+ days), use the \`claim-bonus\` function to receive your share.
+After completing a habit (7+ days), use the `claim-bonus` function to receive your share.
 
 ### How is the bonus calculated?
 
@@ -237,7 +237,7 @@ You need 7+ consecutive days before withdrawal.
 
 ### "Habit Not Found" error
 
-You're using an invalid habit ID. Check your habit IDs with \`get-user-habits\`.
+You're using an invalid habit ID. Check your habit IDs with `get-user-habits`.
 
 ### Contract not responding
 
