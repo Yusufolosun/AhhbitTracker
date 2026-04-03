@@ -1,4 +1,9 @@
 /**
+ * Core type definitions for AhhbitTracker frontend.
+ * @module types/habit
+ */
+
+/**
  * Represents a habit stored on the Stacks blockchain.
  */
 export interface Habit {
