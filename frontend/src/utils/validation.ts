@@ -6,6 +6,11 @@
 import { validateName, validateStake, toMicroSTX } from '@yusufolosun/stx-utils';
 import { MIN_STAKE_AMOUNT, MAX_STAKE_AMOUNT, MAX_HABIT_NAME_LENGTH } from './constants';
 
+/**
+ * Validates a habit name for the contract requirements.
+ * @param name - The habit name to validate
+ * @returns Error message string if invalid, null if valid
+ */
 export function validateHabitName(name: string): string | null {
   const err = validateName(name, MAX_HABIT_NAME_LENGTH);
   if (err === 'Name cannot be empty') return 'Habit name cannot be empty';
@@ -14,6 +19,11 @@ export function validateHabitName(name: string): string | null {
   return err;
 }
 
+/**
+ * Validates a stake amount in STX for the contract requirements.
+ * @param stx - The stake amount in STX (not microSTX)
+ * @returns Error message string if invalid, null if valid
+ */
 export function validateStakeAmount(stx: number): string | null {
   // validateStake v2.0.1 only checks minimum; we add max check here
   const minErr = validateStake(stx, MIN_STAKE_AMOUNT);
