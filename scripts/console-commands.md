@@ -1,12 +1,16 @@
 # Clarinet Console Commands for Mainnet Testing
 
+Quick reference for interacting with the deployed AhhbitTracker contract via Clarinet console.
+
 ## Setup
 
 ```bash
 clarinet console --mainnet
 ```
 
-## Transaction 1: Create First Habit
+## Creating Habits
+
+### Transaction 1: Create First Habit
 
 ```clarity
 (contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2 
@@ -15,7 +19,7 @@ clarinet console --mainnet
   u100000)
 ```
 
-## Transaction 2: Create Second Habit
+### Transaction 2: Create Second Habit
 
 ```clarity
 (contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2 
@@ -24,7 +28,9 @@ clarinet console --mainnet
   u1000000)
 ```
 
-## Transaction 3: First Check-in
+## Check-ins
+
+### Transaction 3: First Check-in
 
 ```clarity
 (contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2 
@@ -32,7 +38,19 @@ clarinet console --mainnet
   u1)
 ```
 
-## Read-Only Query 4: Get Habit
+### Transaction 8: Second Check-in (After 144 blocks)
+
+```clarity
+(contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2 
+  check-in 
+  u1)
+```
+
+> **Note:** Check-ins require at least 144 blocks (~24 hours) between them.
+
+## Read-Only Queries
+
+### Query: Get Habit
 
 ```clarity
 (contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2 
@@ -40,7 +58,7 @@ clarinet console --mainnet
   u1)
 ```
 
-## Read-Only Query 5: Get User Habits
+### Query: Get User Habits
 
 ```clarity
 (contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2 
@@ -48,27 +66,19 @@ clarinet console --mainnet
   'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z)
 ```
 
-## Read-Only Query 6: Get Pool Balance
+### Query: Get Pool Balance
 
 ```clarity
 (contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2 
   get-pool-balance)
 ```
 
-## Read-Only Query 7: Get User Stats
+### Query: Get User Stats
 
 ```clarity
 (contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2 
   get-user-stats 
   'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z)
-```
-
-## Transaction 8: Second Check-in (After 144 blocks)
-
-```clarity
-(contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2 
-  check-in 
-  u1)
 ```
 
 ## Verification Commands
@@ -90,3 +100,12 @@ block-height
 ```clarity
 (stx-get-balance tx-sender)
 ```
+
+## Expected Responses
+
+| Function | Success Response |
+|----------|-----------------|
+| `create-habit` | `(ok <habit-id>)` |
+| `check-in` | `(ok true)` |
+| `get-habit` | `(some { ... })` |
+| `get-pool-balance` | `u<amount>` |
