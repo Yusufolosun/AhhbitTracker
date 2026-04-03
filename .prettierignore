@@ -4,6 +4,8 @@ build
 coverage
 .cache
 .clarinet
+.next
+.turbo
 
 # Ignore dependencies
 node_modules
@@ -13,6 +15,7 @@ node_modules
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
+*.tsbuildinfo
 
 # Ignore environment files
 .env*
@@ -31,3 +34,8 @@ deployments/
 # Ignore OS files
 .DS_Store
 Thumbs.db
+
+# Ignore IDE files
+.idea
+.vscode
+*.sublime-*
