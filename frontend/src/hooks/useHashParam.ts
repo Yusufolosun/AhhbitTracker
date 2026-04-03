@@ -1,13 +1,28 @@
+/**
+ * @module useHashParam
+ * Hook for reading and writing query parameters within the URL hash.
+ */
 import { useState, useEffect, useCallback } from 'react';
 
 /**
  * Reads and writes a single query-string param that lives inside the URL hash.
  *
- * e.g. for the URL `#habits?tab=completed`:
- *   useHashParam('tab', 'active')  →  value = 'completed'
+ * Useful for preserving UI state (like active tabs) in the URL without
+ * affecting the main route.
  *
- * Setting the value rewrites only that param; the route portion of the hash
- * (everything before the `?`) is preserved.
+ * @param key - The parameter name to track
+ * @param defaultValue - Value to return when parameter is not present
+ * @returns Tuple of [currentValue, setterFunction]
+ *
+ * @example
+ * ```tsx
+ * // For URL: #habits?tab=completed
+ * const [tab, setTab] = useHashParam('tab', 'active');
+ * // tab = 'completed'
+ *
+ * setTab('active'); // URL becomes: #habits
+ * setTab('completed'); // URL becomes: #habits?tab=completed
+ * ```
  */
 export function useHashParam(key: string, defaultValue: string): [string, (v: string) => void] {
   const readParam = useCallback((): string => {
