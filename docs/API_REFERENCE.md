@@ -33,7 +33,8 @@ Creates a new habit with stake commitment.
 **Errors:**
 - `u101` - ERR-INVALID-STAKE-AMOUNT (stake below minimum)
 - `u102` - ERR-INVALID-HABIT-NAME (invalid name format)
-- `u110` - ERR-TRANSFER-FAILED (STX transfer error)
+- `u112` - ERR-HABIT-LIMIT-REACHED (user has 100 habits)
+- `u113` - ERR-STAKE-TOO-HIGH (stake exceeds 100 STX)
 
 **Example:**
 ```clarity
@@ -105,7 +106,6 @@ Withdraws stake after completing minimum streak.
 - `u104` - ERR-NOT-HABIT-OWNER
 - `u107` - ERR-INSUFFICIENT-STREAK (need 7+ days)
 - `u108` - ERR-HABIT-ALREADY-COMPLETED
-- `u110` - ERR-TRANSFER-FAILED
 
 **Example:**
 ```clarity
@@ -143,7 +143,7 @@ Claims bonus from forfeited pool.
 - `u104` - ERR-NOT-HABIT-OWNER
 - `u107` - ERR-INSUFFICIENT-STREAK (habit must be completed to claim)
 - `u109` - ERR-POOL-INSUFFICIENT-BALANCE
-- `u110` - ERR-TRANSFER-FAILED
+- `u111` - ERR-BONUS-ALREADY-CLAIMED
 
 **Example:**
 ```clarity
@@ -349,7 +349,6 @@ Gets aggregated statistics for a user.
 | 107 | ERR-INSUFFICIENT-STREAK | Streak too short to withdraw |
 | 108 | ERR-HABIT-ALREADY-COMPLETED | Habit marked complete |
 | 109 | ERR-POOL-INSUFFICIENT-BALANCE | Pool lacks funds |
-| 110 | ERR-TRANSFER-FAILED | STX transfer error |
 | 111 | ERR-BONUS-ALREADY-CLAIMED | Bonus already claimed for this habit |
 | 112 | ERR-HABIT-LIMIT-REACHED | Maximum number of habits reached |
 | 113 | ERR-STAKE-TOO-HIGH | Stake exceeds 100 STX cap |
