@@ -1,7 +1,7 @@
 [project]
 name = "AhhbitTracker"
-description = ""
-authors = []
+description = "On-chain habit tracking with staking on Stacks blockchain"
+authors = ["Yusufolosun"]
 telemetry = true
 cache_dir = "./.cache"
 
