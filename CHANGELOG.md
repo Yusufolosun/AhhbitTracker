@@ -134,6 +134,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- SECURITY.md for GitHub security tab
+- FUNDING.yml for GitHub Sponsors
+- CONTRIBUTORS.md to recognize project contributors
+- .nvmrc for Node.js version management
+- Error code type and helper function in frontend constants
+- Actual API verification in deployment script
+
 ### Changed
 
 - GitHub Actions workflows updated to use checkout@v4 and setup-node@v4
@@ -141,10 +150,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added WebSocket endpoint to CSP connect-src for real-time updates
 - Font loading optimized with non-blocking strategy
 - Multiple accessibility improvements for screen readers
+- Scripts now use environment variables instead of hardcoded values
+- Improved bug report and feature request issue templates
+- Enhanced pull request template with more sections
 
 ### Fixed
 
 - Incorrect check-in wait time in user guide (was 14+ blocks, corrected to 120+ blocks)
+- Removed non-existent ERR-TRANSFER-FAILED (u110) from API reference
+- Fixed broken deployment guide link in contracts README
+- Fixed escaped backtick syntax in FAQ
+- Added missing project metadata in Clarinet.toml
 
 ---
 
