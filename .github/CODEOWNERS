@@ -10,28 +10,40 @@
 /contracts/**/*.clar @Yusufolosun
 Clarinet.toml @Yusufolosun
 
+# Packages - SDK and utility libraries
+/packages/ @Yusufolosun
+/packages/stx-utils/ @Yusufolosun
+/packages/ahhbit-tracker-sdk/ @Yusufolosun
+/packages/defikit/ @Yusufolosun
+
 # Tests - ensure test coverage and quality
 /tests/ @Yusufolosun
 **/*.test.ts @Yusufolosun
+**/*.test.tsx @Yusufolosun
 
 # Frontend - UI/UX and user-facing code
 /frontend/ @Yusufolosun
 /frontend/src/components/ @Yusufolosun
+/frontend/src/hooks/ @Yusufolosun
+/frontend/src/services/ @Yusufolosun
 
 # Documentation - maintain accuracy and clarity
 /docs/ @Yusufolosun
 README.md @Yusufolosun
 CONTRIBUTING.md @Yusufolosun
+CHANGELOG.md @Yusufolosun
 
 # Build & Configuration
 package.json @Yusufolosun
 tsconfig.json @Yusufolosun
 vite.config.ts @Yusufolosun
+vitest.config.ts @Yusufolosun
 
 # CI/CD and DevOps
 /.github/ @Yusufolosun
 /.github/workflows/ @Yusufolosun
 
 # Security-sensitive files
-SECURITY_AUDIT_REPORT.md @Yusufolosun
 .env.example @Yusufolosun
+/settings/ @Yusufolosun
+.github/SECURITY.md @Yusufolosun
