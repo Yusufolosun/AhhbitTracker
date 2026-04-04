@@ -329,15 +329,26 @@ Before deploying or using:
 
 Found a security issue?
 
+**Contact:**
+- **Email:** security@ahhbittracker.com (or create private security advisory on GitHub)
+- **GitHub Security Advisory:** https://github.com/Yusufolosun/AhhbitTracker/security/advisories/new
+
 **DO:**
 1. Email details privately (if serious)
-2. Provide: steps to reproduce, impact assessment
-3. Wait for response before public disclosure
+2. Provide: steps to reproduce, impact assessment, potential fix
+3. Wait for response before public disclosure (90 days recommended)
+4. Allow time for patch development and testing
 
 **DON'T:**
 1. Post publicly immediately
 2. Exploit for personal gain
 3. Disclose user data
+4. Demand payment for disclosure
+
+**Recognition:**
+- Acknowledged in release notes
+- Listed in CONTRIBUTORS.md
+- Public credit once resolved (if desired)
 
 ---
 
