@@ -15,22 +15,15 @@ settings/Devnet.toml
 # ============================================
 # Contains API keys, wallet seeds, RPC endpoints
 .env
-**/.env
 .env.local
 .env.production
 .env.development
 .env.staging
 .env.*.local
 .env.test
-
-# Frontend env overrides (patterns without slash match in all subdirs)
-frontend/.env
-frontend/.env.local
-frontend/.env.production
-frontend/.env.development
-frontend/.env.staging
-frontend/.env.*.local
-frontend/.env.test
+**/.env
+**/.env.local
+**/.env.*.local
 
 # ============================================
 # WALLET & PRIVATE KEYS (CRITICAL)
@@ -45,8 +38,6 @@ mnemonic.txt
 secrets/
 
 # Catch-all for any local key/secret config files in any directory
-**/.env.local
-**/.env.*.local
 **/local.env
 **/local.*.env
 
