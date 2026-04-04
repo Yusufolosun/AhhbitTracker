@@ -60,6 +60,19 @@ npm test
 clarinet check
 ```
 
+#### Security Contributions
+
+**If you discover a security vulnerability:**
+1. **DO NOT** open a public issue
+2. Email security details privately (see SECURITY.md)
+3. Wait for response before disclosure
+4. Follow responsible disclosure practices
+
+**For security improvements:**
+- Clearly document the security benefit
+- Include test cases demonstrating the fix
+- Reference any applicable security standards
+
 ---
 
 ### Contribution Workflow
