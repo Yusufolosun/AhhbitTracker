@@ -6,17 +6,22 @@
     "lib": ["ESNext"],
     "skipLibCheck": true,
 
+    /* Module Resolution */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
 
+    /* Type Checking */
     "strict": true,
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": [
     "node_modules/@stacks/clarinet-sdk/vitest-helpers/src",
