@@ -20,6 +20,24 @@
 
 ---
 
+## Table of Contents
+
+- [What is AhhbitTracker?](#what-is-ahhbittracker)
+- [How It Works](#how-it-works)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+  - [Testing](#testing)
+  - [Packages](#packages)
+  - [Production Build](#production-build)
+- [Deploy to Vercel](#deploy-to-vercel)
+- [Contract Reference](#contract-reference)
+- [Security](#security)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
 ## What is AhhbitTracker?
 
 AhhbitTracker is a decentralized habit-tracking dApp on the [Stacks](https://www.stacks.co/) blockchain. Stake STX as a financial commitment to daily habits. Miss a day — your stake is forfeited to a shared pool. Complete a 7-day streak — reclaim your stake and earn bonuses from forfeited stakes.
