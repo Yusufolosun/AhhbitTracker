@@ -23,6 +23,9 @@ export type { ErrorCodeValue } from './constants';
 // Query errors
 export { ContractInteractionError, toContractInteractionError } from './query-error';
 
+// Contract helpers
+export { resolveContract, contractPrincipal } from './contract';
+
 // Transaction builders
 export {
   buildCreateHabit,
