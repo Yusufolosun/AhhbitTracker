@@ -5,13 +5,17 @@
 import { showContractCall } from '@stacks/connect';
 import {
   uintCV,
-  stringUtf8CV,
   principalCV,
   fetchCallReadOnlyFunction,
   cvToJSON,
-  PostConditionMode,
-  Pc,
 } from '@stacks/transactions';
+import {
+  buildCheckIn,
+  buildClaimBonus,
+  buildCreateHabit,
+  buildSlashHabit,
+  buildWithdrawStake,
+} from '@yusufolosun/ahhbit-tracker-sdk';
 import { CONTRACT_ADDRESS, CONTRACT_NAME, NETWORK } from '../utils/constants';
 import { walletService } from './walletService';
 import type {
@@ -61,20 +65,15 @@ export const contractService = {
       throw new Error('Wallet not connected');
     }
 
-    // Post-condition: User must transfer exactly the stake amount to the contract
-    const postConditions = [
-      Pc.principal(userAddress).willSendEq(stakeAmount).ustx(),
-    ];
+    const txPayload = buildCreateHabit(name, stakeAmount, userAddress, {
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+    });
 
     return new Promise((resolve, reject) => {
       showContractCall({
-        contractAddress: CONTRACT_ADDRESS,
-        contractName: CONTRACT_NAME,
-        functionName: 'create-habit',
-        functionArgs: [stringUtf8CV(name), uintCV(stakeAmount)],
+        ...txPayload,
         network: NETWORK,
-        postConditions,
-        postConditionMode: PostConditionMode.Deny,
         appDetails,
         userSession: walletService.getUserSession(),
         onFinish: (data) => {
@@ -95,12 +94,14 @@ export const contractService = {
    * @throws Error if transaction cancelled
    */
   async checkIn(habitId: number): Promise<string> {
+    const txPayload = buildCheckIn(habitId, {
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+    });
+
     return new Promise((resolve, reject) => {
       showContractCall({
-        contractAddress: CONTRACT_ADDRESS,
-        contractName: CONTRACT_NAME,
-        functionName: 'check-in',
-        functionArgs: [uintCV(habitId)],
+        ...txPayload,
         network: NETWORK,
         appDetails,
         userSession: walletService.getUserSession(),
@@ -128,20 +129,15 @@ export const contractService = {
       throw new Error('Wallet not connected');
     }
 
-    // Post-condition: Contract must transfer exactly the staked amount back to the user
-    const postConditions = [
-      Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`).willSendEq(stakeAmount).ustx(),
-    ];
+    const txPayload = buildWithdrawStake(habitId, stakeAmount, {
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+    });
 
     return new Promise((resolve, reject) => {
       showContractCall({
-        contractAddress: CONTRACT_ADDRESS,
-        contractName: CONTRACT_NAME,
-        functionName: 'withdraw-stake',
-        functionArgs: [uintCV(habitId)],
+        ...txPayload,
         network: NETWORK,
-        postConditions,
-        postConditionMode: PostConditionMode.Deny,
         appDetails,
         userSession: walletService.getUserSession(),
         onFinish: (data) => {
@@ -167,20 +163,15 @@ export const contractService = {
       throw new Error('Wallet not connected');
     }
 
-    // Post-condition: Contract must transfer at least 1 microSTX from the pool
-    const postConditions = [
-      Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`).willSendGte(1).ustx(),
-    ];
+    const txPayload = buildClaimBonus(habitId, {
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+    });
 
     return new Promise((resolve, reject) => {
       showContractCall({
-        contractAddress: CONTRACT_ADDRESS,
-        contractName: CONTRACT_NAME,
-        functionName: 'claim-bonus',
-        functionArgs: [uintCV(habitId)],
+        ...txPayload,
         network: NETWORK,
-        postConditions,
-        postConditionMode: PostConditionMode.Deny,
         appDetails,
         userSession: walletService.getUserSession(),
         onFinish: (data) => {
@@ -202,12 +193,14 @@ export const contractService = {
    * @throws Error if transaction cancelled
    */
   async slashHabit(habitId: number): Promise<string> {
+    const txPayload = buildSlashHabit(habitId, {
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+    });
+
     return new Promise((resolve, reject) => {
       showContractCall({
-        contractAddress: CONTRACT_ADDRESS,
-        contractName: CONTRACT_NAME,
-        functionName: 'slash-habit',
-        functionArgs: [uintCV(habitId)],
+        ...txPayload,
         network: NETWORK,
         appDetails,
         userSession: walletService.getUserSession(),
