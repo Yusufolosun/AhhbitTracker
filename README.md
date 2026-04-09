@@ -12,7 +12,7 @@
   <a href="https://github.com/Yusufolosun/AhhbitTracker/actions/workflows/ci.yml"><img src="https://github.com/Yusufolosun/AhhbitTracker/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
   <a href="https://github.com/Yusufolosun/AhhbitTracker/actions/workflows/security-scan.yml"><img src="https://github.com/Yusufolosun/AhhbitTracker/actions/workflows/security-scan.yml/badge.svg" alt="Security Scan" /></a>
   <a href="https://www.npmjs.com/package/@yusufolosun/stx-utils"><img src="https://img.shields.io/npm/v/@yusufolosun/stx-utils?color=F15A22&label=stx-utils" alt="stx-utils on npm" /></a>
-  <a href="https://explorer.hiro.so/txid/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2?chain=mainnet"><img src="https://img.shields.io/badge/Stacks-Mainnet-F15A22" alt="Stacks Mainnet" /></a>
+  <a href="https://explorer.hiro.so/address/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2?chain=mainnet"><img src="https://img.shields.io/badge/Stacks-Mainnet-F15A22" alt="Stacks Mainnet" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT" /></a>
   <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18-61DAFB" alt="React 18" /></a>
   <a href="https://docs.stacks.co/clarity"><img src="https://img.shields.io/badge/Clarity-v2-F15A22" alt="Clarity v2" /></a>
@@ -42,7 +42,7 @@
 
 AhhbitTracker is a decentralized habit-tracking dApp on the [Stacks](https://www.stacks.co/) blockchain. Stake STX as a financial commitment to daily habits. Miss a day — your stake is forfeited to a shared pool. Complete a 7-day streak — reclaim your stake and earn bonuses from forfeited stakes.
 
-**Live contract:** [`SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2`](https://explorer.hiro.so/txid/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2?chain=mainnet)
+**Live contract:** [`SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2`](https://explorer.hiro.so/address/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2?chain=mainnet)
 
 ## How It Works
 

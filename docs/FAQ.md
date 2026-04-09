@@ -287,4 +287,4 @@ No. The contract has no admin functions. It's completely decentralized.
 
 - **GitHub Issues:** https://github.com/Yusufolosun/AhhbitTracker/issues
 - **Documentation:** https://github.com/Yusufolosun/AhhbitTracker/tree/main/docs
-- **Contract Explorer:** https://explorer.hiro.so/txid/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2?chain=mainnet
+- **Contract Explorer:** https://explorer.hiro.so/address/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2?chain=mainnet

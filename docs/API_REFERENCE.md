@@ -545,6 +545,6 @@ No built-in rate limiting. Frontend should implement:
 
 ## Support
 
-- **Contract Explorer:** https://explorer.hiro.so/txid/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2?chain=mainnet
+- **Contract Explorer:** https://explorer.hiro.so/address/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2?chain=mainnet
 - **Documentation:** https://github.com/Yusufolosun/AhhbitTracker
 - **Issues:** https://github.com/Yusufolosun/AhhbitTracker/issues
