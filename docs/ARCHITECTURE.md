@@ -9,9 +9,19 @@ AhhbitTracker is a decentralized habit tracking application built on the Stacks 
 ┌─────────────────────────────────────────┐
 │         Frontend (React + Vite)         │
 │  - Wallet Connection (@stacks/connect)  │
-│  - Transaction Building                 │
+│  - Transaction submission + UI state    │
 │  - UI/UX Components                     │
 └──────────────┬──────────────────────────┘
+               │
+┌──────────────▼──────────────────────────┐
+│  Shared Contract Abstraction (SDK)      │
+│  - Typed transaction builders            │
+│  - Shared read-only query executor       │
+│  - Retry/timeout + normalized errors     │
+│  - Shared Clarity response parsers       │
+└──────────────┬──────────────────────────┘
+               │
+               │ Reused by frontend, mobile, scripts
                │
                │ JSON-RPC / API Calls
                │
@@ -31,6 +41,22 @@ AhhbitTracker is a decentralized habit tracking application built on the Stacks 
 │  - forfeited-pool-balance               │
 └─────────────────────────────────────────┘
 ```
+
+## Shared Contract Interaction Layer
+
+The repository now routes contract reads through a shared abstraction centered in `packages/ahhbit-tracker-sdk`:
+
+- `queryReadOnly` and `queryReadOnlyJson` centralize read-only invocation behavior.
+- `query-timeout` and `query-retry` enforce consistent timeout and backoff defaults.
+- `query-error` normalizes retriable vs non-retriable contract/network failures.
+- `parsers` provides reusable Clarity JSON parsing for habits, user stats, and numeric responses.
+- `network` exposes `createStacksNetwork` for consistent mainnet/testnet client creation.
+
+Adoption points:
+
+- Frontend service layer delegates write payload construction and typed reads to SDK exports.
+- Mobile service layer uses the shared SDK network factory and typed SDK reads.
+- Scripts use a shared read-only client module (`scripts/shared/contract-readonly.ts`) to avoid one-off parsing and endpoint handling.
 
 ## Smart Contract Architecture
 
@@ -292,5 +318,5 @@ User Action (Click) →
 ---
 
 **Version:** 1.0.0
-**Last Updated:** 2026-03-31
+**Last Updated:** 2026-04-09
 **Network:** Stacks Mainnet
