@@ -20,6 +20,9 @@ export {
 } from './constants';
 export type { ErrorCodeValue } from './constants';
 
+// Query errors
+export { ContractInteractionError, toContractInteractionError } from './query-error';
+
 // Transaction builders
 export {
   buildCreateHabit,
