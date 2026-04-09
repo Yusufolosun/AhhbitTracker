@@ -6,6 +6,8 @@ TypeScript SDK for interacting with the [AhhbitTracker](https://github.com/Yusuf
 
 - Typed transaction builders for all contract functions
 - Read-only query helpers with parsed return types
+- Shared read-only query executor with timeout + retry controls
+- Shared Stacks network factory helpers for web/mobile/scripts
 - Post-condition helpers (Deny mode by default)
 - All on-chain constants and error codes
 - Zero runtime dependencies (peer deps on `@stacks/transactions` and `@stacks/network`)
@@ -58,6 +60,30 @@ const stats = await getUserStats(address, STACKS_MAINNET);
 // { totalHabits, habitIds }
 ```
 
+### Shared Query Abstraction
+
+```typescript
+import { queryReadOnly, createStacksNetwork, unwrapOkNumber } from 'ahhbit-tracker-sdk';
+import { Cl } from '@stacks/transactions';
+
+const network = createStacksNetwork({ mode: 'mainnet' });
+
+const streak = await queryReadOnly(
+  {
+    functionName: 'get-habit-streak',
+    functionArgs: [Cl.uint(42)],
+    network,
+    options: {
+      timeoutMs: 12_000,
+      retry: { maxRetries: 2, baseDelayMs: 500, maxDelayMs: 4_000 },
+    },
+  },
+  unwrapOkNumber,
+);
+```
+
+`queryReadOnly` centralizes timeout protection, retriable backoff, and normalized contract errors.
+
 ### Constants and Error Codes
 
 ```typescript
@@ -109,6 +135,8 @@ const tx = buildCreateHabit('Meditate', 100_000, sender, {
 | `getPoolBalance(network, contract?)` | `number` (microSTX) |
 | `getTotalHabits(network, contract?)` | `number` |
 | `getUserStats(address, network, contract?)` | `UserStats` |
+| `queryReadOnly(request, parser)` | Parsed value from any read-only function |
+| `queryReadOnlyJson(request)` | Raw `cvToJSON` output for read-only function |
 
 ## Types
 

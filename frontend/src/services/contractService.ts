@@ -4,37 +4,19 @@
  */
 import { showContractCall } from '@stacks/connect';
 import {
-  uintCV,
-  stringUtf8CV,
-  principalCV,
-  fetchCallReadOnlyFunction,
-  cvToJSON,
-  PostConditionMode,
-  Pc,
-} from '@stacks/transactions';
+  buildCheckIn,
+  buildClaimBonus,
+  buildCreateHabit,
+  buildSlashHabit,
+  buildWithdrawStake,
+  getHabit as sdkGetHabit,
+  getPoolBalance as sdkGetPoolBalance,
+  getUserHabits as sdkGetUserHabits,
+  getUserStats as sdkGetUserStats,
+} from '@yusufolosun/ahhbit-tracker-sdk';
 import { CONTRACT_ADDRESS, CONTRACT_NAME, NETWORK } from '../utils/constants';
 import { walletService } from './walletService';
-import type {
-  HabitContractResponse,
-  UserHabitsContractResponse,
-  UserStatsContractResponse,
-} from '../types/habit';
-
-/**
- * Races a promise against a timeout to prevent API calls from hanging.
- *
- * @param promise - The promise to race
- * @param ms - Timeout in milliseconds (default: 10000)
- * @returns The promise result or throws on timeout
- */
-function withTimeout<T>(promise: Promise<T>, ms = 10_000): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('API request timed out')), ms),
-    ),
-  ]);
-}
+import type { Habit, UserStats } from '../types/habit';
 
 /** Application details for wallet transaction popups. */
 const appDetails = {
@@ -47,6 +29,36 @@ const appDetails = {
  * Provides methods for both write operations (transactions) and read-only queries.
  */
 export const contractService = {
+  async readHabit(habitId: number): Promise<Habit | null> {
+    return sdkGetHabit(habitId, NETWORK, {
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+    });
+  },
+
+  async readUserHabits(userAddress: string): Promise<number[]> {
+    const result = await sdkGetUserHabits(userAddress, NETWORK, {
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+    });
+
+    return result.habitIds;
+  },
+
+  async readPoolBalance(): Promise<number> {
+    return sdkGetPoolBalance(NETWORK, {
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+    });
+  },
+
+  async readUserStats(userAddress: string): Promise<UserStats> {
+    return sdkGetUserStats(userAddress, NETWORK, {
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+    });
+  },
+
   /**
    * Create a new habit with the specified stake.
    *
@@ -61,20 +73,15 @@ export const contractService = {
       throw new Error('Wallet not connected');
     }
 
-    // Post-condition: User must transfer exactly the stake amount to the contract
-    const postConditions = [
-      Pc.principal(userAddress).willSendEq(stakeAmount).ustx(),
-    ];
+    const txPayload = buildCreateHabit(name, stakeAmount, userAddress, {
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+    });
 
     return new Promise((resolve, reject) => {
       showContractCall({
-        contractAddress: CONTRACT_ADDRESS,
-        contractName: CONTRACT_NAME,
-        functionName: 'create-habit',
-        functionArgs: [stringUtf8CV(name), uintCV(stakeAmount)],
+        ...txPayload,
         network: NETWORK,
-        postConditions,
-        postConditionMode: PostConditionMode.Deny,
         appDetails,
         userSession: walletService.getUserSession(),
         onFinish: (data) => {
@@ -95,12 +102,14 @@ export const contractService = {
    * @throws Error if transaction cancelled
    */
   async checkIn(habitId: number): Promise<string> {
+    const txPayload = buildCheckIn(habitId, {
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+    });
+
     return new Promise((resolve, reject) => {
       showContractCall({
-        contractAddress: CONTRACT_ADDRESS,
-        contractName: CONTRACT_NAME,
-        functionName: 'check-in',
-        functionArgs: [uintCV(habitId)],
+        ...txPayload,
         network: NETWORK,
         appDetails,
         userSession: walletService.getUserSession(),
@@ -128,20 +137,15 @@ export const contractService = {
       throw new Error('Wallet not connected');
     }
 
-    // Post-condition: Contract must transfer exactly the staked amount back to the user
-    const postConditions = [
-      Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`).willSendEq(stakeAmount).ustx(),
-    ];
+    const txPayload = buildWithdrawStake(habitId, stakeAmount, {
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+    });
 
     return new Promise((resolve, reject) => {
       showContractCall({
-        contractAddress: CONTRACT_ADDRESS,
-        contractName: CONTRACT_NAME,
-        functionName: 'withdraw-stake',
-        functionArgs: [uintCV(habitId)],
+        ...txPayload,
         network: NETWORK,
-        postConditions,
-        postConditionMode: PostConditionMode.Deny,
         appDetails,
         userSession: walletService.getUserSession(),
         onFinish: (data) => {
@@ -167,20 +171,15 @@ export const contractService = {
       throw new Error('Wallet not connected');
     }
 
-    // Post-condition: Contract must transfer at least 1 microSTX from the pool
-    const postConditions = [
-      Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`).willSendGte(1).ustx(),
-    ];
+    const txPayload = buildClaimBonus(habitId, {
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+    });
 
     return new Promise((resolve, reject) => {
       showContractCall({
-        contractAddress: CONTRACT_ADDRESS,
-        contractName: CONTRACT_NAME,
-        functionName: 'claim-bonus',
-        functionArgs: [uintCV(habitId)],
+        ...txPayload,
         network: NETWORK,
-        postConditions,
-        postConditionMode: PostConditionMode.Deny,
         appDetails,
         userSession: walletService.getUserSession(),
         onFinish: (data) => {
@@ -202,12 +201,14 @@ export const contractService = {
    * @throws Error if transaction cancelled
    */
   async slashHabit(habitId: number): Promise<string> {
+    const txPayload = buildSlashHabit(habitId, {
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+    });
+
     return new Promise((resolve, reject) => {
       showContractCall({
-        contractAddress: CONTRACT_ADDRESS,
-        contractName: CONTRACT_NAME,
-        functionName: 'slash-habit',
-        functionArgs: [uintCV(habitId)],
+        ...txPayload,
         network: NETWORK,
         appDetails,
         userSession: walletService.getUserSession(),
@@ -219,81 +220,5 @@ export const contractService = {
         },
       });
     });
-  },
-
-  /**
-   * Get details for a specific habit.
-   *
-   * @param habitId - The habit ID to query
-   * @returns Habit data or null if not found
-   */
-  async getHabit(habitId: number): Promise<HabitContractResponse> {
-    const result = await withTimeout(fetchCallReadOnlyFunction({
-      contractAddress: CONTRACT_ADDRESS,
-      contractName: CONTRACT_NAME,
-      functionName: 'get-habit',
-      functionArgs: [uintCV(habitId)],
-      network: NETWORK,
-      senderAddress: CONTRACT_ADDRESS,
-    }));
-
-    return cvToJSON(result) as HabitContractResponse;
-  },
-
-  /**
-   * Get all habits for a user.
-   *
-   * @param userAddress - Stacks address to query
-   * @returns List of habit IDs owned by the user
-   */
-  async getUserHabits(userAddress: string): Promise<UserHabitsContractResponse> {
-    const result = await withTimeout(fetchCallReadOnlyFunction({
-      contractAddress: CONTRACT_ADDRESS,
-      contractName: CONTRACT_NAME,
-      functionName: 'get-user-habits',
-      functionArgs: [principalCV(userAddress)],
-      network: NETWORK,
-      senderAddress: CONTRACT_ADDRESS,
-    }));
-
-    return cvToJSON(result) as UserHabitsContractResponse;
-  },
-
-  /**
-   * Get the current forfeited pool balance.
-   *
-   * @returns Pool balance in microSTX
-   */
-  async getPoolBalance(): Promise<number> {
-    const result = await withTimeout(fetchCallReadOnlyFunction({
-      contractAddress: CONTRACT_ADDRESS,
-      contractName: CONTRACT_NAME,
-      functionName: 'get-pool-balance',
-      functionArgs: [],
-      network: NETWORK,
-      senderAddress: CONTRACT_ADDRESS,
-    }));
-
-    const json = cvToJSON(result);
-    return parseInt(json.value.value);
-  },
-
-  /**
-   * Get statistics for a user.
-   *
-   * @param userAddress - Stacks address to query
-   * @returns User statistics including total habits and streaks
-   */
-  async getUserStats(userAddress: string): Promise<UserStatsContractResponse> {
-    const result = await withTimeout(fetchCallReadOnlyFunction({
-      contractAddress: CONTRACT_ADDRESS,
-      contractName: CONTRACT_NAME,
-      functionName: 'get-user-stats',
-      functionArgs: [principalCV(userAddress)],
-      network: NETWORK,
-      senderAddress: CONTRACT_ADDRESS,
-    }));
-
-    return cvToJSON(result) as UserStatsContractResponse;
   },
 };

@@ -1,5 +1,12 @@
 // Types
 export type { Habit, UserHabits, UserStats, ContractId } from './types';
+export type {
+  StacksReadOnlyNetwork,
+  RetryOptions,
+  ReadOnlyQueryOptions,
+  ReadOnlyQueryRequest,
+  ContractInteractionErrorContext,
+} from './query-types';
 
 // Constants
 export {
@@ -12,6 +19,22 @@ export {
   errorMessages,
 } from './constants';
 export type { ErrorCodeValue } from './constants';
+
+// Query errors
+export { ContractInteractionError, toContractInteractionError } from './query-error';
+
+// Contract helpers
+export { resolveContract, contractPrincipal } from './contract';
+
+// Query execution
+export { queryReadOnly, queryReadOnlyJson } from './query';
+
+// Query response parsers
+export { parseHabit, parseUserHabits, parseUserStats, unwrapOkNumber } from './parsers';
+
+// Network helpers
+export { createStacksNetwork, defaultHiroApiBaseUrl } from './network';
+export type { NetworkMode, NetworkFactoryOptions } from './network';
 
 // Transaction builders
 export {
