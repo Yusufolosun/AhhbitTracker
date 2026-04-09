@@ -26,6 +26,9 @@ export { ContractInteractionError, toContractInteractionError } from './query-er
 // Contract helpers
 export { resolveContract, contractPrincipal } from './contract';
 
+// Query execution
+export { queryReadOnly, queryReadOnlyJson } from './query';
+
 // Transaction builders
 export {
   buildCreateHabit,
