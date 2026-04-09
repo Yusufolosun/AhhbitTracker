@@ -32,6 +32,10 @@ export { queryReadOnly, queryReadOnlyJson } from './query';
 // Query response parsers
 export { parseHabit, parseUserHabits, parseUserStats, unwrapOkNumber } from './parsers';
 
+// Network helpers
+export { createStacksNetwork, defaultHiroApiBaseUrl } from './network';
+export type { NetworkMode, NetworkFactoryOptions } from './network';
+
 // Transaction builders
 export {
   buildCreateHabit,
