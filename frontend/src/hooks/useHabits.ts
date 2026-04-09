@@ -10,46 +10,6 @@ import {
 import { POLLING_INTERVAL, CACHE_TIME, POOL_CACHE_TIME } from '../utils/constants';
 
 /**
- * Type guard to safely parse integer from Clarity response
- */
-const parseIntSafe = (value: unknown, fallback = 0): number => {
-  if (typeof value === 'number') return value;
-  if (typeof value === 'string') {
-    const parsed = parseInt(value, 10);
-    return isNaN(parsed) ? fallback : parsed;
-  }
-  if (value && typeof value === 'object' && 'value' in value) {
-    return parseIntSafe((value as { value: unknown }).value, fallback);
-  }
-  console.warn('[useHabits] Failed to parse integer, using fallback:', value);
-  return fallback;
-};
-
-/**
- * Type guard to safely parse string from Clarity response
- */
-const parseStringSafe = (value: unknown, fallback = ''): string => {
-  if (typeof value === 'string') return value;
-  if (value && typeof value === 'object' && 'value' in value) {
-    return parseStringSafe((value as { value: unknown }).value, fallback);
-  }
-  console.warn('[useHabits] Failed to parse string, using fallback:', value);
-  return fallback;
-};
-
-/**
- * Type guard to safely parse boolean from Clarity response
- */
-const parseBooleanSafe = (value: unknown, fallback = false): boolean => {
-  if (typeof value === 'boolean') return value;
-  if (value && typeof value === 'object' && 'value' in value) {
-    return parseBooleanSafe((value as { value: unknown }).value, fallback);
-  }
-  console.warn('[useHabits] Failed to parse boolean, using fallback:', value);
-  return fallback;
-};
-
-/**
  * Custom hook for managing habits
  */
 export const useHabits = () => {
@@ -73,47 +33,23 @@ export const useHabits = () => {
     queryKey: ['habits', walletState.address],
     queryFn: async () => {
       if (!walletState.address) return [];
-      const result = await contractService.getUserHabits(walletState.address);
+      const habitIds = await contractService.readUserHabits(walletState.address);
+      if (!habitIds.length) return [];
 
-      // Parse habit IDs from result
-      // get-user-habits returns: { habit-ids: (list) }
-      if (result.value?.['habit-ids']?.value) {
-        const habitIds = result.value['habit-ids'].value;
-
-        // Fetch each habit's details
-        const habitPromises = habitIds.map(async (id) => {
-          const habitId = parseIntSafe(id);
-          if (habitId === 0) {
-            console.warn('[useHabits] Invalid habit ID:', id);
-            return null;
-          }
-
-          const habitData = await contractService.getHabit(habitId);
-
-          // Check if optional value exists (habitData.value will be the tuple)
-          if (habitData.value?.value) {
-            const habit = habitData.value.value;
-            return {
-              habitId,
-              name: parseStringSafe(habit.name, 'Unknown Habit'),
-              owner: parseStringSafe(habit.owner),
-              stakeAmount: parseIntSafe(habit['stake-amount']),
-              createdAtBlock: parseIntSafe(habit['created-at-block']),
-              lastCheckInBlock: parseIntSafe(habit['last-check-in-block']),
-              currentStreak: parseIntSafe(habit['current-streak']),
-              isActive: parseBooleanSafe(habit['is-active']),
-              isCompleted: parseBooleanSafe(habit['is-completed']),
-              bonusClaimed: parseBooleanSafe(habit['bonus-claimed']),
-            } as Habit;
-          }
+      const habitPromises = habitIds.map(async (habitId) => {
+        const habit = await contractService.readHabit(habitId);
+        if (!habit) {
           return null;
-        });
+        }
 
-        const habitsData = await Promise.all(habitPromises);
-        return habitsData.filter((h): h is Habit => h !== null);
-      }
+        return {
+          habitId,
+          ...habit,
+        } satisfies Habit;
+      });
 
-      return [];
+      const habitsData = await Promise.all(habitPromises);
+      return habitsData.filter((h): h is Habit => h !== null);
     },
     enabled: !!walletState.address,
     staleTime: CACHE_TIME,
@@ -131,19 +67,7 @@ export const useHabits = () => {
     queryKey: ['userStats', walletState.address],
     queryFn: async () => {
       if (!walletState.address) return null;
-      const result = await contractService.getUserStats(walletState.address);
-
-      // get-user-stats returns a response type
-      if (result.success && result.value?.value) {
-        const stats = result.value.value;
-        const habitIdsValue = stats['habit-ids']?.value || [];
-        return {
-          totalHabits: parseIntSafe(stats['total-habits']),
-          habitIds: habitIdsValue.map((id) => parseIntSafe(id)),
-        } as UserStats;
-      }
-
-      return null;
+      return contractService.readUserStats(walletState.address);
     },
     enabled: !!walletState.address,
     staleTime: CACHE_TIME,
@@ -154,7 +78,7 @@ export const useHabits = () => {
   // Fetch pool balance
   const { data: poolBalance, error: poolError } = useQuery({
     queryKey: ['poolBalance'],
-    queryFn: () => contractService.getPoolBalance(),
+    queryFn: () => contractService.readPoolBalance(),
     staleTime: POOL_CACHE_TIME,
     retry: 3,
     retryDelay: (attempt) => Math.min(15000 * Math.pow(2, attempt - 1), 60000),
