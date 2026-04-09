@@ -1,5 +1,12 @@
 // Types
 export type { Habit, UserHabits, UserStats, ContractId } from './types';
+export type {
+  StacksReadOnlyNetwork,
+  RetryOptions,
+  ReadOnlyQueryOptions,
+  ReadOnlyQueryRequest,
+  ContractInteractionErrorContext,
+} from './query-types';
 
 // Constants
 export {
