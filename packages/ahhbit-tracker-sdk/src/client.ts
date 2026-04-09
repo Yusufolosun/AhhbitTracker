@@ -2,14 +2,14 @@ import {
   uintCV,
   stringUtf8CV,
   principalCV,
-  fetchCallReadOnlyFunction,
-  cvToJSON,
   Pc,
   PostConditionMode,
 } from '@stacks/transactions';
 import type { ContractId, Habit, UserHabits, UserStats } from './types';
 import { contractPrincipal, resolveContract } from './contract';
 import { parseHabit, parseUserHabits, parseUserStats, unwrapOkNumber } from './parsers';
+import { queryReadOnly } from './query';
+import type { StacksReadOnlyNetwork } from './query-types';
 
 // ────────────────────────────────────────────────
 // Helpers
@@ -121,19 +121,18 @@ export function buildClaimBonus(habitId: number, contract?: Partial<ContractId>)
  */
 export async function getHabit(
   habitId: number,
-  network: Parameters<typeof fetchCallReadOnlyFunction>[0]['network'],
+  network: StacksReadOnlyNetwork,
   contract?: Partial<ContractId>,
 ): Promise<Habit | null> {
-  const c = resolveContract(contract);
-  const cv = await fetchCallReadOnlyFunction({
-    contractAddress: c.contractAddress,
-    contractName: c.contractName,
-    functionName: 'get-habit',
-    functionArgs: [uintCV(habitId)],
-    network,
-    senderAddress: c.contractAddress,
-  });
-  return parseHabit(cvToJSON(cv));
+  return queryReadOnly(
+    {
+      functionName: 'get-habit',
+      functionArgs: [uintCV(habitId)],
+      network,
+      contract,
+    },
+    parseHabit,
+  );
 }
 
 /**
@@ -141,19 +140,18 @@ export async function getHabit(
  */
 export async function getUserHabits(
   userAddress: string,
-  network: Parameters<typeof fetchCallReadOnlyFunction>[0]['network'],
+  network: StacksReadOnlyNetwork,
   contract?: Partial<ContractId>,
 ): Promise<UserHabits> {
-  const c = resolveContract(contract);
-  const cv = await fetchCallReadOnlyFunction({
-    contractAddress: c.contractAddress,
-    contractName: c.contractName,
-    functionName: 'get-user-habits',
-    functionArgs: [principalCV(userAddress)],
-    network,
-    senderAddress: c.contractAddress,
-  });
-  return parseUserHabits(cvToJSON(cv));
+  return queryReadOnly(
+    {
+      functionName: 'get-user-habits',
+      functionArgs: [principalCV(userAddress)],
+      network,
+      contract,
+    },
+    parseUserHabits,
+  );
 }
 
 /**
@@ -161,57 +159,54 @@ export async function getUserHabits(
  */
 export async function getHabitStreak(
   habitId: number,
-  network: Parameters<typeof fetchCallReadOnlyFunction>[0]['network'],
+  network: StacksReadOnlyNetwork,
   contract?: Partial<ContractId>,
 ): Promise<number> {
-  const c = resolveContract(contract);
-  const cv = await fetchCallReadOnlyFunction({
-    contractAddress: c.contractAddress,
-    contractName: c.contractName,
-    functionName: 'get-habit-streak',
-    functionArgs: [uintCV(habitId)],
-    network,
-    senderAddress: c.contractAddress,
-  });
-  return unwrapOkNumber(cvToJSON(cv));
+  return queryReadOnly(
+    {
+      functionName: 'get-habit-streak',
+      functionArgs: [uintCV(habitId)],
+      network,
+      contract,
+    },
+    unwrapOkNumber,
+  );
 }
 
 /**
  * Fetch the current forfeited pool balance in microSTX.
  */
 export async function getPoolBalance(
-  network: Parameters<typeof fetchCallReadOnlyFunction>[0]['network'],
+  network: StacksReadOnlyNetwork,
   contract?: Partial<ContractId>,
 ): Promise<number> {
-  const c = resolveContract(contract);
-  const cv = await fetchCallReadOnlyFunction({
-    contractAddress: c.contractAddress,
-    contractName: c.contractName,
-    functionName: 'get-pool-balance',
-    functionArgs: [],
-    network,
-    senderAddress: c.contractAddress,
-  });
-  return unwrapOkNumber(cvToJSON(cv));
+  return queryReadOnly(
+    {
+      functionName: 'get-pool-balance',
+      functionArgs: [],
+      network,
+      contract,
+    },
+    unwrapOkNumber,
+  );
 }
 
 /**
  * Fetch the total number of habits created.
  */
 export async function getTotalHabits(
-  network: Parameters<typeof fetchCallReadOnlyFunction>[0]['network'],
+  network: StacksReadOnlyNetwork,
   contract?: Partial<ContractId>,
 ): Promise<number> {
-  const c = resolveContract(contract);
-  const cv = await fetchCallReadOnlyFunction({
-    contractAddress: c.contractAddress,
-    contractName: c.contractName,
-    functionName: 'get-total-habits',
-    functionArgs: [],
-    network,
-    senderAddress: c.contractAddress,
-  });
-  return unwrapOkNumber(cvToJSON(cv));
+  return queryReadOnly(
+    {
+      functionName: 'get-total-habits',
+      functionArgs: [],
+      network,
+      contract,
+    },
+    unwrapOkNumber,
+  );
 }
 
 /**
@@ -219,18 +214,16 @@ export async function getTotalHabits(
  */
 export async function getUserStats(
   userAddress: string,
-  network: Parameters<typeof fetchCallReadOnlyFunction>[0]['network'],
+  network: StacksReadOnlyNetwork,
   contract?: Partial<ContractId>,
 ): Promise<UserStats> {
-  const c = resolveContract(contract);
-  const cv = await fetchCallReadOnlyFunction({
-    contractAddress: c.contractAddress,
-    contractName: c.contractName,
-    functionName: 'get-user-stats',
-    functionArgs: [principalCV(userAddress)],
-    network,
-    senderAddress: c.contractAddress,
-  });
-  const json = cvToJSON(cv);
-  return parseUserStats(json?.value ?? json);
+  return queryReadOnly(
+    {
+      functionName: 'get-user-stats',
+      functionArgs: [principalCV(userAddress)],
+      network,
+      contract,
+    },
+    (json) => parseUserStats((json as { value?: unknown })?.value ?? json),
+  );
 }
