@@ -1,10 +1,15 @@
-import { STACKS_MAINNET } from "@stacks/network";
-import { fetchCallReadOnlyFunction, cvToJSON } from "@stacks/transactions";
 import * as fs from "fs";
+import { createContractReadonlyClient } from "../shared/contract-readonly";
 
-const NETWORK = STACKS_MAINNET;
 const CONTRACT_ADDRESS = "SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z";
 const CONTRACT_NAME = "habit-tracker-v2";
+
+const client = createContractReadonlyClient({
+  contractAddress: CONTRACT_ADDRESS,
+  contractName: CONTRACT_NAME,
+  mode: 'mainnet',
+  baseUrl: 'https://api.mainnet.hiro.so',
+});
 
 interface PoolSnapshot {
   timestamp: number;
@@ -13,17 +18,7 @@ interface PoolSnapshot {
 }
 
 async function trackPoolBalance() {
-  const result = await fetchCallReadOnlyFunction({
-    contractAddress: CONTRACT_ADDRESS,
-    contractName: CONTRACT_NAME,
-    functionName: "get-pool-balance",
-    functionArgs: [],
-    network: NETWORK,
-    senderAddress: CONTRACT_ADDRESS,
-  });
-  
-  const data = cvToJSON(result);
-  const balance = parseInt(data.value.value);
+  const balance = await client.getPoolBalance();
   
   const snapshot: PoolSnapshot = {
     timestamp: Date.now(),

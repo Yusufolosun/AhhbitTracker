@@ -1,9 +1,14 @@
-import { STACKS_MAINNET } from "@stacks/network";
-import { fetchCallReadOnlyFunction, uintCV, cvToJSON } from "@stacks/transactions";
+import { createContractReadonlyClient } from "../shared/contract-readonly";
 
-const NETWORK = STACKS_MAINNET;
 const CONTRACT_ADDRESS = "SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z";
 const CONTRACT_NAME = "habit-tracker-v2";
+
+const client = createContractReadonlyClient({
+  contractAddress: CONTRACT_ADDRESS,
+  contractName: CONTRACT_NAME,
+  mode: 'mainnet',
+  baseUrl: 'https://api.mainnet.hiro.so',
+});
 
 async function analyzeStreaks(habitIds: number[]) {
   console.log("Analyzing Habit Streaks");
@@ -11,19 +16,10 @@ async function analyzeStreaks(habitIds: number[]) {
   
   const streaks = await Promise.all(
     habitIds.map(async (id) => {
-      const result = await fetchCallReadOnlyFunction({
-        contractAddress: CONTRACT_ADDRESS,
-        contractName: CONTRACT_NAME,
-        functionName: "get-habit-streak",
-        functionArgs: [uintCV(id)],
-        network: NETWORK,
-        senderAddress: CONTRACT_ADDRESS,
-      });
-      
-      const data = cvToJSON(result);
+      const streak = await client.getHabitStreak(id);
       return {
         habitId: id,
-        streak: data.type === 'ok' ? parseInt(data.value.value) : 0
+        streak,
       };
     })
   );

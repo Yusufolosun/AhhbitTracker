@@ -1,30 +1,15 @@
-const CONTRACT_ADDRESS = "SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z";
-const CONTRACT_NAME = "habit-tracker-v2";
-const NETWORK_API = "https://api.mainnet.hiro.so";
+import { createContractReadonlyClient } from './shared/contract-readonly';
 
-async function getHabit(habitId: number) {
-  // Use the correct Clarity value encoding for uint
-  const habitIdHex = '0x' + habitId.toString().padStart(32, '0').split('').map(c => c.charCodeAt(0).toString(16)).join('');
-  
-  const url = `${NETWORK_API}/v2/contracts/call-read/${CONTRACT_ADDRESS}/${CONTRACT_NAME}/get-habit`;
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      sender: CONTRACT_ADDRESS,
-      arguments: [`0x00000000000000000000000000000000${habitId.toString(16).padStart(16, '0')}`]
-    })
-  });
-  
-  const text = await response.text();
-  try {
-    const data = JSON.parse(text);
-    return data;
-  } catch (e) {
-    console.error(`Failed to parse response for habit ${habitId}:`, text.substring(0, 200));
-    return { okay: false, result: 'none' };
-  }
-}
+const CONTRACT_ADDRESS = 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z';
+const CONTRACT_NAME = 'habit-tracker-v2';
+const NETWORK_API = 'https://api.mainnet.hiro.so';
+
+const client = createContractReadonlyClient({
+  contractAddress: CONTRACT_ADDRESS,
+  contractName: CONTRACT_NAME,
+  mode: 'mainnet',
+  baseUrl: NETWORK_API,
+});
 
 async function batchQueryHabits(habitIds: number[]) {
   console.log(`Querying ${habitIds.length} habits...`);
@@ -33,18 +18,18 @@ async function batchQueryHabits(habitIds: number[]) {
   const results = await Promise.all(
     habitIds.map(async (id) => {
       try {
-        const result = await getHabit(id);
-        
-        if (!result.okay || result.result.includes('none')) {
+        const habit = await client.getHabit(id);
+        if (!habit) {
           return null;
         }
 
-        // Parse the Clarity response (simplified parsing)
-        const habitData = result.result;
-        
         return {
           id,
-          rawData: habitData,
+          name: habit.name,
+          owner: habit.owner,
+          stakeAmount: habit.stakeAmount,
+          currentStreak: habit.currentStreak,
+          isActive: habit.isActive,
           exists: true
         };
       } catch (error) {
@@ -64,8 +49,11 @@ async function batchQueryHabits(habitIds: number[]) {
   } else {
     validHabits.forEach((habit: any) => {
       console.log(`Habit #${habit.id}:`);
-      console.log(`  Status: Exists`);
-      console.log(`  Raw data: ${habit.rawData.substring(0, 100)}...`);
+      console.log(`  Name: ${habit.name}`);
+      console.log(`  Owner: ${habit.owner}`);
+      console.log(`  Stake: ${habit.stakeAmount} microSTX`);
+      console.log(`  Current Streak: ${habit.currentStreak}`);
+      console.log(`  Active: ${habit.isActive ? 'Yes' : 'No'}`);
       console.log();
     });
   }
