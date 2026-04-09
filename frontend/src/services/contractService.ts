@@ -15,11 +15,17 @@ import {
   buildCreateHabit,
   buildSlashHabit,
   buildWithdrawStake,
+  getHabit as sdkGetHabit,
+  getPoolBalance as sdkGetPoolBalance,
+  getUserHabits as sdkGetUserHabits,
+  getUserStats as sdkGetUserStats,
 } from '@yusufolosun/ahhbit-tracker-sdk';
 import { CONTRACT_ADDRESS, CONTRACT_NAME, NETWORK } from '../utils/constants';
 import { walletService } from './walletService';
 import type {
+  Habit,
   HabitContractResponse,
+  UserStats,
   UserHabitsContractResponse,
   UserStatsContractResponse,
 } from '../types/habit';
@@ -51,6 +57,36 @@ const appDetails = {
  * Provides methods for both write operations (transactions) and read-only queries.
  */
 export const contractService = {
+  async readHabit(habitId: number): Promise<Habit | null> {
+    return sdkGetHabit(habitId, NETWORK, {
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+    });
+  },
+
+  async readUserHabits(userAddress: string): Promise<number[]> {
+    const result = await sdkGetUserHabits(userAddress, NETWORK, {
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+    });
+
+    return result.habitIds;
+  },
+
+  async readPoolBalance(): Promise<number> {
+    return sdkGetPoolBalance(NETWORK, {
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+    });
+  },
+
+  async readUserStats(userAddress: string): Promise<UserStats> {
+    return sdkGetUserStats(userAddress, NETWORK, {
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+    });
+  },
+
   /**
    * Create a new habit with the specified stake.
    *
