@@ -8,88 +8,12 @@ import {
   PostConditionMode,
 } from '@stacks/transactions';
 import type { ContractId, Habit, UserHabits, UserStats } from './types';
-import { MAINNET_CONTRACT } from './constants';
+import { contractPrincipal, resolveContract } from './contract';
+import { parseHabit, parseUserHabits, parseUserStats, unwrapOkNumber } from './parsers';
 
 // ────────────────────────────────────────────────
 // Helpers
 // ────────────────────────────────────────────────
-
-function resolveContract(override?: Partial<ContractId>): ContractId {
-  return {
-    contractAddress: override?.contractAddress ?? MAINNET_CONTRACT.contractAddress,
-    contractName: override?.contractName ?? MAINNET_CONTRACT.contractName,
-  };
-}
-
-function contractPrincipal(c: ContractId): string {
-  return `${c.contractAddress}.${c.contractName}`;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function parseHabit(json: any): Habit | null {
-  // Handle none/null cases - type includes "(optional none)" or value is null
-  if (!json || json.value === null || json.type?.includes('optional none')) return null;
-  // Unwrap optional: some has nested value with tuple inside
-  let v = json.value ?? json;
-  // If v is a tuple wrapper, unwrap to get the actual fields
-  if (v && typeof v === 'object' && v.value && typeof v.value === 'object') {
-    v = v.value;
-  }
-  return {
-    owner: v.owner?.value ?? v.owner,
-    name: v.name?.value ?? v.name,
-    stakeAmount: Number(v['stake-amount']?.value ?? v['stake-amount']),
-    currentStreak: Number(v['current-streak']?.value ?? v['current-streak']),
-    lastCheckInBlock: Number(v['last-check-in-block']?.value ?? v['last-check-in-block']),
-    createdAtBlock: Number(v['created-at-block']?.value ?? v['created-at-block']),
-    isActive: v['is-active']?.value ?? v['is-active'],
-    isCompleted: v['is-completed']?.value ?? v['is-completed'],
-    bonusClaimed: v['bonus-claimed']?.value ?? v['bonus-claimed'],
-  };
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function parseUserHabits(json: any): UserHabits {
-  const ids = json?.value?.['habit-ids']?.value ?? json?.['habit-ids']?.value ?? [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return { habitIds: ids.map((v: any) => Number(v.value ?? v)) };
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function parseUserStats(json: any): UserStats {
-  const v = json?.value ?? json;
-  const ids = v['habit-ids']?.value ?? [];
-  return {
-    totalHabits: Number(v['total-habits']?.value ?? v['total-habits']),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    habitIds: ids.map((i: any) => Number(i.value ?? i)),
-  };
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function unwrapOkNumber(json: any): number {
-  // Handle new format with success field: {"type":"(response...)", "success":true, "value":{...}}
-  if (json?.success === true) {
-    const inner = json.value;
-    if (inner && typeof inner === 'object' && 'value' in inner) {
-      return Number(inner.value);
-    }
-    return Number(inner ?? 0);
-  }
-  // Handle old format: {"type":"ok", "value":{...}}
-  if (json?.type === 'ok' || json?.type === 'response_ok') {
-    const inner = json.value;
-    if (inner && typeof inner === 'object' && 'value' in inner) {
-      return Number(inner.value);
-    }
-    return Number(inner ?? 0);
-  }
-  // Direct uint type
-  if (json?.type === 'uint' || json?.type?.includes('uint')) {
-    return Number(json.value ?? 0);
-  }
-  return Number(json?.value ?? 0);
-}
 
 // ────────────────────────────────────────────────
 // Transaction argument builders
