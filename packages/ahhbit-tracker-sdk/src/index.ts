@@ -29,6 +29,9 @@ export { resolveContract, contractPrincipal } from './contract';
 // Query execution
 export { queryReadOnly, queryReadOnlyJson } from './query';
 
+// Query response parsers
+export { parseHabit, parseUserHabits, parseUserStats, unwrapOkNumber } from './parsers';
+
 // Transaction builders
 export {
   buildCreateHabit,
