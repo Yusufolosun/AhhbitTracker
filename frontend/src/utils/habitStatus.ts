@@ -1,16 +1,23 @@
 import { Habit } from '../types/habit';
-import { CHECK_IN_WINDOW, MIN_STREAK_FOR_WITHDRAWAL } from './constants';
+import {
+  CHECK_IN_WINDOW,
+  MIN_CHECK_IN_INTERVAL,
+  MIN_STREAK_FOR_WITHDRAWAL,
+} from './constants';
 
 /**
- * Threshold (in blocks) at which we warn the user their window is closing.
- * 120 blocks = ~83% of the 144-block window, leaving ~4 hours to act.
+ * Threshold (in blocks) at which we warn the user the valid check-in period
+ * is close to expiring.
+ *
+ * Valid window is [120, 144]. We mark [133, 144] as urgent.
  */
-const URGENT_THRESHOLD = 120;
+const URGENT_THRESHOLD = 132;
 
 export type CheckInWindowState =
   | 'expired'
   | 'urgent'
   | 'available'
+  | 'cooldown'
   | 'just-checked-in'
   | 'unknown';
 
@@ -29,6 +36,7 @@ export function getCheckInWindowState(
 
   if (blocksElapsed < 1) return 'just-checked-in';
   if (blocksElapsed > CHECK_IN_WINDOW) return 'expired';
+  if (blocksElapsed < MIN_CHECK_IN_INTERVAL) return 'cooldown';
   if (blocksElapsed > URGENT_THRESHOLD) return 'urgent';
   return 'available';
 }
@@ -40,6 +48,15 @@ export function getCheckInWindowState(
 export function getBlocksRemaining(habit: Habit, currentBlock: number): number {
   const remaining = CHECK_IN_WINDOW - (currentBlock - habit.lastCheckInBlock);
   return Math.max(0, remaining);
+}
+
+/**
+ * Number of blocks left before the next valid check-in can be submitted.
+ * Returns 0 when check-in is already available.
+ */
+export function getBlocksUntilNextCheckIn(habit: Habit, currentBlock: number): number {
+  const wait = MIN_CHECK_IN_INTERVAL - (currentBlock - habit.lastCheckInBlock);
+  return Math.max(0, wait);
 }
 
 /**

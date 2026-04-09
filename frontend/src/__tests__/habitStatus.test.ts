@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { getCheckInWindowState, getBlocksRemaining, isEligibleToWithdraw } from '../utils/habitStatus';
+import {
+  getCheckInWindowState,
+  getBlocksRemaining,
+  getBlocksUntilNextCheckIn,
+  isEligibleToWithdraw,
+} from '../utils/habitStatus';
 import { Habit } from '../types/habit';
 
 function makeHabit(overrides: Partial<Habit> = {}): Habit {
@@ -33,10 +38,9 @@ describe('getCheckInWindowState', () => {
     expect(getCheckInWindowState(habit, 1000)).toBe('just-checked-in');
   });
 
-  it('returns available when within comfortable window', () => {
+  it('returns cooldown before the minimum interval is reached', () => {
     const habit = makeHabit({ lastCheckInBlock: 1000 });
-    // elapsed = 50, well within 120 threshold
-    expect(getCheckInWindowState(habit, 1050)).toBe('available');
+    expect(getCheckInWindowState(habit, 1050)).toBe('cooldown');
   });
 
   it('returns available at exactly 120 blocks elapsed', () => {
@@ -44,9 +48,14 @@ describe('getCheckInWindowState', () => {
     expect(getCheckInWindowState(habit, 1120)).toBe('available');
   });
 
-  it('returns urgent when elapsed > 120 but <= 144', () => {
+  it('returns available when elapsed is between 120 and 132 blocks', () => {
     const habit = makeHabit({ lastCheckInBlock: 1000 });
-    expect(getCheckInWindowState(habit, 1130)).toBe('urgent');
+    expect(getCheckInWindowState(habit, 1130)).toBe('available');
+  });
+
+  it('returns urgent when elapsed > 132 but <= 144', () => {
+    const habit = makeHabit({ lastCheckInBlock: 1000 });
+    expect(getCheckInWindowState(habit, 1133)).toBe('urgent');
   });
 
   it('returns urgent at exactly 144 blocks elapsed', () => {
@@ -74,6 +83,19 @@ describe('getBlocksRemaining', () => {
   it('returns full window at block 0 elapsed', () => {
     const habit = makeHabit({ lastCheckInBlock: 1000 });
     expect(getBlocksRemaining(habit, 1000)).toBe(144);
+  });
+});
+
+describe('getBlocksUntilNextCheckIn', () => {
+  it('returns remaining cooldown blocks', () => {
+    const habit = makeHabit({ lastCheckInBlock: 1000 });
+    expect(getBlocksUntilNextCheckIn(habit, 1100)).toBe(20);
+  });
+
+  it('returns 0 once check-in is available', () => {
+    const habit = makeHabit({ lastCheckInBlock: 1000 });
+    expect(getBlocksUntilNextCheckIn(habit, 1120)).toBe(0);
+    expect(getBlocksUntilNextCheckIn(habit, 1140)).toBe(0);
   });
 });
 

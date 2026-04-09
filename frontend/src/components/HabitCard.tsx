@@ -8,7 +8,12 @@ import { useCurrentBlock } from '../hooks/useCurrentBlock';
 import { MIN_STREAK_FOR_WITHDRAWAL, CONTRACT_ADDRESS, CONTRACT_NAME } from '../utils/constants';
 import { contractUrl } from '@yusufolosun/stx-utils';
 import { ConfirmationDialog } from './ConfirmationDialog';
-import { getCheckInWindowState, getBlocksRemaining, isEligibleToWithdraw } from '../utils/habitStatus';
+import {
+  getCheckInWindowState,
+  getBlocksRemaining,
+  getBlocksUntilNextCheckIn,
+  isEligibleToWithdraw,
+} from '../utils/habitStatus';
 
 interface HabitCardProps {
   habit: Habit;
@@ -90,12 +95,16 @@ export function HabitCard({ habit }: HabitCardProps) {
   const canWithdraw = isEligibleToWithdraw(habit);
   const canClaimBonus = habit.isCompleted && !habit.bonusClaimed;
   const blocksRemaining = currentBlock !== null ? getBlocksRemaining(habit, currentBlock) : null;
+  const blocksUntilNextCheckIn =
+    currentBlock !== null ? getBlocksUntilNextCheckIn(habit, currentBlock) : null;
+  const canSubmitCheckIn = windowState === 'available' || windowState === 'urgent';
   const estimatedBonus = Math.min(Math.floor(poolBalance / 100), 1_000_000);
 
   const getBadge = () => {
     if (habit.isCompleted) return { label: 'Completed', className: 'bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-400' };
     if (!habit.isActive && !habit.isCompleted) return { label: 'Forfeited', className: 'bg-surface-100 text-surface-600 dark:bg-surface-700 dark:text-surface-400' };
     if (windowState === 'expired') return { label: 'Window Expired', className: 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-400' };
+    if (windowState === 'cooldown') return { label: 'Cooldown', className: 'bg-sky-100 text-sky-800 dark:bg-sky-500/15 dark:text-sky-400' };
     if (windowState === 'urgent') return { label: 'Expiring Soon', className: 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-400' };
     return { label: 'Active', className: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-400' };
   };
@@ -162,6 +171,18 @@ export function HabitCard({ habit }: HabitCardProps) {
         </div>
       )}
 
+      {/* Cooldown guidance */}
+      {windowState === 'cooldown' && blocksUntilNextCheckIn !== null && (
+        <div className="mb-4 p-3 rounded-lg bg-sky-50 border border-sky-200 dark:bg-sky-500/10 dark:border-sky-500/20">
+          <p className="text-sm font-medium text-sky-800 dark:text-sky-300">
+            Next check-in unlocks in ~{blocksToTime(blocksUntilNextCheckIn)}
+          </p>
+          <p className="text-xs text-sky-600 dark:text-sky-400 mt-1">
+            Check-ins are valid between 120 and 144 blocks after your last check-in.
+          </p>
+        </div>
+      )}
+
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div>
@@ -185,10 +206,10 @@ export function HabitCard({ habit }: HabitCardProps) {
         {habit.isActive && windowState !== 'expired' && isOwnHabit && (
           <button
             onClick={handleCheckIn}
-            disabled={isCheckingIn}
+            disabled={isCheckingIn || !canSubmitCheckIn}
             className="btn-primary w-full"
           >
-            {isCheckingIn ? 'Checking In...' : 'Check In'}
+            {isCheckingIn ? 'Checking In...' : canSubmitCheckIn ? 'Check In' : 'Check In Not Ready'}
           </button>
         )}
 
