@@ -1,8 +1,8 @@
 import { CONTRACT_ADDRESS, CONTRACT_NAME } from '../utils/constants';
-import { contractUrl } from '@yusufolosun/stx-utils';
+import { contractExplorerUrl } from '../utils/explorer';
 
 const REPO_URL = 'https://github.com/Yusufolosun/AhhbitTracker';
-const EXPLORER_CONTRACT_URL = contractUrl(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`, 'mainnet');
+const EXPLORER_CONTRACT_URL = contractExplorerUrl(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`);
 
 const RESOURCE_LINKS = [
   { label: 'Documentation', href: `${REPO_URL}#readme` },

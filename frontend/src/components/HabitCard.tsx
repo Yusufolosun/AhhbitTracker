@@ -6,7 +6,7 @@ import { useToast } from '../context/ToastContext';
 import { formatSTX, blocksAgo, blocksToTime } from '../utils/formatting';
 import { useCurrentBlock } from '../hooks/useCurrentBlock';
 import { MIN_STREAK_FOR_WITHDRAWAL, CONTRACT_ADDRESS, CONTRACT_NAME } from '../utils/constants';
-import { contractUrl } from '@yusufolosun/stx-utils';
+import { contractExplorerUrl } from '../utils/explorer';
 import { ConfirmationDialog } from './ConfirmationDialog';
 import {
   getCheckInWindowState,
@@ -247,7 +247,7 @@ export function HabitCard({ habit }: HabitCardProps) {
       {/* Contract link */}
       <div className="mt-3 pt-3 border-t border-surface-200 dark:border-surface-700 text-right">
         <a
-          href={contractUrl(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`, 'mainnet')}
+          href={contractExplorerUrl(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`)}
           target="_blank"
           rel="noopener noreferrer"
           className="text-xs text-surface-400 hover:text-primary-500 transition-colors"

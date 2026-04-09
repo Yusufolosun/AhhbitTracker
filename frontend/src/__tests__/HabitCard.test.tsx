@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { HabitCard } from '../components/HabitCard';
 import { ToastProvider } from '../context/ToastContext';
@@ -42,8 +42,9 @@ vi.mock('../context/WalletContext', () => ({
 }));
 
 // Mock useCurrentBlock so it returns a deterministic value
+let mockCurrentBlock = 200;
 vi.mock('../hooks/useCurrentBlock', () => ({
-  useCurrentBlock: () => 200,
+  useCurrentBlock: () => mockCurrentBlock,
 }));
 
 // Mock formatSTX so bonus values are predictable in assertions
@@ -89,6 +90,10 @@ const TestWrapper = ({ children }: { children: React.ReactNode }) => (
 );
 
 describe('HabitCard', () => {
+  beforeEach(() => {
+    mockCurrentBlock = 200;
+  });
+
   it('renders habit name', () => {
     render(<HabitCard habit={mockHabit} />, { wrapper: TestWrapper });
     expect(screen.getByText('Morning Exercise')).toBeDefined();
@@ -99,9 +104,19 @@ describe('HabitCard', () => {
     expect(screen.getByText('5')).toBeDefined();
   });
 
-  it('shows active status', () => {
+  it('shows cooldown status before check-in opens', () => {
+    render(<HabitCard habit={mockHabit} />, { wrapper: TestWrapper });
+    expect(screen.getByText('Cooldown')).toBeDefined();
+    const button = screen.getByRole('button', { name: 'Check In Not Ready' });
+    expect(button).toHaveProperty('disabled', true);
+  });
+
+  it('shows active status when check-in is available', () => {
+    mockCurrentBlock = 230;
     render(<HabitCard habit={mockHabit} />, { wrapper: TestWrapper });
     expect(screen.getByText('Active')).toBeDefined();
+    const button = screen.getByRole('button', { name: 'Check In' });
+    expect(button).toHaveProperty('disabled', false);
   });
 
   it('displays estimated bonus in claim dialog', () => {
