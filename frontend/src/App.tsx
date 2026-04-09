@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useMemo } from 'react';
 import { emitRateLimitEvent } from './components/RateLimitBanner';
 import { WalletProvider, useWallet } from './context/WalletContext';
 import { TransactionProvider } from './context/TransactionContext';
@@ -12,6 +12,7 @@ import { WalletConnect } from './components/WalletConnect';
 import { RateLimitBanner } from './components/RateLimitBanner';
 import { ToastContainer } from './components/ToastContainer';
 import { TransactionTracker } from './components/TransactionTracker';
+import { LongestStreakBanner } from './components/LongestStreakBanner';
 import { useHabits } from './hooks/useHabits';
 import { DashboardSkeleton } from './components/Skeletons';
 import { useHashRoute } from './hooks/useHashRoute';
@@ -63,6 +64,22 @@ function AppContent() {
   const { habits, isLoadingHabits } = useHabits();
   const { route } = useHashRoute();
 
+  const longestStreakData = useMemo(() => {
+    return habits.reduce(
+      (best, habit) => {
+        if (habit.currentStreak > best.longestStreak) {
+          return {
+            longestStreak: habit.currentStreak,
+            habitName: habit.name,
+          };
+        }
+
+        return best;
+      },
+      { longestStreak: 0, habitName: '' }
+    );
+  }, [habits]);
+
   if (!walletState.isConnected) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-surface-50 dark:bg-surface-900 px-4">
@@ -86,6 +103,13 @@ function AppContent() {
 
       <main id="main-content" className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
+          <LongestStreakBanner
+            longestStreak={longestStreakData.longestStreak}
+            habitName={longestStreakData.habitName}
+            hasHabits={habits.length > 0}
+            isLoading={isLoadingHabits}
+          />
+
           {/* Route-based rendering with code splitting */}
           <Suspense fallback={<DashboardSkeleton />}>
             {route === 'dashboard' && (
