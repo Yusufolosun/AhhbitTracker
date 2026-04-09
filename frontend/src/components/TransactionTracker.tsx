@@ -9,11 +9,18 @@ export function TransactionTracker() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 space-y-2 max-w-sm w-full">
+    <div
+      className="fixed bottom-4 right-4 z-50 space-y-2 max-w-sm w-full"
+      role="region"
+      aria-label="Transaction status updates"
+      aria-live="polite"
+      aria-atomic="false"
+    >
       {transactions.map((tx) => (
         <div
           key={tx.txId}
           className={`bg-white dark:bg-surface-800 border rounded-lg shadow-lg p-4 animate-slide-in ${statusBorderClass(tx.status)}`}
+          role="status"
         >
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
