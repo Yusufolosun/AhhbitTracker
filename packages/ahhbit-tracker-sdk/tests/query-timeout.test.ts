@@ -28,8 +28,9 @@ describe('withTimeout', () => {
       10,
     );
 
+    const expectation = expect(pending).rejects.toThrow('timed out after 10ms');
     await vi.advanceTimersByTimeAsync(11);
-    await expect(pending).rejects.toThrow('timed out after 10ms');
+    await expectation;
 
     vi.useRealTimers();
   });

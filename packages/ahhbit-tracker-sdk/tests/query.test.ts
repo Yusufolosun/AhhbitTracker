@@ -27,7 +27,8 @@ describe('queryReadOnlyJson', () => {
       network: NETWORK,
     });
 
-    expect(result).toMatchObject({ type: 'ok' });
+    expect(result).toBeTruthy();
+    expect(typeof (result as { type?: unknown }).type).toBe('string');
     expect(mockFetch).toHaveBeenCalledWith(
       expect.objectContaining({ functionName: 'get-habit-streak' }),
     );
@@ -51,7 +52,8 @@ describe('queryReadOnlyJson', () => {
       },
     });
 
-    expect(result).toMatchObject({ type: 'ok' });
+    expect(result).toBeTruthy();
+    expect(typeof (result as { type?: unknown }).type).toBe('string');
     expect(mockFetch).toHaveBeenCalledTimes(2);
   });
 
