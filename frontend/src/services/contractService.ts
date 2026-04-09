@@ -4,12 +4,6 @@
  */
 import { showContractCall } from '@stacks/connect';
 import {
-  uintCV,
-  principalCV,
-  fetchCallReadOnlyFunction,
-  cvToJSON,
-} from '@stacks/transactions';
-import {
   buildCheckIn,
   buildClaimBonus,
   buildCreateHabit,
@@ -22,29 +16,7 @@ import {
 } from '@yusufolosun/ahhbit-tracker-sdk';
 import { CONTRACT_ADDRESS, CONTRACT_NAME, NETWORK } from '../utils/constants';
 import { walletService } from './walletService';
-import type {
-  Habit,
-  HabitContractResponse,
-  UserStats,
-  UserHabitsContractResponse,
-  UserStatsContractResponse,
-} from '../types/habit';
-
-/**
- * Races a promise against a timeout to prevent API calls from hanging.
- *
- * @param promise - The promise to race
- * @param ms - Timeout in milliseconds (default: 10000)
- * @returns The promise result or throws on timeout
- */
-function withTimeout<T>(promise: Promise<T>, ms = 10_000): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('API request timed out')), ms),
-    ),
-  ]);
-}
+import type { Habit, UserStats } from '../types/habit';
 
 /** Application details for wallet transaction popups. */
 const appDetails = {
@@ -248,81 +220,5 @@ export const contractService = {
         },
       });
     });
-  },
-
-  /**
-   * Get details for a specific habit.
-   *
-   * @param habitId - The habit ID to query
-   * @returns Habit data or null if not found
-   */
-  async getHabit(habitId: number): Promise<HabitContractResponse> {
-    const result = await withTimeout(fetchCallReadOnlyFunction({
-      contractAddress: CONTRACT_ADDRESS,
-      contractName: CONTRACT_NAME,
-      functionName: 'get-habit',
-      functionArgs: [uintCV(habitId)],
-      network: NETWORK,
-      senderAddress: CONTRACT_ADDRESS,
-    }));
-
-    return cvToJSON(result) as HabitContractResponse;
-  },
-
-  /**
-   * Get all habits for a user.
-   *
-   * @param userAddress - Stacks address to query
-   * @returns List of habit IDs owned by the user
-   */
-  async getUserHabits(userAddress: string): Promise<UserHabitsContractResponse> {
-    const result = await withTimeout(fetchCallReadOnlyFunction({
-      contractAddress: CONTRACT_ADDRESS,
-      contractName: CONTRACT_NAME,
-      functionName: 'get-user-habits',
-      functionArgs: [principalCV(userAddress)],
-      network: NETWORK,
-      senderAddress: CONTRACT_ADDRESS,
-    }));
-
-    return cvToJSON(result) as UserHabitsContractResponse;
-  },
-
-  /**
-   * Get the current forfeited pool balance.
-   *
-   * @returns Pool balance in microSTX
-   */
-  async getPoolBalance(): Promise<number> {
-    const result = await withTimeout(fetchCallReadOnlyFunction({
-      contractAddress: CONTRACT_ADDRESS,
-      contractName: CONTRACT_NAME,
-      functionName: 'get-pool-balance',
-      functionArgs: [],
-      network: NETWORK,
-      senderAddress: CONTRACT_ADDRESS,
-    }));
-
-    const json = cvToJSON(result);
-    return parseInt(json.value.value);
-  },
-
-  /**
-   * Get statistics for a user.
-   *
-   * @param userAddress - Stacks address to query
-   * @returns User statistics including total habits and streaks
-   */
-  async getUserStats(userAddress: string): Promise<UserStatsContractResponse> {
-    const result = await withTimeout(fetchCallReadOnlyFunction({
-      contractAddress: CONTRACT_ADDRESS,
-      contractName: CONTRACT_NAME,
-      functionName: 'get-user-stats',
-      functionArgs: [principalCV(userAddress)],
-      network: NETWORK,
-      senderAddress: CONTRACT_ADDRESS,
-    }));
-
-    return cvToJSON(result) as UserStatsContractResponse;
   },
 };
