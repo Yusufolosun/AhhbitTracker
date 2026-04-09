@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { lazy, Suspense, useMemo } from 'react';
-import { emitRateLimitEvent } from './components/RateLimitBanner';
+import { emitRateLimitEvent } from './utils/rateLimitEvents';
 import { WalletProvider, useWallet } from './context/WalletContext';
 import { TransactionProvider } from './context/TransactionContext';
 import { ToastProvider } from './context/ToastContext';

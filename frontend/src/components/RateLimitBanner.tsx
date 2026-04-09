@@ -1,4 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
+import {
+  HIRO_RATE_LIMIT_EVENT,
+  HiroRateLimitDetail,
+} from '../utils/rateLimitEvents';
 
 /**
  * Banner displayed when Hiro API returns 429 (Too Many Requests).
@@ -10,15 +14,15 @@ export function RateLimitBanner() {
   const [retryAfter, setRetryAfter] = useState<number | null>(null);
   const [countdown, setCountdown] = useState(0);
 
-  const handleRateLimit = useCallback((event: CustomEvent<{ retryAfter: number }>) => {
+  const handleRateLimit = useCallback((event: CustomEvent<HiroRateLimitDetail>) => {
     const seconds = event.detail.retryAfter || 30;
     setRetryAfter(seconds);
     setCountdown(seconds);
   }, []);
 
   useEffect(() => {
-    window.addEventListener('hiro-rate-limit', handleRateLimit as EventListener);
-    return () => window.removeEventListener('hiro-rate-limit', handleRateLimit as EventListener);
+    window.addEventListener(HIRO_RATE_LIMIT_EVENT, handleRateLimit as EventListener);
+    return () => window.removeEventListener(HIRO_RATE_LIMIT_EVENT, handleRateLimit as EventListener);
   }, [handleRateLimit]);
 
   useEffect(() => {
@@ -44,15 +48,5 @@ export function RateLimitBanner() {
         API rate limit reached — retrying in <strong>{countdown}s</strong>
       </span>
     </div>
-  );
-}
-
-/**
- * Dispatch a custom event when 429 is detected. Call this from fetch wrappers
- * or React Query's `onError` / `queryFn` catch blocks.
- */
-export function emitRateLimitEvent(retryAfter = 30): void {
-  window.dispatchEvent(
-    new CustomEvent('hiro-rate-limit', { detail: { retryAfter } }),
   );
 }
