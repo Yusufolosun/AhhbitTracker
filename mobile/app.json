@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "AhhbitTracker Mobile",
+    "slug": "ahhbittracker-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "scheme": "ahhbittracker",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ahhbittracker.mobile"
+    },
+    "android": {
+      "package": "com.ahhbittracker.mobile",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+    "extra": {
+      "contractAddress": "SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z",
+      "contractName": "habit-tracker-v2",
+      "hiroApiBaseUrl": "https://api.mainnet.hiro.so",
+      "stacksNetwork": "mainnet"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}
