@@ -34,6 +34,53 @@ vi.mock('@stacks/transactions', () => ({
   },
 }));
 
+vi.mock('@yusufolosun/ahhbit-tracker-sdk', () => ({
+  buildCreateHabit: () => ({
+    contractAddress: 'SP000000000000000000002Q6VF78',
+    contractName: 'ahhbit-tracker',
+    functionName: 'create-habit',
+    functionArgs: [],
+    postConditions: [],
+    postConditionMode: 2,
+  }),
+  buildCheckIn: () => ({
+    contractAddress: 'SP000000000000000000002Q6VF78',
+    contractName: 'ahhbit-tracker',
+    functionName: 'check-in',
+    functionArgs: [],
+    postConditions: [],
+    postConditionMode: 2,
+  }),
+  buildWithdrawStake: () => ({
+    contractAddress: 'SP000000000000000000002Q6VF78',
+    contractName: 'ahhbit-tracker',
+    functionName: 'withdraw-stake',
+    functionArgs: [],
+    postConditions: [],
+    postConditionMode: 2,
+  }),
+  buildClaimBonus: () => ({
+    contractAddress: 'SP000000000000000000002Q6VF78',
+    contractName: 'ahhbit-tracker',
+    functionName: 'claim-bonus',
+    functionArgs: [],
+    postConditions: [],
+    postConditionMode: 2,
+  }),
+  buildSlashHabit: () => ({
+    contractAddress: 'SP000000000000000000002Q6VF78',
+    contractName: 'ahhbit-tracker',
+    functionName: 'slash-habit',
+    functionArgs: [],
+    postConditions: [],
+    postConditionMode: 2,
+  }),
+  getHabit: vi.fn(),
+  getUserHabits: vi.fn(),
+  getPoolBalance: vi.fn(),
+  getUserStats: vi.fn(),
+}));
+
 vi.mock('../services/walletService', () => ({
   walletService: {
     getAddress: () => 'SP2ABC123',
