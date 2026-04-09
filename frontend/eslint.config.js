@@ -40,4 +40,11 @@ export default tseslint.config(
       'prefer-const': 'warn',
     },
   },
+  {
+    files: ['src/context/*.tsx'],
+    rules: {
+      // Context modules intentionally export provider components and hooks.
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 );
