@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useWallet } from '../context/WalletContext';
 import { shortenAddress, formatSTX } from '../utils/formatting';
 import { addressUrl } from '@yusufolosun/stx-utils';
@@ -24,6 +24,21 @@ export function Header() {
   const closeMenu = useCallback(() => {
     setMobileMenuOpen(false);
   }, []);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [route]);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMobileMenuOpen(false);
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [mobileMenuOpen]);
 
   return (
     <header className="bg-white dark:bg-surface-950 border-b border-surface-200 dark:border-surface-700 sticky top-0 z-50 backdrop-blur-sm bg-white/90 dark:bg-surface-950/90">
