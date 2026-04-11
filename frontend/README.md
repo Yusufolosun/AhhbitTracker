@@ -37,10 +37,19 @@ npm run dev                  # → http://localhost:3000
 
 | Variable | Default | Description |
 |---|---|---|
+| `VITE_APP_STAGE` | `production` | Stage profile (`development`, `staging`, `production`) |
+| `VITE_STACKS_NETWORK` | stage-based | Selects `mainnet` or `testnet` defaults |
+| `VITE_STACKS_API_URL` | stage-based | Stacks API base URL used by the dev proxy |
 | `VITE_CONTRACT_ADDRESS` | `SP1N3809...` | Contract principal |
 | `VITE_CONTRACT_NAME` | `habit-tracker-v2` | Contract name |
 
-See `.env.example` for the full template. Never commit `.env.local`.
+Use stage templates for safer setup:
+
+- `.env.development.example`
+- `.env.staging.example`
+- `.env.production.example`
+
+See `.env.example` for variable descriptions. Never commit `.env.local` or `*.local` stage files.
 
 ## Deploy to Vercel
 

@@ -1,18 +1,21 @@
-import { STACKS_MAINNET, createNetwork } from '@stacks/network';
+import { createNetwork } from '@stacks/network';
 import { registerErrors, DEFAULT_MIN_STAKE } from '@yusufolosun/stx-utils';
+import { getFrontendRuntimeConfig } from './environment';
 
 // Network Configuration
 // In development, use Vite proxy to avoid CORS issues with Hiro API
 const isDev = typeof import.meta !== 'undefined' && import.meta.env?.DEV;
+const runtimeConfig = getFrontendRuntimeConfig();
 export const NETWORK = isDev
-  ? createNetwork({ network: 'mainnet', client: { baseUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/api/stacks` } })
-  : STACKS_MAINNET;
+  ? createNetwork({ network: runtimeConfig.stacksNetwork, client: { baseUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/api/stacks` } })
+  : createNetwork({ network: runtimeConfig.stacksNetwork, client: { baseUrl: runtimeConfig.stacksApiUrl } });
 
 // Contract Configuration — override via VITE_CONTRACT_ADDRESS / VITE_CONTRACT_NAME
-export const CONTRACT_ADDRESS =
-  import.meta.env.VITE_CONTRACT_ADDRESS ?? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z';
-export const CONTRACT_NAME =
-  import.meta.env.VITE_CONTRACT_NAME ?? 'habit-tracker-v2';
+export const APP_STAGE = runtimeConfig.stage;
+export const STACKS_NETWORK = runtimeConfig.stacksNetwork;
+export const STACKS_API_URL = runtimeConfig.stacksApiUrl;
+export const CONTRACT_ADDRESS = runtimeConfig.contractAddress;
+export const CONTRACT_NAME = runtimeConfig.contractName;
 
 // Contract Constants
 export const MIN_STAKE_AMOUNT = DEFAULT_MIN_STAKE; // 0.02 STX in microSTX (from stx-utils)

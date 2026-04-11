@@ -1,9 +1,15 @@
 import Constants from 'expo-constants';
-import type { AppNetworkConfig, StacksNetworkMode } from '@/core/types';
+import type { AppNetworkConfig, AppStage, StacksNetworkMode } from '@/core/types';
 
-function getExtra(key: 'contractAddress' | 'contractName' | 'hiroApiBaseUrl' | 'stacksNetwork') {
+function getExtra(key: 'appStage' | 'contractAddress' | 'contractName' | 'hiroApiBaseUrl' | 'stacksNetwork') {
   const extra = Constants.expoConfig?.extra as Record<string, string> | undefined;
   return extra?.[key];
+}
+
+function getAppStage(value: string | undefined): AppStage {
+  return value === 'development' || value === 'staging' || value === 'production'
+    ? value
+    : 'production';
 }
 
 function getStacksNetworkMode(value: string | undefined): StacksNetworkMode {
@@ -27,6 +33,8 @@ const networkMode = getStacksNetworkMode(
   process.env.EXPO_PUBLIC_STACKS_NETWORK ?? getExtra('stacksNetwork') ?? 'mainnet',
 );
 
+const appStage = getAppStage(process.env.EXPO_PUBLIC_APP_STAGE ?? getExtra('appStage'));
+
 export const networkConfig: AppNetworkConfig = {
   contract: {
     contractAddress,
@@ -34,4 +42,5 @@ export const networkConfig: AppNetworkConfig = {
   },
   hiroApiBaseUrl,
   networkMode,
+  appStage,
 };

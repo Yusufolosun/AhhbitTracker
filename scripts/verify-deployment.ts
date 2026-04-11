@@ -1,13 +1,12 @@
-import 'dotenv/config';
-import { STACKS_MAINNET } from "@stacks/network";
+import { getRuntimeConfig } from './shared/runtime-config';
 
-const NETWORK = STACKS_MAINNET;
-const API_URL = process.env.STACKS_API_URL || "https://api.mainnet.hiro.so";
+const runtime = getRuntimeConfig();
+const API_URL = runtime.stacksApiUrl;
 
 async function verifyDeployment(contractAddress: string) {
   console.log("Verifying deployment...");
   console.log("Contract Address:", contractAddress);
-  console.log("Network:", NETWORK.version);
+  console.log("Network:", runtime.stacksNetwork);
   console.log("API URL:", API_URL);
   
   try {

@@ -1,8 +1,13 @@
-import { STACKS_MAINNET } from "@stacks/network";
+import { createNetwork } from '@stacks/network';
+import { getRuntimeConfig } from '../shared/runtime-config';
 
-const NETWORK = STACKS_MAINNET;
-const CONTRACT_ADDRESS = "SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z";
-const CONTRACT_NAME = "habit-tracker-v2";
+const runtime = getRuntimeConfig();
+const NETWORK = createNetwork({
+  network: runtime.stacksNetwork,
+  client: { baseUrl: runtime.stacksApiUrl },
+});
+const CONTRACT_ADDRESS = runtime.contractAddress;
+const CONTRACT_NAME = runtime.contractName;
 
 async function inspectContract() {
   console.log("Contract Inspector");

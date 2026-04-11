@@ -87,6 +87,35 @@ cd frontend && npm test   # Run frontend tests (30 tests)
 clarinet check        # Validate Clarity syntax
 ```
 
+### Environment Stages
+
+The repository now supports three explicit runtime stages without committing secrets:
+
+- `development`
+- `staging`
+- `production`
+
+Use stage templates as your starting point and keep real values in local-only files:
+
+```bash
+# Root scripts (deployment and automation)
+cp .env.development.example .env.development.local
+cp .env.staging.example .env.staging.local
+cp .env.production.example .env.production.local
+
+# Frontend (Vite)
+cp frontend/.env.development.example frontend/.env.development.local
+cp frontend/.env.staging.example frontend/.env.staging.local
+cp frontend/.env.production.example frontend/.env.production.local
+
+# Mobile (Expo)
+cp mobile/.env.development.example mobile/.env.development.local
+cp mobile/.env.staging.example mobile/.env.staging.local
+cp mobile/.env.production.example mobile/.env.production.local
+```
+
+`*.local` env files are gitignored. Commit only `*.example` templates and never commit mnemonics, private keys, or secret API credentials.
+
 ### Packages
 
 | Package | Description |
