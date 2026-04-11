@@ -1,13 +1,19 @@
-const CONTRACT_ADDRESS = "SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z";
-const CONTRACT_NAME = "habit-tracker-v2";
-const NETWORK_API = "https://api.mainnet.hiro.so";
+import { getContractPrincipal, getRuntimeConfig } from './shared/runtime-config';
+
+const runtime = getRuntimeConfig();
+const CONTRACT_ADDRESS = runtime.contractAddress;
+const CONTRACT_NAME = runtime.contractName;
+const NETWORK_API = runtime.stacksApiUrl;
+const CONTRACT_PRINCIPAL = getContractPrincipal(runtime);
 
 console.log("=".repeat(70));
 console.log("MAINNET TRANSACTION TESTING SUITE");
 console.log("=".repeat(70));
 console.log();
-console.log("Contract:", `${CONTRACT_ADDRESS}.${CONTRACT_NAME}`);
+console.log("Contract:", CONTRACT_PRINCIPAL);
 console.log("Network:", NETWORK_API);
+console.log("Stage:", runtime.stage);
+console.log("Stacks network:", runtime.stacksNetwork);
 console.log();
 
 console.log("PLANNED TEST TRANSACTIONS:");
