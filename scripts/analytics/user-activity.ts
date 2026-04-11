@@ -1,14 +1,18 @@
-import { STACKS_MAINNET } from "@stacks/network";
+import { createNetwork } from '@stacks/network';
+import { getContractPrincipal, getRuntimeConfig } from '../shared/runtime-config';
 
-const NETWORK = STACKS_MAINNET;
-const CONTRACT_ADDRESS = "SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z";
-const CONTRACT_NAME = "habit-tracker-v2";
+const runtime = getRuntimeConfig();
+const NETWORK = createNetwork({
+  network: runtime.stacksNetwork,
+  client: { baseUrl: runtime.stacksApiUrl },
+});
+const CONTRACT_PRINCIPAL = getContractPrincipal(runtime);
 
 async function analyzeUserActivity(days: number = 7) {
   console.log(`Analyzing User Activity (Last ${days} days)`);
   console.log("=".repeat(60));
   
-  const url = `${NETWORK.coreApiUrl}/extended/v1/address/${CONTRACT_ADDRESS}.${CONTRACT_NAME}/transactions?limit=50`;
+  const url = `${NETWORK.coreApiUrl}/extended/v1/address/${CONTRACT_PRINCIPAL}/transactions?limit=50`;
   const response = await fetch(url);
   const data = await response.json();
   
