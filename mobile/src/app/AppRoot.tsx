@@ -1,11 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
+import { AppNavigation } from '@/app/navigation';
 import { AppProviders } from '@/app/providers';
-import { DashboardScreen } from '@/app/screens';
 
 export function AppRoot() {
   return (
     <AppProviders>
-      <DashboardScreen />
+      <AppNavigation />
       <StatusBar style="dark" />
     </AppProviders>
   );

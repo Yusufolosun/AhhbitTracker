@@ -1,0 +1,41 @@
+import type {
+  CompositeScreenProps,
+  NavigatorScreenParams,
+} from '@react-navigation/native';
+import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+
+export const ROOT_ROUTES = {
+  MainTabs: 'MainTabs',
+  HabitDetails: 'HabitDetails',
+  CreateHabit: 'CreateHabit',
+} as const;
+
+export const MAIN_TAB_ROUTES = {
+  Overview: 'Overview',
+  Habits: 'Habits',
+  Preview: 'Preview',
+  Account: 'Account',
+} as const;
+
+export type MainTabParamList = {
+  Overview: undefined;
+  Habits: undefined;
+  Preview: undefined;
+  Account: undefined;
+};
+
+export type RootStackParamList = {
+  MainTabs: NavigatorScreenParams<MainTabParamList>;
+  HabitDetails: { habitId: number };
+  CreateHabit: undefined;
+};
+
+export type RootStackScreenProps<RouteName extends keyof RootStackParamList> =
+  NativeStackScreenProps<RootStackParamList, RouteName>;
+
+export type MainTabScreenProps<RouteName extends keyof MainTabParamList> =
+  CompositeScreenProps<
+    BottomTabScreenProps<MainTabParamList, RouteName>,
+    NativeStackScreenProps<RootStackParamList>
+  >;

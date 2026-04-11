@@ -8,6 +8,7 @@ React Native (Expo) client for AhhbitTracker, structured with feature-first boun
 mobile/src/
 ├── app/
 │   ├── AppRoot.tsx               # Root composition (providers + screen shell)
+│   ├── navigation/               # Typed stack/tab navigation, deep linking, route guards
 │   ├── providers/                # Global providers (React Query + app context)
 │   └── screens/                  # Screen-level composition
 ├── core/
@@ -33,6 +34,20 @@ mobile/src/
 - Shared reusable primitives only in `shared/*`
 - Screen files orchestrate, feature files implement
 - Legacy paths in `src/components`, `src/services`, etc. are maintained as re-export shims for compatibility
+
+## Navigation
+
+- Root: Native stack with `MainTabs`, `HabitDetails`, and `CreateHabit`
+- Tabs: `Overview`, `Habits`, `Preview`, and `Account`
+- Deep links:
+    - `ahhbittracker://overview`
+    - `ahhbittracker://habits`
+    - `ahhbittracker://habits/:habitId`
+    - `ahhbittracker://habits/create`
+    - `ahhbittracker://preview`
+    - `ahhbittracker://account`
+- Address-dependent routes are protected with a reusable guard component
+- Transaction previews are shared between screens through a dedicated context provider
 
 ## Local Development
 
