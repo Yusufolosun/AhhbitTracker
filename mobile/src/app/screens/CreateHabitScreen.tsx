@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
+import { RequireAddress } from '@/app/navigation/RequireAddress';
 import { MAIN_TAB_ROUTES, type RootStackScreenProps } from '@/app/navigation/types';
 import { useAddress } from '@/features/address';
 import {
@@ -6,7 +7,7 @@ import {
   CreateHabitPreviewCard,
   usePreview,
 } from '@/features/transactions';
-import { EmptyState, Screen, SectionHeader } from '@/shared/components';
+import { Screen, SectionHeader } from '@/shared/components';
 import { palette, radius, spacing, typography } from '@/shared/theme';
 
 type CreateHabitScreenProps = RootStackScreenProps<'CreateHabit'>;
@@ -31,31 +32,28 @@ export function CreateHabitScreen({ navigation }: CreateHabitScreenProps) {
     navigation.navigate('MainTabs', { screen: MAIN_TAB_ROUTES.Preview });
   };
 
-  if (!activeAddress) {
-    return (
-      <Screen>
-        <SectionHeader title="Create habit" subtitle="Address required" />
-        <EmptyState message="Save a Stacks address in Overview before creating a habit preview." />
-      </Screen>
-    );
-  }
-
   return (
-    <Screen contentContainerStyle={styles.content}>
-      <SectionHeader
-        title="Create habit"
-        subtitle="Generate a create-habit contract call payload"
-      />
+    <RequireAddress
+      title="Create habit"
+      subtitle="Address required"
+      message="Save a Stacks address in Overview before creating a habit preview."
+    >
+      <Screen contentContainerStyle={styles.content}>
+        <SectionHeader
+          title="Create habit"
+          subtitle="Generate a create-habit contract call payload"
+        />
 
-      <CreateHabitPreviewCard onPreview={handleCreatePreview} />
+        <CreateHabitPreviewCard onPreview={handleCreatePreview} />
 
-      <Pressable
-        onPress={() => navigation.navigate('MainTabs', { screen: MAIN_TAB_ROUTES.Preview })}
-        style={({ pressed }) => [styles.previewLink, pressed && styles.pressed]}
-      >
-        <Text style={styles.previewLinkText}>Open transaction preview panel</Text>
-      </Pressable>
-    </Screen>
+        <Pressable
+          onPress={() => navigation.navigate('MainTabs', { screen: MAIN_TAB_ROUTES.Preview })}
+          style={({ pressed }) => [styles.previewLink, pressed && styles.pressed]}
+        >
+          <Text style={styles.previewLinkText}>Open transaction preview panel</Text>
+        </Pressable>
+      </Screen>
+    </RequireAddress>
   );
 }
 
