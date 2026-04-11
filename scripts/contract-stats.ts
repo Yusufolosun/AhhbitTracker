@@ -1,8 +1,9 @@
-import 'dotenv/config';
+import { getRuntimeConfig } from './shared/runtime-config';
 
-const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS || "SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z";
-const CONTRACT_NAME = process.env.CONTRACT_NAME || "habit-tracker-v2";
-const NETWORK_API = process.env.STACKS_API_URL || "https://api.mainnet.hiro.so";
+const runtime = getRuntimeConfig();
+const CONTRACT_ADDRESS = runtime.contractAddress;
+const CONTRACT_NAME = runtime.contractName;
+const NETWORK_API = runtime.stacksApiUrl;
 
 async function getContractStats() {
   console.log("=".repeat(60));
