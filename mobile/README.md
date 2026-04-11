@@ -9,7 +9,8 @@ mobile/src/
 ├── app/
 │   ├── AppRoot.tsx               # Root composition (providers + screen shell)
 │   ├── navigation/               # Typed stack/tab navigation, deep linking, route guards
-│   ├── providers/                # Global providers (React Query + app context)
+│   ├── providers/                # Global providers (React Query + app state)
+│   ├── state/                    # Reducer-based app state, selectors, persistence
 │   └── screens/                  # Screen-level composition
 ├── core/
 │   ├── config/                   # Runtime config and query constants
@@ -34,6 +35,15 @@ mobile/src/
 - Shared reusable primitives only in `shared/*`
 - Screen files orchestrate, feature files implement
 - Legacy paths in `src/components`, `src/services`, etc. are maintained as re-export shims for compatibility
+
+## Global State Management
+
+- `AppStateProvider` composes reducer-driven global state with focused selector hooks
+- State is split by concern:
+    - Address lifecycle: tracked address + hydration status (persisted in AsyncStorage)
+    - Transaction preview lifecycle: in-memory preview payload shared across tabs/screens
+- Query state remains in React Query; app state changes trigger cache pruning/invalidation for user-scoped keys
+- Feature-level context exports remain as compatibility adapters and now delegate to app state hooks
 
 ## Navigation
 

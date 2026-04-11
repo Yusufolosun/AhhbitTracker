@@ -1,13 +1,12 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { RequireAddress } from '@/app/navigation/RequireAddress';
 import { MAIN_TAB_ROUTES, type RootStackScreenProps } from '@/app/navigation/types';
-import { useAddress } from '@/features/address';
+import { useAddressState, usePreviewState } from '@/app/state';
 import { useUserHabitsQuery } from '@/features/habits';
 import {
   buildCheckInPreview,
   buildClaimBonusPreview,
   buildWithdrawStakePreview,
-  usePreview,
 } from '@/features/transactions';
 import { EmptyState, ErrorState, LoadingState, Screen, SectionHeader } from '@/shared/components';
 import { formatAddress, formatMicroStx, formatStreakDays } from '@/shared/utils';
@@ -34,8 +33,8 @@ function ActionButton({ label, onPress }: { label: string; onPress: () => void }
 
 export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProps) {
   const { habitId } = route.params;
-  const { activeAddress } = useAddress();
-  const { setPreview } = usePreview();
+  const { activeAddress } = useAddressState();
+  const { setPreview } = usePreviewState();
 
   const habitsQuery = useUserHabitsQuery(activeAddress);
   const habit = habitsQuery.data?.find((item) => item.habitId === habitId);

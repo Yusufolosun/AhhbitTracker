@@ -1,11 +1,10 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
 import { RequireAddress } from '@/app/navigation/RequireAddress';
 import { MAIN_TAB_ROUTES, type RootStackScreenProps } from '@/app/navigation/types';
-import { useAddress } from '@/features/address';
+import { useAddressState, usePreviewState } from '@/app/state';
 import {
   buildCreateHabitPreview,
   CreateHabitPreviewCard,
-  usePreview,
 } from '@/features/transactions';
 import { Screen, SectionHeader } from '@/shared/components';
 import { palette, radius, spacing, typography } from '@/shared/theme';
@@ -17,8 +16,8 @@ function stxToMicroStx(stxAmount: number): number {
 }
 
 export function CreateHabitScreen({ navigation }: CreateHabitScreenProps) {
-  const { activeAddress } = useAddress();
-  const { setPreview } = usePreview();
+  const { activeAddress } = useAddressState();
+  const { setPreview } = usePreviewState();
 
   const handleCreatePreview = (name: string, stakeAmountStx: number) => {
     if (!activeAddress) {

@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import { useAddress } from '@/features/address';
+import { useAddressState } from '@/app/state';
 import { EmptyState, Screen, SectionHeader } from '@/shared/components';
 
 interface RequireAddressProps extends PropsWithChildren {
@@ -14,7 +14,7 @@ export function RequireAddress({
   message,
   children,
 }: RequireAddressProps) {
-  const { activeAddress } = useAddress();
+  const { activeAddress } = useAddressState();
 
   if (!activeAddress) {
     return (

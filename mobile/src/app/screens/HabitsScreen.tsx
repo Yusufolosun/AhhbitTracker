@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { MAIN_TAB_ROUTES, ROOT_ROUTES, type MainTabScreenProps } from '@/app/navigation/types';
 import { RequireAddress } from '@/app/navigation/RequireAddress';
-import { useAddress } from '@/features/address';
+import { useAddressState, usePreviewState } from '@/app/state';
 import {
   HabitCard,
   useUserHabitsQuery,
@@ -10,7 +10,6 @@ import {
   buildCheckInPreview,
   buildClaimBonusPreview,
   buildWithdrawStakePreview,
-  usePreview,
 } from '@/features/transactions';
 import { EmptyState, ErrorState, LoadingState, Screen, SectionHeader } from '@/shared/components';
 import { palette, radius, spacing, typography } from '@/shared/theme';
@@ -18,8 +17,8 @@ import { palette, radius, spacing, typography } from '@/shared/theme';
 type HabitsScreenProps = MainTabScreenProps<'Habits'>;
 
 export function HabitsScreen({ navigation }: HabitsScreenProps) {
-  const { activeAddress } = useAddress();
-  const { setPreview } = usePreview();
+  const { activeAddress } = useAddressState();
+  const { setPreview } = usePreviewState();
   const habitsQuery = useUserHabitsQuery(activeAddress);
 
   const openPreviewTab = () => {

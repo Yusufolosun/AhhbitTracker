@@ -253,6 +253,11 @@ src/
 - ToastContext: Notifications
 - ThemeContext: Dark/light mode
 
+**Mobile App State:** Reducer + Context selectors
+- AppStateProvider: Tracks address hydration and transaction preview payloads
+- AsyncStorage persistence: Restores tracked address at startup with address validation
+- React Query boundary: Address transitions prune and invalidate user-scoped cache keys
+
 **URL State:** Hash-based routing
 - useHashRoute for page navigation
 - useHashParam for filter state (e.g., active tab)

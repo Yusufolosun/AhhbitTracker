@@ -1,14 +1,11 @@
 import { type PropsWithChildren } from 'react';
-import { AddressProvider } from '@/features/address';
-import { PreviewProvider } from '@/features/transactions';
+import { AppStateProvider } from '@/app/state';
 import { QueryProvider } from './QueryProvider';
 
 export function AppProviders({ children }: PropsWithChildren) {
   return (
     <QueryProvider>
-      <AddressProvider>
-        <PreviewProvider>{children}</PreviewProvider>
-      </AddressProvider>
+      <AppStateProvider>{children}</AppStateProvider>
     </QueryProvider>
   );
 }

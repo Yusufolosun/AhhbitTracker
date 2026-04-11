@@ -1,8 +1,7 @@
-import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useAddressState, usePreviewState } from '@/app/state';
 import {
   AddressInputCard,
-  useAddress,
 } from '@/features/address';
 import {
   HabitList,
@@ -20,7 +19,6 @@ import {
   TransactionPreviewPanel,
 } from '@/features/transactions';
 import { EmptyState, LoadingState, Screen, SectionHeader } from '@/shared/components';
-import type { ContractCallPreview } from '@/core/types';
 import { palette, spacing, typography } from '@/shared/theme';
 
 function stxToMicroStx(stxAmount: number): number {
@@ -28,8 +26,8 @@ function stxToMicroStx(stxAmount: number): number {
 }
 
 export function DashboardScreen() {
-  const { activeAddress, isHydrating, setAddress, clearAddress } = useAddress();
-  const [preview, setPreview] = useState<ContractCallPreview | null>(null);
+  const { activeAddress, isHydrating, setAddress, clearAddress } = useAddressState();
+  const { preview, setPreview } = usePreviewState();
 
   const habitsQuery = useUserHabitsQuery(activeAddress);
   const poolBalanceQuery = usePoolBalanceQuery();

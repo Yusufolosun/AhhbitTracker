@@ -1,10 +1,11 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
-import { TransactionPreviewPanel, usePreview } from '@/features/transactions';
+import { usePreviewState } from '@/app/state';
+import { TransactionPreviewPanel } from '@/features/transactions';
 import { Screen, SectionHeader } from '@/shared/components';
 import { palette, radius, spacing, typography } from '@/shared/theme';
 
 export function PreviewScreen() {
-  const { preview, clearPreview } = usePreview();
+  const { preview, clearPreview } = usePreviewState();
 
   return (
     <Screen contentContainerStyle={styles.content}>

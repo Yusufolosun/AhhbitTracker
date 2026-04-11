@@ -1,5 +1,5 @@
 import * as Clipboard from 'expo-clipboard';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { ContractCallPreview } from '@/core/types';
 import { palette, radius, spacing, typography } from '@/shared/theme';
@@ -10,6 +10,15 @@ interface TransactionPreviewPanelProps {
 
 export function TransactionPreviewPanel({ preview }: TransactionPreviewPanelProps) {
   const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
+  const copyResetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (copyResetTimeoutRef.current) {
+        clearTimeout(copyResetTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const payloadText = useMemo(() => {
     if (!preview) {
@@ -32,7 +41,11 @@ export function TransactionPreviewPanel({ preview }: TransactionPreviewPanelProp
     await Clipboard.setStringAsync(payloadText);
     setCopyState('copied');
 
-    setTimeout(() => {
+    if (copyResetTimeoutRef.current) {
+      clearTimeout(copyResetTimeoutRef.current);
+    }
+
+    copyResetTimeoutRef.current = setTimeout(() => {
       setCopyState('idle');
     }, 1500);
   };

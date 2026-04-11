@@ -1,6 +1,6 @@
 import * as Linking from 'expo-linking';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { useAddress } from '@/features/address';
+import { useAddressState } from '@/app/state';
 import { EmptyState, Screen, SectionHeader } from '@/shared/components';
 import { formatAddress } from '@/shared/utils';
 import { palette, radius, spacing, typography } from '@/shared/theme';
@@ -31,7 +31,7 @@ function ActionButton({
 }
 
 export function AccountScreen() {
-  const { activeAddress, clearAddress } = useAddress();
+  const { activeAddress, clearAddress } = useAddressState();
 
   const openExplorer = async () => {
     if (!activeAddress) {
