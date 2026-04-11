@@ -1,14 +1,13 @@
 import { createContractReadonlyClient } from './shared/contract-readonly';
+import { getRuntimeConfig } from './shared/runtime-config';
 
-const CONTRACT_ADDRESS = 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z';
-const CONTRACT_NAME = 'habit-tracker-v2';
-const NETWORK_API = 'https://api.mainnet.hiro.so';
+const runtime = getRuntimeConfig();
 
 const client = createContractReadonlyClient({
-  contractAddress: CONTRACT_ADDRESS,
-  contractName: CONTRACT_NAME,
-  mode: 'mainnet',
-  baseUrl: NETWORK_API,
+  contractAddress: runtime.contractAddress,
+  contractName: runtime.contractName,
+  mode: runtime.stacksNetwork,
+  baseUrl: runtime.stacksApiUrl,
 });
 
 async function batchQueryHabits(habitIds: number[]) {
