@@ -10,6 +10,7 @@ import {
 import { validateStacksAddress } from '@/shared/utils';
 import { appStateActions } from './actions';
 import { appStateReducer, createInitialAppState } from './reducer';
+import { clearPersistedAppState, loadPersistedAppState, saveTrackedAddress } from './storage';
 import type { AppState } from './types';
 import type { ContractCallPreview } from '@/core/types';
 
@@ -27,7 +28,33 @@ export function AppStateProvider({ children }: PropsWithChildren) {
   const [state, dispatch] = useReducer(appStateReducer, undefined, createInitialAppState);
 
   useEffect(() => {
-    dispatch(appStateActions.hydrateComplete(null));
+    let isMounted = true;
+
+    const hydrate = async () => {
+      dispatch(appStateActions.hydrateStart());
+
+      try {
+        const persistedState = await loadPersistedAppState();
+
+        if (!isMounted) {
+          return;
+        }
+
+        dispatch(appStateActions.hydrateComplete(persistedState?.trackedAddress ?? null));
+      } catch {
+        if (!isMounted) {
+          return;
+        }
+
+        dispatch(appStateActions.hydrateComplete(null));
+      }
+    };
+
+    void hydrate();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const setTrackedAddress = useCallback(async (value: string) => {
@@ -38,10 +65,12 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       throw new Error(validationError);
     }
 
+    await saveTrackedAddress(normalizedAddress);
     dispatch(appStateActions.setAddress(normalizedAddress));
   }, []);
 
   const clearTrackedAddress = useCallback(async () => {
+    await clearPersistedAppState();
     dispatch(appStateActions.clearAddress());
   }, []);
 
