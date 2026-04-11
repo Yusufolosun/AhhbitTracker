@@ -21,16 +21,19 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         ...state,
         trackedAddress: action.payload.trackedAddress,
         isHydrating: false,
+        preview: null,
       };
     case 'address:set':
       return {
         ...state,
         trackedAddress: action.payload.trackedAddress,
+        preview: null,
       };
     case 'address:clear':
       return {
         ...state,
         trackedAddress: null,
+        preview: null,
       };
     case 'preview:set':
       return {
