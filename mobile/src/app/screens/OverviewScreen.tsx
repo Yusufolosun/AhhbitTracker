@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { MAIN_TAB_ROUTES, ROOT_ROUTES, type MainTabScreenProps } from '@/app/navigation/types';
-import { AddressInputCard, useAddress } from '@/features/address';
+import { useAddressState } from '@/app/state';
+import { AddressInputCard } from '@/features/address';
 import { useUserStatsQuery, usePoolBalanceQuery } from '@/features/habits';
 import { PoolBalanceCard } from '@/features/pool';
 import { EmptyState, LoadingState, Screen, SectionHeader } from '@/shared/components';
@@ -17,7 +18,7 @@ function ActionCard({ label, onPress }: { label: string; onPress: () => void }) 
 }
 
 export function OverviewScreen({ navigation }: OverviewScreenProps) {
-  const { activeAddress, isHydrating, setAddress, clearAddress } = useAddress();
+  const { activeAddress, isHydrating, setAddress, clearAddress } = useAddressState();
   const poolBalanceQuery = usePoolBalanceQuery();
   const statsQuery = useUserStatsQuery(activeAddress);
 
