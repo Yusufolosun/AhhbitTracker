@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { RequireAddress } from '@/app/navigation/RequireAddress';
 import { MAIN_TAB_ROUTES, type RootStackScreenProps } from '@/app/navigation/types';
 import { useAddress } from '@/features/address';
 import { useUserHabitsQuery } from '@/features/habits';
@@ -38,15 +39,6 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
 
   const habitsQuery = useUserHabitsQuery(activeAddress);
   const habit = habitsQuery.data?.find((item) => item.habitId === habitId);
-
-  if (!activeAddress) {
-    return (
-      <Screen>
-        <SectionHeader title="Habit details" subtitle="Address required" />
-        <EmptyState message="Save a Stacks address before viewing habit details." />
-      </Screen>
-    );
-  }
 
   if (habitsQuery.isLoading) {
     return (
@@ -95,25 +87,31 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
   };
 
   return (
-    <Screen contentContainerStyle={styles.content}>
-      <SectionHeader title={habit.name} subtitle={`Habit #${habit.habitId}`} />
+    <RequireAddress
+      title="Habit details"
+      subtitle="Address required"
+      message="Save a Stacks address before viewing habit details."
+    >
+      <Screen contentContainerStyle={styles.content}>
+        <SectionHeader title={habit.name} subtitle={`Habit #${habit.habitId}`} />
 
-      <View style={styles.card}>
-        <DetailRow label="Owner" value={formatAddress(habit.owner)} />
-        <DetailRow label="Stake" value={formatMicroStx(habit.stakeAmount)} />
-        <DetailRow label="Current streak" value={formatStreakDays(habit.currentStreak)} />
-        <DetailRow label="Last check-in block" value={String(habit.lastCheckInBlock)} />
-        <DetailRow label="Created at block" value={String(habit.createdAtBlock)} />
-        <DetailRow label="Status" value={habit.isCompleted ? 'Completed' : habit.isActive ? 'Active' : 'Inactive'} />
-        <DetailRow label="Bonus claimed" value={habit.bonusClaimed ? 'Yes' : 'No'} />
-      </View>
+        <View style={styles.card}>
+          <DetailRow label="Owner" value={formatAddress(habit.owner)} />
+          <DetailRow label="Stake" value={formatMicroStx(habit.stakeAmount)} />
+          <DetailRow label="Current streak" value={formatStreakDays(habit.currentStreak)} />
+          <DetailRow label="Last check-in block" value={String(habit.lastCheckInBlock)} />
+          <DetailRow label="Created at block" value={String(habit.createdAtBlock)} />
+          <DetailRow label="Status" value={habit.isCompleted ? 'Completed' : habit.isActive ? 'Active' : 'Inactive'} />
+          <DetailRow label="Bonus claimed" value={habit.bonusClaimed ? 'Yes' : 'No'} />
+        </View>
 
-      <View style={styles.actions}>
-        <ActionButton label="Generate check-in preview" onPress={handleCheckInPreview} />
-        <ActionButton label="Generate withdraw preview" onPress={handleWithdrawPreview} />
-        <ActionButton label="Generate claim preview" onPress={handleClaimPreview} />
-      </View>
-    </Screen>
+        <View style={styles.actions}>
+          <ActionButton label="Generate check-in preview" onPress={handleCheckInPreview} />
+          <ActionButton label="Generate withdraw preview" onPress={handleWithdrawPreview} />
+          <ActionButton label="Generate claim preview" onPress={handleClaimPreview} />
+        </View>
+      </Screen>
+    </RequireAddress>
   );
 }
 
