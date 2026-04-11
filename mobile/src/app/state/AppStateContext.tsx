@@ -5,8 +5,11 @@ import {
   useEffect,
   useMemo,
   useReducer,
+  useRef,
   type PropsWithChildren,
 } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { QUERY_KEYS } from '@/core/config';
 import { validateStacksAddress } from '@/shared/utils';
 import { appStateActions } from './actions';
 import { appStateReducer, createInitialAppState } from './reducer';
@@ -26,6 +29,8 @@ const AppStateContext = createContext<AppStateContextValue | undefined>(undefine
 
 export function AppStateProvider({ children }: PropsWithChildren) {
   const [state, dispatch] = useReducer(appStateReducer, undefined, createInitialAppState);
+  const queryClient = useQueryClient();
+  const previousAddressRef = useRef<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -56,6 +61,34 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       isMounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (state.isHydrating) {
+      return;
+    }
+
+    const previousAddress = previousAddressRef.current;
+    const currentAddress = state.trackedAddress;
+
+    if (previousAddress === currentAddress) {
+      return;
+    }
+
+    if (previousAddress) {
+      queryClient.removeQueries({ queryKey: QUERY_KEYS.userHabits(previousAddress) });
+      queryClient.removeQueries({ queryKey: QUERY_KEYS.userStats(previousAddress) });
+    }
+
+    queryClient.removeQueries({ queryKey: QUERY_KEYS.userHabits('anonymous') });
+    queryClient.removeQueries({ queryKey: QUERY_KEYS.userStats('anonymous') });
+
+    if (currentAddress) {
+      void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.userHabits(currentAddress) });
+      void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.userStats(currentAddress) });
+    }
+
+    previousAddressRef.current = currentAddress;
+  }, [state.isHydrating, state.trackedAddress, queryClient]);
 
   const setTrackedAddress = useCallback(async (value: string) => {
     const normalizedAddress = value.trim();
