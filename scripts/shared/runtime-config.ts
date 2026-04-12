@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import {
   buildRuntimeConfig,
+  assertStacksAddress,
   getContractPrincipal,
   getRuntimeConfigSummary,
   parseContractPrincipal,
@@ -74,6 +75,7 @@ export function getRuntimeConfig(forceReload = false): RuntimeConfig {
 
 export { getContractPrincipal };
 export { parseContractPrincipal };
+export { assertStacksAddress };
 
 export function getSafeRuntimeConfigSummary(config: RuntimeConfig = getRuntimeConfig()): RuntimeConfigSummary {
   return getRuntimeConfigSummary(config);
