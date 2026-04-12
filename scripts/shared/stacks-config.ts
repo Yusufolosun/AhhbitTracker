@@ -179,6 +179,23 @@ export function getContractPrincipal(config: Pick<RuntimeConfig, 'contractAddres
   return `${config.contractAddress}.${config.contractName}`;
 }
 
+export function parseContractPrincipal(
+  contractPrincipal: string,
+  key = 'CONTRACT_PRINCIPAL',
+): { contractAddress: string; contractName: string } {
+  const normalized = mustBeNonEmpty(contractPrincipal, key);
+  const [address, name] = normalized.split('.', 2);
+
+  if (!address || !name) {
+    throw new Error(`${key} must be in ADDRESS.CONTRACT_NAME format`);
+  }
+
+  return {
+    contractAddress: assertStacksAddress(address, `${key} address`),
+    contractName: assertContractName(name, `${key} name`),
+  };
+}
+
 export interface RuntimeConfigSummary {
   stage: AppStage;
   stacksNetwork: StacksNetworkMode;
