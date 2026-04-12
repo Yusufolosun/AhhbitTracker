@@ -6,6 +6,7 @@ import {
   buildRuntimeConfig,
   getContractPrincipal,
   getRuntimeConfigSummary,
+  parseContractPrincipal,
   type AppStage,
   type RuntimeConfig,
   type RuntimeConfigSummary,
@@ -72,6 +73,7 @@ export function getRuntimeConfig(forceReload = false): RuntimeConfig {
 }
 
 export { getContractPrincipal };
+export { parseContractPrincipal };
 
 export function getSafeRuntimeConfigSummary(config: RuntimeConfig = getRuntimeConfig()): RuntimeConfigSummary {
   return getRuntimeConfigSummary(config);
