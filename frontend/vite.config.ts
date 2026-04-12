@@ -1,28 +1,6 @@
 import { defineConfig, loadEnv, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
-
-function getStage(mode: string, rawStage: string | undefined): 'development' | 'staging' | 'production' {
-  const normalized = rawStage?.trim().toLowerCase();
-  if (normalized === 'development' || normalized === 'staging' || normalized === 'production') {
-    return normalized;
-  }
-
-  if (mode === 'staging') {
-    return 'staging';
-  }
-
-  return mode === 'production' ? 'production' : 'development';
-}
-
-function getDefaultAppUrl(stage: 'development' | 'staging' | 'production'): string {
-  if (stage === 'staging') return 'https://staging.ahhbittracker.app';
-  if (stage === 'production') return 'https://ahhbit-tracker.vercel.app';
-  return 'http://localhost:3000';
-}
-
-function getDefaultStacksApiUrl(stage: 'development' | 'staging' | 'production'): string {
-  return stage === 'production' ? 'https://api.mainnet.hiro.so' : 'https://api.testnet.hiro.so';
-}
+import { resolveFrontendRuntimeConfig } from './src/utils/stacksConfig';
 
 /**
  * Custom Vite plugin to inject environment variables into index.html.
@@ -41,9 +19,19 @@ function htmlEnvPlugin(appUrl: string): Plugin {
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const stage = getStage(mode, env.VITE_APP_STAGE);
-  const appUrl = env.VITE_APP_URL || getDefaultAppUrl(stage);
-  const stacksApiUrl = env.VITE_STACKS_API_URL || getDefaultStacksApiUrl(stage);
+  const runtimeConfig = resolveFrontendRuntimeConfig({
+    MODE: mode,
+    DEV: mode !== 'production',
+    VITE_APP_STAGE: env.VITE_APP_STAGE,
+    VITE_STACKS_NETWORK: env.VITE_STACKS_NETWORK,
+    VITE_STACKS_API_URL: env.VITE_STACKS_API_URL,
+    VITE_CONTRACT_ADDRESS: env.VITE_CONTRACT_ADDRESS,
+    VITE_CONTRACT_NAME: env.VITE_CONTRACT_NAME,
+    VITE_APP_URL: env.VITE_APP_URL,
+  });
+
+  const appUrl = runtimeConfig.appUrl;
+  const stacksApiUrl = runtimeConfig.stacksApiUrl;
 
   return {
     plugins: [react(), htmlEnvPlugin(appUrl)],
