@@ -2,50 +2,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
-
-export type AppStage = 'development' | 'staging' | 'production';
-export type StacksNetworkMode = 'mainnet' | 'testnet';
-
-interface StageDefaults {
-  stacksNetwork: StacksNetworkMode;
-  stacksApiUrl: string;
-  contractAddress: string;
-  contractName: string;
-  deployerAddress: string;
-}
-
-export interface RuntimeConfig {
-  stage: AppStage;
-  stacksNetwork: StacksNetworkMode;
-  stacksApiUrl: string;
-  contractAddress: string;
-  contractName: string;
-  deployerAddress: string;
-}
-
-const STAGE_DEFAULTS: Record<AppStage, StageDefaults> = {
-  development: {
-    stacksNetwork: 'testnet',
-    stacksApiUrl: 'https://api.testnet.hiro.so',
-    contractAddress: 'ST1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK1GA0CF0',
-    contractName: 'habit-tracker-v2',
-    deployerAddress: 'ST1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK1GA0CF0',
-  },
-  staging: {
-    stacksNetwork: 'testnet',
-    stacksApiUrl: 'https://api.testnet.hiro.so',
-    contractAddress: 'ST1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK1GA0CF0',
-    contractName: 'habit-tracker-v2',
-    deployerAddress: 'ST1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK1GA0CF0',
-  },
-  production: {
-    stacksNetwork: 'mainnet',
-    stacksApiUrl: 'https://api.mainnet.hiro.so',
-    contractAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
-    contractName: 'habit-tracker-v2',
-    deployerAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
-  },
-};
+import {
+  buildRuntimeConfig,
+  getContractPrincipal,
+  type AppStage,
+  type RuntimeConfig,
+} from './stacks-config';
 
 let cachedConfig: RuntimeConfig | null = null;
 
@@ -67,12 +29,6 @@ function toStage(value: string | undefined): AppStage {
   }
 
   return 'production';
-}
-
-function toNetwork(value: string | undefined, fallback: StacksNetworkMode): StacksNetworkMode {
-  if (!value) return fallback;
-  const normalized = value.trim().toLowerCase();
-  return normalized === 'testnet' ? 'testnet' : normalized === 'mainnet' ? 'mainnet' : fallback;
 }
 
 function loadFileIfExists(filePath: string): void {
@@ -108,22 +64,9 @@ export function getRuntimeConfig(forceReload = false): RuntimeConfig {
 
   const rootDir = resolveRepoRoot();
   const stage = loadStageEnvironment(rootDir);
-  const defaults = STAGE_DEFAULTS[stage];
-
-  const stacksNetwork = toNetwork(process.env.STACKS_NETWORK, defaults.stacksNetwork);
-
-  cachedConfig = {
-    stage,
-    stacksNetwork,
-    stacksApiUrl: process.env.STACKS_API_URL ?? defaults.stacksApiUrl,
-    contractAddress: process.env.CONTRACT_ADDRESS ?? defaults.contractAddress,
-    contractName: process.env.CONTRACT_NAME ?? defaults.contractName,
-    deployerAddress: process.env.DEPLOYER_ADDRESS ?? defaults.deployerAddress,
-  };
+  cachedConfig = buildRuntimeConfig(process.env, stage);
 
   return cachedConfig;
 }
 
-export function getContractPrincipal(config: RuntimeConfig = getRuntimeConfig()): string {
-  return `${config.contractAddress}.${config.contractName}`;
-}
+export { getContractPrincipal };
