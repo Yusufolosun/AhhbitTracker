@@ -4,6 +4,8 @@ import {
   assertStacksAddress,
   assertStacksApiUrl,
   buildRuntimeConfig,
+  getRuntimeConfigSummary,
+  parseContractPrincipal,
 } from '../scripts/shared/stacks-config';
 
 describe('stacks config validation', () => {
@@ -63,5 +65,22 @@ describe('stacks config validation', () => {
     expect(config.stacksNetwork).toBe('mainnet');
     expect(config.stacksApiUrl).toBe('https://api.mainnet.hiro.so');
     expect(config.contractAddress).toBe('SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z');
+  });
+
+  it('parses contract principal safely', () => {
+    expect(parseContractPrincipal('SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2')).toEqual({
+      contractAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
+      contractName: 'habit-tracker-v2',
+    });
+
+    expect(() => parseContractPrincipal('not-a-principal')).toThrow('ADDRESS.CONTRACT_NAME');
+  });
+
+  it('builds a sanitized config summary', () => {
+    const config = buildRuntimeConfig({}, 'production');
+    const summary = getRuntimeConfigSummary(config);
+
+    expect(summary.contractPrincipal).toBe('SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2');
+    expect(summary.stacksNetwork).toBe('mainnet');
   });
 });
