@@ -47,7 +47,6 @@ export default defineConfig({
       reporter: ['text', 'json-summary', 'html', 'lcov'],
       include: [
         'contracts/**/*.clar',
-        'packages/*/src/**/*.ts',
       ],
       exclude: [
         '**/*.test.*',
