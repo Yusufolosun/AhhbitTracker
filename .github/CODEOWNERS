@@ -10,12 +10,6 @@
 /contracts/**/*.clar @Yusufolosun
 Clarinet.toml @Yusufolosun
 
-# Packages - SDK and utility libraries
-/packages/ @Yusufolosun
-/packages/stx-utils/ @Yusufolosun
-/packages/ahhbit-tracker-sdk/ @Yusufolosun
-/packages/defikit/ @Yusufolosun
-
 # Tests - ensure test coverage and quality
 /tests/ @Yusufolosun
 **/*.test.ts @Yusufolosun

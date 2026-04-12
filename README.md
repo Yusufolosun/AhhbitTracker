@@ -27,7 +27,7 @@
 - [Tech Stack](#tech-stack)
 - [Getting Started](#getting-started)
   - [Testing](#testing)
-  - [Packages](#packages)
+  - [External Packages](#external-packages)
   - [Production Build](#production-build)
 - [Deploy to Vercel](#deploy-to-vercel)
 - [Contract Reference](#contract-reference)
@@ -82,7 +82,7 @@ npm run dev                  # → http://localhost:3000
 ### Testing
 
 ```bash
-npm test              # Run contract + stx-utils tests (111 tests)
+npm test              # Run contract and integration tests
 cd frontend && npm test   # Run frontend tests (30 tests)
 clarinet check        # Validate Clarity syntax
 ```
@@ -116,12 +116,13 @@ cp mobile/.env.production.example mobile/.env.production.local
 
 `*.local` env files are gitignored. Commit only `*.example` templates and never commit mnemonics, private keys, or secret API credentials.
 
-### Packages
+### External Packages
 
 | Package | Description |
 |---|---|
-| [`stx-utils`](packages/stx-utils/) | Zero-dependency utility library for Stacks — formatting, validation, block math, address helpers |
-| [`ahhbit-tracker-sdk`](packages/ahhbit-tracker-sdk/) | Typed SDK for the AhhbitTracker contract — transaction builders, read-only queries, post-conditions |
+| [`stx-utils`](https://github.com/Yusufolosun/ahhbit-tracker-stx-utils) | Zero-dependency utility library for Stacks — formatting, validation, block math, address helpers |
+| [`ahhbit-tracker-sdk`](https://github.com/Yusufolosun/ahhbit-tracker-sdk) | Typed SDK for the AhhbitTracker contract — transaction builders, read-only queries, post-conditions |
+| [`defikit`](https://github.com/Yusufolosun/ahhbit-tracker-defikit) | DeFi utility toolkit for basis points, fee math, slippage, AMM and token amount helpers |
 
 ### Production Build
 

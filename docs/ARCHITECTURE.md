@@ -44,7 +44,7 @@ AhhbitTracker is a decentralized habit tracking application built on the Stacks 
 
 ## Shared Contract Interaction Layer
 
-The repository now routes contract reads through a shared abstraction centered in `packages/ahhbit-tracker-sdk`:
+The repository now routes contract reads through a shared abstraction centered in `@yusufolosun/ahhbit-tracker-sdk` (maintained in a dedicated repository):
 
 - `queryReadOnly` and `queryReadOnlyJson` centralize read-only invocation behavior.
 - `query-timeout` and `query-retry` enforce consistent timeout and backoff defaults.
