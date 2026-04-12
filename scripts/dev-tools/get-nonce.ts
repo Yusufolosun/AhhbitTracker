@@ -1,13 +1,20 @@
 import { fetchNonce } from "@stacks/transactions";
-import { STACKS_MAINNET } from "@stacks/network";
+import { createNetwork } from "@stacks/network";
+import { assertStacksAddress, getRuntimeConfig } from "../shared/runtime-config";
 
-const NETWORK = STACKS_MAINNET;
+const runtime = getRuntimeConfig();
+const NETWORK = createNetwork({
+  network: runtime.stacksNetwork,
+  client: { baseUrl: runtime.stacksApiUrl },
+});
 
 async function checkNonce(address: string) {
-  console.log(`Checking nonce for: ${address}`);
+  const normalizedAddress = assertStacksAddress(address, 'CLI address');
+
+  console.log(`Checking nonce for: ${normalizedAddress}`);
   console.log("=".repeat(70));
   
-  const nonce = await fetchNonce({ address, network: NETWORK });
+  const nonce = await fetchNonce({ address: normalizedAddress, network: NETWORK });
   
   console.log(`Current Nonce: ${nonce}`);
   console.log(`Next Transaction Nonce: ${Number(nonce)}`);
