@@ -42,7 +42,7 @@ const STAGE_DEFAULTS: Readonly<Record<FrontendStage, StageDefaults>> = {
   },
 } as const;
 
-const STACKS_ADDRESS_PATTERN = /^S[PMTN][A-Z0-9]{38}$/;
+const STACKS_ADDRESS_PATTERN = /^S[PMTN][A-Z0-9]{39}$/;
 const CONTRACT_NAME_PATTERN = /^[a-zA-Z]([a-zA-Z0-9_-]{0,127})$/;
 
 function isLocalHostname(hostname: string): boolean {
