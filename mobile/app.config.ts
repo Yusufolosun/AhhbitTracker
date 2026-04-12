@@ -1,57 +1,13 @@
 import type { ExpoConfig } from 'expo/config';
+import { resolveMobileNetworkConfig } from './src/core/config/stacksConfig';
 
-type AppStage = 'development' | 'staging' | 'production';
-type StacksNetworkMode = 'mainnet' | 'testnet';
-
-interface StageDefaults {
-  stacksNetwork: StacksNetworkMode;
-  hiroApiBaseUrl: string;
-  contractAddress: string;
-  contractName: string;
-}
-
-const STAGE_DEFAULTS: Record<AppStage, StageDefaults> = {
-  development: {
-    stacksNetwork: 'testnet',
-    hiroApiBaseUrl: 'https://api.testnet.hiro.so',
-    contractAddress: 'ST1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK1GA0CF0',
-    contractName: 'habit-tracker-v2',
-  },
-  staging: {
-    stacksNetwork: 'testnet',
-    hiroApiBaseUrl: 'https://api.testnet.hiro.so',
-    contractAddress: 'ST1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK1GA0CF0',
-    contractName: 'habit-tracker-v2',
-  },
-  production: {
-    stacksNetwork: 'mainnet',
-    hiroApiBaseUrl: 'https://api.mainnet.hiro.so',
-    contractAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
-    contractName: 'habit-tracker-v2',
-  },
-};
-
-function toStage(value: string | undefined): AppStage {
-  const normalized = value?.trim().toLowerCase();
-  if (normalized === 'development' || normalized === 'staging' || normalized === 'production') {
-    return normalized;
-  }
-
-  return 'production';
-}
-
-function toNetwork(value: string | undefined, fallback: StacksNetworkMode): StacksNetworkMode {
-  const normalized = value?.trim().toLowerCase();
-  if (normalized === 'mainnet' || normalized === 'testnet') {
-    return normalized;
-  }
-
-  return fallback;
-}
-
-const stage = toStage(process.env.EXPO_PUBLIC_APP_STAGE ?? process.env.APP_STAGE);
-const defaults = STAGE_DEFAULTS[stage];
-const stacksNetwork = toNetwork(process.env.EXPO_PUBLIC_STACKS_NETWORK, defaults.stacksNetwork);
+const networkConfig = resolveMobileNetworkConfig({
+  appStage: process.env.EXPO_PUBLIC_APP_STAGE ?? process.env.APP_STAGE,
+  stacksNetwork: process.env.EXPO_PUBLIC_STACKS_NETWORK,
+  hiroApiBaseUrl: process.env.EXPO_PUBLIC_HIRO_API_BASE_URL,
+  contractAddress: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS,
+  contractName: process.env.EXPO_PUBLIC_CONTRACT_NAME,
+});
 
 const config: ExpoConfig = {
   name: 'AhhbitTracker Mobile',
@@ -81,11 +37,11 @@ const config: ExpoConfig = {
     predictiveBackGestureEnabled: false,
   },
   extra: {
-    appStage: stage,
-    contractAddress: process.env.EXPO_PUBLIC_CONTRACT_ADDRESS ?? defaults.contractAddress,
-    contractName: process.env.EXPO_PUBLIC_CONTRACT_NAME ?? defaults.contractName,
-    hiroApiBaseUrl: process.env.EXPO_PUBLIC_HIRO_API_BASE_URL ?? defaults.hiroApiBaseUrl,
-    stacksNetwork,
+    appStage: networkConfig.appStage,
+    contractAddress: networkConfig.contract.contractAddress,
+    contractName: networkConfig.contract.contractName,
+    hiroApiBaseUrl: networkConfig.hiroApiBaseUrl,
+    stacksNetwork: networkConfig.networkMode,
   },
   web: {
     favicon: './assets/favicon.png',
