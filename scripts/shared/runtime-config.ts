@@ -5,8 +5,10 @@ import { fileURLToPath } from 'url';
 import {
   buildRuntimeConfig,
   getContractPrincipal,
+  getRuntimeConfigSummary,
   type AppStage,
   type RuntimeConfig,
+  type RuntimeConfigSummary,
 } from './stacks-config';
 
 let cachedConfig: RuntimeConfig | null = null;
@@ -70,3 +72,7 @@ export function getRuntimeConfig(forceReload = false): RuntimeConfig {
 }
 
 export { getContractPrincipal };
+
+export function getSafeRuntimeConfigSummary(config: RuntimeConfig = getRuntimeConfig()): RuntimeConfigSummary {
+  return getRuntimeConfigSummary(config);
+}
