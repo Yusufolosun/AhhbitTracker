@@ -1,13 +1,25 @@
-import { STACKS_MAINNET } from "@stacks/network";
+import { createNetwork } from "@stacks/network";
+import { assertStacksAddress, getRuntimeConfig } from "../shared/runtime-config";
 
-const NETWORK = STACKS_MAINNET;
+const runtime = getRuntimeConfig();
+const NETWORK = createNetwork({
+  network: runtime.stacksNetwork,
+  client: { baseUrl: runtime.stacksApiUrl },
+});
 
 async function checkBalance(address: string) {
-  console.log(`Checking balance for: ${address}`);
+  const normalizedAddress = assertStacksAddress(address, 'CLI address');
+
+  console.log(`Checking balance for: ${normalizedAddress}`);
   console.log("=".repeat(70));
   
-  const url = `${NETWORK.coreApiUrl}/v2/accounts/${address}`;
+  const url = `${NETWORK.coreApiUrl}/v2/accounts/${normalizedAddress}`;
   const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Balance lookup failed: ${response.status} ${response.statusText}`);
+  }
+
   const data = await response.json();
   
   const balanceMicroSTX = parseInt(data.balance);

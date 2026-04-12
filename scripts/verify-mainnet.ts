@@ -1,24 +1,22 @@
-import { getContractPrincipal, getRuntimeConfig } from './shared/runtime-config';
+import { getRuntimeConfig, getSafeRuntimeConfigSummary } from './shared/runtime-config';
 
 const runtime = getRuntimeConfig();
+const summary = getSafeRuntimeConfigSummary(runtime);
 const CONTRACT_ADDRESS = runtime.contractAddress;
-const CONTRACT_NAME = runtime.contractName;
-const NETWORK_API = runtime.stacksApiUrl;
-const CONTRACT_PRINCIPAL = getContractPrincipal(runtime);
 
 async function verifyDeployment() {
   console.log("=".repeat(60));
   console.log("MAINNET DEPLOYMENT VERIFICATION");
   console.log("=".repeat(60));
   console.log();
-  console.log("Contract:", CONTRACT_PRINCIPAL);
-  console.log("Network:", NETWORK_API);
-  console.log("Stage:", runtime.stage);
-  console.log("Stacks network:", runtime.stacksNetwork);
+  console.log("Contract:", summary.contractPrincipal);
+  console.log("Network:", summary.stacksApiUrl);
+  console.log("Stage:", summary.stage);
+  console.log("Stacks network:", summary.stacksNetwork);
   console.log();
   console.log("Explorer Links:");
-  console.log(`Contract: https://explorer.hiro.so/address/${CONTRACT_PRINCIPAL}?chain=${runtime.stacksNetwork}`);
-  console.log(`Deployer: https://explorer.hiro.so/address/${CONTRACT_ADDRESS}?chain=${runtime.stacksNetwork}`);
+  console.log(`Contract: https://explorer.hiro.so/address/${summary.contractPrincipal}?chain=${summary.stacksNetwork}`);
+  console.log(`Deployer: https://explorer.hiro.so/address/${CONTRACT_ADDRESS}?chain=${summary.stacksNetwork}`);
   console.log();
   console.log("Verification Steps:");
   console.log("1. [OK] Contract deployed and confirmed");

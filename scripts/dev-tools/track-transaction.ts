@@ -1,12 +1,29 @@
-import { STACKS_MAINNET } from "@stacks/network";
+import { createNetwork } from "@stacks/network";
+import { getRuntimeConfig } from "../shared/runtime-config";
 
-const NETWORK = STACKS_MAINNET;
+const runtime = getRuntimeConfig();
+const NETWORK = createNetwork({
+  network: runtime.stacksNetwork,
+  client: { baseUrl: runtime.stacksApiUrl },
+});
+
+function normalizeTxId(value: string): string {
+  const normalized = value.trim().toLowerCase().replace(/^0x/, '');
+
+  if (!/^[a-f0-9]{64}$/.test(normalized)) {
+    throw new Error('Invalid tx id. Expected 64 hex characters.');
+  }
+
+  return normalized;
+}
 
 async function trackTransaction(txId: string) {
-  console.log(`Tracking transaction: ${txId}`);
+  const normalizedTxId = normalizeTxId(txId);
+
+  console.log(`Tracking transaction: ${normalizedTxId}`);
   console.log("=".repeat(70));
   
-  const url = `${NETWORK.coreApiUrl}/extended/v1/tx/${txId}`;
+  const url = `${NETWORK.coreApiUrl}/extended/v1/tx/${normalizedTxId}`;
   
   let attempts = 0;
   const maxAttempts = 30;
@@ -26,7 +43,7 @@ async function trackTransaction(txId: string) {
       console.log(`  Sender: ${data.sender_address}`);
       console.log();
       console.log(`View on Explorer:`);
-      console.log(`  https://explorer.hiro.so/txid/${txId}?chain=mainnet`);
+      console.log(`  https://explorer.hiro.so/txid/${normalizedTxId}?chain=${runtime.stacksNetwork}`);
       break;
     } else if (data.tx_status === 'abort_by_response' || data.tx_status === 'abort_by_post_condition') {
       console.log("[FAIL] Transaction failed");
