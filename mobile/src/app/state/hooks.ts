@@ -31,3 +31,20 @@ export function usePreviewState() {
     [state.preview, setPreview, clearPreview],
   );
 }
+
+export function useWalletInteractionState() {
+  const {
+    state,
+    setWalletInteraction,
+    clearWalletInteraction,
+  } = useAppStateContext();
+
+  return useMemo(
+    () => ({
+      walletInteraction: state.walletInteraction,
+      setWalletInteraction,
+      clearWalletInteraction,
+    }),
+    [state.walletInteraction, setWalletInteraction, clearWalletInteraction],
+  );
+}
