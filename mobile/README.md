@@ -21,6 +21,7 @@ mobile/src/
 │   ├── address/                  # Address state + address UI
 │   ├── habits/                   # Habits query hooks and habit UI
 │   ├── pool/                     # Pool balance UI
+│   ├── wallet/                   # Wallet deep-link helpers and handoff UI
 │   └── transactions/             # Transaction preview builders + UI
 └── shared/
     ├── components/               # Reusable UI primitives/states
@@ -34,6 +35,7 @@ mobile/src/
 - Stable core contracts/network/config in `core/*`
 - Shared reusable primitives only in `shared/*`
 - Screen files orchestrate, feature files implement
+- Wallet handoffs are modeled as session-scoped deep links, not persisted account state
 - Legacy paths in `src/components`, `src/services`, etc. are maintained as re-export shims for compatibility
 
 ## Global State Management
