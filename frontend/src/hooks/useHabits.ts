@@ -279,6 +279,50 @@ export const useHabits = () => {
     },
   });
 
+  const runDailyCheckIn = useCallback(async (habitIds: number[]): Promise<DailyCheckInResult> => {
+    if (habitIds.length === 0) {
+      return {
+        attempted: 0,
+        submitted: 0,
+        failed: 0,
+        entries: [],
+      };
+    }
+
+    setIsRunningDailyCheckIn(true);
+    const entries: DailyCheckInEntry[] = [];
+
+    try {
+      for (const habitId of habitIds) {
+        try {
+          const txId = await checkInMutation.mutateAsync(habitId);
+          entries.push({ habitId, txId });
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          entries.push({ habitId, error: message });
+
+          // User cancellation should stop the remaining queue to avoid repeatedly
+          // reopening the wallet popup after an intentional cancel action.
+          if (message === 'Transaction cancelled') {
+            break;
+          }
+        }
+      }
+    } finally {
+      setIsRunningDailyCheckIn(false);
+    }
+
+    const submitted = entries.filter((entry) => entry.txId).length;
+    const failed = entries.length - submitted;
+
+    return {
+      attempted: entries.length,
+      submitted,
+      failed,
+      entries,
+    };
+  }, [checkInMutation]);
+
   return {
     // Data
     habits: habits || [],
