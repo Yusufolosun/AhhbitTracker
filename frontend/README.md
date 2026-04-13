@@ -78,3 +78,4 @@ src/
 - **Rate limiting** — `RateLimitBanner` listens for 429 events from `@tanstack/react-query` retry logic
 - **Dev proxy** — In development, Vite proxies `/api/stacks/*` to `https://api.mainnet.hiro.so` to avoid CORS
 - **Production** — Uses `STACKS_MAINNET` from `@stacks/network` directly (no proxy needed)
+- **Create habit flow** — The habit form enforces the contract's 0.02-100 STX stake range and 50-character name limit before submitting a `create-habit` call
