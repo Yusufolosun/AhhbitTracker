@@ -24,6 +24,8 @@ function normalizeStake(value: string): number {
 }
 
 export function CreateHabitPreviewCard({ onPreview }: CreateHabitPreviewCardProps) {
+  const minStakeStx = MIN_STAKE_AMOUNT / 1_000_000;
+  const maxStakeStx = MAX_STAKE_AMOUNT / 1_000_000;
   const [habitName, setHabitName] = useState('');
   const [stake, setStake] = useState('0.02');
   const [error, setError] = useState<string | null>(null);
@@ -75,7 +77,7 @@ export function CreateHabitPreviewCard({ onPreview }: CreateHabitPreviewCardProp
         value={stake}
       />
       <Text style={styles.hint}>
-        Min {MIN_STAKE_AMOUNT / 1_000_000} STX · Max {MAX_STAKE_AMOUNT / 1_000_000} STX · Up to {MAX_HABIT_NAME_LENGTH} characters
+        Min {minStakeStx} STX · Max {maxStakeStx} STX · Up to {MAX_HABIT_NAME_LENGTH} characters
       </Text>
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <Pressable
