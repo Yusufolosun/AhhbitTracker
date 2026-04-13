@@ -16,6 +16,10 @@ export const linkingConfig: LinkingOptions<RootStackParamList> = {
               payload: String,
               result: String,
             },
+            stringify: {
+              payload: String,
+              result: String,
+            },
           },
           Account: 'account',
         },
