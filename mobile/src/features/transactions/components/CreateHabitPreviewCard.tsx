@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   },
   hint: {
     color: palette.steel,
-    fontSize: typography.caption,
+    fontSize: typography.label,
     marginBottom: spacing.sm,
   },
   previewButton: {
