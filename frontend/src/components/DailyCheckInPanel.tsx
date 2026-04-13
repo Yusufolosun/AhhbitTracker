@@ -1,17 +1,19 @@
 import { useMemo, useState } from 'react';
 import { Habit } from '../types/habit';
-import { useToast } from '../context/ToastContext';
 import {
   getEligibleDailyCheckInHabitIds,
   getCheckInWindowState,
 } from '../utils/habitStatus';
 import type { DailyCheckInResult } from '../hooks/useHabits';
 
+type NotificationLevel = 'success' | 'error' | 'info';
+
 interface DailyCheckInPanelProps {
   habits: Habit[];
   currentBlock: number | null;
   isRunningDailyCheckIn: boolean;
   runDailyCheckIn: (habitIds: number[]) => Promise<DailyCheckInResult>;
+  notify?: (message: string, level: NotificationLevel) => void;
 }
 
 export function DailyCheckInPanel({
@@ -19,8 +21,8 @@ export function DailyCheckInPanel({
   currentBlock,
   isRunningDailyCheckIn,
   runDailyCheckIn,
+  notify,
 }: DailyCheckInPanelProps) {
-  const { showToast } = useToast();
   const [lastResult, setLastResult] = useState<DailyCheckInResult | null>(null);
 
   const eligibleHabitIds = useMemo(
@@ -39,7 +41,7 @@ export function DailyCheckInPanel({
 
   const handleDailyCheckIn = async () => {
     if (eligibleHabitIds.length === 0) {
-      showToast('No habits are currently eligible for check-in.', 'info');
+      notify?.('No habits are currently eligible for check-in.', 'info');
       return;
     }
 
@@ -47,12 +49,12 @@ export function DailyCheckInPanel({
     setLastResult(result);
 
     if (result.submitted > 0) {
-      showToast(`Submitted ${result.submitted} check-in transaction(s).`, 'success');
+      notify?.(`Submitted ${result.submitted} check-in transaction(s).`, 'success');
     }
 
     if (result.failed > 0) {
       const firstError = result.entries.find((entry) => entry.error)?.error;
-      showToast(
+      notify?.(
         firstError
           ? `${result.failed} check-in(s) failed. ${firstError}`
           : `${result.failed} check-in transaction(s) failed.`,
