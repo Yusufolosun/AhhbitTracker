@@ -56,6 +56,12 @@ export function TransactionTracker() {
               View on Explorer
             </a>
           </div>
+
+          {tx.status === 'failed' && tx.errorMessage ? (
+            <p className="mt-2 text-xs text-red-600 dark:text-red-400">
+              {tx.errorCode ? `Error ${tx.errorCode}: ${tx.errorMessage}` : tx.errorMessage}
+            </p>
+          ) : null}
         </div>
       ))}
     </div>
@@ -84,7 +90,7 @@ function StatusLabel({ status }: { status: TrackedTransaction['status'] }) {
   if (status === 'failed') {
     return (
       <span className="text-xs text-red-600 dark:text-red-400 font-medium">
-        Failed
+        Failed on-chain
       </span>
     );
   }
