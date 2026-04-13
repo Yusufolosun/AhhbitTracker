@@ -37,7 +37,7 @@ export function PreviewScreen({ route }: PreviewScreenProps) {
     <Screen contentContainerStyle={styles.content}>
       <SectionHeader
         title="Transaction preview"
-        subtitle="Review and copy contract call payloads before wallet signing"
+        subtitle="Review, copy, and hand off contract call payloads through wallet deep links"
       />
 
       <WalletInteractionCard preview={preview} walletInteraction={walletInteraction} />
