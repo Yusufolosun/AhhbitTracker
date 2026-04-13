@@ -26,6 +26,11 @@ Creates a new habit with stake commitment.
 - `name` (string-utf8 50): Habit description
 - `stake-amount` (uint): Amount to stake in microSTX
 
+**Limits:**
+- Minimum stake: 20,000 microSTX (0.02 STX)
+- Maximum stake: 100,000,000 microSTX (100 STX)
+- Habit name length: up to 50 UTF-8 characters
+
 **Returns:**
 - Success: `(ok uint)` - The habit ID
 - Error: See error codes below
