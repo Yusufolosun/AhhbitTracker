@@ -84,6 +84,14 @@ export function WalletInteractionCard({ preview, walletInteraction }: WalletInte
   return (
     <View style={styles.card}>
       <Text style={styles.label}>Wallet deep links</Text>
+      {walletInteraction?.txId && walletInteraction.status ? (
+        <View style={styles.summary}>
+          <Text style={styles.summaryLabel}>Wallet result</Text>
+          <Text style={styles.summaryText}>
+            {walletInteraction.status} · {walletInteraction.txId}
+          </Text>
+        </View>
+      ) : null}
       {previewLink ? (
         <View style={styles.block}>
           <Text style={styles.blockLabel}>Preview link</Text>
@@ -117,6 +125,23 @@ const styles = StyleSheet.create({
   },
   block: {
     marginTop: spacing.sm,
+  },
+  summary: {
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    borderRadius: radius.md,
+    marginBottom: spacing.sm,
+    padding: spacing.sm,
+  },
+  summaryLabel: {
+    color: '#D8E1F0',
+    fontSize: typography.body,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  summaryText: {
+    color: '#9DB0CC',
+    fontFamily: 'monospace',
+    fontSize: 12,
   },
   blockLabel: {
     color: '#D8E1F0',
