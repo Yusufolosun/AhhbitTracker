@@ -340,6 +340,7 @@ export const useHabits = () => {
     // Mutations
     createHabit: createHabitMutation.mutateAsync,
     checkIn: checkInMutation.mutateAsync,
+    runDailyCheckIn,
     withdrawStake: withdrawStakeMutation.mutateAsync,
     claimBonus: claimBonusMutation.mutateAsync,
     slashHabit: slashHabitMutation.mutateAsync,
@@ -353,6 +354,7 @@ export const useHabits = () => {
     // Global mutation states (kept for backward compatibility)
     isCreatingHabit: createHabitMutation.isPending,
     isCheckingIn: checkInMutation.isPending,
+    isRunningDailyCheckIn,
     isWithdrawing: withdrawStakeMutation.isPending,
     isClaiming: claimBonusMutation.isPending,
     isSlashing: slashHabitMutation.isPending,
