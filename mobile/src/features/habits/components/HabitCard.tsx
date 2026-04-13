@@ -1,18 +1,37 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Habit } from '@/core/types';
-import { formatAddress, formatMicroStx, formatStreakDays } from '@/shared/utils';
+import {
+  canSubmitMobileDailyCheckIn,
+  formatAddress,
+  formatMicroStx,
+  formatStreakDays,
+  getMobileCheckInWindowState,
+} from '@/shared/utils';
 import { palette, radius, spacing, typography } from '@/shared/theme';
 
 interface HabitCardProps {
   habit: Habit;
+  currentBlock: number | null;
   onCheckInPreview: (habitId: number) => void;
   onWithdrawPreview: (habitId: number, stakeAmount: number) => void;
   onClaimPreview: (habitId: number) => void;
 }
 
-function ActionButton({ label, onPress }: { label: string; onPress: () => void }) {
+function ActionButton({
+  disabled,
+  label,
+  onPress,
+}: {
+  disabled?: boolean;
+  label: string;
+  onPress: () => void;
+}) {
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [styles.actionButton, pressed && styles.pressed]}>
+    <Pressable
+      disabled={disabled}
+      onPress={onPress}
+      style={({ pressed }) => [styles.actionButton, disabled && styles.actionButtonDisabled, pressed && styles.pressed]}
+    >
       <Text style={styles.actionButtonText}>{label}</Text>
     </Pressable>
   );
@@ -20,10 +39,14 @@ function ActionButton({ label, onPress }: { label: string; onPress: () => void }
 
 export function HabitCard({
   habit,
+  currentBlock,
   onCheckInPreview,
   onWithdrawPreview,
   onClaimPreview,
 }: HabitCardProps) {
+  const checkInWindowState = getMobileCheckInWindowState(habit, currentBlock);
+  const canCheckIn = canSubmitMobileDailyCheckIn(habit, currentBlock);
+
   return (
     <View style={styles.card}>
       <Text style={styles.name}>{habit.name}</Text>
@@ -31,9 +54,14 @@ export function HabitCard({
       <Text style={styles.meta}>Stake: {formatMicroStx(habit.stakeAmount)}</Text>
       <Text style={styles.meta}>Streak: {formatStreakDays(habit.currentStreak)}</Text>
       <Text style={styles.meta}>Status: {habit.isCompleted ? 'Completed' : habit.isActive ? 'Active' : 'Inactive'}</Text>
+      <Text style={styles.meta}>Check-in window: {checkInWindowState}</Text>
 
       <View style={styles.actionsRow}>
-        <ActionButton label="Check-in" onPress={() => onCheckInPreview(habit.habitId)} />
+        <ActionButton
+          disabled={!canCheckIn}
+          label={canCheckIn ? 'Check-in' : 'Check-in blocked'}
+          onPress={() => onCheckInPreview(habit.habitId)}
+        />
         <ActionButton
           label="Withdraw"
           onPress={() => onWithdrawPreview(habit.habitId, habit.stakeAmount)}
@@ -78,6 +106,9 @@ const styles = StyleSheet.create({
     minHeight: 38,
     justifyContent: 'center',
     paddingHorizontal: spacing.sm,
+  },
+  actionButtonDisabled: {
+    opacity: 0.45,
   },
   actionButtonText: {
     color: palette.ink,

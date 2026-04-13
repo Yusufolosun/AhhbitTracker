@@ -2,14 +2,20 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { RequireAddress } from '@/app/navigation/RequireAddress';
 import { MAIN_TAB_ROUTES, type RootStackScreenProps } from '@/app/navigation/types';
 import { useAddressState, usePreviewState } from '@/app/state';
-import { useUserHabitsQuery } from '@/features/habits';
+import { useCurrentBlockQuery, useUserHabitsQuery } from '@/features/habits';
 import {
   buildCheckInPreview,
   buildClaimBonusPreview,
   buildWithdrawStakePreview,
 } from '@/features/transactions';
 import { EmptyState, ErrorState, LoadingState, Screen, SectionHeader } from '@/shared/components';
-import { formatAddress, formatMicroStx, formatStreakDays } from '@/shared/utils';
+import {
+  canSubmitMobileDailyCheckIn,
+  formatAddress,
+  formatMicroStx,
+  formatStreakDays,
+  getMobileCheckInWindowState,
+} from '@/shared/utils';
 import { palette, radius, spacing, typography } from '@/shared/theme';
 
 type HabitDetailsScreenProps = RootStackScreenProps<'HabitDetails'>;
@@ -23,9 +29,21 @@ function DetailRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function ActionButton({ label, onPress }: { label: string; onPress: () => void }) {
+function ActionButton({
+  disabled,
+  label,
+  onPress,
+}: {
+  disabled?: boolean;
+  label: string;
+  onPress: () => void;
+}) {
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [styles.actionButton, pressed && styles.pressed]}>
+    <Pressable
+      disabled={disabled}
+      onPress={onPress}
+      style={({ pressed }) => [styles.actionButton, disabled && styles.actionDisabled, pressed && styles.pressed]}
+    >
       <Text style={styles.actionText}>{label}</Text>
     </Pressable>
   );
@@ -37,6 +55,7 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
   const { setPreview } = usePreviewState();
 
   const habitsQuery = useUserHabitsQuery(activeAddress);
+  const currentBlockQuery = useCurrentBlockQuery();
   const habit = habitsQuery.data?.find((item) => item.habitId === habitId);
 
   if (habitsQuery.isLoading) {
@@ -70,7 +89,15 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
     navigation.navigate('MainTabs', { screen: MAIN_TAB_ROUTES.Preview });
   };
 
+  const currentBlock = currentBlockQuery.data ?? null;
+  const checkInWindowState = getMobileCheckInWindowState(habit, currentBlock);
+  const canCheckIn = canSubmitMobileDailyCheckIn(habit, currentBlock);
+
   const handleCheckInPreview = () => {
+    if (!canCheckIn) {
+      return;
+    }
+
     setPreview(buildCheckInPreview(habit.habitId));
     navigateToPreview();
   };
@@ -101,11 +128,16 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
           <DetailRow label="Last check-in block" value={String(habit.lastCheckInBlock)} />
           <DetailRow label="Created at block" value={String(habit.createdAtBlock)} />
           <DetailRow label="Status" value={habit.isCompleted ? 'Completed' : habit.isActive ? 'Active' : 'Inactive'} />
+          <DetailRow label="Check-in window" value={checkInWindowState} />
           <DetailRow label="Bonus claimed" value={habit.bonusClaimed ? 'Yes' : 'No'} />
         </View>
 
         <View style={styles.actions}>
-          <ActionButton label="Generate check-in preview" onPress={handleCheckInPreview} />
+          <ActionButton
+            disabled={!canCheckIn}
+            label={canCheckIn ? 'Generate check-in preview' : 'Check-in preview blocked'}
+            onPress={handleCheckInPreview}
+          />
           <ActionButton label="Generate withdraw preview" onPress={handleWithdrawPreview} />
           <ActionButton label="Generate claim preview" onPress={handleClaimPreview} />
         </View>
@@ -149,6 +181,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     minHeight: 46,
     paddingHorizontal: spacing.md,
+  },
+  actionDisabled: {
+    opacity: 0.45,
   },
   actionText: {
     color: palette.card,

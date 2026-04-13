@@ -5,6 +5,7 @@ import {
 } from '@/features/address';
 import {
   HabitList,
+  useCurrentBlockQuery,
   usePoolBalanceQuery,
   useUserHabitsQuery,
   useUserStatsQuery,
@@ -28,6 +29,7 @@ export function DashboardScreen() {
   const { preview, setPreview } = usePreviewState();
 
   const habitsQuery = useUserHabitsQuery(activeAddress);
+  const currentBlockQuery = useCurrentBlockQuery();
   const poolBalanceQuery = usePoolBalanceQuery();
   const statsQuery = useUserStatsQuery(activeAddress);
 
@@ -96,6 +98,7 @@ export function DashboardScreen() {
       <View style={styles.sectionSpacing}>
         <SectionHeader title="Habits" subtitle="Generate check-in, withdraw, or claim previews" />
         <HabitList
+          currentBlock={currentBlockQuery.data ?? null}
           habits={habitsQuery.data ?? []}
           isLoading={habitsQuery.isLoading}
           error={habitsQuery.error}

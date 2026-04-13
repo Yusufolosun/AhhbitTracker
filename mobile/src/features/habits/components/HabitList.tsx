@@ -5,6 +5,7 @@ import { HabitCard } from './HabitCard';
 
 interface HabitListProps {
   habits: Habit[];
+  currentBlock: number | null;
   isLoading: boolean;
   error: Error | null;
   onCheckInPreview: (habitId: number) => void;
@@ -14,6 +15,7 @@ interface HabitListProps {
 
 export function HabitList({
   habits,
+  currentBlock,
   isLoading,
   error,
   onCheckInPreview,
@@ -39,6 +41,7 @@ export function HabitList({
       renderItem={({ item }) => (
         <HabitCard
           habit={item}
+          currentBlock={currentBlock}
           onCheckInPreview={onCheckInPreview}
           onWithdrawPreview={onWithdrawPreview}
           onClaimPreview={onClaimPreview}
