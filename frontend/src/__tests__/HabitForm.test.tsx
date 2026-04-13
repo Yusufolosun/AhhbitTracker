@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { HabitForm } from '../components/HabitForm';
+import { MAX_HABIT_NAME_LENGTH, MAX_STAKE_AMOUNT, MIN_STAKE_AMOUNT } from '../utils/constants';
 
 const createHabit = vi.fn().mockResolvedValue('tx-create');
 const showToast = vi.fn();
@@ -27,14 +28,21 @@ describe('HabitForm', () => {
   it('starts with the contract minimum stake', () => {
     render(<HabitForm />);
 
-    expect(screen.getByLabelText('Stake Amount (STX)')).toHaveValue(0.02);
-    expect(screen.getByText('Min 0.02 STX · Max 100 STX')).toBeDefined();
+    expect(screen.getByLabelText('Stake Amount (STX)')).toHaveValue(MIN_STAKE_AMOUNT / 1_000_000);
+    expect(
+      screen.getByText(
+        `Min ${(MIN_STAKE_AMOUNT / 1_000_000).toFixed(2)} STX · Max ${(MAX_STAKE_AMOUNT / 1_000_000).toFixed(0)} STX`,
+      ),
+    ).toBeDefined();
   });
 
   it('caps habit names at the contract limit', () => {
     render(<HabitForm />);
 
-    expect(screen.getByLabelText('Habit Name')).toHaveAttribute('maxlength', '50');
+    expect(screen.getByLabelText('Habit Name')).toHaveAttribute(
+      'maxlength',
+      MAX_HABIT_NAME_LENGTH.toString(),
+    );
   });
 
   it('submits a trimmed habit name and microSTX stake', async () => {
@@ -68,7 +76,7 @@ describe('HabitForm', () => {
     fireEvent.change(screen.getByLabelText('Stake Amount (STX)'), {
       target: { value: '101' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Create Habit' }));
+    fireEvent.submit(screen.getByRole('button', { name: 'Create Habit' }).closest('form'));
 
     expect(await screen.findByText('Maximum stake is 100 STX')).toBeDefined();
     expect(createHabit).not.toHaveBeenCalled();
