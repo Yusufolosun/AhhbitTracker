@@ -47,6 +47,7 @@ mobile/src/
 - Wallet deep-link state: Session-scoped preview payloads and return callbacks stay in memory only
 - Query state remains in React Query; app state changes trigger cache pruning/invalidation for user-scoped keys
 - Feature-level context exports remain as compatibility adapters and now delegate to app state hooks
+- Daily check-in previews are gated by on-chain timing (120-144 block window) using live block height polling
 
 ## Navigation
 
