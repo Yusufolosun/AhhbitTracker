@@ -61,7 +61,12 @@ const queryClient = new QueryClient({
 
 function AppContent() {
   const { walletState } = useWallet();
-  const { habits, isLoadingHabits } = useHabits();
+  const {
+    habits,
+    isLoadingHabits,
+    runDailyCheckIn,
+    isRunningDailyCheckIn,
+  } = useHabits();
   const { route } = useHashRoute();
 
   const longestStreakData = useMemo(() => {
@@ -114,7 +119,15 @@ function AppContent() {
           <Suspense fallback={<DashboardSkeleton />}>
             {route === 'dashboard' && (
               <section id="dashboard">
-                {isLoadingHabits ? <DashboardSkeleton /> : <Dashboard habits={habits} />}
+                {isLoadingHabits ? (
+                  <DashboardSkeleton />
+                ) : (
+                  <Dashboard
+                    habits={habits}
+                    runDailyCheckIn={runDailyCheckIn}
+                    isRunningDailyCheckIn={isRunningDailyCheckIn}
+                  />
+                )}
               </section>
             )}
 
