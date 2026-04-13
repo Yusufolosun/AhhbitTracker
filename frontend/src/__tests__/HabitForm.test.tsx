@@ -31,6 +31,12 @@ describe('HabitForm', () => {
     expect(screen.getByText('Min 0.02 STX · Max 100 STX')).toBeDefined();
   });
 
+  it('caps habit names at the contract limit', () => {
+    render(<HabitForm />);
+
+    expect(screen.getByLabelText('Habit Name')).toHaveAttribute('maxlength', '50');
+  });
+
   it('submits a trimmed habit name and microSTX stake', async () => {
     render(<HabitForm />);
 
