@@ -9,6 +9,19 @@ import {
 } from '../types/habit';
 import { POLLING_INTERVAL, CACHE_TIME, POOL_CACHE_TIME } from '../utils/constants';
 
+export interface DailyCheckInEntry {
+  habitId: number;
+  txId?: string;
+  error?: string;
+}
+
+export interface DailyCheckInResult {
+  attempted: number;
+  submitted: number;
+  failed: number;
+  entries: DailyCheckInEntry[];
+}
+
 /**
  * Custom hook for managing habits
  */
@@ -23,6 +36,7 @@ export const useHabits = () => {
   const [pendingWithdrawals, setPendingWithdrawals] = useState<Set<number>>(new Set());
   const [pendingClaims, setPendingClaims] = useState<Set<number>>(new Set());
   const [pendingSlashes, setPendingSlashes] = useState<Set<number>>(new Set());
+  const [isRunningDailyCheckIn, setIsRunningDailyCheckIn] = useState(false);
 
   // Fetch user habits
   const {
