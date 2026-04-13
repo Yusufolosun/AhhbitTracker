@@ -6,6 +6,7 @@ export function createInitialAppState(): AppState {
     trackedAddress: null,
     isHydrating: true,
     preview: null,
+    walletInteraction: null,
   };
 }
 
@@ -22,18 +23,21 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
         trackedAddress: action.payload.trackedAddress,
         isHydrating: false,
         preview: null,
+        walletInteraction: null,
       };
     case 'address:set':
       return {
         ...state,
         trackedAddress: action.payload.trackedAddress,
         preview: null,
+        walletInteraction: null,
       };
     case 'address:clear':
       return {
         ...state,
         trackedAddress: null,
         preview: null,
+        walletInteraction: null,
       };
     case 'preview:set':
       return {
@@ -44,6 +48,16 @@ export function appStateReducer(state: AppState, action: AppStateAction): AppSta
       return {
         ...state,
         preview: null,
+      };
+    case 'wallet-interaction:set':
+      return {
+        ...state,
+        walletInteraction: action.payload.walletInteraction,
+      };
+    case 'wallet-interaction:clear':
+      return {
+        ...state,
+        walletInteraction: null,
       };
     default:
       return state;
