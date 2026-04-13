@@ -4,12 +4,20 @@ import { StatsCard } from './StatsCard';
 import { formatSTX } from '../utils/formatting';
 import { useCurrentBlock } from '../hooks/useCurrentBlock';
 import { getCheckInWindowState, isEligibleToWithdraw } from '../utils/habitStatus';
+import { DailyCheckInPanel } from './DailyCheckInPanel';
+import type { DailyCheckInResult } from '../hooks/useHabits';
 
 interface DashboardProps {
   habits: Habit[];
+  isRunningDailyCheckIn: boolean;
+  runDailyCheckIn: (habitIds: number[]) => Promise<DailyCheckInResult>;
 }
 
-export function Dashboard({ habits }: DashboardProps) {
+export function Dashboard({
+  habits,
+  isRunningDailyCheckIn,
+  runDailyCheckIn,
+}: DashboardProps) {
   const currentBlock = useCurrentBlock();
 
   const stats = useMemo(() => {
@@ -50,6 +58,13 @@ export function Dashboard({ habits }: DashboardProps) {
         <h2 className="text-2xl font-bold text-surface-900 dark:text-white mb-2">Dashboard</h2>
         <p className="text-surface-600 dark:text-surface-400">Track your habit-building progress</p>
       </div>
+
+      <DailyCheckInPanel
+        habits={habits}
+        currentBlock={currentBlock}
+        isRunningDailyCheckIn={isRunningDailyCheckIn}
+        runDailyCheckIn={runDailyCheckIn}
+      />
 
       {/* Empty state — first-time user onboarding */}
       {habits.length === 0 ? (
