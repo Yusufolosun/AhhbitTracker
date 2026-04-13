@@ -1,0 +1,2 @@
+export const MIN_CHECK_IN_INTERVAL_BLOCKS = 120;
+export const CHECK_IN_WINDOW_BLOCKS = 144;

@@ -1,11 +1,19 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo, ReactNode } from 'react';
 import { txUrl } from '@yusufolosun/stx-utils';
+import {
+  normalizeTxId,
+  summarizeTransactionStatus,
+  type TransactionStatusSummary,
+} from '../utils/transactionStatus';
 
 export interface TrackedTransaction {
   txId: string;
   functionName: string;
   status: 'pending' | 'confirmed' | 'failed';
   timestamp: number;
+  updatedAt: number;
+  errorCode?: number;
+  errorMessage?: string;
 }
 
 interface TransactionContextType {
@@ -39,13 +47,13 @@ const TX_MAX_ENTRIES = 20; // keep at most 20 transactions in state
  * Fetch transaction status from the Hiro API.
  * Returns 'confirmed', 'failed', or 'pending'.
  */
-async function fetchTxStatus(txId: string): Promise<'confirmed' | 'failed' | 'pending'> {
+async function fetchTxStatus(txId: string): Promise<TransactionStatusSummary> {
   const isDev = typeof import.meta !== 'undefined' && import.meta.env?.DEV;
   const baseUrl = isDev
     ? `${typeof window !== 'undefined' ? window.location.origin : ''}/api/stacks`
     : 'https://api.mainnet.hiro.so';
 
-  const cleanTxId = txId.startsWith('0x') ? txId : `0x${txId}`;
+  const cleanTxId = normalizeTxId(txId);
   const url = `${baseUrl}/extended/v1/tx/${cleanTxId}`;
 
   const controller = new AbortController();
@@ -57,21 +65,15 @@ async function fetchTxStatus(txId: string): Promise<'confirmed' | 'failed' | 'pe
 
     if (!response.ok) {
       // 404 usually means the tx hasn't been picked up yet — still pending
-      if (response.status === 404) return 'pending';
-      return 'pending';
+      if (response.status === 404) return { status: 'pending' };
+      return { status: 'pending' };
     }
 
     const data = await response.json();
-    const status: string = data.tx_status;
-
-    if (status === 'success') return 'confirmed';
-    if (status === 'pending') return 'pending';
-    // Any abort or drop status counts as failed
-    if (status.startsWith('abort_') || status.startsWith('dropped_')) return 'failed';
-    return 'pending';
+    return summarizeTransactionStatus(data);
   } catch {
     // Network error or timeout — assume still pending
-    return 'pending';
+    return { status: 'pending' };
   }
 }
 
@@ -86,6 +88,7 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
         functionName,
         status: 'pending' as const,
         timestamp: Date.now(),
+        updatedAt: Date.now(),
       },
       ...prev,
     ].slice(0, TX_MAX_ENTRIES));
@@ -125,13 +128,13 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
 
       if (pendingTxs.length === 0) return;
 
-      const updates: { txId: string; status: 'confirmed' | 'failed' }[] = [];
+      const updates: { txId: string; next: TransactionStatusSummary }[] = [];
 
       await Promise.all(
         pendingTxs.map(async (tx) => {
-          const status = await fetchTxStatus(tx.txId);
-          if (status !== 'pending') {
-            updates.push({ txId: tx.txId, status });
+          const next = await fetchTxStatus(tx.txId);
+          if (next.status !== 'pending') {
+            updates.push({ txId: tx.txId, next });
           }
         })
       );
@@ -140,7 +143,15 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
         setTransactions((prev) =>
           prev.map((tx) => {
             const update = updates.find((u) => u.txId === tx.txId);
-            return update ? { ...tx, status: update.status } : tx;
+            return update
+              ? {
+                  ...tx,
+                  status: update.next.status,
+                  updatedAt: Date.now(),
+                  errorCode: update.next.errorCode,
+                  errorMessage: update.next.errorMessage,
+                }
+              : tx;
           })
         );
       }
@@ -172,7 +183,7 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
     if (settled.length === 0) return;
 
     const timers = settled.map((tx) => {
-      const elapsed = Date.now() - tx.timestamp;
+      const elapsed = Date.now() - tx.updatedAt;
       const remaining = Math.max(TX_AUTO_DISMISS_DELAY - elapsed, 0);
       return setTimeout(() => {
         setTransactions((prev) => prev.filter((t) => t.txId !== tx.txId));

@@ -3,7 +3,7 @@ import { lazy, Suspense, useMemo } from 'react';
 import { emitRateLimitEvent } from './utils/rateLimitEvents';
 import { WalletProvider, useWallet } from './context/WalletContext';
 import { TransactionProvider } from './context/TransactionContext';
-import { ToastProvider } from './context/ToastContext';
+import { ToastProvider, useToast } from './context/ToastContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Header } from './components/Header';
@@ -61,7 +61,13 @@ const queryClient = new QueryClient({
 
 function AppContent() {
   const { walletState } = useWallet();
-  const { habits, isLoadingHabits } = useHabits();
+  const { showToast } = useToast();
+  const {
+    habits,
+    isLoadingHabits,
+    runDailyCheckIn,
+    isRunningDailyCheckIn,
+  } = useHabits();
   const { route } = useHashRoute();
 
   const longestStreakData = useMemo(() => {
@@ -114,7 +120,16 @@ function AppContent() {
           <Suspense fallback={<DashboardSkeleton />}>
             {route === 'dashboard' && (
               <section id="dashboard">
-                {isLoadingHabits ? <DashboardSkeleton /> : <Dashboard habits={habits} />}
+                {isLoadingHabits ? (
+                  <DashboardSkeleton />
+                ) : (
+                  <Dashboard
+                    habits={habits}
+                    runDailyCheckIn={runDailyCheckIn}
+                    isRunningDailyCheckIn={isRunningDailyCheckIn}
+                    notify={showToast}
+                  />
+                )}
               </section>
             )}
 

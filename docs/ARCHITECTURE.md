@@ -274,6 +274,12 @@ User Action (Click) →
             Update UI
 ```
 
+Daily check-ins use the same flow with additional safeguards:
+
+- Dashboard-level daily runner only submits habits in the valid 120-144 block window
+- Check-ins are submitted sequentially to avoid overlapping wallet prompts
+- Transaction polling decodes Clarity abort codes so failed check-ins surface actionable reasons
+
 ## Security Model
 
 ### Contract Security

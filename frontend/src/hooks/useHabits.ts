@@ -9,6 +9,19 @@ import {
 } from '../types/habit';
 import { POLLING_INTERVAL, CACHE_TIME, POOL_CACHE_TIME } from '../utils/constants';
 
+export interface DailyCheckInEntry {
+  habitId: number;
+  txId?: string;
+  error?: string;
+}
+
+export interface DailyCheckInResult {
+  attempted: number;
+  submitted: number;
+  failed: number;
+  entries: DailyCheckInEntry[];
+}
+
 /**
  * Custom hook for managing habits
  */
@@ -23,6 +36,7 @@ export const useHabits = () => {
   const [pendingWithdrawals, setPendingWithdrawals] = useState<Set<number>>(new Set());
   const [pendingClaims, setPendingClaims] = useState<Set<number>>(new Set());
   const [pendingSlashes, setPendingSlashes] = useState<Set<number>>(new Set());
+  const [isRunningDailyCheckIn, setIsRunningDailyCheckIn] = useState(false);
 
   // Fetch user habits
   const {
@@ -265,6 +279,50 @@ export const useHabits = () => {
     },
   });
 
+  const runDailyCheckIn = useCallback(async (habitIds: number[]): Promise<DailyCheckInResult> => {
+    if (habitIds.length === 0) {
+      return {
+        attempted: 0,
+        submitted: 0,
+        failed: 0,
+        entries: [],
+      };
+    }
+
+    setIsRunningDailyCheckIn(true);
+    const entries: DailyCheckInEntry[] = [];
+
+    try {
+      for (const habitId of habitIds) {
+        try {
+          const txId = await checkInMutation.mutateAsync(habitId);
+          entries.push({ habitId, txId });
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          entries.push({ habitId, error: message });
+
+          // User cancellation should stop the remaining queue to avoid repeatedly
+          // reopening the wallet popup after an intentional cancel action.
+          if (message === 'Transaction cancelled') {
+            break;
+          }
+        }
+      }
+    } finally {
+      setIsRunningDailyCheckIn(false);
+    }
+
+    const submitted = entries.filter((entry) => entry.txId).length;
+    const failed = entries.length - submitted;
+
+    return {
+      attempted: entries.length,
+      submitted,
+      failed,
+      entries,
+    };
+  }, [checkInMutation]);
+
   return {
     // Data
     habits: habits || [],
@@ -282,6 +340,7 @@ export const useHabits = () => {
     // Mutations
     createHabit: createHabitMutation.mutateAsync,
     checkIn: checkInMutation.mutateAsync,
+    runDailyCheckIn,
     withdrawStake: withdrawStakeMutation.mutateAsync,
     claimBonus: claimBonusMutation.mutateAsync,
     slashHabit: slashHabitMutation.mutateAsync,
@@ -295,6 +354,7 @@ export const useHabits = () => {
     // Global mutation states (kept for backward compatibility)
     isCreatingHabit: createHabitMutation.isPending,
     isCheckingIn: checkInMutation.isPending,
+    isRunningDailyCheckIn,
     isWithdrawing: withdrawStakeMutation.isPending,
     isClaiming: claimBonusMutation.isPending,
     isSlashing: slashHabitMutation.isPending,

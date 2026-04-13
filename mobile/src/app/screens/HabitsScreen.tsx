@@ -5,6 +5,7 @@ import { RequireAddress } from '@/app/navigation/RequireAddress';
 import { useAddressState, usePreviewState } from '@/app/state';
 import {
   HabitCard,
+  useCurrentBlockQuery,
   useUserHabitsQuery,
 } from '@/features/habits';
 import {
@@ -21,6 +22,7 @@ export function HabitsScreen({ navigation }: HabitsScreenProps) {
   const { activeAddress } = useAddressState();
   const { setPreview } = usePreviewState();
   const habitsQuery = useUserHabitsQuery(activeAddress);
+  const currentBlockQuery = useCurrentBlockQuery();
 
   const openPreviewTab = () => {
     navigation.navigate(MAIN_TAB_ROUTES.Preview);
@@ -65,6 +67,7 @@ export function HabitsScreen({ navigation }: HabitsScreenProps) {
               <View key={habit.habitId} style={styles.habitRow}>
                 <HabitCard
                   habit={habit}
+                  currentBlock={currentBlockQuery.data ?? null}
                   onCheckInPreview={handleCheckInPreview}
                   onWithdrawPreview={handleWithdrawPreview}
                   onClaimPreview={handleClaimPreview}

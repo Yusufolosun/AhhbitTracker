@@ -47,8 +47,9 @@ Successful users can claim bonuses from the forfeited pool created by users who 
 ### Daily Check-ins
 
 1. Visit AhhbitTracker once per day
-2. Click "Check In" on your active habit
-3. Confirm the transaction
+2. Use the Dashboard "Run Daily Check-In" action to submit all eligible habits, or click "Check In" on a single habit
+3. Confirm each wallet prompt
+4. Watch the transaction tracker for pending, confirmed, or failed on-chain status
 
 **Transaction cost:** ~0.10-0.20 STX per check-in
 
