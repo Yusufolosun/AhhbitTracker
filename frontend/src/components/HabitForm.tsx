@@ -19,7 +19,7 @@ function getErrorMessage(error: unknown): string {
 
 export function HabitForm() {
   const [name, setName] = useState('');
-  const [stake, setStake] = useState('0.1');
+  const [stake, setStake] = useState((MIN_STAKE_AMOUNT / 1_000_000).toString());
   const [error, setError] = useState<string | null>(null);
   const [lockedUntil, setLockedUntil] = useState<number | null>(null);
   const lockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -58,7 +58,7 @@ export function HabitForm() {
       await createHabit({ name: trimmedName, stakeAmount });
 
       setName('');
-      setStake('0.1');
+      setStake((MIN_STAKE_AMOUNT / 1_000_000).toString());
 
       // Lock the form after the wallet signs so the user can't accidentally
       // fire a duplicate transaction before the first one confirms on-chain.
