@@ -1,25 +1,56 @@
+import { useEffect } from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
-import { usePreviewState } from '@/app/state';
+import type { MainTabScreenProps } from '@/app/navigation/types';
+import { usePreviewState, useWalletInteractionState } from '@/app/state';
+import { WalletInteractionCard, parseWalletInteractionParams } from '@/features/wallet';
 import { TransactionPreviewPanel } from '@/features/transactions';
 import { Screen, SectionHeader } from '@/shared/components';
 import { palette, radius, spacing, typography } from '@/shared/theme';
 
-export function PreviewScreen() {
-  const { preview, clearPreview } = usePreviewState();
+type PreviewScreenProps = MainTabScreenProps<'Preview'>;
+
+export function PreviewScreen({ route }: PreviewScreenProps) {
+  const { preview, clearPreview, setPreview } = usePreviewState();
+  const { walletInteraction, setWalletInteraction, clearWalletInteraction } =
+    useWalletInteractionState();
+
+  useEffect(() => {
+    const routeWalletInteraction = parseWalletInteractionParams(route.params);
+
+    if (!routeWalletInteraction) {
+      return;
+    }
+
+    setWalletInteraction(routeWalletInteraction);
+
+    if (routeWalletInteraction.preview) {
+      setPreview(routeWalletInteraction.preview);
+    }
+  }, [route.params, setPreview, setWalletInteraction]);
+
+  const handleClear = () => {
+    clearPreview();
+    clearWalletInteraction();
+  };
 
   return (
     <Screen contentContainerStyle={styles.content}>
       <SectionHeader
         title="Transaction preview"
-        subtitle="Review and copy contract call payloads before wallet signing"
+        subtitle="Review, copy, and hand off contract call payloads through wallet deep links"
       />
 
+      <WalletInteractionCard preview={preview} walletInteraction={walletInteraction} />
       <TransactionPreviewPanel preview={preview} />
 
       <Pressable
-        disabled={!preview}
-        onPress={clearPreview}
-        style={({ pressed }) => [styles.clearButton, !preview && styles.disabled, pressed && styles.pressed]}
+        disabled={!preview && !walletInteraction}
+        onPress={handleClear}
+        style={({ pressed }) => [
+          styles.clearButton,
+          !preview && !walletInteraction && styles.disabled,
+          pressed && styles.pressed,
+        ]}
       >
         <Text style={styles.clearButtonText}>Clear current preview</Text>
       </Pressable>

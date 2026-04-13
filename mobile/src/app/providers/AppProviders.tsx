@@ -1,4 +1,4 @@
-import { type PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 import { AppStateProvider } from '@/app/state';
 import { QueryProvider } from './QueryProvider';
 

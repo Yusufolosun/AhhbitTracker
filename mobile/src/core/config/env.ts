@@ -1,5 +1,5 @@
 import Constants from 'expo-constants';
-import type { AppNetworkConfig } from '@/core/types';
+import { AppNetworkConfig } from '@/core/types';
 import { resolveMobileNetworkConfig } from '@/core/config/stacksConfig';
 
 function getExtra(key: 'appStage' | 'contractAddress' | 'contractName' | 'hiroApiBaseUrl' | 'stacksNetwork') {

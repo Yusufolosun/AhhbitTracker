@@ -1,4 +1,4 @@
-import type { AppNetworkConfig, AppStage, StacksNetworkMode } from '../types';
+import { AppNetworkConfig, AppStage, StacksNetworkMode } from '../types';
 
 interface StageDefaults {
   stacksNetwork: StacksNetworkMode;

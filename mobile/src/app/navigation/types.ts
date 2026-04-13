@@ -4,6 +4,7 @@ import type {
 } from '@react-navigation/native';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import type { WalletInteractionRouteParams } from '@/features/wallet';
 
 export const ROOT_ROUTES = {
   MainTabs: 'MainTabs',
@@ -18,10 +19,12 @@ export const MAIN_TAB_ROUTES = {
   Account: 'Account',
 } as const;
 
+export type PreviewRouteParams = WalletInteractionRouteParams;
+
 export type MainTabParamList = {
   Overview: undefined;
   Habits: undefined;
-  Preview: undefined;
+  Preview: PreviewRouteParams | undefined;
   Account: undefined;
 };
 

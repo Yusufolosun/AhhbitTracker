@@ -257,6 +257,7 @@ src/
 - AppStateProvider: Tracks address hydration and transaction preview payloads
 - AsyncStorage persistence: Restores tracked address at startup with address validation
 - React Query boundary: Address transitions prune and invalidate user-scoped cache keys
+- Wallet handoff lifecycle: Session-scoped deep-link metadata for preview payloads and return callbacks
 
 **URL State:** Hash-based routing
 - useHashRoute for page navigation
@@ -288,6 +289,7 @@ User Action (Click) →
 2. **Transaction Preview:** Users see full transaction before signing
 3. **Amount Validation:** Frontend validates stake amounts before building tx
 4. **Read-Only Defaults:** Contract reads don't require wallet connection
+5. **Deep-Link Hygiene:** Wallet preview payloads and return callbacks remain session-scoped inside the app shell
 
 ## Scalability Considerations
 

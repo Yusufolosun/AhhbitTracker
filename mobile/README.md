@@ -21,6 +21,7 @@ mobile/src/
 │   ├── address/                  # Address state + address UI
 │   ├── habits/                   # Habits query hooks and habit UI
 │   ├── pool/                     # Pool balance UI
+│   ├── wallet/                   # Wallet deep-link helpers and handoff UI
 │   └── transactions/             # Transaction preview builders + UI
 └── shared/
     ├── components/               # Reusable UI primitives/states
@@ -34,6 +35,7 @@ mobile/src/
 - Stable core contracts/network/config in `core/*`
 - Shared reusable primitives only in `shared/*`
 - Screen files orchestrate, feature files implement
+- Wallet handoffs are modeled as session-scoped deep links, not persisted account state
 - Legacy paths in `src/components`, `src/services`, etc. are maintained as re-export shims for compatibility
 
 ## Global State Management
@@ -42,6 +44,7 @@ mobile/src/
 - State is split by concern:
     - Address lifecycle: tracked address + hydration status (persisted in AsyncStorage)
     - Transaction preview lifecycle: in-memory preview payload shared across tabs/screens
+- Wallet deep-link state: Session-scoped preview payloads and return callbacks stay in memory only
 - Query state remains in React Query; app state changes trigger cache pruning/invalidation for user-scoped keys
 - Feature-level context exports remain as compatibility adapters and now delegate to app state hooks
 
@@ -56,6 +59,10 @@ mobile/src/
     - `ahhbittracker://habits/create`
     - `ahhbittracker://preview`
     - `ahhbittracker://account`
+- Wallet deep-link payloads:
+    - `ahhbittracker://preview?payload=...` for a serialized contract call preview
+    - `ahhbittracker://preview?result=...` for a wallet return callback with `txId` and `status`
+- The preview tab is the canonical wallet handoff surface for copying signing links and reviewing callback summaries
 - Address-dependent routes are protected with a reusable guard component
 - Transaction previews are shared between screens through a dedicated context provider
 

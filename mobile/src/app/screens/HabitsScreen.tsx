@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { MAIN_TAB_ROUTES, ROOT_ROUTES, type MainTabScreenProps } from '@/app/navigation/types';
+import type { MainTabScreenProps } from '@/app/navigation/types';
+import { MAIN_TAB_ROUTES, ROOT_ROUTES } from '@/app/navigation/types';
 import { RequireAddress } from '@/app/navigation/RequireAddress';
 import { useAddressState, usePreviewState } from '@/app/state';
 import {
