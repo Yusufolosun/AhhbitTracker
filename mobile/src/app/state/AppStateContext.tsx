@@ -6,8 +6,8 @@ import {
   useMemo,
   useReducer,
   useRef,
-  type PropsWithChildren,
 } from 'react';
+import type { PropsWithChildren } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/core/config';
 import { validateStacksAddress } from '@/shared/utils';
