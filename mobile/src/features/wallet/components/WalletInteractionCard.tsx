@@ -1,5 +1,5 @@
 import * as Clipboard from 'expo-clipboard';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { buildWalletPreviewLink, buildWalletReturnLink } from '../linking';
 import type { WalletInteractionState } from '../types';
@@ -19,11 +19,25 @@ function CopyButton({
   value: string;
 }) {
   const [copied, setCopied] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleCopy = async () => {
     await Clipboard.setStringAsync(value);
     setCopied(true);
-    setTimeout(() => {
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
       setCopied(false);
     }, 1200);
   };

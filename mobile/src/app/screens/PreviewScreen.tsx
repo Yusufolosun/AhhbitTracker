@@ -44,9 +44,13 @@ export function PreviewScreen({ route }: PreviewScreenProps) {
       <TransactionPreviewPanel preview={preview} />
 
       <Pressable
-        disabled={!preview}
+        disabled={!preview && !walletInteraction}
         onPress={handleClear}
-        style={({ pressed }) => [styles.clearButton, !preview && styles.disabled, pressed && styles.pressed]}
+        style={({ pressed }) => [
+          styles.clearButton,
+          !preview && !walletInteraction && styles.disabled,
+          pressed && styles.pressed,
+        ]}
       >
         <Text style={styles.clearButtonText}>Clear current preview</Text>
       </Pressable>
