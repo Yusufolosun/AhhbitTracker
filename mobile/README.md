@@ -65,6 +65,7 @@ mobile/src/
 - The preview tab is the canonical wallet handoff surface for copying signing links and reviewing callback summaries
 - Address-dependent routes are protected with a reusable guard component
 - Transaction previews are shared between screens through a dedicated context provider
+- The create-habit preview flow enforces the contract's 0.02-100 STX stake range and 50-character name limit before building the wallet handoff payload
 
 ## Local Development
 
