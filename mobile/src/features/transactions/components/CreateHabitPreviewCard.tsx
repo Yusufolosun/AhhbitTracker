@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Card } from '@/shared/components';
 import { palette, radius, spacing, typography } from '@/shared/theme';
+import { MAX_HABIT_NAME_LENGTH, MAX_STAKE_AMOUNT, MIN_STAKE_AMOUNT } from '@/core/config';
 import { validateHabitName, validateHabitStake } from '@/shared/utils';
 
 interface CreateHabitPreviewCardProps {
@@ -59,6 +60,7 @@ export function CreateHabitPreviewCard({ onPreview }: CreateHabitPreviewCardProp
         placeholderTextColor={palette.steel}
         style={styles.input}
         value={habitName}
+        maxLength={MAX_HABIT_NAME_LENGTH}
       />
       <TextInput
         keyboardType="decimal-pad"
@@ -68,6 +70,9 @@ export function CreateHabitPreviewCard({ onPreview }: CreateHabitPreviewCardProp
         style={styles.input}
         value={stake}
       />
+      <Text style={styles.hint}>
+        Min {MIN_STAKE_AMOUNT / 1_000_000} STX · Max {MAX_STAKE_AMOUNT / 1_000_000} STX · Up to {MAX_HABIT_NAME_LENGTH} characters
+      </Text>
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <Pressable
         accessibilityRole="button"
@@ -109,6 +114,11 @@ const styles = StyleSheet.create({
   },
   error: {
     color: palette.danger,
+    marginBottom: spacing.sm,
+  },
+  hint: {
+    color: palette.steel,
+    fontSize: typography.caption,
     marginBottom: spacing.sm,
   },
   previewButton: {
