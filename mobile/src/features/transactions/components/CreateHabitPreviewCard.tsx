@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Pressable,
   StyleSheet,
@@ -29,6 +29,12 @@ export function CreateHabitPreviewCard({ onPreview }: CreateHabitPreviewCardProp
   const [error, setError] = useState<string | null>(null);
 
   const isDisabled = useMemo(() => !habitName.trim() || !stake.trim(), [habitName, stake]);
+
+  useEffect(() => {
+    if (error) {
+      setError(null);
+    }
+  }, [habitName, stake]);
 
   const handlePreview = () => {
     const normalizedName = habitName.trim();
