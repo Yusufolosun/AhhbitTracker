@@ -1,12 +1,12 @@
 import { validateName, validatePrincipal, validateStake } from '@yusufolosun/stx-utils';
-import { MIN_STAKE_AMOUNT } from '@/core/config';
+import { MAX_HABIT_NAME_LENGTH, MIN_STAKE_AMOUNT } from '@/core/config';
 
 export function validateStacksAddress(value: string): string | null {
   return validatePrincipal(value.trim());
 }
 
 export function validateHabitName(value: string): string | null {
-  return validateName(value.trim());
+  return validateName(value.trim(), MAX_HABIT_NAME_LENGTH);
 }
 
 export function validateHabitStake(stxAmount: number): string | null {
