@@ -174,6 +174,13 @@ describe('contractService', () => {
   });
 
   describe('wallet guard', () => {
+    it('createHabit throws when wallet is not connected', async () => {
+      vi.spyOn(walletService, 'getAddress').mockReturnValueOnce(null);
+      await expect(contractService.createHabit('Running', 500_000)).rejects.toThrow(
+        'Wallet not connected',
+      );
+    });
+
     it('withdrawStake throws when wallet is not connected', async () => {
       vi.spyOn(walletService, 'getAddress').mockReturnValueOnce(null);
       await expect(contractService.withdrawStake(1, 1_000_000)).rejects.toThrow('Wallet not connected');
