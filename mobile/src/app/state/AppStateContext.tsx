@@ -11,6 +11,7 @@ import {
 import { useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/core/config';
 import { validateStacksAddress } from '@/shared/utils';
+import type { WalletInteractionState } from '@/features/wallet/types';
 import { appStateActions } from './actions';
 import { appStateReducer, createInitialAppState } from './reducer';
 import { clearPersistedAppState, loadPersistedAppState, saveTrackedAddress } from './storage';
@@ -23,6 +24,8 @@ interface AppStateContextValue {
   clearTrackedAddress: () => Promise<void>;
   setPreview: (nextPreview: ContractCallPreview) => void;
   clearPreview: () => void;
+  setWalletInteraction: (walletInteraction: WalletInteractionState) => void;
+  clearWalletInteraction: () => void;
 }
 
 const AppStateContext = createContext<AppStateContextValue | undefined>(undefined);
@@ -115,6 +118,14 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     dispatch(appStateActions.clearPreview());
   }, []);
 
+  const setWalletInteraction = useCallback((walletInteraction: WalletInteractionState) => {
+    dispatch(appStateActions.setWalletInteraction(walletInteraction));
+  }, []);
+
+  const clearWalletInteraction = useCallback(() => {
+    dispatch(appStateActions.clearWalletInteraction());
+  }, []);
+
   const value = useMemo<AppStateContextValue>(
     () => ({
       state,
@@ -122,8 +133,18 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       clearTrackedAddress,
       setPreview,
       clearPreview,
+      setWalletInteraction,
+      clearWalletInteraction,
     }),
-    [state, setTrackedAddress, clearTrackedAddress, setPreview, clearPreview],
+    [
+      state,
+      setTrackedAddress,
+      clearTrackedAddress,
+      setPreview,
+      clearPreview,
+      setWalletInteraction,
+      clearWalletInteraction,
+    ],
   );
 
   return <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>;
