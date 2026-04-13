@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { POLLING_INTERVAL_MS, QUERY_KEYS } from '@/core/config';
+import { POLLING_INTERVAL_MS, QUERY_KEYS, networkConfig } from '@/core/config';
 import {
   fetchHabitsByAddress,
   fetchPoolBalance,
@@ -42,6 +42,24 @@ export function useUserStatsQuery(address: string | null) {
       return fetchUserStats(address);
     },
     enabled: Boolean(address),
+    staleTime: POLLING_INTERVAL_MS,
+    refetchInterval: POLLING_INTERVAL_MS,
+  });
+}
+
+export function useCurrentBlockQuery() {
+  return useQuery({
+    queryKey: ['current-block-height'],
+    queryFn: async () => {
+      const response = await fetch(`${networkConfig.hiroApiBaseUrl}/v2/info`);
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch current block (${response.status})`);
+      }
+
+      const payload = await response.json();
+      return Number(payload.stacks_tip_height ?? 0);
+    },
     staleTime: POLLING_INTERVAL_MS,
     refetchInterval: POLLING_INTERVAL_MS,
   });
