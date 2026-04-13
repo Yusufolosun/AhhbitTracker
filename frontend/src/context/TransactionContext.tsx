@@ -6,6 +6,9 @@ export interface TrackedTransaction {
   functionName: string;
   status: 'pending' | 'confirmed' | 'failed';
   timestamp: number;
+  updatedAt: number;
+  errorCode?: number;
+  errorMessage?: string;
 }
 
 interface TransactionContextType {
@@ -86,6 +89,7 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
         functionName,
         status: 'pending' as const,
         timestamp: Date.now(),
+        updatedAt: Date.now(),
       },
       ...prev,
     ].slice(0, TX_MAX_ENTRIES));
