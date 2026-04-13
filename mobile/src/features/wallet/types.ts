@@ -1,4 +1,4 @@
-import type { ContractCallPreview } from '@/core/types';
+import { ContractCallPreview } from '@/core/types';
 
 export type WalletReturnStatus = 'success' | 'cancelled' | 'expired';
 

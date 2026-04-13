@@ -1,7 +1,7 @@
 import * as Linking from 'expo-linking';
 import { APP_LINK_SCHEME } from '@/core/config';
-import type { ContractCallPreview } from '@/core/types';
-import type {
+import { ContractCallPreview } from '@/core/types';
+import {
   WalletInteractionState,
   WalletInteractionRouteParams,
   WalletPreviewLinkPayload,
