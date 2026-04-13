@@ -65,3 +65,26 @@ export function getBlocksUntilNextCheckIn(habit: Habit, currentBlock: number): n
 export function isEligibleToWithdraw(habit: Habit): boolean {
   return habit.isActive && habit.currentStreak >= MIN_STREAK_FOR_WITHDRAWAL;
 }
+
+/**
+ * Whether a habit is currently eligible for a daily check-in transaction.
+ */
+export function isEligibleForDailyCheckIn(
+  habit: Habit,
+  currentBlock: number | null,
+): boolean {
+  const state = getCheckInWindowState(habit, currentBlock);
+  return state === 'available' || state === 'urgent';
+}
+
+/**
+ * Return habit IDs that can be checked in right now.
+ */
+export function getEligibleDailyCheckInHabitIds(
+  habits: Habit[],
+  currentBlock: number | null,
+): number[] {
+  return habits
+    .filter((habit) => isEligibleForDailyCheckIn(habit, currentBlock))
+    .map((habit) => habit.habitId);
+}
