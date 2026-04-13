@@ -12,6 +12,7 @@ import {
   getCheckInWindowState,
   getBlocksRemaining,
   getBlocksUntilNextCheckIn,
+  isEligibleForDailyCheckIn,
   isEligibleToWithdraw,
 } from '../utils/habitStatus';
 
@@ -97,7 +98,7 @@ export function HabitCard({ habit }: HabitCardProps) {
   const blocksRemaining = currentBlock !== null ? getBlocksRemaining(habit, currentBlock) : null;
   const blocksUntilNextCheckIn =
     currentBlock !== null ? getBlocksUntilNextCheckIn(habit, currentBlock) : null;
-  const canSubmitCheckIn = windowState === 'available' || windowState === 'urgent';
+  const canSubmitCheckIn = isEligibleForDailyCheckIn(habit, currentBlock);
   const estimatedBonus = Math.min(Math.floor(poolBalance / 100), 1_000_000);
 
   const getBadge = () => {
