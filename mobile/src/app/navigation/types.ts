@@ -18,10 +18,15 @@ export const MAIN_TAB_ROUTES = {
   Account: 'Account',
 } as const;
 
+export interface PreviewRouteParams {
+  payload?: string;
+  result?: string;
+}
+
 export type MainTabParamList = {
   Overview: undefined;
   Habits: undefined;
-  Preview: undefined;
+  Preview: PreviewRouteParams | undefined;
   Account: undefined;
 };
 
