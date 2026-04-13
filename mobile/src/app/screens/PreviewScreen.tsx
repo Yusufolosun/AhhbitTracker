@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
-import { type MainTabScreenProps } from '@/app/navigation/types';
+import type { MainTabScreenProps } from '@/app/navigation/types';
 import { usePreviewState, useWalletInteractionState } from '@/app/state';
 import { WalletInteractionCard, parseWalletInteractionParams } from '@/features/wallet';
 import { TransactionPreviewPanel } from '@/features/transactions';

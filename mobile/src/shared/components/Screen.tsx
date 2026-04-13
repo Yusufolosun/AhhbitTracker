@@ -1,4 +1,4 @@
-import { type PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, type ViewStyle } from 'react-native';
 import { palette, spacing } from '@/shared/theme';
 
