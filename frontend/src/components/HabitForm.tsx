@@ -116,7 +116,7 @@ export function HabitForm() {
             id="stake"
             type="number"
             className="input"
-            placeholder="0.1"
+            placeholder={(MIN_STAKE_AMOUNT / 1_000_000).toString()}
             value={stake}
             onChange={(e) => setStake(e.target.value)}
             min={(MIN_STAKE_AMOUNT / 1_000_000).toString()}
