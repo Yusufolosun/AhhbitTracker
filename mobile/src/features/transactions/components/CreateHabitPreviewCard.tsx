@@ -31,9 +31,7 @@ export function CreateHabitPreviewCard({ onPreview }: CreateHabitPreviewCardProp
   const isDisabled = useMemo(() => !habitName.trim() || !stake.trim(), [habitName, stake]);
 
   useEffect(() => {
-    if (error) {
-      setError(null);
-    }
+    setError(null);
   }, [habitName, stake]);
 
   const handlePreview = () => {
