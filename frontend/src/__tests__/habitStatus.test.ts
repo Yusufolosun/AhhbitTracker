@@ -3,6 +3,8 @@ import {
   getCheckInWindowState,
   getBlocksRemaining,
   getBlocksUntilNextCheckIn,
+  getEligibleDailyCheckInHabitIds,
+  isEligibleForDailyCheckIn,
   isEligibleToWithdraw,
 } from '../utils/habitStatus';
 import { Habit } from '../types/habit';
@@ -112,5 +114,31 @@ describe('isEligibleToWithdraw', () => {
 
   it('returns false when not active even with high streak', () => {
     expect(isEligibleToWithdraw(makeHabit({ isActive: false, currentStreak: 10 }))).toBe(false);
+  });
+});
+
+describe('isEligibleForDailyCheckIn', () => {
+  it('returns true for available and urgent windows', () => {
+    expect(isEligibleForDailyCheckIn(makeHabit({ lastCheckInBlock: 1000 }), 1120)).toBe(true);
+    expect(isEligibleForDailyCheckIn(makeHabit({ lastCheckInBlock: 1000 }), 1138)).toBe(true);
+  });
+
+  it('returns false for cooldown, expired, and unknown', () => {
+    expect(isEligibleForDailyCheckIn(makeHabit({ lastCheckInBlock: 1000 }), 1100)).toBe(false);
+    expect(isEligibleForDailyCheckIn(makeHabit({ lastCheckInBlock: 1000 }), 1145)).toBe(false);
+    expect(isEligibleForDailyCheckIn(makeHabit(), null)).toBe(false);
+  });
+});
+
+describe('getEligibleDailyCheckInHabitIds', () => {
+  it('returns only habit IDs that are currently check-in eligible', () => {
+    const habits = [
+      makeHabit({ habitId: 1, lastCheckInBlock: 1000 }), // available at 1120
+      makeHabit({ habitId: 2, lastCheckInBlock: 1008 }), // cooldown at 1120
+      makeHabit({ habitId: 3, lastCheckInBlock: 988 }),  // urgent at 1120
+      makeHabit({ habitId: 4, lastCheckInBlock: 970 }),  // expired at 1120
+    ];
+
+    expect(getEligibleDailyCheckInHabitIds(habits, 1120)).toEqual([1, 3]);
   });
 });
