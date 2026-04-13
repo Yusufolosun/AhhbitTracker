@@ -7,13 +7,10 @@ import {
   CreateHabitPreviewCard,
 } from '@/features/transactions';
 import { Screen, SectionHeader } from '@/shared/components';
+import { toMicroSTX } from '@/shared/utils';
 import { palette, radius, spacing, typography } from '@/shared/theme';
 
 type CreateHabitScreenProps = RootStackScreenProps<'CreateHabit'>;
-
-function stxToMicroStx(stxAmount: number): number {
-  return Math.round(stxAmount * 1_000_000);
-}
 
 export function CreateHabitScreen({ navigation }: CreateHabitScreenProps) {
   const { activeAddress } = useAddressState();
@@ -24,9 +21,7 @@ export function CreateHabitScreen({ navigation }: CreateHabitScreenProps) {
       return;
     }
 
-    setPreview(
-      buildCreateHabitPreview(activeAddress, name, stxToMicroStx(stakeAmountStx)),
-    );
+    setPreview(buildCreateHabitPreview(activeAddress, name, toMicroSTX(stakeAmountStx)));
 
     navigation.navigate('MainTabs', { screen: MAIN_TAB_ROUTES.Preview });
   };
