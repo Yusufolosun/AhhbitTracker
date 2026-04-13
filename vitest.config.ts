@@ -1,4 +1,5 @@
 import { defineConfig } from "vitest/config";
+import { fileURLToPath, URL } from 'node:url';
 import {
   vitestSetupFilePath,
   getClarinetVitestsArgv,
@@ -23,6 +24,11 @@ import {
  *   - vitest run -- --coverage --costs          # collect reports
  */
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./mobile/src', import.meta.url)),
+    },
+  },
   test: {
     environment: "clarinet",
     pool: "forks",
