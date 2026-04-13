@@ -111,6 +111,15 @@ describe('contractService', () => {
   describe('createHabit', () => {
     it('resolves with the transaction ID on approval', async () => {
       const promise = contractService.createHabit('Running', 500_000);
+      expect(mocks.buildCreateHabit).toHaveBeenCalledWith(
+        'Running',
+        500_000,
+        'SP2ABC123',
+        {
+          contractAddress: 'SP000000000000000000002Q6VF78',
+          contractName: 'ahhbit-tracker',
+        },
+      );
       requireCapturedOptions().onFinish({ txId: 'tx-create' });
       await expect(promise).resolves.toBe('tx-create');
     });
