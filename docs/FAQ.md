@@ -54,6 +54,10 @@ Purchase STX from:
 
 Yes, up to 100 STX per habit (100,000,000 microSTX). Higher stakes = stronger commitment.
 
+### How long can my habit name be?
+
+Habit names can be up to 50 UTF-8 characters.
+
 ### How often must I check in?
 
 Once every 24 hours (144 blocks on Stacks).
