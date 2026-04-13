@@ -2,6 +2,7 @@ import { DEFAULT_MIN_STAKE } from '@yusufolosun/stx-utils';
 
 export const APP_LINK_SCHEME = 'ahhbittracker';
 export const MIN_STAKE_AMOUNT = DEFAULT_MIN_STAKE;
+export const MAX_STAKE_AMOUNT = 100_000_000;
 export const MAX_HABIT_NAME_LENGTH = 50;
 export const CHECK_IN_WINDOW_BLOCKS = 144;
 export const MIN_STREAK_FOR_WITHDRAWAL = 7;

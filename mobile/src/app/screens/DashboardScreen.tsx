@@ -19,11 +19,9 @@ import {
   TransactionPreviewPanel,
 } from '@/features/transactions';
 import { EmptyState, LoadingState, Screen, SectionHeader } from '@/shared/components';
+import { toMicroSTX } from '@/shared/utils';
 import { palette, spacing, typography } from '@/shared/theme';
 
-function stxToMicroStx(stxAmount: number): number {
-  return Math.round(stxAmount * 1_000_000);
-}
 
 export function DashboardScreen() {
   const { activeAddress, isHydrating, setAddress, clearAddress } = useAddressState();
@@ -38,7 +36,7 @@ export function DashboardScreen() {
       return;
     }
 
-    const stakeAmountMicroStx = stxToMicroStx(stakeAmountStx);
+    const stakeAmountMicroStx = toMicroSTX(stakeAmountStx);
     setPreview(buildCreateHabitPreview(activeAddress, name, stakeAmountMicroStx));
   };
 

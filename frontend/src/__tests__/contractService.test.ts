@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+const mocks = vi.hoisted(() => ({
+  buildCreateHabit: vi.fn(),
+}));
+
 // Capture the options passed to showContractCall so we can invoke callbacks
 interface MockContractCallOptions {
   onFinish: (data: { txId: string }) => void;
@@ -35,14 +39,7 @@ vi.mock('@stacks/transactions', () => ({
 }));
 
 vi.mock('@yusufolosun/ahhbit-tracker-sdk', () => ({
-  buildCreateHabit: () => ({
-    contractAddress: 'SP000000000000000000002Q6VF78',
-    contractName: 'ahhbit-tracker',
-    functionName: 'create-habit',
-    functionArgs: [],
-    postConditions: [],
-    postConditionMode: 2,
-  }),
+  buildCreateHabit: mocks.buildCreateHabit,
   buildCheckIn: () => ({
     contractAddress: 'SP000000000000000000002Q6VF78',
     contractName: 'ahhbit-tracker',
@@ -101,11 +98,28 @@ import { walletService } from '../services/walletService';
 describe('contractService', () => {
   beforeEach(() => {
     capturedOptions = null;
+    mocks.buildCreateHabit.mockReturnValue({
+      contractAddress: 'SP000000000000000000002Q6VF78',
+      contractName: 'ahhbit-tracker',
+      functionName: 'create-habit',
+      functionArgs: [],
+      postConditions: [],
+      postConditionMode: 2,
+    });
   });
 
   describe('createHabit', () => {
     it('resolves with the transaction ID on approval', async () => {
       const promise = contractService.createHabit('Running', 500_000);
+      expect(mocks.buildCreateHabit).toHaveBeenCalledWith(
+        'Running',
+        500_000,
+        'SP2ABC123',
+        {
+          contractAddress: 'SP000000000000000000002Q6VF78',
+          contractName: 'ahhbit-tracker',
+        },
+      );
       requireCapturedOptions().onFinish({ txId: 'tx-create' });
       await expect(promise).resolves.toBe('tx-create');
     });
@@ -160,6 +174,13 @@ describe('contractService', () => {
   });
 
   describe('wallet guard', () => {
+    it('createHabit throws when wallet is not connected', async () => {
+      vi.spyOn(walletService, 'getAddress').mockReturnValueOnce(null);
+      await expect(contractService.createHabit('Running', 500_000)).rejects.toThrow(
+        'Wallet not connected',
+      );
+    });
+
     it('withdrawStake throws when wallet is not connected', async () => {
       vi.spyOn(walletService, 'getAddress').mockReturnValueOnce(null);
       await expect(contractService.withdrawStake(1, 1_000_000)).rejects.toThrow('Wallet not connected');

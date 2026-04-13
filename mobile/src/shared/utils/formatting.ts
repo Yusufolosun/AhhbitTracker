@@ -1,4 +1,4 @@
-import { formatSTX, shortenAddress } from '@yusufolosun/stx-utils';
+import { formatSTX, shortenAddress, toMicroSTX } from '@yusufolosun/stx-utils';
 
 export function formatMicroStx(microStx: number): string {
   return `${formatSTX(microStx)} STX`;
@@ -11,3 +11,5 @@ export function formatStreakDays(value: number): string {
 export function formatAddress(value: string): string {
   return shortenAddress(value);
 }
+
+export { toMicroSTX };

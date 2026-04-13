@@ -3,6 +3,7 @@ import { useHabits } from '../hooks/useHabits';
 import { useToast } from '../context/ToastContext';
 import { validateHabitName, validateStakeAmount } from '../utils/validation';
 import { toMicroSTX } from '../utils/formatting';
+import { MAX_HABIT_NAME_LENGTH, MAX_STAKE_AMOUNT, MIN_STAKE_AMOUNT } from '../utils/constants';
 
 /** How long (ms) the form stays locked after the wallet signs a transaction.
  *  Long enough to outlive typical mempool propagation; short enough that a
@@ -17,8 +18,10 @@ function getErrorMessage(error: unknown): string {
 }
 
 export function HabitForm() {
+  const minStakeStx = MIN_STAKE_AMOUNT / 1_000_000;
+  const maxStakeStx = MAX_STAKE_AMOUNT / 1_000_000;
   const [name, setName] = useState('');
-  const [stake, setStake] = useState('0.1');
+  const [stake, setStake] = useState(minStakeStx.toString());
   const [error, setError] = useState<string | null>(null);
   const [lockedUntil, setLockedUntil] = useState<number | null>(null);
   const lockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -57,7 +60,7 @@ export function HabitForm() {
       await createHabit({ name: trimmedName, stakeAmount });
 
       setName('');
-      setStake('0.1');
+      setStake(minStakeStx.toString());
 
       // Lock the form after the wallet signs so the user can't accidentally
       // fire a duplicate transaction before the first one confirms on-chain.
@@ -97,13 +100,13 @@ export function HabitForm() {
             placeholder="e.g., Daily Exercise"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            maxLength={50}
+            maxLength={MAX_HABIT_NAME_LENGTH}
             required
             disabled={isDisabled}
             aria-describedby={error ? 'form-error' : undefined}
           />
           <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-            {name.length}/50 characters
+            {name.length}/{MAX_HABIT_NAME_LENGTH} characters
           </p>
         </div>
 
@@ -115,18 +118,18 @@ export function HabitForm() {
             id="stake"
             type="number"
             className="input"
-            placeholder="0.1"
+            placeholder={minStakeStx.toString()}
             value={stake}
             onChange={(e) => setStake(e.target.value)}
-            min="0.02"
-            max="100"
+            min={minStakeStx.toString()}
+            max={maxStakeStx.toString()}
             step="0.01"
             required
             disabled={isDisabled}
             aria-describedby="stake-hint"
           />
           <p id="stake-hint" className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-            Min 0.02 STX &middot; Max 100 STX
+            Min {minStakeStx.toFixed(2)} STX &middot; Max {maxStakeStx.toFixed(0)} STX
           </p>
         </div>
 

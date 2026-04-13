@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Pressable,
   StyleSheet,
@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Card } from '@/shared/components';
 import { palette, radius, spacing, typography } from '@/shared/theme';
+import { MAX_HABIT_NAME_LENGTH, MAX_STAKE_AMOUNT, MIN_STAKE_AMOUNT } from '@/core/config';
 import { validateHabitName, validateHabitStake } from '@/shared/utils';
 
 interface CreateHabitPreviewCardProps {
@@ -23,11 +24,17 @@ function normalizeStake(value: string): number {
 }
 
 export function CreateHabitPreviewCard({ onPreview }: CreateHabitPreviewCardProps) {
+  const minStakeStx = MIN_STAKE_AMOUNT / 1_000_000;
+  const maxStakeStx = MAX_STAKE_AMOUNT / 1_000_000;
   const [habitName, setHabitName] = useState('');
   const [stake, setStake] = useState('0.02');
   const [error, setError] = useState<string | null>(null);
 
   const isDisabled = useMemo(() => !habitName.trim() || !stake.trim(), [habitName, stake]);
+
+  useEffect(() => {
+    setError(null);
+  }, [habitName, stake]);
 
   const handlePreview = () => {
     const normalizedName = habitName.trim();
@@ -59,6 +66,7 @@ export function CreateHabitPreviewCard({ onPreview }: CreateHabitPreviewCardProp
         placeholderTextColor={palette.steel}
         style={styles.input}
         value={habitName}
+        maxLength={MAX_HABIT_NAME_LENGTH}
       />
       <TextInput
         keyboardType="decimal-pad"
@@ -68,6 +76,9 @@ export function CreateHabitPreviewCard({ onPreview }: CreateHabitPreviewCardProp
         style={styles.input}
         value={stake}
       />
+      <Text style={styles.hint}>
+        Min {minStakeStx} STX · Max {maxStakeStx} STX · Up to {MAX_HABIT_NAME_LENGTH} characters
+      </Text>
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <Pressable
         accessibilityRole="button"
@@ -109,6 +120,11 @@ const styles = StyleSheet.create({
   },
   error: {
     color: palette.danger,
+    marginBottom: spacing.sm,
+  },
+  hint: {
+    color: palette.steel,
+    fontSize: typography.label,
     marginBottom: spacing.sm,
   },
   previewButton: {
