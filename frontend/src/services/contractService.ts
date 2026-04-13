@@ -102,6 +102,11 @@ export const contractService = {
    * @throws Error if transaction cancelled
    */
   async checkIn(habitId: number): Promise<string> {
+    const userAddress = walletService.getAddress();
+    if (!userAddress) {
+      throw new Error('Wallet not connected');
+    }
+
     const txPayload = buildCheckIn(habitId, {
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
@@ -201,6 +206,11 @@ export const contractService = {
    * @throws Error if transaction cancelled
    */
   async slashHabit(habitId: number): Promise<string> {
+    const userAddress = walletService.getAddress();
+    if (!userAddress) {
+      throw new Error('Wallet not connected');
+    }
+
     const txPayload = buildSlashHabit(habitId, {
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
