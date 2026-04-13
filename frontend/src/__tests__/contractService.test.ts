@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+const mocks = vi.hoisted(() => ({
+  buildCreateHabit: vi.fn(),
+}));
+
 // Capture the options passed to showContractCall so we can invoke callbacks
 interface MockContractCallOptions {
   onFinish: (data: { txId: string }) => void;
@@ -35,14 +39,7 @@ vi.mock('@stacks/transactions', () => ({
 }));
 
 vi.mock('@yusufolosun/ahhbit-tracker-sdk', () => ({
-  buildCreateHabit: () => ({
-    contractAddress: 'SP000000000000000000002Q6VF78',
-    contractName: 'ahhbit-tracker',
-    functionName: 'create-habit',
-    functionArgs: [],
-    postConditions: [],
-    postConditionMode: 2,
-  }),
+  buildCreateHabit: mocks.buildCreateHabit,
   buildCheckIn: () => ({
     contractAddress: 'SP000000000000000000002Q6VF78',
     contractName: 'ahhbit-tracker',
@@ -101,6 +98,14 @@ import { walletService } from '../services/walletService';
 describe('contractService', () => {
   beforeEach(() => {
     capturedOptions = null;
+    mocks.buildCreateHabit.mockReturnValue({
+      contractAddress: 'SP000000000000000000002Q6VF78',
+      contractName: 'ahhbit-tracker',
+      functionName: 'create-habit',
+      functionArgs: [],
+      postConditions: [],
+      postConditionMode: 2,
+    });
   });
 
   describe('createHabit', () => {
