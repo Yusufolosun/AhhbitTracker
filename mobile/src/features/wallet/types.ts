@@ -13,6 +13,11 @@ export interface WalletReturnLinkPayload {
   status: WalletReturnStatus;
 }
 
+export interface WalletInteractionRouteParams {
+  payload?: string;
+  result?: string;
+}
+
 export interface WalletInteractionState {
   preview: ContractCallPreview | null;
   previewLink: string | null;
