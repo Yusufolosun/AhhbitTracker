@@ -1,4 +1,5 @@
 import type { ContractCallPreview } from '@/core/types';
+import type { WalletInteractionState } from '@/features/wallet/types';
 
 export type AppStateAction =
   | { type: 'hydrate:start' }
@@ -6,7 +7,9 @@ export type AppStateAction =
   | { type: 'address:set'; payload: { trackedAddress: string } }
   | { type: 'address:clear' }
   | { type: 'preview:set'; payload: { preview: ContractCallPreview } }
-  | { type: 'preview:clear' };
+  | { type: 'preview:clear' }
+  | { type: 'wallet-interaction:set'; payload: { walletInteraction: WalletInteractionState } }
+  | { type: 'wallet-interaction:clear' };
 
 export const appStateActions = {
   hydrateStart: (): AppStateAction => ({ type: 'hydrate:start' }),
@@ -24,4 +27,9 @@ export const appStateActions = {
     payload: { preview },
   }),
   clearPreview: (): AppStateAction => ({ type: 'preview:clear' }),
+  setWalletInteraction: (walletInteraction: WalletInteractionState): AppStateAction => ({
+    type: 'wallet-interaction:set',
+    payload: { walletInteraction },
+  }),
+  clearWalletInteraction: (): AppStateAction => ({ type: 'wallet-interaction:clear' }),
 };
