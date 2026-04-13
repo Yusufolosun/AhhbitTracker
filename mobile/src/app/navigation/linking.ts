@@ -10,7 +10,13 @@ export const linkingConfig: LinkingOptions<RootStackParamList> = {
         screens: {
           Overview: 'overview',
           Habits: 'habits',
-          Preview: 'preview',
+          Preview: {
+            path: 'preview',
+            parse: {
+              payload: String,
+              result: String,
+            },
+          },
           Account: 'account',
         },
       },
