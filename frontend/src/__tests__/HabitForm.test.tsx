@@ -52,4 +52,20 @@ describe('HabitForm', () => {
       'success',
     );
   });
+
+  it('rejects a stake above the contract maximum', async () => {
+    render(<HabitForm />);
+
+    fireEvent.change(screen.getByLabelText('Habit Name'), {
+      target: { value: 'Daily Exercise' },
+    });
+    fireEvent.change(screen.getByLabelText('Stake Amount (STX)'), {
+      target: { value: '101' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Create Habit' }));
+
+    expect(await screen.findByText('Maximum stake is 100 STX')).toBeDefined();
+    expect(createHabit).not.toHaveBeenCalled();
+    expect(showToast).not.toHaveBeenCalled();
+  });
 });
