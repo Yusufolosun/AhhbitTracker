@@ -9,14 +9,21 @@ import type { DailyCheckInResult } from '../hooks/useHabits';
 
 interface DashboardProps {
   habits: Habit[];
-  isRunningDailyCheckIn: boolean;
-  runDailyCheckIn: (habitIds: number[]) => Promise<DailyCheckInResult>;
+  isRunningDailyCheckIn?: boolean;
+  runDailyCheckIn?: (habitIds: number[]) => Promise<DailyCheckInResult>;
+  notify?: (message: string, level: 'success' | 'error' | 'info') => void;
 }
 
 export function Dashboard({
   habits,
-  isRunningDailyCheckIn,
-  runDailyCheckIn,
+  isRunningDailyCheckIn = false,
+  runDailyCheckIn = async () => ({
+    attempted: 0,
+    submitted: 0,
+    failed: 0,
+    entries: [],
+  }),
+  notify,
 }: DashboardProps) {
   const currentBlock = useCurrentBlock();
 
@@ -64,6 +71,7 @@ export function Dashboard({
         currentBlock={currentBlock}
         isRunningDailyCheckIn={isRunningDailyCheckIn}
         runDailyCheckIn={runDailyCheckIn}
+        notify={notify}
       />
 
       {/* Empty state — first-time user onboarding */}
