@@ -65,6 +65,8 @@ export function WalletInteractionCard({ preview, walletInteraction }: WalletInte
     return null;
   }, [preview, walletInteraction?.previewLink]);
 
+  const functionName = walletInteraction?.functionName ?? preview?.functionName ?? undefined;
+
   const returnLink = useMemo(() => {
     if (!walletInteraction?.txId || !walletInteraction.status) {
       return null;
@@ -74,8 +76,8 @@ export function WalletInteractionCard({ preview, walletInteraction }: WalletInte
       return walletInteraction.returnLink;
     }
 
-    return buildWalletReturnLink(walletInteraction.txId, walletInteraction.status);
-  }, [walletInteraction]);
+    return buildWalletReturnLink(walletInteraction.txId, walletInteraction.status, functionName);
+  }, [functionName, walletInteraction]);
 
   if (!previewLink && !returnLink) {
     return null;

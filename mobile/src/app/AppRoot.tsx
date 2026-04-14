@@ -1,10 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import { AppNavigation } from '@/app/navigation';
 import { AppProviders } from '@/app/providers';
-import { useWalletDeepLinking } from '@/features/wallet/useWalletDeepLinking';
+import { useWalletDeepLinking, useWalletInteractionSync } from '@/features/wallet';
 
 function WalletDeepLinkBootstrap() {
   useWalletDeepLinking();
+  useWalletInteractionSync();
 
   return null;
 }

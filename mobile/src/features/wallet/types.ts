@@ -1,4 +1,4 @@
-import { ContractCallPreview } from '@/core/types';
+import type { ContractCallPreview, MobileTxType } from '@/core/types';
 
 export type WalletReturnStatus = 'success' | 'cancelled' | 'expired';
 
@@ -11,6 +11,7 @@ export interface WalletReturnLinkPayload {
   version: 1;
   txId: string;
   status: WalletReturnStatus;
+  functionName?: MobileTxType;
 }
 
 export interface WalletInteractionRouteParams {
@@ -24,4 +25,5 @@ export interface WalletInteractionState {
   returnLink: string | null;
   txId: string | null;
   status: WalletReturnStatus | null;
+  functionName: MobileTxType | null;
 }

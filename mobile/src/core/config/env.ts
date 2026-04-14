@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
-import { AppNetworkConfig } from '@/core/types';
-import { resolveMobileNetworkConfig } from '@/core/config/stacksConfig';
+import { AppNetworkConfig } from '../types';
+import { resolveMobileNetworkConfig } from './stacksConfig';
 
 function getExtra(key: 'appStage' | 'contractAddress' | 'contractName' | 'hiroApiBaseUrl' | 'stacksNetwork') {
   const extra = Constants.expoConfig?.extra as Record<string, string> | undefined;

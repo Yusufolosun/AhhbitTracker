@@ -67,12 +67,17 @@ export function buildWalletPreviewLink(preview: ContractCallPreview): string {
   });
 }
 
-export function buildWalletReturnLink(txId: string, status: WalletReturnStatus): string {
+export function buildWalletReturnLink(
+  txId: string,
+  status: WalletReturnStatus,
+  functionName?: ContractCallPreview['functionName'],
+): string {
   return buildDeepLink(PREVIEW_ROUTE, {
     result: encodePayload<WalletReturnLinkPayload>({
       version: 1,
       txId,
       status,
+      functionName,
     }),
   });
 }
@@ -95,6 +100,7 @@ export function parseWalletInteractionState(url: string): WalletInteractionState
         returnLink: null,
         txId: null,
         status: null,
+        functionName: payload.preview.functionName,
       };
     }
   }
@@ -114,6 +120,7 @@ export function parseWalletInteractionState(url: string): WalletInteractionState
         returnLink: url,
         txId: payload.txId,
         status: payload.status,
+        functionName: payload.functionName ?? null,
       };
     }
   }
@@ -138,6 +145,7 @@ export function parseWalletInteractionParams(
         returnLink: null,
         txId: null,
         status: null,
+        functionName: payload.preview.functionName,
       };
     }
   }
@@ -156,6 +164,7 @@ export function parseWalletInteractionParams(
         returnLink: null,
         txId: payload.txId,
         status: payload.status,
+        functionName: payload.functionName ?? null,
       };
     }
   }
