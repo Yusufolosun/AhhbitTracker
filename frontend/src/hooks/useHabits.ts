@@ -5,9 +5,9 @@ import { useWallet } from '../context/WalletContext';
 import { useTransactions } from '../context/TransactionContext';
 import {
   Habit,
-  UserStats,
 } from '../types/habit';
 import { POLLING_INTERVAL, CACHE_TIME, POOL_CACHE_TIME } from '../utils/constants';
+import { getHabitSyncTargets } from './habitTransactionSync';
 
 export interface DailyCheckInEntry {
   habitId: number;
@@ -27,7 +27,7 @@ export interface DailyCheckInResult {
  */
 export const useHabits = () => {
   const { walletState, refreshBalance } = useWallet();
-  const { addTransaction } = useTransactions();
+  const { addTransaction, transactions } = useTransactions();
   const queryClient = useQueryClient();
 
   // Track which habit IDs have in-flight mutations so each card can
@@ -56,10 +56,7 @@ export const useHabits = () => {
           return null;
         }
 
-        return {
-          habitId,
-          ...habit,
-        } satisfies Habit;
+        return habit satisfies Habit;
       });
 
       const habitsData = await Promise.all(habitPromises);
@@ -102,6 +99,7 @@ export const useHabits = () => {
   // Stacks blocks average ~10 min; we refetch at 30s and 2min as best-effort.
   // All timers are tracked so they can be cleaned up on unmount.
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const handledConfirmedTransactionsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     return () => {
@@ -109,6 +107,54 @@ export const useHabits = () => {
       timersRef.current = [];
     };
   }, []);
+
+  useEffect(() => {
+    if (!walletState.address) {
+      handledConfirmedTransactionsRef.current.clear();
+      return;
+    }
+
+    const activeTxIds = new Set(transactions.map((tx) => tx.txId));
+
+    for (const txId of handledConfirmedTransactionsRef.current) {
+      if (!activeTxIds.has(txId)) {
+        handledConfirmedTransactionsRef.current.delete(txId);
+      }
+    }
+
+    const confirmedTransactions = transactions.filter(
+      (tx) => tx.status === 'confirmed' && !handledConfirmedTransactionsRef.current.has(tx.txId)
+    );
+
+    if (!confirmedTransactions.length) {
+      return;
+    }
+
+    for (const tx of confirmedTransactions) {
+      handledConfirmedTransactionsRef.current.add(tx.txId);
+
+      const syncTargets = getHabitSyncTargets(tx.functionName);
+      if (!syncTargets) {
+        continue;
+      }
+
+      if (syncTargets.invalidateHabits) {
+        void queryClient.invalidateQueries({ queryKey: ['habits', walletState.address] });
+      }
+
+      if (syncTargets.invalidateUserStats) {
+        void queryClient.invalidateQueries({ queryKey: ['userStats', walletState.address] });
+      }
+
+      if (syncTargets.invalidatePoolBalance) {
+        void queryClient.invalidateQueries({ queryKey: ['poolBalance'] });
+      }
+
+      if (syncTargets.refreshBalance) {
+        void refreshBalance();
+      }
+    }
+  }, [queryClient, refreshBalance, transactions, walletState.address]);
 
   const scheduleRefetch = useCallback(
     (queryKeys: string[][]) => {
@@ -140,31 +186,9 @@ export const useHabits = () => {
   // Check-in mutation with optimistic streak update
   const checkInMutation = useMutation({
     mutationFn: (habitId: number) => contractService.checkIn(habitId),
-    onMutate: async (habitId: number) => {
+    onMutate: (habitId: number) => {
       setPendingCheckIns((prev) => new Set(prev).add(habitId));
-      const queryKey = ['habits', walletState.address];
-      await queryClient.cancelQueries({ queryKey });
-      const previous = queryClient.getQueryData<Habit[]>(queryKey);
-      const currentBlock = queryClient.getQueryData<number>(['currentBlock']);
-      if (previous) {
-        queryClient.setQueryData<Habit[]>(queryKey, (old) =>
-          (old ?? []).map((h) =>
-            h.habitId === habitId
-              ? {
-                  ...h,
-                  currentStreak: h.currentStreak + 1,
-                  ...(currentBlock != null && { lastCheckInBlock: currentBlock }),
-                }
-              : h
-          )
-        );
-      }
-      return { previous };
-    },
-    onError: (_err, _habitId, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(['habits', walletState.address], context.previous);
-      }
+      return null;
     },
     onSettled: (_data, _err, habitId) => {
       setPendingCheckIns((prev) => {
@@ -183,26 +207,9 @@ export const useHabits = () => {
   const withdrawStakeMutation = useMutation({
     mutationFn: ({ habitId, stakeAmount }: { habitId: number; stakeAmount: number }) =>
       contractService.withdrawStake(habitId, stakeAmount),
-    onMutate: async ({ habitId }) => {
+    onMutate: ({ habitId }) => {
       setPendingWithdrawals((prev) => new Set(prev).add(habitId));
-      const queryKey = ['habits', walletState.address];
-      await queryClient.cancelQueries({ queryKey });
-      const previous = queryClient.getQueryData<Habit[]>(queryKey);
-      if (previous) {
-        queryClient.setQueryData<Habit[]>(queryKey, (old) =>
-          (old ?? []).map((h) =>
-            h.habitId === habitId
-              ? { ...h, isActive: false, isCompleted: true }
-              : h
-          )
-        );
-      }
-      return { previous };
-    },
-    onError: (_err, _vars, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(['habits', walletState.address], context.previous);
-      }
+      return null;
     },
     onSettled: (_data, _err, { habitId }) => {
       setPendingWithdrawals((prev) => {
@@ -225,26 +232,9 @@ export const useHabits = () => {
   // Claim bonus mutation with optimistic update
   const claimBonusMutation = useMutation({
     mutationFn: (habitId: number) => contractService.claimBonus(habitId),
-    onMutate: async (habitId: number) => {
+    onMutate: (habitId: number) => {
       setPendingClaims((prev) => new Set(prev).add(habitId));
-      const queryKey = ['habits', walletState.address];
-      await queryClient.cancelQueries({ queryKey });
-      const previous = queryClient.getQueryData<Habit[]>(queryKey);
-      if (previous) {
-        queryClient.setQueryData<Habit[]>(queryKey, (old) =>
-          (old ?? []).map((h) =>
-            h.habitId === habitId
-              ? { ...h, bonusClaimed: true }
-              : h
-          )
-        );
-      }
-      return { previous };
-    },
-    onError: (_err, _vars, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(['habits', walletState.address], context.previous);
-      }
+      return null;
     },
     onSettled: (_data, _err, habitId) => {
       setPendingClaims((prev) => {
