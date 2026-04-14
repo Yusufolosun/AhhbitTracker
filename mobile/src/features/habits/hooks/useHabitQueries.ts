@@ -12,6 +12,8 @@ export function usePoolBalanceQuery() {
     queryFn: fetchPoolBalance,
     staleTime: POLLING_INTERVAL_MS,
     refetchInterval: POLLING_INTERVAL_MS,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -28,6 +30,8 @@ export function useUserHabitsQuery(address: string | null) {
     enabled: Boolean(address),
     staleTime: POLLING_INTERVAL_MS,
     refetchInterval: POLLING_INTERVAL_MS,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -44,6 +48,8 @@ export function useUserStatsQuery(address: string | null) {
     enabled: Boolean(address),
     staleTime: POLLING_INTERVAL_MS,
     refetchInterval: POLLING_INTERVAL_MS,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -62,5 +68,7 @@ export function useCurrentBlockQuery() {
     },
     staleTime: POLLING_INTERVAL_MS,
     refetchInterval: POLLING_INTERVAL_MS,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 }
