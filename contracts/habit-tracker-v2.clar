@@ -387,9 +387,8 @@
       (caller tx-sender)
       (habit (unwrap! (map-get? habits { habit-id: habit-id }) ERR-HABIT-NOT-FOUND))
       (pool-balance (var-get forfeited-pool-balance))
-      ;; Bonus: 1% of pool, capped at MAX-BONUS-AMOUNT (1 STX)
-      (raw-bonus (/ pool-balance BONUS-DIVISOR))
-      (bonus-amount (if (<= raw-bonus MAX-BONUS-AMOUNT) raw-bonus MAX-BONUS-AMOUNT))
+      (eligible-claimants (var-get unclaimed-completed-habits))
+      (bonus-amount (calculate-bonus-share pool-balance eligible-claimants))
     )
     ;; Verify caller is habit owner
     (asserts! (is-eq caller (get owner habit)) ERR-NOT-HABIT-OWNER)
@@ -401,6 +400,7 @@
     (asserts! (not (get bonus-claimed habit)) ERR-BONUS-ALREADY-CLAIMED)
     
     ;; Verify pool has sufficient balance and bonus is non-zero
+    (asserts! (> eligible-claimants u0) ERR-POOL-INSUFFICIENT-BALANCE)
     (asserts! (> bonus-amount u0) ERR-POOL-INSUFFICIENT-BALANCE)
     (asserts! (>= pool-balance bonus-amount) ERR-POOL-INSUFFICIENT-BALANCE)
     
