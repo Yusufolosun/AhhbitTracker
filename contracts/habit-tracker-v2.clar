@@ -38,9 +38,8 @@
 ;; Minimum streak required for withdrawal
 (define-constant MIN-STREAK-FOR-WITHDRAWAL u7)
 
-;; Bonus distribution: 1% of pool per claim, capped at 1 STX
-(define-constant BONUS-DIVISOR u100)
-(define-constant MAX-BONUS-AMOUNT u1000000)
+;; Bonus distribution uses dynamic equal-share allocation across
+;; completed habits that have not claimed yet.
 
 ;; ============================================
 ;; ERROR CODES
