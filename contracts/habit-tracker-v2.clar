@@ -423,6 +423,8 @@
       habit-id: habit-id,
       owner: caller,
       amount: bonus-amount,
+      claimant-count: eligible-claimants,
+      remaining-claimants: (- eligible-claimants u1),
       remaining-pool: (- pool-balance bonus-amount),
       block: block-height
     })
