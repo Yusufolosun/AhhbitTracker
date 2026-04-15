@@ -360,6 +360,9 @@
         is-completed: true
       })
     )
+
+    ;; Completed habits become eligible for a single pool bonus claim.
+    (var-set unclaimed-completed-habits (+ (var-get unclaimed-completed-habits) u1))
     
     ;; Emit event
     (print {
