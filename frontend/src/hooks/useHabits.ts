@@ -95,6 +95,22 @@ export const useHabits = () => {
     retryDelay: (attempt) => Math.min(15000 * Math.pow(2, attempt - 1), 60000),
   });
 
+  const { data: estimatedBonusShare } = useQuery({
+    queryKey: ['estimatedBonusShare'],
+    queryFn: () => contractService.readEstimatedBonusShare(),
+    staleTime: POOL_CACHE_TIME,
+    retry: 3,
+    retryDelay: (attempt) => Math.min(15000 * Math.pow(2, attempt - 1), 60000),
+  });
+
+  const { data: unclaimedCompletedHabits } = useQuery({
+    queryKey: ['unclaimedCompletedHabits'],
+    queryFn: () => contractService.readUnclaimedCompletedHabits(),
+    staleTime: POOL_CACHE_TIME,
+    retry: 3,
+    retryDelay: (attempt) => Math.min(15000 * Math.pow(2, attempt - 1), 60000),
+  });
+
   // Helper: schedule a deferred refetch after the tx has time to mine.
   // Stacks blocks average ~10 min; we refetch at 30s and 2min as best-effort.
   // All timers are tracked so they can be cleaned up on unmount.
@@ -148,6 +164,8 @@ export const useHabits = () => {
 
       if (syncTargets.invalidatePoolBalance) {
         void queryClient.invalidateQueries({ queryKey: ['poolBalance'] });
+        void queryClient.invalidateQueries({ queryKey: ['estimatedBonusShare'] });
+        void queryClient.invalidateQueries({ queryKey: ['unclaimedCompletedHabits'] });
       }
 
       if (syncTargets.refreshBalance) {
@@ -225,6 +243,8 @@ export const useHabits = () => {
         ['habits', walletState.address!],
         ['userStats', walletState.address!],
         ['poolBalance'],
+        ['estimatedBonusShare'],
+        ['unclaimedCompletedHabits'],
       ]);
     },
   });
@@ -246,7 +266,12 @@ export const useHabits = () => {
     onSuccess: (txId) => {
       addTransaction(txId, 'claim-bonus');
       void refreshBalance();
-      scheduleRefetch([['habits', walletState.address!], ['poolBalance']]);
+      scheduleRefetch([
+        ['habits', walletState.address!],
+        ['poolBalance'],
+        ['estimatedBonusShare'],
+        ['unclaimedCompletedHabits'],
+      ]);
     },
   });
 
@@ -265,7 +290,11 @@ export const useHabits = () => {
     },
     onSuccess: (txId) => {
       addTransaction(txId, 'slash-habit');
-      scheduleRefetch([['habits', walletState.address!], ['poolBalance']]);
+      scheduleRefetch([
+        ['habits', walletState.address!],
+        ['poolBalance'],
+        ['estimatedBonusShare'],
+      ]);
     },
   });
 
@@ -318,6 +347,8 @@ export const useHabits = () => {
     habits: habits || [],
     userStats,
     poolBalance: poolBalance || 0,
+    estimatedBonusShare: estimatedBonusShare || 0,
+    unclaimedCompletedHabits: unclaimedCompletedHabits || 0,
 
     // Loading states
     isLoadingHabits,

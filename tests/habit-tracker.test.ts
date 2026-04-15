@@ -50,6 +50,24 @@ function getHabit(habitId: number) {
   );
 }
 
+function getUnclaimedCompletedHabits() {
+  return simnet.callReadOnlyFn(
+    "habit-tracker-v2",
+    "get-unclaimed-completed-habits",
+    [],
+    deployer
+  );
+}
+
+function getEstimatedBonusShare() {
+  return simnet.callReadOnlyFn(
+    "habit-tracker-v2",
+    "get-estimated-bonus-share",
+    [],
+    deployer
+  );
+}
+
 /*
  * AhhbitTracker Contract Tests
  * Comprehensive test suite for habit tracking smart contract
@@ -415,8 +433,8 @@ describe("AhhbitTracker Contract", () => {
 
       // 4. Claim bonus
       const result = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(id1)], user1);
-      // Pool had MIN_STAKE * 10 (1 STX). 1% = MIN_STAKE / 10 = 10000
-      expect(result.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE / 10)));
+      // Only one eligible claimant, so claim receives the full available pool.
+      expect(result.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE * 10)));
     });
 
     it("should distribute nearly equal bonuses to consecutive claimants", () => {
@@ -443,23 +461,22 @@ describe("AhhbitTracker Contract", () => {
       for (let i = 0; i < 7; i++) { checkIn(user2, id2); simnet.mineEmptyBlocks(120); }
       withdrawStake(user2, id2);
 
-      // Both claim — bonuses should be within ~1% of each other
+      // Both claim from a fixed pool with two claimants.
       const claim1 = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(id1)], user1);
       const claim2 = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(id2)], user2);
 
       const bonus1 = Number((claim1.result as any).value.value);
       const bonus2 = Number((claim2.result as any).value.value);
 
-      // With 1% per claim, the spread between first and second is ~1%
-      // bonus1 = pool / 100, bonus2 = (pool - bonus1) / 100
+      // Share-based payout should keep consecutive claim amounts aligned.
       expect(bonus1).toBeGreaterThan(0);
       expect(bonus2).toBeGreaterThan(0);
-      // Difference should be less than 2% (much better than old 10%)
+      // Difference should stay very small for this even split setup.
       expect((bonus1 - bonus2) / bonus1).toBeLessThan(0.02);
     });
 
-    it("should cap bonus at MAX-BONUS-AMOUNT (1 STX)", () => {
-      // Fund pool with two large slashed stakes to exceed 100 STX
+    it("should distribute full pool when only one claimant is eligible", () => {
+      // Fund pool with two large slashed stakes.
       const fail1 = createHabit(user2, "Big stake 1", MAX_STAKE_AMOUNT);
       const fid1 = Number((fail1.result as any).value.value);
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
@@ -473,7 +490,7 @@ describe("AhhbitTracker Contract", () => {
       checkIn(user3, fid2);
       simnet.mineEmptyBlocks(150);
       simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(fid2)], user1);
-      // Pool = 200 STX. 1% = 2 STX > MAX-BONUS-AMOUNT (1 STX)
+      // Pool = 200 STX and user1 is the only eligible claimant.
 
       // User1 completes a habit and claims
       const h1 = createHabit(user1, "Capped habit", MIN_STAKE);
@@ -483,13 +500,71 @@ describe("AhhbitTracker Contract", () => {
       withdrawStake(user1, cid);
 
       const result = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(cid)], user1);
-      // Should be capped at 1 STX = 1,000,000 microSTX
-      expect(result.result).toEqual(Cl.ok(Cl.uint(1_000_000)));
+      expect(result.result).toEqual(Cl.ok(Cl.uint(MAX_STAKE_AMOUNT * 2)));
     });
 
     it("should reject bonus claim by non-owner", () => {
       const result = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(habitId)], user2);
       expect(result.result).toEqual(Cl.error(Cl.uint(104))); // ERR-NOT-HABIT-OWNER
+    });
+
+    it("should update unclaimed claimant count across withdraw and claim", () => {
+      // Build pool funds from an expired habit.
+      const failHabit = createHabit(user2, "Fail for pool", MIN_STAKE);
+      const failId = Number((failHabit.result as any).value.value);
+      simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
+      checkIn(user2, failId);
+      simnet.mineEmptyBlocks(150);
+      simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(failId)], user1);
+
+      // Complete and withdraw one habit (becomes an eligible claimant).
+      const completed = createHabit(user1, "Claim eligible", MIN_STAKE);
+      const completedId = Number((completed.result as any).value.value);
+      simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
+      for (let i = 0; i < 7; i++) { checkIn(user1, completedId); simnet.mineEmptyBlocks(120); }
+      withdrawStake(user1, completedId);
+
+      expect(getUnclaimedCompletedHabits().result).toEqual(Cl.ok(Cl.uint(1)));
+
+      const claim = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(completedId)], user1);
+      expect(claim.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE)));
+      expect(getUnclaimedCompletedHabits().result).toEqual(Cl.ok(Cl.uint(0)));
+    });
+
+    it("should report estimated bonus share from pool and claimant count", () => {
+      // Fund a 0.06 STX pool.
+      const failing = createHabit(user3, "Pool source", MIN_STAKE * 3);
+      const failingId = Number((failing.result as any).value.value);
+      simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
+      checkIn(user3, failingId);
+      simnet.mineEmptyBlocks(150);
+      simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(failingId)], user1);
+
+      // Prepare two eligible claimants.
+      const h1 = createHabit(user1, "Estimator A", MIN_STAKE);
+      const id1 = Number((h1.result as any).value.value);
+      simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
+      for (let i = 0; i < 7; i++) { checkIn(user1, id1); simnet.mineEmptyBlocks(120); }
+      withdrawStake(user1, id1);
+
+      const h2 = createHabit(user2, "Estimator B", MIN_STAKE);
+      const id2 = Number((h2.result as any).value.value);
+      simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
+      for (let i = 0; i < 7; i++) { checkIn(user2, id2); simnet.mineEmptyBlocks(120); }
+      withdrawStake(user2, id2);
+
+      // 60,000 / 2 claimants => 30,000 estimated bonus share.
+      expect(getEstimatedBonusShare().result).toEqual(Cl.ok(Cl.uint(MIN_STAKE + (MIN_STAKE / 2))));
+
+      const firstClaim = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(id1)], user1);
+      expect(firstClaim.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE + (MIN_STAKE / 2))));
+
+      // Remaining pool = 30,000 with one claimant left => 30,000.
+      expect(getEstimatedBonusShare().result).toEqual(Cl.ok(Cl.uint(MIN_STAKE + (MIN_STAKE / 2))));
+
+      const secondClaim = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(id2)], user2);
+      expect(secondClaim.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE + (MIN_STAKE / 2))));
+      expect(getEstimatedBonusShare().result).toEqual(Cl.ok(Cl.uint(0)));
     });
 
   });

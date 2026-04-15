@@ -28,7 +28,18 @@ function getErrorMessage(error: unknown): string {
 }
 
 export function HabitCard({ habit }: HabitCardProps) {
-  const { checkIn, withdrawStake, claimBonus, slashHabit, poolBalance, pendingCheckIns, pendingWithdrawals, pendingClaims, pendingSlashes } = useHabits();
+  const {
+    checkIn,
+    withdrawStake,
+    claimBonus,
+    slashHabit,
+    estimatedBonusShare,
+    unclaimedCompletedHabits,
+    pendingCheckIns,
+    pendingWithdrawals,
+    pendingClaims,
+    pendingSlashes,
+  } = useHabits();
   const { showToast } = useToast();
   const { walletState } = useWallet();
   const [confirmAction, setConfirmAction] = useState<'withdraw' | 'claim' | 'slash' | null>(null);
@@ -99,7 +110,7 @@ export function HabitCard({ habit }: HabitCardProps) {
   const blocksUntilNextCheckIn =
     currentBlock !== null ? getBlocksUntilNextCheckIn(habit, currentBlock) : null;
   const canSubmitCheckIn = isEligibleForDailyCheckIn(habit, currentBlock);
-  const estimatedBonus = Math.min(Math.floor(poolBalance / 100), 1_000_000);
+  const estimatedBonus = estimatedBonusShare;
 
   const getBadge = () => {
     if (habit.isCompleted) return { label: 'Completed', className: 'bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-400' };
@@ -339,7 +350,7 @@ export function HabitCard({ habit }: HabitCardProps) {
             </div>
           </dl>
           <p className="text-xs text-surface-500 dark:text-surface-400">
-            Bonus is 1% of the current pool, capped at 1 STX. The actual amount may differ slightly if the pool changes before confirmation.
+            Bonus payout is the current equal-share estimate from contract state for {unclaimedCompletedHabits || 0} pending claimant{(unclaimedCompletedHabits || 0) === 1 ? '' : 's'}. The actual amount may differ if claims settle before your transaction confirms.
           </p>
           <p className="text-xs text-amber-600 dark:text-amber-400">
             This action is irreversible and will incur a gas fee.

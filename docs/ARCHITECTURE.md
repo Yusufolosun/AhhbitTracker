@@ -105,9 +105,10 @@ User → withdraw-stake(habit-id) → Contract
 ```
 User → claim-bonus(habit-id) → Contract
   ├─ Verify user has completed habits
-  ├─ Calculate user's share of pool
+  ├─ Read forfeited pool and unclaimed completed claimant count
+  ├─ Calculate equal share using integer division
   ├─ Transfer bonus from pool to user
-  ├─ Update pool balance
+  ├─ Update pool balance and claimant count
   └─ Emit claim event
 ```
 
@@ -185,6 +186,11 @@ If user checks in after 144 blocks from last check-in, streak is broken and stak
 
 **Forfeited pool:** 30 STX
 **Per successful user bonus:** 30 STX ÷ 70 = **~0.43 STX**
+
+In implementation, payout is recalculated per claim as:
+`forfeited-pool-balance / unclaimed-completed-habits`
+
+This keeps accounting accurate on-chain while preserving any integer remainder for subsequent claims.
 
 **ROI for successful user:**
 - Stake recovered: 1 STX

@@ -60,6 +60,10 @@ Claims bonus from forfeited pool.
 
 **Returns:** Bonus amount (uint)
 
+**Distribution model:**
+- Bonus is computed as `forfeited-pool-balance / unclaimed-completed-habits`
+- Integer division is used; any remainder is preserved in the pool for later claims
+
 **Errors:**
 - `ERR-POOL-INSUFFICIENT-BALANCE` - Pool empty
 
@@ -100,6 +104,16 @@ Gets total balance in forfeited pool.
 
 **Returns:** Pool balance in microSTX
 
+#### get-unclaimed-completed-habits
+Gets total number of completed habits that have not claimed a bonus.
+
+**Returns:** Eligible claimant count (uint)
+
+#### get-estimated-bonus-share
+Gets the current estimated payout for the next successful claim.
+
+**Returns:** Estimated bonus amount in microSTX (uint)
+
 #### get-user-stats
 Gets aggregated statistics for a user.
 
@@ -126,6 +140,7 @@ Links users to their habit IDs.
 ### Data Variables
 - `habit-id-nonce` - Counter for generating unique IDs
 - `forfeited-pool-balance` - Total STX in forfeiture pool
+- `unclaimed-completed-habits` - Eligible completed habits pending bonus claim
 
 ## Testing
 

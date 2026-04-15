@@ -52,6 +52,8 @@ vi.mock('../services/contractService', () => ({
     } satisfies Omit<Habit, 'habitId'>),
     readUserStats: vi.fn().mockResolvedValue({ totalHabits: 1, habitIds: [1] }),
     readPoolBalance: vi.fn().mockResolvedValue(0),
+    readEstimatedBonusShare: vi.fn().mockResolvedValue(0),
+    readUnclaimedCompletedHabits: vi.fn().mockResolvedValue(0),
     createHabit: vi.fn(),
     checkIn: vi.fn(),
     withdrawStake: vi.fn(),

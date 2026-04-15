@@ -5,10 +5,32 @@ import {
   getUserStats,
   type Habit as SdkHabit,
 } from '@yusufolosun/ahhbit-tracker-sdk';
+import { cvToJSON, fetchCallReadOnlyFunction } from '@stacks/transactions';
 import { formatSTX } from '@yusufolosun/stx-utils';
 import { networkConfig } from '@/core/config';
 import { stacksNetwork } from '@/core/network';
 import type { Habit, PoolBalance, UserStats } from '@/core/types';
+
+function unwrapOkNumber(json: any): number {
+  if (json?.success === true) {
+    return Number(json.value?.value ?? 0);
+  }
+
+  return Number(json?.value ?? 0);
+}
+
+async function readPoolDistributionValue(functionName: string): Promise<number> {
+  const response = await fetchCallReadOnlyFunction({
+    contractAddress: networkConfig.contract.contractAddress,
+    contractName: networkConfig.contract.contractName,
+    functionName,
+    functionArgs: [],
+    network: stacksNetwork,
+    senderAddress: networkConfig.contract.contractAddress,
+  });
+
+  return unwrapOkNumber(cvToJSON(response));
+}
 
 function toMobileHabit(habitId: number, value: SdkHabit): Habit {
   return {
@@ -50,11 +72,18 @@ export async function fetchHabitsByAddress(address: string): Promise<Habit[]> {
 }
 
 export async function fetchPoolBalance(): Promise<PoolBalance> {
-  const microStx = await getPoolBalance(stacksNetwork, networkConfig.contract);
+  const [microStx, estimatedBonusShareMicroStx, unclaimedCompletedHabits] = await Promise.all([
+    getPoolBalance(stacksNetwork, networkConfig.contract),
+    readPoolDistributionValue('get-estimated-bonus-share'),
+    readPoolDistributionValue('get-unclaimed-completed-habits'),
+  ]);
 
   return {
     microStx,
     stx: formatSTX(microStx),
+    estimatedBonusShareMicroStx,
+    estimatedBonusShareStx: formatSTX(estimatedBonusShareMicroStx),
+    unclaimedCompletedHabits,
   };
 }
 

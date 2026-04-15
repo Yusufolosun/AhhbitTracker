@@ -38,9 +38,8 @@
 ;; Minimum streak required for withdrawal
 (define-constant MIN-STREAK-FOR-WITHDRAWAL u7)
 
-;; Bonus distribution: 1% of pool per claim, capped at 1 STX
-(define-constant BONUS-DIVISOR u100)
-(define-constant MAX-BONUS-AMOUNT u1000000)
+;; Bonus distribution uses dynamic equal-share allocation across
+;; completed habits that have not claimed yet.
 
 ;; ============================================
 ;; ERROR CODES
@@ -93,6 +92,9 @@
 ;; Forfeited stakes pool (total available for distribution)
 (define-data-var forfeited-pool-balance uint u0)
 
+;; Number of completed habits that are still eligible to claim bonus
+(define-data-var unclaimed-completed-habits uint u0)
+
 ;; ============================================
 ;; PRIVATE HELPER FUNCTIONS
 ;; ============================================
@@ -141,6 +143,15 @@
       (blocks-elapsed (- block-height last-check-in-block))
     )
     (< blocks-elapsed MIN-CHECK-IN-INTERVAL)
+  )
+)
+
+;; Calculate equal-share bonus amount for the next claimant.
+;; Integer division intentionally leaves any remainder for later claimants.
+(define-private (calculate-bonus-share (pool-balance uint) (eligible-claimants uint))
+  (if (> eligible-claimants u0)
+    (/ pool-balance eligible-claimants)
+    u0
   )
 )
 
@@ -349,6 +360,9 @@
         is-completed: true
       })
     )
+
+    ;; Completed habits become eligible for a single pool bonus claim.
+    (var-set unclaimed-completed-habits (+ (var-get unclaimed-completed-habits) u1))
     
     ;; Emit event
     (print {
@@ -373,9 +387,8 @@
       (caller tx-sender)
       (habit (unwrap! (map-get? habits { habit-id: habit-id }) ERR-HABIT-NOT-FOUND))
       (pool-balance (var-get forfeited-pool-balance))
-      ;; Bonus: 1% of pool, capped at MAX-BONUS-AMOUNT (1 STX)
-      (raw-bonus (/ pool-balance BONUS-DIVISOR))
-      (bonus-amount (if (<= raw-bonus MAX-BONUS-AMOUNT) raw-bonus MAX-BONUS-AMOUNT))
+      (eligible-claimants (var-get unclaimed-completed-habits))
+      (bonus-amount (calculate-bonus-share pool-balance eligible-claimants))
     )
     ;; Verify caller is habit owner
     (asserts! (is-eq caller (get owner habit)) ERR-NOT-HABIT-OWNER)
@@ -387,6 +400,7 @@
     (asserts! (not (get bonus-claimed habit)) ERR-BONUS-ALREADY-CLAIMED)
     
     ;; Verify pool has sufficient balance and bonus is non-zero
+    (asserts! (> eligible-claimants u0) ERR-POOL-INSUFFICIENT-BALANCE)
     (asserts! (> bonus-amount u0) ERR-POOL-INSUFFICIENT-BALANCE)
     (asserts! (>= pool-balance bonus-amount) ERR-POOL-INSUFFICIENT-BALANCE)
     
@@ -395,6 +409,7 @@
     
     ;; Update pool balance
     (var-set forfeited-pool-balance (- pool-balance bonus-amount))
+    (var-set unclaimed-completed-habits (- eligible-claimants u1))
 
     ;; Mark bonus as claimed to prevent re-entrancy
     (map-set habits
@@ -408,6 +423,8 @@
       habit-id: habit-id,
       owner: caller,
       amount: bonus-amount,
+      claimant-count: eligible-claimants,
+      remaining-claimants: (- eligible-claimants u1),
       remaining-pool: (- pool-balance bonus-amount),
       block: block-height
     })
@@ -444,6 +461,22 @@
 ;; Get forfeited pool balance
 (define-read-only (get-pool-balance)
   (ok (var-get forfeited-pool-balance))
+)
+
+;; Get number of completed habits that have not yet claimed bonus
+(define-read-only (get-unclaimed-completed-habits)
+  (ok (var-get unclaimed-completed-habits))
+)
+
+;; Estimate next claim amount based on current pool and claimant count
+(define-read-only (get-estimated-bonus-share)
+  (let
+    (
+      (pool-balance (var-get forfeited-pool-balance))
+      (eligible-claimants (var-get unclaimed-completed-habits))
+    )
+    (ok (calculate-bonus-share pool-balance eligible-claimants))
+  )
 )
 
 ;; Get total habits created

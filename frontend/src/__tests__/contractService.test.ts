@@ -94,10 +94,13 @@ vi.mock('../utils/constants', () => ({
 // Import after mocks are set up
 import { contractService } from '../services/contractService';
 import { walletService } from '../services/walletService';
+import { cvToJSON, fetchCallReadOnlyFunction } from '@stacks/transactions';
 
 describe('contractService', () => {
   beforeEach(() => {
     capturedOptions = null;
+    vi.mocked(fetchCallReadOnlyFunction).mockReset();
+    vi.mocked(cvToJSON).mockReset();
     mocks.buildCreateHabit.mockReturnValue({
       contractAddress: 'SP000000000000000000002Q6VF78',
       contractName: 'ahhbit-tracker',
@@ -105,6 +108,32 @@ describe('contractService', () => {
       functionArgs: [],
       postConditions: [],
       postConditionMode: 2,
+    });
+  });
+
+  describe('read-only distribution helpers', () => {
+    it('reads estimated bonus share', async () => {
+      vi.mocked(fetchCallReadOnlyFunction).mockResolvedValueOnce({} as any);
+      vi.mocked(cvToJSON).mockReturnValueOnce({ success: true, value: { value: 500_000 } } as any);
+
+      const result = await contractService.readEstimatedBonusShare();
+
+      expect(fetchCallReadOnlyFunction).toHaveBeenCalledWith(
+        expect.objectContaining({ functionName: 'get-estimated-bonus-share' }),
+      );
+      expect(result).toBe(500_000);
+    });
+
+    it('reads unclaimed completed habits', async () => {
+      vi.mocked(fetchCallReadOnlyFunction).mockResolvedValueOnce({} as any);
+      vi.mocked(cvToJSON).mockReturnValueOnce({ success: true, value: { value: 3 } } as any);
+
+      const result = await contractService.readUnclaimedCompletedHabits();
+
+      expect(fetchCallReadOnlyFunction).toHaveBeenCalledWith(
+        expect.objectContaining({ functionName: 'get-unclaimed-completed-habits' }),
+      );
+      expect(result).toBe(3);
     });
   });
 

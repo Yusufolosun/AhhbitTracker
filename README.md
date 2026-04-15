@@ -149,6 +149,8 @@ npm run preview       # Preview locally
 | `claim-bonus` | Claim share of forfeited pool |
 | `get-habit` | Read habit details |
 | `get-pool-balance` | View total forfeited STX |
+| `get-unclaimed-completed-habits` | View pending bonus claimant count |
+| `get-estimated-bonus-share` | View next estimated bonus share |
 
 Full reference → [docs/API_REFERENCE.md](docs/API_REFERENCE.md)
 
