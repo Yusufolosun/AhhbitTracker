@@ -415,8 +415,8 @@ describe("AhhbitTracker Contract", () => {
 
       // 4. Claim bonus
       const result = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(id1)], user1);
-      // Pool had MIN_STAKE * 10 (1 STX). 1% = MIN_STAKE / 10 = 10000
-      expect(result.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE / 10)));
+      // Only one eligible claimant, so claim receives the full available pool.
+      expect(result.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE * 10)));
     });
 
     it("should distribute nearly equal bonuses to consecutive claimants", () => {
