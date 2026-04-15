@@ -509,6 +509,29 @@ describe("AhhbitTracker Contract", () => {
       expect(result.result).toEqual(Cl.error(Cl.uint(104))); // ERR-NOT-HABIT-OWNER
     });
 
+    it("should update unclaimed claimant count across withdraw and claim", () => {
+      // Build pool funds from an expired habit.
+      const failHabit = createHabit(user2, "Fail for pool", MIN_STAKE);
+      const failId = Number((failHabit.result as any).value.value);
+      simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
+      checkIn(user2, failId);
+      simnet.mineEmptyBlocks(150);
+      simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(failId)], user1);
+
+      // Complete and withdraw one habit (becomes an eligible claimant).
+      const completed = createHabit(user1, "Claim eligible", MIN_STAKE);
+      const completedId = Number((completed.result as any).value.value);
+      simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
+      for (let i = 0; i < 7; i++) { checkIn(user1, completedId); simnet.mineEmptyBlocks(120); }
+      withdrawStake(user1, completedId);
+
+      expect(getUnclaimedCompletedHabits().result).toEqual(Cl.ok(Cl.uint(1)));
+
+      const claim = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(completedId)], user1);
+      expect(claim.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE)));
+      expect(getUnclaimedCompletedHabits().result).toEqual(Cl.ok(Cl.uint(0)));
+    });
+
   });
 
   describe("read-only functions", () => {
