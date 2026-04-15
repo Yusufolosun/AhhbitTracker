@@ -409,6 +409,7 @@
     
     ;; Update pool balance
     (var-set forfeited-pool-balance (- pool-balance bonus-amount))
+    (var-set unclaimed-completed-habits (- eligible-claimants u1))
 
     ;; Mark bonus as claimed to prevent re-entrancy
     (map-set habits
