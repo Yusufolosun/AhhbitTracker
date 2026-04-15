@@ -160,6 +160,11 @@ Claims bonus from forfeited pool.
 - Caller must own the habit
 - Habit must be completed (withdrawn)
 - Pool must have balance
+- At least one unclaimed completed habit must exist
+
+**Payout Formula:**
+- `bonus-amount = forfeited-pool-balance / unclaimed-completed-habits`
+- Integer remainder stays in the pool and is settled by later claims
 
 **Gas Cost:** ~60,000 microSTX
 
@@ -280,6 +285,38 @@ Gets total balance in forfeited pool.
 ```
 
 **Gas Cost:** Free (read-only)
+
+---
+
+### get-unclaimed-completed-habits
+
+Gets the number of completed habits that are eligible to claim bonus.
+
+**Signature:**
+```clarity
+(define-read-only (get-unclaimed-completed-habits))
+```
+
+**Parameters:** None
+
+**Returns:**
+- `(ok uint)` - Pending claimant count
+
+---
+
+### get-estimated-bonus-share
+
+Gets the estimated payout for the next successful bonus claim.
+
+**Signature:**
+```clarity
+(define-read-only (get-estimated-bonus-share))
+```
+
+**Parameters:** None
+
+**Returns:**
+- `(ok uint)` - Estimated next bonus amount in microSTX
 
 ---
 
