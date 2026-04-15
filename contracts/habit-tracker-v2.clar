@@ -463,6 +463,11 @@
   (ok (var-get forfeited-pool-balance))
 )
 
+;; Get number of completed habits that have not yet claimed bonus
+(define-read-only (get-unclaimed-completed-habits)
+  (ok (var-get unclaimed-completed-habits))
+)
+
 ;; Get total habits created
 (define-read-only (get-total-habits)
   (ok (var-get habit-id-nonce))
