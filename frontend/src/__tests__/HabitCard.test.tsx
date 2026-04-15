@@ -14,6 +14,8 @@ vi.mock('../hooks/useHabits', () => ({
     claimBonus: vi.fn(),
     slashHabit: vi.fn(),
     poolBalance: 50_000_000,
+    estimatedBonusShare: 500_000,
+    unclaimedCompletedHabits: 4,
     pendingCheckIns: new Set<number>(),
     pendingWithdrawals: new Set<number>(),
     pendingClaims: new Set<number>(),
@@ -122,7 +124,7 @@ describe('HabitCard', () => {
   it('displays estimated bonus in claim dialog', () => {
     render(<HabitCard habit={completedHabit} />, { wrapper: TestWrapper });
     fireEvent.click(screen.getByText('Claim Bonus'));
-    // poolBalance is 50_000_000 → 1% = 500_000 microSTX → formatSTX = "0.50"
+    // estimatedBonusShare is 500_000 microSTX → formatSTX = "0.50"
     expect(screen.getByText('Est. Bonus')).toBeDefined();
     expect(screen.getByText('0.50 STX')).toBeDefined();
   });
