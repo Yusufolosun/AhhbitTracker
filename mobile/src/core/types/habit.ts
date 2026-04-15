@@ -19,6 +19,9 @@ export interface UserStats {
 export interface PoolBalance {
   microStx: number;
   stx: string;
+  estimatedBonusShareMicroStx: number;
+  estimatedBonusShareStx: string;
+  unclaimedCompletedHabits: number;
 }
 
 export interface HabitFilters {
