@@ -3,6 +3,7 @@
  * Service for interacting with the AhhbitTracker smart contract.
  */
 import { showContractCall } from '@stacks/connect';
+import { cvToJSON, fetchCallReadOnlyFunction } from '@stacks/transactions';
 import {
   buildCheckIn,
   buildClaimBonus,
@@ -17,6 +18,14 @@ import {
 import { CONTRACT_ADDRESS, CONTRACT_NAME, NETWORK } from '../utils/constants';
 import { walletService } from './walletService';
 import type { Habit, UserStats } from '../types/habit';
+
+function unwrapOkNumber(json: any): number {
+  if (json?.success === true) {
+    return Number(json.value?.value ?? 0);
+  }
+
+  return Number(json?.value ?? 0);
+}
 
 /** Application details for wallet transaction popups. */
 const appDetails = {
@@ -50,6 +59,32 @@ export const contractService = {
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
     });
+  },
+
+  async readEstimatedBonusShare(): Promise<number> {
+    const response = await fetchCallReadOnlyFunction({
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+      functionName: 'get-estimated-bonus-share',
+      functionArgs: [],
+      network: NETWORK,
+      senderAddress: CONTRACT_ADDRESS,
+    });
+
+    return unwrapOkNumber(cvToJSON(response));
+  },
+
+  async readUnclaimedCompletedHabits(): Promise<number> {
+    const response = await fetchCallReadOnlyFunction({
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+      functionName: 'get-unclaimed-completed-habits',
+      functionArgs: [],
+      network: NETWORK,
+      senderAddress: CONTRACT_ADDRESS,
+    });
+
+    return unwrapOkNumber(cvToJSON(response));
   },
 
   async readUserStats(userAddress: string): Promise<UserStats> {
