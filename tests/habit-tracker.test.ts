@@ -50,6 +50,24 @@ function getHabit(habitId: number) {
   );
 }
 
+function getUnclaimedCompletedHabits() {
+  return simnet.callReadOnlyFn(
+    "habit-tracker-v2",
+    "get-unclaimed-completed-habits",
+    [],
+    deployer
+  );
+}
+
+function getEstimatedBonusShare() {
+  return simnet.callReadOnlyFn(
+    "habit-tracker-v2",
+    "get-estimated-bonus-share",
+    [],
+    deployer
+  );
+}
+
 /*
  * AhhbitTracker Contract Tests
  * Comprehensive test suite for habit tracking smart contract
