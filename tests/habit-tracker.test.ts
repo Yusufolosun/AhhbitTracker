@@ -461,18 +461,17 @@ describe("AhhbitTracker Contract", () => {
       for (let i = 0; i < 7; i++) { checkIn(user2, id2); simnet.mineEmptyBlocks(120); }
       withdrawStake(user2, id2);
 
-      // Both claim — bonuses should be within ~1% of each other
+      // Both claim from a fixed pool with two claimants.
       const claim1 = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(id1)], user1);
       const claim2 = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(id2)], user2);
 
       const bonus1 = Number((claim1.result as any).value.value);
       const bonus2 = Number((claim2.result as any).value.value);
 
-      // With 1% per claim, the spread between first and second is ~1%
-      // bonus1 = pool / 100, bonus2 = (pool - bonus1) / 100
+      // Share-based payout should keep consecutive claim amounts aligned.
       expect(bonus1).toBeGreaterThan(0);
       expect(bonus2).toBeGreaterThan(0);
-      // Difference should be less than 2% (much better than old 10%)
+      // Difference should stay very small for this even split setup.
       expect((bonus1 - bonus2) / bonus1).toBeLessThan(0.02);
     });
 
