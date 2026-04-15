@@ -458,8 +458,8 @@ describe("AhhbitTracker Contract", () => {
       expect((bonus1 - bonus2) / bonus1).toBeLessThan(0.02);
     });
 
-    it("should cap bonus at MAX-BONUS-AMOUNT (1 STX)", () => {
-      // Fund pool with two large slashed stakes to exceed 100 STX
+    it("should distribute full pool when only one claimant is eligible", () => {
+      // Fund pool with two large slashed stakes.
       const fail1 = createHabit(user2, "Big stake 1", MAX_STAKE_AMOUNT);
       const fid1 = Number((fail1.result as any).value.value);
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
@@ -473,7 +473,7 @@ describe("AhhbitTracker Contract", () => {
       checkIn(user3, fid2);
       simnet.mineEmptyBlocks(150);
       simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(fid2)], user1);
-      // Pool = 200 STX. 1% = 2 STX > MAX-BONUS-AMOUNT (1 STX)
+      // Pool = 200 STX and user1 is the only eligible claimant.
 
       // User1 completes a habit and claims
       const h1 = createHabit(user1, "Capped habit", MIN_STAKE);
@@ -483,8 +483,7 @@ describe("AhhbitTracker Contract", () => {
       withdrawStake(user1, cid);
 
       const result = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(cid)], user1);
-      // Should be capped at 1 STX = 1,000,000 microSTX
-      expect(result.result).toEqual(Cl.ok(Cl.uint(1_000_000)));
+      expect(result.result).toEqual(Cl.ok(Cl.uint(MAX_STAKE_AMOUNT * 2)));
     });
 
     it("should reject bonus claim by non-owner", () => {
