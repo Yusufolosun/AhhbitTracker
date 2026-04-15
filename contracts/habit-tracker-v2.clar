@@ -468,6 +468,17 @@
   (ok (var-get unclaimed-completed-habits))
 )
 
+;; Estimate next claim amount based on current pool and claimant count
+(define-read-only (get-estimated-bonus-share)
+  (let
+    (
+      (pool-balance (var-get forfeited-pool-balance))
+      (eligible-claimants (var-get unclaimed-completed-habits))
+    )
+    (ok (calculate-bonus-share pool-balance eligible-claimants))
+  )
+)
+
 ;; Get total habits created
 (define-read-only (get-total-habits)
   (ok (var-get habit-id-nonce))
