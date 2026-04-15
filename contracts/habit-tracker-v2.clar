@@ -93,6 +93,9 @@
 ;; Forfeited stakes pool (total available for distribution)
 (define-data-var forfeited-pool-balance uint u0)
 
+;; Number of completed habits that are still eligible to claim bonus
+(define-data-var unclaimed-completed-habits uint u0)
+
 ;; ============================================
 ;; PRIVATE HELPER FUNCTIONS
 ;; ============================================
