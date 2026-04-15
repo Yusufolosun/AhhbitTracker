@@ -146,6 +146,15 @@
   )
 )
 
+;; Calculate equal-share bonus amount for the next claimant.
+;; Integer division intentionally leaves any remainder for later claimants.
+(define-private (calculate-bonus-share (pool-balance uint) (eligible-claimants uint))
+  (if (> eligible-claimants u0)
+    (/ pool-balance eligible-claimants)
+    u0
+  )
+)
+
 ;; ============================================
 ;; PUBLIC FUNCTIONS - HABIT MANAGEMENT
 ;; ============================================
