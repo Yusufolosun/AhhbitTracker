@@ -10,7 +10,9 @@ import {
 } from '@/features/transactions';
 import { EmptyState, ErrorState, LoadingState, Screen, SectionHeader } from '@/shared/components';
 import {
+  canWithdrawHabit,
   canSubmitMobileDailyCheckIn,
+  describeWithdrawHabitStatus,
   formatAddress,
   formatMicroStx,
   formatStreakDays,
@@ -92,6 +94,8 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
   const currentBlock = currentBlockQuery.data ?? null;
   const checkInWindowState = getMobileCheckInWindowState(habit, currentBlock);
   const canCheckIn = canSubmitMobileDailyCheckIn(habit, currentBlock);
+  const canWithdraw = canWithdrawHabit(habit);
+  const withdrawStatus = describeWithdrawHabitStatus(habit);
 
   const handleCheckInPreview = () => {
     if (!canCheckIn) {
@@ -103,6 +107,10 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
   };
 
   const handleWithdrawPreview = () => {
+    if (!canWithdraw) {
+      return;
+    }
+
     setPreview(buildWithdrawStakePreview(habit.habitId, habit.stakeAmount));
     navigateToPreview();
   };
@@ -129,6 +137,7 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
           <DetailRow label="Created at block" value={String(habit.createdAtBlock)} />
           <DetailRow label="Status" value={habit.isCompleted ? 'Completed' : habit.isActive ? 'Active' : 'Inactive'} />
           <DetailRow label="Check-in window" value={checkInWindowState} />
+          <DetailRow label="Withdrawal" value={withdrawStatus} />
           <DetailRow label="Bonus claimed" value={habit.bonusClaimed ? 'Yes' : 'No'} />
         </View>
 
@@ -138,7 +147,11 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
             label={canCheckIn ? 'Generate check-in preview' : 'Check-in preview blocked'}
             onPress={handleCheckInPreview}
           />
-          <ActionButton label="Generate withdraw preview" onPress={handleWithdrawPreview} />
+          <ActionButton
+            disabled={!canWithdraw}
+            label={canWithdraw ? 'Generate withdraw preview' : 'Withdraw preview blocked'}
+            onPress={handleWithdrawPreview}
+          />
           <ActionButton label="Generate claim preview" onPress={handleClaimPreview} />
         </View>
       </Screen>

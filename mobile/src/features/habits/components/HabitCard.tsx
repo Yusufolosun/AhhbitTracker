@@ -1,7 +1,9 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Habit } from '@/core/types';
 import {
+  canWithdrawHabit,
   canSubmitMobileDailyCheckIn,
+  describeWithdrawHabitStatus,
   formatAddress,
   formatMicroStx,
   formatStreakDays,
@@ -46,6 +48,8 @@ export function HabitCard({
 }: HabitCardProps) {
   const checkInWindowState = getMobileCheckInWindowState(habit, currentBlock);
   const canCheckIn = canSubmitMobileDailyCheckIn(habit, currentBlock);
+  const canWithdraw = canWithdrawHabit(habit);
+  const withdrawStatus = describeWithdrawHabitStatus(habit);
 
   return (
     <View style={styles.card}>
@@ -55,6 +59,7 @@ export function HabitCard({
       <Text style={styles.meta}>Streak: {formatStreakDays(habit.currentStreak)}</Text>
       <Text style={styles.meta}>Status: {habit.isCompleted ? 'Completed' : habit.isActive ? 'Active' : 'Inactive'}</Text>
       <Text style={styles.meta}>Check-in window: {checkInWindowState}</Text>
+      <Text style={styles.meta}>Withdrawal: {withdrawStatus}</Text>
 
       <View style={styles.actionsRow}>
         <ActionButton
@@ -63,7 +68,8 @@ export function HabitCard({
           onPress={() => onCheckInPreview(habit.habitId)}
         />
         <ActionButton
-          label="Withdraw"
+          disabled={!canWithdraw}
+          label={canWithdraw ? 'Withdraw' : 'Withdraw blocked'}
           onPress={() => onWithdrawPreview(habit.habitId, habit.stakeAmount)}
         />
         <ActionButton label="Claim" onPress={() => onClaimPreview(habit.habitId)} />
