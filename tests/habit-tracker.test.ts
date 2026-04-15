@@ -532,6 +532,42 @@ describe("AhhbitTracker Contract", () => {
       expect(getUnclaimedCompletedHabits().result).toEqual(Cl.ok(Cl.uint(0)));
     });
 
+    it("should report estimated bonus share from pool and claimant count", () => {
+      // Fund a 0.06 STX pool.
+      const failing = createHabit(user3, "Pool source", MIN_STAKE * 3);
+      const failingId = Number((failing.result as any).value.value);
+      simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
+      checkIn(user3, failingId);
+      simnet.mineEmptyBlocks(150);
+      simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(failingId)], user1);
+
+      // Prepare two eligible claimants.
+      const h1 = createHabit(user1, "Estimator A", MIN_STAKE);
+      const id1 = Number((h1.result as any).value.value);
+      simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
+      for (let i = 0; i < 7; i++) { checkIn(user1, id1); simnet.mineEmptyBlocks(120); }
+      withdrawStake(user1, id1);
+
+      const h2 = createHabit(user2, "Estimator B", MIN_STAKE);
+      const id2 = Number((h2.result as any).value.value);
+      simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
+      for (let i = 0; i < 7; i++) { checkIn(user2, id2); simnet.mineEmptyBlocks(120); }
+      withdrawStake(user2, id2);
+
+      // 60,000 / 2 claimants => 30,000 estimated bonus share.
+      expect(getEstimatedBonusShare().result).toEqual(Cl.ok(Cl.uint(MIN_STAKE + (MIN_STAKE / 2))));
+
+      const firstClaim = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(id1)], user1);
+      expect(firstClaim.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE + (MIN_STAKE / 2))));
+
+      // Remaining pool = 30,000 with one claimant left => 30,000.
+      expect(getEstimatedBonusShare().result).toEqual(Cl.ok(Cl.uint(MIN_STAKE + (MIN_STAKE / 2))));
+
+      const secondClaim = simnet.callPublicFn("habit-tracker-v2", "claim-bonus", [Cl.uint(id2)], user2);
+      expect(secondClaim.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE + (MIN_STAKE / 2))));
+      expect(getEstimatedBonusShare().result).toEqual(Cl.ok(Cl.uint(0)));
+    });
+
   });
 
   describe("read-only functions", () => {
