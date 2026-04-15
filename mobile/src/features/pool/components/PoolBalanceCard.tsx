@@ -17,7 +17,15 @@ export function PoolBalanceCard({ data, isLoading, error }: PoolBalanceCardProps
       ) : null}
       {!isLoading && error ? <Text style={styles.error}>{error.message}</Text> : null}
       {!isLoading && !error ? (
-        <Text style={styles.value}>{data ? `${data.stx} STX` : '0.00 STX'}</Text>
+        <View>
+          <Text style={styles.value}>{data ? `${data.stx} STX` : '0.00 STX'}</Text>
+          <Text style={styles.meta}>
+            Next bonus est.: {data ? `${data.estimatedBonusShareStx} STX` : '0.00 STX'}
+          </Text>
+          <Text style={styles.meta}>
+            Pending claimants: {data ? data.unclaimedCompletedHabits : 0}
+          </Text>
+        </View>
       ) : null}
     </View>
   );
@@ -41,6 +49,11 @@ const styles = StyleSheet.create({
     color: palette.card,
     fontSize: typography.heading,
     fontWeight: '700',
+  },
+  meta: {
+    color: palette.cloud,
+    fontSize: typography.label,
+    marginTop: spacing.xs,
   },
   error: {
     color: '#FECACA',
