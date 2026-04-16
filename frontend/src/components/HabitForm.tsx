@@ -4,6 +4,7 @@ import { useToast } from '../context/ToastContext';
 import { validateHabitName, validateStakeAmount } from '../utils/validation';
 import { toMicroSTX } from '../utils/formatting';
 import { MAX_HABIT_NAME_LENGTH, MAX_STAKE_AMOUNT, MIN_STAKE_AMOUNT } from '../utils/constants';
+import { ActionButton, SurfaceCard } from './ui';
 
 /** How long (ms) the form stays locked after the wallet signs a transaction.
  *  Long enough to outlive typical mempool propagation; short enough that a
@@ -83,7 +84,7 @@ export function HabitForm() {
   const secondsLeft = lockedUntil ? Math.ceil((lockedUntil - Date.now()) / 1000) : 0;
 
   return (
-    <div className="card">
+    <SurfaceCard>
       <h2 className="text-xl font-bold text-surface-900 dark:text-white mb-4">
         Create New Habit
       </h2>
@@ -139,11 +140,7 @@ export function HabitForm() {
           </div>
         )}
 
-        <button
-          type="submit"
-          className="btn-primary w-full"
-          disabled={isDisabled}
-        >
+        <ActionButton type="submit" className="w-full" disabled={isDisabled}>
           {isCreatingHabit ? (
             <span className="flex items-center justify-center">
               <div className="spinner w-5 h-5 mr-2"></div>
@@ -157,7 +154,7 @@ export function HabitForm() {
           ) : (
             'Create Habit'
           )}
-        </button>
+        </ActionButton>
       </form>
 
       <div className="mt-4 p-4 bg-primary-50 dark:bg-primary-500/10 rounded-lg border border-primary-200 dark:border-primary-500/20">
@@ -165,6 +162,6 @@ export function HabitForm() {
           <strong>Tip:</strong> Choose a realistic daily habit. You'll need to check in every 24 hours!
         </p>
       </div>
-    </div>
+    </SurfaceCard>
   );
 }
