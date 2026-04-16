@@ -1,12 +1,11 @@
-import type { PropsWithChildren } from 'react';
+import type { HTMLAttributes, PropsWithChildren } from 'react';
 
 type SurfaceTone = 'default' | 'accent' | 'success' | 'warning' | 'danger';
 type SurfacePadding = 'none' | 'sm' | 'md' | 'lg';
 
-interface SurfaceCardProps extends PropsWithChildren {
+interface SurfaceCardProps extends PropsWithChildren, HTMLAttributes<HTMLDivElement> {
   tone?: SurfaceTone;
   padding?: SurfacePadding;
-  className?: string;
 }
 
 const toneClasses: Record<SurfaceTone, string> = {
@@ -29,9 +28,10 @@ export function SurfaceCard({
   tone = 'default',
   padding = 'md',
   className = '',
+  ...props
 }: SurfaceCardProps) {
   return (
-    <div className={`card ${toneClasses[tone]} ${paddingClasses[padding]} ${className}`.trim()}>
+    <div {...props} className={`card ${toneClasses[tone]} ${paddingClasses[padding]} ${className}`.trim()}>
       {children}
     </div>
   );
