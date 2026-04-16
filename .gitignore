@@ -188,3 +188,6 @@ scripts/**/*-results.json
 
 # Vite config compilation cache (auto-generated, never commit)
 frontend/vite.config.ts.timestamp-*.mjs
+
+scripts/test
+scripts/test2
