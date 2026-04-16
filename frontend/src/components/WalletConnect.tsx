@@ -1,10 +1,11 @@
 import { useWallet } from '../context/WalletContext';
+import { ActionButton, SurfaceCard } from './ui';
 
 export function WalletConnect() {
   const { connect, isLoading } = useWallet();
 
   return (
-    <div className="card max-w-md mx-auto text-center animate-fade-in dark:bg-surface-800 dark:border-surface-700">
+    <SurfaceCard className="max-w-md mx-auto text-center animate-fade-in">
       <div className="mb-8">
         <img
           src="/logos/full-logo-dark.jpg"
@@ -21,13 +22,9 @@ export function WalletConnect() {
         </p>
       </div>
 
-      <button
-        onClick={connect}
-        disabled={isLoading}
-        className="btn-primary w-full mb-6"
-      >
-        {isLoading ? 'Connecting...' : 'Connect Wallet'}
-      </button>
+      <ActionButton onClick={connect} isLoading={isLoading} className="w-full mb-6">
+        Connect Wallet
+      </ActionButton>
 
       <div className="text-sm text-surface-500 dark:text-surface-400">
         <p className="mb-2">Supported wallets:</p>
@@ -39,6 +36,6 @@ export function WalletConnect() {
           <span>Asigna</span>
         </div>
       </div>
-    </div>
+    </SurfaceCard>
   );
 }

@@ -4,6 +4,7 @@ import { shortenAddress, formatSTX } from '../utils/formatting';
 import { addressUrl } from '@yusufolosun/stx-utils';
 import { ThemeToggle } from './ThemeToggle';
 import { useHashRoute } from '../hooks/useHashRoute';
+import { ActionButton } from './ui';
 
 const NAV_LINKS = [
   { href: '#dashboard', label: 'Dashboard' },
@@ -105,18 +106,19 @@ export function Header() {
                     </span>
                   )}
                 </div>
-                <button
+                <ActionButton
                   onClick={disconnect}
-                  className="text-sm text-surface-500 hover:text-primary-500 dark:text-surface-400 dark:hover:text-primary-400 transition-colors"
+                  variant="ghost"
+                  className="text-sm px-3 py-2"
                   aria-label="Disconnect wallet"
                 >
                   Disconnect
-                </button>
+                </ActionButton>
               </>
             ) : (
-              <button onClick={connect} className="btn-primary text-sm px-4 py-2">
+              <ActionButton onClick={connect} className="text-sm px-4 py-2">
                 Connect Wallet
-              </button>
+              </ActionButton>
             )}
 
             {/* Mobile menu toggle */}
