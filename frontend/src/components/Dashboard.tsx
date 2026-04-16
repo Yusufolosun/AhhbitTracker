@@ -6,6 +6,7 @@ import { useCurrentBlock } from '../hooks/useCurrentBlock';
 import { getCheckInWindowState, isEligibleToWithdraw } from '../utils/habitStatus';
 import { DailyCheckInPanel } from './DailyCheckInPanel';
 import type { DailyCheckInResult } from '../hooks/useHabits';
+import { EmptyStateCard, SectionHeading } from './ui';
 
 interface DashboardProps {
   habits: Habit[];
@@ -61,10 +62,7 @@ export function Dashboard({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold text-surface-900 dark:text-white mb-2">Dashboard</h2>
-        <p className="text-surface-600 dark:text-surface-400">Track your habit-building progress</p>
-      </div>
+      <SectionHeading title="Dashboard" subtitle="Track your habit-building progress" />
 
       <DailyCheckInPanel
         habits={habits}
@@ -76,24 +74,19 @@ export function Dashboard({
 
       {/* Empty state — first-time user onboarding */}
       {habits.length === 0 ? (
-        <div className="card text-center py-12">
-          <div className="w-16 h-16 bg-primary-100 dark:bg-primary-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+        <EmptyStateCard
+          title="No habits yet"
+          description="Create your first on-chain habit below. Stake STX, check in daily, and earn rewards from the forfeited pool when you stay consistent."
+          icon={
             <svg className="w-8 h-8 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
-          </div>
-          <h3 className="text-lg font-semibold text-surface-800 dark:text-white mb-2">No habits yet</h3>
-          <p className="text-surface-500 dark:text-surface-400 max-w-md mx-auto">
-            Create your first on-chain habit below. Stake STX, check in daily, and earn
-            rewards from the forfeited pool when you stay consistent.
-          </p>
-          <a
-            href="#create-habit"
-            className="inline-block mt-6 btn-primary"
-          >
-            Create Your First Habit
-          </a>
-        </div>
+          }
+          actionLabel="Create Your First Habit"
+          onAction={() => {
+            window.location.hash = '#create-habit';
+          }}
+        />
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
