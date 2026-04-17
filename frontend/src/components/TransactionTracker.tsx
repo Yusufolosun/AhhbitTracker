@@ -1,5 +1,6 @@
 import { useTransactions } from '../context/TransactionContext';
 import type { TrackedTransaction } from '../context/TransactionContext';
+import { ActionButton, CalloutCard, SurfaceCard } from './ui';
 
 export function TransactionTracker() {
   const { transactions, dismissTransaction, getExplorerUrl } = useTransactions();
@@ -17,9 +18,9 @@ export function TransactionTracker() {
       aria-atomic="false"
     >
       {transactions.map((tx) => (
-        <div
+        <SurfaceCard
           key={tx.txId}
-          className={`bg-white dark:bg-surface-800 border rounded-lg shadow-lg p-4 animate-slide-in ${statusBorderClass(tx.status)}`}
+          className={`shadow-lg animate-slide-in ${statusBorderClass(tx.status)}`}
           role="status"
         >
           <div className="flex items-start justify-between">
@@ -34,15 +35,16 @@ export function TransactionTracker() {
                 {shortenTxId(tx.txId)}
               </p>
             </div>
-            <button
+            <ActionButton
               onClick={() => dismissTransaction(tx.txId)}
-              className="ml-2 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300 transition-colors"
+              variant="ghost"
+              className="ml-2 px-2 py-1 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300 transition-colors"
               aria-label="Dismiss notification"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
-            </button>
+            </ActionButton>
           </div>
 
           <div className="mt-2 flex items-center justify-between">
@@ -58,11 +60,13 @@ export function TransactionTracker() {
           </div>
 
           {tx.status === 'failed' && tx.errorMessage ? (
-            <p className="mt-2 text-xs text-red-600 dark:text-red-400">
-              {tx.errorCode ? `Error ${tx.errorCode}: ${tx.errorMessage}` : tx.errorMessage}
-            </p>
+            <CalloutCard
+              title={tx.errorCode ? `Error ${tx.errorCode}` : 'Transaction failed'}
+              tone="danger"
+              description={tx.errorMessage}
+            />
           ) : null}
-        </div>
+        </SurfaceCard>
       ))}
     </div>
   );
