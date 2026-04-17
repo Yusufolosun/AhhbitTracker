@@ -1,3 +1,5 @@
+import { SurfaceCard } from './ui';
+
 interface LongestStreakBannerProps {
   longestStreak: number;
   habitName?: string;
@@ -13,15 +15,15 @@ export function LongestStreakBanner({
 }: LongestStreakBannerProps) {
   if (isLoading) {
     return (
-      <section className="rounded-2xl border border-primary-200 dark:border-primary-500/20 bg-white dark:bg-surface-900 p-4 sm:p-5 animate-pulse">
+      <SurfaceCard className="rounded-2xl animate-pulse" tone="default">
         <div className="h-4 w-40 bg-surface-200 dark:bg-surface-700 rounded" />
         <div className="mt-3 h-10 w-32 bg-surface-200 dark:bg-surface-700 rounded" />
-      </section>
+      </SurfaceCard>
     );
   }
 
   return (
-    <section className="rounded-2xl border border-primary-200 dark:border-primary-500/20 bg-gradient-to-r from-primary-50 to-amber-50 dark:from-primary-500/10 dark:to-amber-500/10 p-4 sm:p-5">
+    <SurfaceCard className="rounded-2xl bg-gradient-to-r from-primary-50 to-amber-50 dark:from-primary-500/10 dark:to-amber-500/10" tone="accent">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-xs sm:text-sm font-semibold tracking-wide uppercase text-primary-700 dark:text-primary-300">
@@ -52,6 +54,6 @@ export function LongestStreakBanner({
           </svg>
         </div>
       </div>
-    </section>
+    </SurfaceCard>
   );
 }
