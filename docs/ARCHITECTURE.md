@@ -259,6 +259,12 @@ src/
 - React Query boundary: Address transitions prune and invalidate user-scoped cache keys
 - Wallet handoff lifecycle: Session-scoped deep-link metadata for preview payloads and return callbacks
 
+**Reusable UI Layers:**
+- Frontend shared primitives live in `frontend/src/components/ui/` and centralize card, button, callout, empty-state, and heading surfaces.
+- Mobile shared primitives live in `mobile/src/shared/components/` and centralize card tone variants, action buttons, metric rows, and shell layout components.
+- Feature and screen components compose these primitives instead of redefining their own button chrome or status-card styling.
+- Tone variants stay platform-specific but semantically aligned so warnings, success states, and destructive actions feel consistent across web and mobile.
+
 **URL State:** Hash-based routing
 - useHashRoute for page navigation
 - useHashParam for filter state (e.g., active tab)

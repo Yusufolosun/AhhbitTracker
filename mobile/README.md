@@ -24,7 +24,7 @@ mobile/src/
 │   ├── wallet/                   # Wallet deep-link helpers and handoff UI
 │   └── transactions/             # Transaction preview builders + UI
 └── shared/
-    ├── components/               # Reusable UI primitives/states
+    ├── components/               # Reusable UI primitives/states (Card, ActionButton, MetricRow, etc.)
     ├── theme/                    # Design tokens
     └── utils/                    # Formatting and validation helpers
 ```
@@ -37,6 +37,7 @@ mobile/src/
 - Screen files orchestrate, feature files implement
 - Wallet handoffs are modeled as session-scoped deep links, not persisted account state
 - Legacy paths in `src/components`, `src/services`, etc. are maintained as re-export shims for compatibility
+- Shared UI primitives keep card surfaces, action buttons, and metric rows visually aligned without duplicating styles
 
 ## Global State Management
 
