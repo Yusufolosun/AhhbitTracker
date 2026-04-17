@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { RequireAddress } from '@/app/navigation/RequireAddress';
 import { MAIN_TAB_ROUTES, type RootStackScreenProps } from '@/app/navigation/types';
 import { useAddressState, usePreviewState } from '@/app/state';
@@ -8,7 +8,7 @@ import {
   buildClaimBonusPreview,
   buildWithdrawStakePreview,
 } from '@/features/transactions';
-import { EmptyState, ErrorState, LoadingState, Screen, SectionHeader } from '@/shared/components';
+import { ActionButton, Card, EmptyState, ErrorState, LoadingState, MetricRow, Screen, SectionHeader } from '@/shared/components';
 import {
   canWithdrawHabit,
   canSubmitMobileDailyCheckIn,
@@ -18,38 +18,9 @@ import {
   formatStreakDays,
   getMobileCheckInWindowState,
 } from '@/shared/utils';
-import { palette, radius, spacing, typography } from '@/shared/theme';
+import { spacing } from '@/shared/theme';
 
 type HabitDetailsScreenProps = RootStackScreenProps<'HabitDetails'>;
-
-function DetailRow({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.detailRow}>
-      <Text style={styles.detailLabel}>{label}</Text>
-      <Text style={styles.detailValue}>{value}</Text>
-    </View>
-  );
-}
-
-function ActionButton({
-  disabled,
-  label,
-  onPress,
-}: {
-  disabled?: boolean;
-  label: string;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      disabled={disabled}
-      onPress={onPress}
-      style={({ pressed }) => [styles.actionButton, disabled && styles.actionDisabled, pressed && styles.pressed]}
-    >
-      <Text style={styles.actionText}>{label}</Text>
-    </Pressable>
-  );
-}
 
 export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProps) {
   const { habitId } = route.params;
@@ -129,30 +100,37 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
       <Screen contentContainerStyle={styles.content}>
         <SectionHeader title={habit.name} subtitle={`Habit #${habit.habitId}`} />
 
-        <View style={styles.card}>
-          <DetailRow label="Owner" value={formatAddress(habit.owner)} />
-          <DetailRow label="Stake" value={formatMicroStx(habit.stakeAmount)} />
-          <DetailRow label="Current streak" value={formatStreakDays(habit.currentStreak)} />
-          <DetailRow label="Last check-in block" value={String(habit.lastCheckInBlock)} />
-          <DetailRow label="Created at block" value={String(habit.createdAtBlock)} />
-          <DetailRow label="Status" value={habit.isCompleted ? 'Completed' : habit.isActive ? 'Active' : 'Inactive'} />
-          <DetailRow label="Check-in window" value={checkInWindowState} />
-          <DetailRow label="Withdrawal" value={withdrawStatus} />
-          <DetailRow label="Bonus claimed" value={habit.bonusClaimed ? 'Yes' : 'No'} />
-        </View>
+        <Card>
+          <MetricRow label="Owner" value={formatAddress(habit.owner)} hint={habit.owner} />
+          <MetricRow label="Stake" value={formatMicroStx(habit.stakeAmount)} tone="accent" />
+          <MetricRow label="Current streak" value={formatStreakDays(habit.currentStreak)} />
+          <MetricRow label="Last check-in block" value={String(habit.lastCheckInBlock)} />
+          <MetricRow label="Created at block" value={String(habit.createdAtBlock)} />
+          <MetricRow
+            label="Status"
+            value={habit.isCompleted ? 'Completed' : habit.isActive ? 'Active' : 'Inactive'}
+            tone={habit.isCompleted ? 'success' : habit.isActive ? 'accent' : 'danger'}
+          />
+          <MetricRow label="Check-in window" value={checkInWindowState} />
+          <MetricRow label="Withdrawal" value={withdrawStatus} />
+          <MetricRow label="Bonus claimed" value={habit.bonusClaimed ? 'Yes' : 'No'} tone={habit.bonusClaimed ? 'success' : 'default'} />
+        </Card>
 
         <View style={styles.actions}>
           <ActionButton
-            disabled={!canCheckIn}
             label={canCheckIn ? 'Generate check-in preview' : 'Check-in preview blocked'}
+            disabled={!canCheckIn}
+            fullWidth
             onPress={handleCheckInPreview}
           />
           <ActionButton
-            disabled={!canWithdraw}
             label={canWithdraw ? 'Generate withdraw preview' : 'Withdraw preview blocked'}
+            disabled={!canWithdraw}
+            fullWidth
+            variant="secondary"
             onPress={handleWithdrawPreview}
           />
-          <ActionButton label="Generate claim preview" onPress={handleClaimPreview} />
+          <ActionButton fullWidth label="Generate claim preview" variant="secondary" onPress={handleClaimPreview} />
         </View>
       </Screen>
     </RequireAddress>
@@ -163,47 +141,7 @@ const styles = StyleSheet.create({
   content: {
     gap: spacing.md,
   },
-  card: {
-    backgroundColor: palette.card,
-    borderColor: palette.cloud,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    padding: spacing.md,
-  },
-  detailRow: {
-    marginBottom: spacing.sm,
-  },
-  detailLabel: {
-    color: palette.steel,
-    fontSize: typography.label,
-    fontWeight: '700',
-    marginBottom: spacing.xs,
-    textTransform: 'uppercase',
-  },
-  detailValue: {
-    color: palette.ink,
-    fontSize: typography.body,
-  },
   actions: {
     gap: spacing.sm,
-  },
-  actionButton: {
-    alignItems: 'center',
-    backgroundColor: palette.accent,
-    borderRadius: radius.md,
-    justifyContent: 'center',
-    minHeight: 46,
-    paddingHorizontal: spacing.md,
-  },
-  actionDisabled: {
-    opacity: 0.45,
-  },
-  actionText: {
-    color: palette.card,
-    fontSize: typography.body,
-    fontWeight: '700',
-  },
-  pressed: {
-    opacity: 0.8,
   },
 });

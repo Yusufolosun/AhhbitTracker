@@ -1,5 +1,6 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import type { Habit } from '@/core/types';
+import { ActionButton, Card } from '@/shared/components';
 import {
   canWithdrawHabit,
   canSubmitMobileDailyCheckIn,
@@ -19,26 +20,6 @@ interface HabitCardProps {
   onClaimPreview: (habitId: number) => void;
 }
 
-function ActionButton({
-  disabled,
-  label,
-  onPress,
-}: {
-  disabled?: boolean;
-  label: string;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      disabled={disabled}
-      onPress={onPress}
-      style={({ pressed }) => [styles.actionButton, disabled && styles.actionButtonDisabled, pressed && styles.pressed]}
-    >
-      <Text style={styles.actionButtonText}>{label}</Text>
-    </Pressable>
-  );
-}
-
 export function HabitCard({
   habit,
   currentBlock,
@@ -50,9 +31,16 @@ export function HabitCard({
   const canCheckIn = canSubmitMobileDailyCheckIn(habit, currentBlock);
   const canWithdraw = canWithdrawHabit(habit);
   const withdrawStatus = describeWithdrawHabitStatus(habit);
+  const cardTone = !habit.isActive && !habit.isCompleted
+    ? 'danger'
+    : habit.isCompleted
+      ? 'success'
+      : checkInWindowState === 'urgent'
+        ? 'warning'
+        : 'default';
 
   return (
-    <View style={styles.card}>
+    <Card style={styles.card} tone={cardTone}>
       <Text style={styles.name}>{habit.name}</Text>
       <Text style={styles.meta}>Owner: {formatAddress(habit.owner)}</Text>
       <Text style={styles.meta}>Stake: {formatMicroStx(habit.stakeAmount)}</Text>
@@ -63,29 +51,27 @@ export function HabitCard({
 
       <View style={styles.actionsRow}>
         <ActionButton
-          disabled={!canCheckIn}
           label={canCheckIn ? 'Check-in' : 'Check-in blocked'}
+          disabled={!canCheckIn}
+          fullWidth
           onPress={() => onCheckInPreview(habit.habitId)}
         />
         <ActionButton
-          disabled={!canWithdraw}
           label={canWithdraw ? 'Withdraw' : 'Withdraw blocked'}
+          disabled={!canWithdraw}
+          fullWidth
+          variant="secondary"
           onPress={() => onWithdrawPreview(habit.habitId, habit.stakeAmount)}
         />
-        <ActionButton label="Claim" onPress={() => onClaimPreview(habit.habitId)} />
+        <ActionButton fullWidth label="Claim" variant="secondary" onPress={() => onClaimPreview(habit.habitId)} />
       </View>
-    </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: palette.card,
-    borderColor: palette.cloud,
-    borderRadius: radius.lg,
-    borderWidth: 1,
     marginBottom: spacing.sm,
-    padding: spacing.md,
   },
   name: {
     color: palette.ink,
@@ -99,30 +85,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   actionsRow: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     gap: spacing.xs,
     marginTop: spacing.md,
-  },
-  actionButton: {
-    backgroundColor: palette.surface,
-    borderColor: palette.cloud,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    flex: 1,
-    minHeight: 38,
-    justifyContent: 'center',
-    paddingHorizontal: spacing.sm,
-  },
-  actionButtonDisabled: {
-    opacity: 0.45,
-  },
-  actionButtonText: {
-    color: palette.ink,
-    fontSize: typography.label,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-  pressed: {
-    opacity: 0.85,
   },
 });

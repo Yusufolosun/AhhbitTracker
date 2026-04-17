@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { RequireAddress } from '@/app/navigation/RequireAddress';
 import { MAIN_TAB_ROUTES, type RootStackScreenProps } from '@/app/navigation/types';
 import { useAddressState, usePreviewState } from '@/app/state';
@@ -6,9 +6,9 @@ import {
   buildCreateHabitPreview,
   CreateHabitPreviewCard,
 } from '@/features/transactions';
-import { Screen, SectionHeader } from '@/shared/components';
+import { ActionButton, Screen, SectionHeader } from '@/shared/components';
 import { toMicroSTX } from '@/shared/utils';
-import { palette, radius, spacing, typography } from '@/shared/theme';
+import { spacing } from '@/shared/theme';
 
 type CreateHabitScreenProps = RootStackScreenProps<'CreateHabit'>;
 
@@ -40,12 +40,13 @@ export function CreateHabitScreen({ navigation }: CreateHabitScreenProps) {
 
         <CreateHabitPreviewCard onPreview={handleCreatePreview} />
 
-        <Pressable
+        <ActionButton
+          label="Open transaction preview panel"
           onPress={() => navigation.navigate('MainTabs', { screen: MAIN_TAB_ROUTES.Preview })}
-          style={({ pressed }) => [styles.previewLink, pressed && styles.pressed]}
-        >
-          <Text style={styles.previewLinkText}>Open transaction preview panel</Text>
-        </Pressable>
+          variant="secondary"
+          fullWidth
+          style={styles.previewLink}
+        />
       </Screen>
     </RequireAddress>
   );
@@ -56,20 +57,6 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   previewLink: {
-    alignItems: 'center',
-    backgroundColor: palette.surface,
-    borderColor: palette.cloud,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    minHeight: 42,
-    justifyContent: 'center',
-  },
-  previewLinkText: {
-    color: palette.ink,
-    fontSize: typography.label,
-    fontWeight: '700',
-  },
-  pressed: {
-    opacity: 0.8,
+    marginTop: spacing.xs,
   },
 });

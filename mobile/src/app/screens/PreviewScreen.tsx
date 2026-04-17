@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { StyleSheet } from 'react-native';
 import type { MainTabScreenProps } from '@/app/navigation/types';
 import { usePreviewState, useWalletInteractionState } from '@/app/state';
 import { WalletInteractionCard, parseWalletInteractionParams } from '@/features/wallet';
 import { TransactionPreviewPanel } from '@/features/transactions';
-import { Screen, SectionHeader } from '@/shared/components';
-import { palette, radius, spacing, typography } from '@/shared/theme';
+import { ActionButton, Screen, SectionHeader } from '@/shared/components';
+import { spacing } from '@/shared/theme';
 
 type PreviewScreenProps = MainTabScreenProps<'Preview'>;
 
@@ -43,17 +43,14 @@ export function PreviewScreen({ route }: PreviewScreenProps) {
       <WalletInteractionCard preview={preview} walletInteraction={walletInteraction} />
       <TransactionPreviewPanel preview={preview} />
 
-      <Pressable
+      <ActionButton
         disabled={!preview && !walletInteraction}
+        fullWidth
+        label="Clear current preview"
         onPress={handleClear}
-        style={({ pressed }) => [
-          styles.clearButton,
-          !preview && !walletInteraction && styles.disabled,
-          pressed && styles.pressed,
-        ]}
-      >
-        <Text style={styles.clearButtonText}>Clear current preview</Text>
-      </Pressable>
+        variant="secondary"
+        style={styles.clearButton}
+      />
     </Screen>
   );
 }
@@ -63,23 +60,6 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   clearButton: {
-    alignItems: 'center',
-    backgroundColor: palette.surface,
-    borderColor: palette.cloud,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    justifyContent: 'center',
-    minHeight: 42,
-  },
-  clearButtonText: {
-    color: palette.ink,
-    fontSize: typography.label,
-    fontWeight: '700',
-  },
-  disabled: {
-    opacity: 0.45,
-  },
-  pressed: {
-    opacity: 0.8,
+    marginTop: spacing.xs,
   },
 });

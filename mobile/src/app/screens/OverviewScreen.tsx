@@ -1,22 +1,14 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import type { MainTabScreenProps } from '@/app/navigation/types';
 import { MAIN_TAB_ROUTES, ROOT_ROUTES } from '@/app/navigation/types';
 import { useAddressState } from '@/app/state';
 import { AddressInputCard } from '@/features/address';
 import { useUserStatsQuery, usePoolBalanceQuery } from '@/features/habits';
 import { PoolBalanceCard } from '@/features/pool';
-import { EmptyState, LoadingState, Screen, SectionHeader } from '@/shared/components';
+import { ActionButton, Card, EmptyState, LoadingState, MetricRow, Screen, SectionHeader } from '@/shared/components';
 import { palette, radius, spacing, typography } from '@/shared/theme';
 
 type OverviewScreenProps = MainTabScreenProps<'Overview'>;
-
-function ActionCard({ label, onPress }: { label: string; onPress: () => void }) {
-  return (
-    <Pressable onPress={onPress} style={({ pressed }) => [styles.actionCard, pressed && styles.pressed]}>
-      <Text style={styles.actionLabel}>{label}</Text>
-    </Pressable>
-  );
-}
 
 export function OverviewScreen({ navigation }: OverviewScreenProps) {
   const { activeAddress, isHydrating, setAddress, clearAddress } = useAddressState();
@@ -52,26 +44,31 @@ export function OverviewScreen({ navigation }: OverviewScreenProps) {
       />
 
       {activeAddress ? (
-        <View style={styles.statsRow}>
-          <Text style={styles.statsLabel}>Total habits</Text>
-          <Text style={styles.statsValue}>{statsQuery.data?.totalHabits ?? 0}</Text>
-        </View>
+        <Card style={styles.statsCard}>
+          <MetricRow label="Total habits" value={statsQuery.data?.totalHabits ?? 0} tone="accent" />
+        </Card>
       ) : (
         <EmptyState message="Save a Stacks address to load habits and stats." />
       )}
 
       <View style={styles.actionsGrid}>
-        <ActionCard
+        <ActionButton
           label="Open habits"
           onPress={() => navigation.navigate(MAIN_TAB_ROUTES.Habits)}
+          variant="secondary"
+          fullWidth
         />
-        <ActionCard
+        <ActionButton
           label="Create habit"
           onPress={() => navigation.navigate(ROOT_ROUTES.CreateHabit)}
+          variant="secondary"
+          fullWidth
         />
-        <ActionCard
+        <ActionButton
           label="View previews"
           onPress={() => navigation.navigate(MAIN_TAB_ROUTES.Preview)}
+          variant="secondary"
+          fullWidth
         />
       </View>
     </Screen>
@@ -82,46 +79,10 @@ const styles = StyleSheet.create({
   content: {
     gap: spacing.md,
   },
-  statsRow: {
-    alignItems: 'center',
-    backgroundColor: palette.card,
-    borderColor: palette.cloud,
-    borderRadius: 12,
-    borderWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  statsLabel: {
-    color: palette.slate,
-    fontSize: typography.body,
-    fontWeight: '600',
-  },
-  statsValue: {
-    color: palette.ink,
-    fontSize: typography.heading,
-    fontWeight: '800',
+  statsCard: {
+    marginTop: spacing.xs,
   },
   actionsGrid: {
     gap: spacing.sm,
-  },
-  actionCard: {
-    alignItems: 'center',
-    backgroundColor: palette.card,
-    borderColor: palette.cloud,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    justifyContent: 'center',
-    minHeight: 48,
-    paddingHorizontal: spacing.md,
-  },
-  actionLabel: {
-    color: palette.ink,
-    fontSize: typography.body,
-    fontWeight: '700',
-  },
-  pressed: {
-    opacity: 0.8,
   },
 });
