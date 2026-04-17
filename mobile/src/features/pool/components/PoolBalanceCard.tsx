@@ -1,5 +1,6 @@
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import type { PoolBalance } from '@/core/types';
+import { Card } from '@/shared/components';
 import { palette, radius, spacing, typography } from '@/shared/theme';
 
 interface PoolBalanceCardProps {
@@ -10,7 +11,7 @@ interface PoolBalanceCardProps {
 
 export function PoolBalanceCard({ data, isLoading, error }: PoolBalanceCardProps) {
   return (
-    <View style={styles.card}>
+    <Card style={styles.card} tone={error ? 'danger' : 'accent'}>
       <Text style={styles.label}>Forfeited Pool</Text>
       {isLoading ? (
         <ActivityIndicator color={palette.accent} size="small" />
@@ -19,31 +20,28 @@ export function PoolBalanceCard({ data, isLoading, error }: PoolBalanceCardProps
       {!isLoading && !error ? (
         <Text style={styles.value}>{data ? `${data.stx} STX` : '0.00 STX'}</Text>
       ) : null}
-    </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: palette.ink,
-    borderRadius: radius.lg,
     marginTop: spacing.md,
-    padding: spacing.md,
   },
   label: {
-    color: palette.cloud,
+    color: palette.ink,
     fontSize: typography.label,
     fontWeight: '700',
     marginBottom: spacing.sm,
     textTransform: 'uppercase',
   },
   value: {
-    color: palette.card,
+    color: palette.ink,
     fontSize: typography.heading,
     fontWeight: '700',
   },
   error: {
-    color: '#FECACA',
+    color: palette.danger,
     fontSize: typography.body,
   },
 });

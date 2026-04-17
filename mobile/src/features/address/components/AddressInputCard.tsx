@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Pressable,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
-import { Card } from '@/shared/components';
+import { ActionButton, Card } from '@/shared/components';
 import { palette, radius, spacing, typography } from '@/shared/theme';
 
 interface AddressInputCardProps {
@@ -73,32 +72,21 @@ export function AddressInputCard({
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
       <View style={styles.row}>
-        <Pressable
-          accessibilityRole="button"
-          disabled={pending}
+        <ActionButton
+          fullWidth
+          label="Save"
+          loading={pending}
+          loadingLabel="Saving"
           onPress={handleSave}
-          style={({ pressed }) => [
-            styles.action,
-            styles.primary,
-            pressed && styles.pressed,
-            pending && styles.disabled,
-          ]}
-        >
-          {pending ? <ActivityIndicator color={palette.card} size="small" /> : <Text style={styles.primaryText}>Save</Text>}
-        </Pressable>
-        <Pressable
-          accessibilityRole="button"
-          disabled={pending}
+          style={styles.action}
+        />
+        <ActionButton
+          fullWidth
+          label="Clear"
           onPress={handleClear}
-          style={({ pressed }) => [
-            styles.action,
-            styles.secondary,
-            pressed && styles.pressed,
-            pending && styles.disabled,
-          ]}
-        >
-          <Text style={styles.secondaryText}>Clear</Text>
-        </Pressable>
+          variant="secondary"
+          style={styles.action}
+        />
       </View>
     </Card>
   );
@@ -132,32 +120,6 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
   },
   action: {
-    alignItems: 'center',
-    borderRadius: radius.md,
     flex: 1,
-    justifyContent: 'center',
-    minHeight: 44,
-  },
-  primary: {
-    backgroundColor: palette.accent,
-  },
-  secondary: {
-    backgroundColor: palette.surface,
-    borderColor: palette.cloud,
-    borderWidth: 1,
-  },
-  primaryText: {
-    color: palette.card,
-    fontWeight: '700',
-  },
-  secondaryText: {
-    color: palette.ink,
-    fontWeight: '700',
-  },
-  disabled: {
-    opacity: 0.55,
-  },
-  pressed: {
-    opacity: 0.85,
   },
 });

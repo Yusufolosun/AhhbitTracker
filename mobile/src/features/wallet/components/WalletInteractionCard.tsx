@@ -1,9 +1,10 @@
 import * as Clipboard from 'expo-clipboard';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { buildWalletPreviewLink, buildWalletReturnLink } from '../linking';
 import type { WalletInteractionState } from '../types';
 import type { ContractCallPreview } from '@/core/types';
+import { ActionButton, Card } from '@/shared/components';
 import { palette, radius, spacing, typography } from '@/shared/theme';
 
 interface WalletInteractionCardProps {
@@ -43,12 +44,13 @@ function CopyButton({
   };
 
   return (
-    <Pressable
+    <ActionButton
+      label={copied ? 'Copied' : label}
       onPress={handleCopy}
-      style={({ pressed }) => [styles.copyButton, pressed && styles.pressed]}
-    >
-      <Text style={styles.copyButtonText}>{copied ? 'Copied' : label}</Text>
-    </Pressable>
+      variant="ghost"
+      style={styles.copyButton}
+      textStyle={styles.copyButtonText}
+    />
   );
 }
 
@@ -84,7 +86,7 @@ export function WalletInteractionCard({ preview, walletInteraction }: WalletInte
   }
 
   return (
-    <View style={styles.card}>
+    <Card style={styles.card} tone="inverse">
       <Text style={styles.label}>Wallet deep links</Text>
       {walletInteraction?.txId && walletInteraction.status ? (
         <View style={styles.summary}>
@@ -108,14 +110,12 @@ export function WalletInteractionCard({ preview, walletInteraction }: WalletInte
           <CopyButton label="Copy return link" value={returnLink} />
         </View>
       ) : null}
-    </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#0A1020',
-    borderRadius: radius.lg,
     padding: spacing.md,
   },
   label: {
@@ -159,17 +159,14 @@ const styles = StyleSheet.create({
   },
   copyButton: {
     alignSelf: 'flex-start',
-    backgroundColor: '#1E293B',
-    borderRadius: radius.md,
     marginTop: spacing.xs,
+    minHeight: 34,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
   },
   copyButtonText: {
     color: palette.card,
+    fontSize: typography.label,
     fontWeight: '700',
-  },
-  pressed: {
-    opacity: 0.82,
   },
 });

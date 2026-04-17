@@ -1,12 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
-import { Card } from '@/shared/components';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActionButton, Card } from '@/shared/components';
 import { palette, radius, spacing, typography } from '@/shared/theme';
 import { MAX_HABIT_NAME_LENGTH, MAX_STAKE_AMOUNT, MIN_STAKE_AMOUNT } from '@/core/config';
 import { validateHabitName, validateHabitStake } from '@/shared/utils';
@@ -80,18 +74,13 @@ export function CreateHabitPreviewCard({ onPreview }: CreateHabitPreviewCardProp
         Min {minStakeStx} STX · Max {maxStakeStx} STX · Up to {MAX_HABIT_NAME_LENGTH} characters
       </Text>
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Pressable
-        accessibilityRole="button"
+      <ActionButton
+        fullWidth
+        label="Generate create-habit preview"
         disabled={isDisabled}
         onPress={handlePreview}
-        style={({ pressed }) => [
-          styles.previewButton,
-          isDisabled && styles.disabled,
-          pressed && styles.pressed,
-        ]}
-      >
-        <Text style={styles.previewButtonText}>Generate create-habit preview</Text>
-      </Pressable>
+        style={styles.previewButton}
+      />
     </Card>
   );
 }
@@ -128,20 +117,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   previewButton: {
-    alignItems: 'center',
-    backgroundColor: palette.accent,
-    borderRadius: radius.md,
-    justifyContent: 'center',
-    minHeight: 44,
-  },
-  previewButtonText: {
-    color: palette.card,
-    fontWeight: '700',
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-  pressed: {
-    opacity: 0.85,
+    marginTop: spacing.sm,
   },
 });
