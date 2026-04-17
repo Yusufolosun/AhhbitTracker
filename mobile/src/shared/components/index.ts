@@ -1,5 +1,6 @@
 export * from './Card';
 export * from './ActionButton';
+export * from './MetricRow';
 export * from './Screen';
 export * from './SectionHeader';
 export * from './LoadingState';
