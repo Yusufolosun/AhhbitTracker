@@ -21,39 +21,55 @@ export function AddressInputCard({
   onClear,
 }: AddressInputCardProps) {
   const [value, setValue] = useState(initialValue);
-  const [pending, setPending] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const pending = isSaving || isClearing;
 
   useEffect(() => {
     setValue(initialValue);
   }, [initialValue]);
 
   const handleSave = async () => {
-    setPending(true);
+    setIsSaving(true);
     setError(null);
+    setSuccess(null);
 
     try {
       await onSubmit(value);
+      setSuccess('Address saved successfully.');
     } catch (submissionError) {
       setError(
         submissionError instanceof Error
           ? submissionError.message
           : 'Unable to save address.',
       );
+      setSuccess(null);
     } finally {
-      setPending(false);
+      setIsSaving(false);
     }
   };
 
   const handleClear = async () => {
-    setPending(true);
+    setIsClearing(true);
     setError(null);
+    setSuccess(null);
 
     try {
       await onClear();
       setValue('');
+      setSuccess('Address cleared.');
+    } catch (clearError) {
+      setError(
+        clearError instanceof Error
+          ? clearError.message
+          : 'Unable to clear address.',
+      );
+      setSuccess(null);
     } finally {
-      setPending(false);
+      setIsClearing(false);
     }
   };
 
@@ -71,11 +87,13 @@ export function AddressInputCard({
         value={value}
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
+      {success ? <Text style={styles.success}>{success}</Text> : null}
       <View style={styles.row}>
         <ActionButton
           fullWidth
           label="Save"
-          loading={pending}
+          disabled={isClearing}
+          loading={isSaving}
           loadingLabel="Saving"
           onPress={handleSave}
           style={styles.action}
@@ -83,6 +101,9 @@ export function AddressInputCard({
         <ActionButton
           fullWidth
           label="Clear"
+          disabled={isSaving}
+          loading={isClearing}
+          loadingLabel="Clearing"
           onPress={handleClear}
           variant="secondary"
           style={styles.action}
@@ -112,6 +133,10 @@ const styles = StyleSheet.create({
   },
   error: {
     color: palette.danger,
+    marginTop: spacing.sm,
+  },
+  success: {
+    color: palette.success,
     marginTop: spacing.sm,
   },
   row: {
