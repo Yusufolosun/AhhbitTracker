@@ -5,10 +5,11 @@ import { WalletState } from '../types/habit';
 interface WalletContextType {
   walletState: WalletState;
   connect: () => void;
-  disconnect: () => void;
+  disconnect: () => Promise<void>;
   refreshBalance: () => Promise<void>;
   isLoading: boolean;
   isBalanceLoading: boolean;
+  isDisconnecting: boolean;
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
@@ -33,6 +34,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isBalanceLoading, setIsBalanceLoading] = useState(false);
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
 
   const fetchAndSetBalance = async (address: string) => {
     setIsBalanceLoading(true);
@@ -106,17 +108,26 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     }
   };
 
-  const disconnect = () => {
-    walletService.disconnect();
-    setWalletState({
-      isConnected: false,
-      address: null,
-      balance: 0,
-    });
+  const disconnect = async () => {
+    setIsDisconnecting(true);
+
+    try {
+      walletService.disconnect();
+      setWalletState({
+        isConnected: false,
+        address: null,
+        balance: 0,
+      });
+    } catch (error) {
+      console.error('Error disconnecting wallet:', error);
+      throw error;
+    } finally {
+      setIsDisconnecting(false);
+    }
   };
 
   return (
-    <WalletContext.Provider value={{ walletState, connect, disconnect, refreshBalance, isLoading, isBalanceLoading }}>
+    <WalletContext.Provider value={{ walletState, connect, disconnect, refreshBalance, isLoading, isBalanceLoading, isDisconnecting }}>
       {children}
     </WalletContext.Provider>
   );
