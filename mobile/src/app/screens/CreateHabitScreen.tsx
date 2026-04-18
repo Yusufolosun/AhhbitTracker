@@ -16,9 +16,9 @@ export function CreateHabitScreen({ navigation }: CreateHabitScreenProps) {
   const { activeAddress } = useAddressState();
   const { setPreview } = usePreviewState();
 
-  const handleCreatePreview = (name: string, stakeAmountStx: number) => {
+  const handleCreatePreview = async (name: string, stakeAmountStx: number) => {
     if (!activeAddress) {
-      return;
+      throw new Error('Save a Stacks address before generating a create-habit preview.');
     }
 
     setPreview(buildCreateHabitPreview(activeAddress, name, toMicroSTX(stakeAmountStx)));
