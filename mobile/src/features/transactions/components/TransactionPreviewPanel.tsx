@@ -10,7 +10,7 @@ interface TransactionPreviewPanelProps {
 }
 
 export function TransactionPreviewPanel({ preview }: TransactionPreviewPanelProps) {
-  const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
+  const [copyState, setCopyState] = useState<'idle' | 'copying' | 'copied' | 'error'>('idle');
   const copyResetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -39,16 +39,26 @@ export function TransactionPreviewPanel({ preview }: TransactionPreviewPanelProp
   }
 
   const handleCopy = async () => {
-    await Clipboard.setStringAsync(payloadText);
-    setCopyState('copied');
+    setCopyState('copying');
 
     if (copyResetTimeoutRef.current) {
       clearTimeout(copyResetTimeoutRef.current);
     }
 
-    copyResetTimeoutRef.current = setTimeout(() => {
-      setCopyState('idle');
-    }, 1500);
+    try {
+      await Clipboard.setStringAsync(payloadText);
+      setCopyState('copied');
+
+      copyResetTimeoutRef.current = setTimeout(() => {
+        setCopyState('idle');
+      }, 1500);
+    } catch {
+      setCopyState('error');
+
+      copyResetTimeoutRef.current = setTimeout(() => {
+        setCopyState('idle');
+      }, 1800);
+    }
   };
 
   return (
@@ -56,8 +66,16 @@ export function TransactionPreviewPanel({ preview }: TransactionPreviewPanelProp
       <View style={styles.headerRow}>
         <Text style={styles.label}>Transaction Preview</Text>
         <ActionButton
-          label={copyState === 'copied' ? 'Copied' : 'Copy'}
+          label={
+            copyState === 'copied'
+              ? 'Copied'
+              : copyState === 'error'
+                ? 'Copy failed'
+                : 'Copy'
+          }
           onPress={handleCopy}
+          loading={copyState === 'copying'}
+          loadingLabel="Copying"
           variant="ghost"
           style={styles.copyButton}
           textStyle={styles.copyButtonText}
