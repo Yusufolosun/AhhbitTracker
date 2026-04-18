@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { RequireAddress } from '@/app/navigation/RequireAddress';
 import { MAIN_TAB_ROUTES, type RootStackScreenProps } from '@/app/navigation/types';
@@ -8,7 +9,8 @@ import {
   buildClaimBonusPreview,
   buildWithdrawStakePreview,
 } from '@/features/transactions';
-import { ActionButton, Card, EmptyState, ErrorState, LoadingState, MetricRow, Screen, SectionHeader } from '@/shared/components';
+import { ActionButton, Card, EmptyState, ErrorState, InteractionStatusBanner, LoadingState, MetricRow, Screen, SectionHeader } from '@/shared/components';
+import { useInteractionStatus } from '@/shared/hooks/useInteractionStatus';
 import {
   canWithdrawHabit,
   canSubmitMobileDailyCheckIn,
@@ -26,6 +28,8 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
   const { habitId } = route.params;
   const { activeAddress } = useAddressState();
   const { setPreview } = usePreviewState();
+  const [pendingAction, setPendingAction] = useState<'check-in' | 'withdraw' | 'claim' | null>(null);
+  const { status, showError, showSuccess } = useInteractionStatus();
 
   const habitsQuery = useUserHabitsQuery(activeAddress);
   const currentBlockQuery = useCurrentBlockQuery();
@@ -70,7 +74,7 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
 
   const handleCheckInPreview = () => {
     if (!canCheckIn) {
-      return;
+      throw new Error('This habit is not eligible for check-in yet.');
     }
 
     setPreview(buildCheckInPreview(habit.habitId));
@@ -79,7 +83,7 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
 
   const handleWithdrawPreview = () => {
     if (!canWithdraw) {
-      return;
+      throw new Error('This habit is not eligible for withdrawal yet.');
     }
 
     setPreview(buildWithdrawStakePreview(habit.habitId, habit.stakeAmount));
@@ -89,6 +93,24 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
   const handleClaimPreview = () => {
     setPreview(buildClaimBonusPreview(habit.habitId));
     navigateToPreview();
+  };
+
+  const runAction = async (
+    action: 'check-in' | 'withdraw' | 'claim',
+    callback: () => void,
+    successMessage: string,
+  ) => {
+    setPendingAction(action);
+
+    try {
+      callback();
+      showSuccess(successMessage);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to generate preview.';
+      showError(message);
+    } finally {
+      setPendingAction(null);
+    }
   };
 
   return (
@@ -116,21 +138,35 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
           <MetricRow label="Bonus claimed" value={habit.bonusClaimed ? 'Yes' : 'No'} tone={habit.bonusClaimed ? 'success' : 'default'} />
         </Card>
 
+        <InteractionStatusBanner status={status} />
+
         <View style={styles.actions}>
           <ActionButton
             label={canCheckIn ? 'Generate check-in preview' : 'Check-in preview blocked'}
-            disabled={!canCheckIn}
+            disabled={!canCheckIn || pendingAction !== null}
             fullWidth
-            onPress={handleCheckInPreview}
+            loading={pendingAction === 'check-in'}
+            loadingLabel="Generating"
+            onPress={() => void runAction('check-in', handleCheckInPreview, 'Check-in preview generated.')}
           />
           <ActionButton
             label={canWithdraw ? 'Generate withdraw preview' : 'Withdraw preview blocked'}
-            disabled={!canWithdraw}
+            disabled={!canWithdraw || pendingAction !== null}
             fullWidth
             variant="secondary"
-            onPress={handleWithdrawPreview}
+            loading={pendingAction === 'withdraw'}
+            loadingLabel="Generating"
+            onPress={() => void runAction('withdraw', handleWithdrawPreview, 'Withdraw preview generated.')}
           />
-          <ActionButton fullWidth label="Generate claim preview" variant="secondary" onPress={handleClaimPreview} />
+          <ActionButton
+            fullWidth
+            label="Generate claim preview"
+            variant="secondary"
+            disabled={pendingAction !== null}
+            loading={pendingAction === 'claim'}
+            loadingLabel="Generating"
+            onPress={() => void runAction('claim', handleClaimPreview, 'Claim preview generated.')}
+          />
         </View>
       </Screen>
     </RequireAddress>
