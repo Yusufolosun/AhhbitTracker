@@ -8,9 +8,9 @@ interface HabitListProps {
   currentBlock: number | null;
   isLoading: boolean;
   error: Error | null;
-  onCheckInPreview: (habitId: number) => void;
-  onWithdrawPreview: (habitId: number, stakeAmount: number) => void;
-  onClaimPreview: (habitId: number) => void;
+  onCheckInPreview: (habitId: number) => Promise<void> | void;
+  onWithdrawPreview: (habitId: number, stakeAmount: number) => Promise<void> | void;
+  onClaimPreview: (habitId: number) => Promise<void> | void;
 }
 
 export function HabitList({
