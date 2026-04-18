@@ -19,7 +19,7 @@ function CopyButton({
   label: string;
   value: string;
 }) {
-  const [copied, setCopied] = useState(false);
+  const [copyState, setCopyState] = useState<'idle' | 'copying' | 'copied' | 'error'>('idle');
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -31,22 +31,40 @@ function CopyButton({
   }, []);
 
   const handleCopy = async () => {
-    await Clipboard.setStringAsync(value);
-    setCopied(true);
+    setCopyState('copying');
 
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
 
-    timeoutRef.current = setTimeout(() => {
-      setCopied(false);
-    }, 1200);
+    try {
+      await Clipboard.setStringAsync(value);
+      setCopyState('copied');
+
+      timeoutRef.current = setTimeout(() => {
+        setCopyState('idle');
+      }, 1200);
+    } catch {
+      setCopyState('error');
+
+      timeoutRef.current = setTimeout(() => {
+        setCopyState('idle');
+      }, 1800);
+    }
   };
 
   return (
     <ActionButton
-      label={copied ? 'Copied' : label}
+      label={
+        copyState === 'copied'
+          ? 'Copied'
+          : copyState === 'error'
+            ? 'Copy failed'
+            : label
+      }
       onPress={handleCopy}
+      loading={copyState === 'copying'}
+      loadingLabel="Copying"
       variant="ghost"
       style={styles.copyButton}
       textStyle={styles.copyButtonText}
