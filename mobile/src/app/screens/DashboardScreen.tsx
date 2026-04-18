@@ -33,24 +33,24 @@ export function DashboardScreen() {
   const poolBalanceQuery = usePoolBalanceQuery();
   const statsQuery = useUserStatsQuery(activeAddress);
 
-  const handleCreatePreview = (name: string, stakeAmountStx: number) => {
+  const handleCreatePreview = async (name: string, stakeAmountStx: number) => {
     if (!activeAddress) {
-      return;
+      throw new Error('Save a Stacks address before generating a create-habit preview.');
     }
 
     const stakeAmountMicroStx = toMicroSTX(stakeAmountStx);
     setPreview(buildCreateHabitPreview(activeAddress, name, stakeAmountMicroStx));
   };
 
-  const handleCheckInPreview = (habitId: number) => {
+  const handleCheckInPreview = async (habitId: number) => {
     setPreview(buildCheckInPreview(habitId));
   };
 
-  const handleWithdrawPreview = (habitId: number, stakeAmount: number) => {
+  const handleWithdrawPreview = async (habitId: number, stakeAmount: number) => {
     setPreview(buildWithdrawStakePreview(habitId, stakeAmount));
   };
 
-  const handleClaimPreview = (habitId: number) => {
+  const handleClaimPreview = async (habitId: number) => {
     setPreview(buildClaimBonusPreview(habitId));
   };
 
