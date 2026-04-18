@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useWallet } from '../context/WalletContext';
+import { useToast } from '../context/ToastContext';
 import { shortenAddress, formatSTX } from '../utils/formatting';
 import { addressUrl } from '@yusufolosun/stx-utils';
 import { ThemeToggle } from './ThemeToggle';
@@ -14,7 +15,8 @@ const NAV_LINKS = [
 ];
 
 export function Header() {
-  const { walletState, connect, disconnect, isBalanceLoading } = useWallet();
+  const { walletState, connect, disconnect, isLoading, isBalanceLoading, isDisconnecting } = useWallet();
+  const { showToast } = useToast();
   const { route } = useHashRoute();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -40,6 +42,16 @@ export function Header() {
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [mobileMenuOpen]);
+
+  const handleDisconnect = async () => {
+    try {
+      await disconnect();
+      showToast('Wallet disconnected.', 'success');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to disconnect wallet.';
+      showToast(message, 'error');
+    }
+  };
 
   return (
     <header className="bg-white dark:bg-surface-950 border-b border-surface-200 dark:border-surface-700 sticky top-0 z-50 backdrop-blur-sm bg-white/90 dark:bg-surface-950/90">
@@ -107,7 +119,8 @@ export function Header() {
                   )}
                 </div>
                 <ActionButton
-                  onClick={disconnect}
+                  onClick={() => void handleDisconnect()}
+                  isLoading={isDisconnecting}
                   variant="ghost"
                   className="text-sm px-3 py-2"
                   aria-label="Disconnect wallet"
@@ -116,7 +129,7 @@ export function Header() {
                 </ActionButton>
               </>
             ) : (
-              <ActionButton onClick={connect} className="text-sm px-4 py-2">
+              <ActionButton onClick={connect} isLoading={isLoading} className="text-sm px-4 py-2">
                 Connect Wallet
               </ActionButton>
             )}
