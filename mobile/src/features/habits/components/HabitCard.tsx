@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import type { Habit } from '@/core/types';
-import { ActionButton, Card } from '@/shared/components';
+import { ActionButton, Card, InteractionStatusBanner } from '@/shared/components';
+import { useInteractionStatus } from '@/shared/hooks/useInteractionStatus';
 import {
   canWithdrawHabit,
   canSubmitMobileDailyCheckIn,
@@ -15,10 +17,12 @@ import { palette, radius, spacing, typography } from '@/shared/theme';
 interface HabitCardProps {
   habit: Habit;
   currentBlock: number | null;
-  onCheckInPreview: (habitId: number) => void;
-  onWithdrawPreview: (habitId: number, stakeAmount: number) => void;
-  onClaimPreview: (habitId: number) => void;
+  onCheckInPreview: (habitId: number) => Promise<void> | void;
+  onWithdrawPreview: (habitId: number, stakeAmount: number) => Promise<void> | void;
+  onClaimPreview: (habitId: number) => Promise<void> | void;
 }
+
+type HabitAction = 'check-in' | 'withdraw' | 'claim';
 
 export function HabitCard({
   habit,
@@ -27,6 +31,8 @@ export function HabitCard({
   onWithdrawPreview,
   onClaimPreview,
 }: HabitCardProps) {
+  const [pendingAction, setPendingAction] = useState<HabitAction | null>(null);
+  const { status, showError, showSuccess } = useInteractionStatus();
   const checkInWindowState = getMobileCheckInWindowState(habit, currentBlock);
   const canCheckIn = canSubmitMobileDailyCheckIn(habit, currentBlock);
   const canWithdraw = canWithdrawHabit(habit);
@@ -39,6 +45,24 @@ export function HabitCard({
         ? 'warning'
         : 'default';
 
+  const runAction = async (
+    action: HabitAction,
+    callback: () => Promise<void> | void,
+    successMessage: string,
+  ) => {
+    setPendingAction(action);
+
+    try {
+      await callback();
+      showSuccess(successMessage);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to generate preview.';
+      showError(message);
+    } finally {
+      setPendingAction(null);
+    }
+  };
+
   return (
     <Card style={styles.card} tone={cardTone}>
       <Text style={styles.name}>{habit.name}</Text>
@@ -49,21 +73,53 @@ export function HabitCard({
       <Text style={styles.meta}>Check-in window: {checkInWindowState}</Text>
       <Text style={styles.meta}>Withdrawal: {withdrawStatus}</Text>
 
+      <InteractionStatusBanner status={status} />
+
       <View style={styles.actionsRow}>
         <ActionButton
           label={canCheckIn ? 'Check-in' : 'Check-in blocked'}
-          disabled={!canCheckIn}
+          disabled={!canCheckIn || pendingAction !== null}
           fullWidth
-          onPress={() => onCheckInPreview(habit.habitId)}
+          loading={pendingAction === 'check-in'}
+          loadingLabel="Generating"
+          onPress={() =>
+            void runAction(
+              'check-in',
+              () => onCheckInPreview(habit.habitId),
+              'Check-in preview generated.',
+            )
+          }
         />
         <ActionButton
           label={canWithdraw ? 'Withdraw' : 'Withdraw blocked'}
-          disabled={!canWithdraw}
+          disabled={!canWithdraw || pendingAction !== null}
           fullWidth
           variant="secondary"
-          onPress={() => onWithdrawPreview(habit.habitId, habit.stakeAmount)}
+          loading={pendingAction === 'withdraw'}
+          loadingLabel="Generating"
+          onPress={() =>
+            void runAction(
+              'withdraw',
+              () => onWithdrawPreview(habit.habitId, habit.stakeAmount),
+              'Withdraw preview generated.',
+            )
+          }
         />
-        <ActionButton fullWidth label="Claim" variant="secondary" onPress={() => onClaimPreview(habit.habitId)} />
+        <ActionButton
+          fullWidth
+          label="Claim"
+          variant="secondary"
+          disabled={pendingAction !== null}
+          loading={pendingAction === 'claim'}
+          loadingLabel="Generating"
+          onPress={() =>
+            void runAction(
+              'claim',
+              () => onClaimPreview(habit.habitId),
+              'Claim preview generated.',
+            )
+          }
+        />
       </View>
     </Card>
   );
