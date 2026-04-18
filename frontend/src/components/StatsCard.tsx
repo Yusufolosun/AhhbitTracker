@@ -1,4 +1,5 @@
-import React from 'react';
+import type { ReactNode } from 'react';
+import { SurfaceCard } from './ui';
 
 /**
  * A card component displaying a statistic with optional icon and trend indicator.
@@ -7,7 +8,7 @@ interface StatsCardProps {
   title: string;
   value: string | number;
   subtitle?: string;
-  icon?: React.ReactNode;
+  icon?: ReactNode;
   trend?: 'up' | 'down' | 'neutral';
 }
 
@@ -19,7 +20,7 @@ export function StatsCard({ title, value, subtitle, icon, trend }: StatsCardProp
   };
 
   return (
-    <div className="card">
+    <SurfaceCard>
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <p className="text-sm font-medium text-surface-600 dark:text-surface-400 mb-1">{title}</p>
@@ -36,6 +37,6 @@ export function StatsCard({ title, value, subtitle, icon, trend }: StatsCardProp
           </div>
         )}
       </div>
-    </div>
+    </SurfaceCard>
   );
 }

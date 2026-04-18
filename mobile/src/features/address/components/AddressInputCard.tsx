@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
-  Pressable,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
-import { Card } from '@/shared/components';
+import { ActionButton, Card } from '@/shared/components';
 import { palette, radius, spacing, typography } from '@/shared/theme';
 
 interface AddressInputCardProps {
@@ -22,39 +21,55 @@ export function AddressInputCard({
   onClear,
 }: AddressInputCardProps) {
   const [value, setValue] = useState(initialValue);
-  const [pending, setPending] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const pending = isSaving || isClearing;
 
   useEffect(() => {
     setValue(initialValue);
   }, [initialValue]);
 
   const handleSave = async () => {
-    setPending(true);
+    setIsSaving(true);
     setError(null);
+    setSuccess(null);
 
     try {
       await onSubmit(value);
+      setSuccess('Address saved successfully.');
     } catch (submissionError) {
       setError(
         submissionError instanceof Error
           ? submissionError.message
           : 'Unable to save address.',
       );
+      setSuccess(null);
     } finally {
-      setPending(false);
+      setIsSaving(false);
     }
   };
 
   const handleClear = async () => {
-    setPending(true);
+    setIsClearing(true);
     setError(null);
+    setSuccess(null);
 
     try {
       await onClear();
       setValue('');
+      setSuccess('Address cleared.');
+    } catch (clearError) {
+      setError(
+        clearError instanceof Error
+          ? clearError.message
+          : 'Unable to clear address.',
+      );
+      setSuccess(null);
     } finally {
-      setPending(false);
+      setIsClearing(false);
     }
   };
 
@@ -72,33 +87,27 @@ export function AddressInputCard({
         value={value}
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
+      {success ? <Text style={styles.success}>{success}</Text> : null}
       <View style={styles.row}>
-        <Pressable
-          accessibilityRole="button"
-          disabled={pending}
+        <ActionButton
+          fullWidth
+          label="Save"
+          disabled={isClearing}
+          loading={isSaving}
+          loadingLabel="Saving"
           onPress={handleSave}
-          style={({ pressed }) => [
-            styles.action,
-            styles.primary,
-            pressed && styles.pressed,
-            pending && styles.disabled,
-          ]}
-        >
-          {pending ? <ActivityIndicator color={palette.card} size="small" /> : <Text style={styles.primaryText}>Save</Text>}
-        </Pressable>
-        <Pressable
-          accessibilityRole="button"
-          disabled={pending}
+          style={styles.action}
+        />
+        <ActionButton
+          fullWidth
+          label="Clear"
+          disabled={isSaving}
+          loading={isClearing}
+          loadingLabel="Clearing"
           onPress={handleClear}
-          style={({ pressed }) => [
-            styles.action,
-            styles.secondary,
-            pressed && styles.pressed,
-            pending && styles.disabled,
-          ]}
-        >
-          <Text style={styles.secondaryText}>Clear</Text>
-        </Pressable>
+          variant="secondary"
+          style={styles.action}
+        />
       </View>
     </Card>
   );
@@ -126,38 +135,16 @@ const styles = StyleSheet.create({
     color: palette.danger,
     marginTop: spacing.sm,
   },
+  success: {
+    color: palette.success,
+    marginTop: spacing.sm,
+  },
   row: {
     flexDirection: 'row',
     gap: spacing.sm,
     marginTop: spacing.md,
   },
   action: {
-    alignItems: 'center',
-    borderRadius: radius.md,
     flex: 1,
-    justifyContent: 'center',
-    minHeight: 44,
-  },
-  primary: {
-    backgroundColor: palette.accent,
-  },
-  secondary: {
-    backgroundColor: palette.surface,
-    borderColor: palette.cloud,
-    borderWidth: 1,
-  },
-  primaryText: {
-    color: palette.card,
-    fontWeight: '700',
-  },
-  secondaryText: {
-    color: palette.ink,
-    fontWeight: '700',
-  },
-  disabled: {
-    opacity: 0.55,
-  },
-  pressed: {
-    opacity: 0.85,
   },
 });

@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef } from 'react';
+import { ActionButton, SurfaceCard } from './ui';
 
 interface ConfirmationDialogProps {
   open: boolean;
@@ -97,33 +98,36 @@ export function ConfirmationDialog({
       <div
         ref={dialogRef}
         tabIndex={-1}
-        className="relative bg-white dark:bg-surface-800 rounded-xl shadow-xl max-w-md w-full mx-4 p-6 animate-fade-in border border-surface-200 dark:border-surface-700"
+        className="relative max-w-md w-full mx-4 animate-fade-in"
       >
-        <h2
-          id={titleId}
-          className="text-lg font-semibold text-surface-900 dark:text-white mb-4"
-        >
-          {title}
-        </h2>
-
-        <div className="text-sm text-surface-600 dark:text-surface-400 mb-6">{children}</div>
-
-        <div className="flex justify-end space-x-3">
-          <button
-            onClick={onCancel}
-            disabled={isLoading}
-            className="px-4 py-2 text-sm font-medium text-surface-700 dark:text-surface-300 bg-surface-100 dark:bg-surface-700 rounded-lg hover:bg-surface-200 dark:hover:bg-surface-600 transition-colors disabled:opacity-50"
+        <SurfaceCard className="p-6 shadow-xl" padding="none">
+          <h2
+            id={titleId}
+            className="text-lg font-semibold text-surface-900 dark:text-white mb-4"
           >
-            {cancelLabel}
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={isLoading}
-            className="px-4 py-2 text-sm font-medium text-white bg-primary-500 rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50"
-          >
-            {isLoading ? 'Processing...' : confirmLabel}
-          </button>
-        </div>
+            {title}
+          </h2>
+
+          <div className="text-sm text-surface-600 dark:text-surface-400 mb-6">{children}</div>
+
+          <div className="flex justify-end space-x-3">
+            <ActionButton
+              onClick={onCancel}
+              disabled={isLoading}
+              variant="secondary"
+              className="px-4 py-2 text-sm"
+            >
+              {cancelLabel}
+            </ActionButton>
+            <ActionButton
+              onClick={onConfirm}
+              disabled={isLoading}
+              className="px-4 py-2 text-sm"
+            >
+              {isLoading ? 'Processing...' : confirmLabel}
+            </ActionButton>
+          </div>
+        </SurfaceCard>
       </div>
     </div>
   );

@@ -1,7 +1,8 @@
 import * as Clipboard from 'expo-clipboard';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { ContractCallPreview } from '@/core/types';
+import { ActionButton, Card } from '@/shared/components';
 import { palette, radius, spacing, typography } from '@/shared/theme';
 
 interface TransactionPreviewPanelProps {
@@ -9,7 +10,7 @@ interface TransactionPreviewPanelProps {
 }
 
 export function TransactionPreviewPanel({ preview }: TransactionPreviewPanelProps) {
-  const [copyState, setCopyState] = useState<'idle' | 'copied'>('idle');
+  const [copyState, setCopyState] = useState<'idle' | 'copying' | 'copied' | 'error'>('idle');
   const copyResetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -38,39 +39,58 @@ export function TransactionPreviewPanel({ preview }: TransactionPreviewPanelProp
   }
 
   const handleCopy = async () => {
-    await Clipboard.setStringAsync(payloadText);
-    setCopyState('copied');
+    setCopyState('copying');
 
     if (copyResetTimeoutRef.current) {
       clearTimeout(copyResetTimeoutRef.current);
     }
 
-    copyResetTimeoutRef.current = setTimeout(() => {
-      setCopyState('idle');
-    }, 1500);
+    try {
+      await Clipboard.setStringAsync(payloadText);
+      setCopyState('copied');
+
+      copyResetTimeoutRef.current = setTimeout(() => {
+        setCopyState('idle');
+      }, 1500);
+    } catch {
+      setCopyState('error');
+
+      copyResetTimeoutRef.current = setTimeout(() => {
+        setCopyState('idle');
+      }, 1800);
+    }
   };
 
   return (
-    <View style={styles.card}>
+    <Card style={styles.card} tone="inverse">
       <View style={styles.headerRow}>
         <Text style={styles.label}>Transaction Preview</Text>
-        <Pressable onPress={handleCopy} style={({ pressed }) => [styles.copyButton, pressed && styles.pressed]}>
-          <Text style={styles.copyButtonText}>{copyState === 'copied' ? 'Copied' : 'Copy'}</Text>
-        </Pressable>
+        <ActionButton
+          label={
+            copyState === 'copied'
+              ? 'Copied'
+              : copyState === 'error'
+                ? 'Copy failed'
+                : 'Copy'
+          }
+          onPress={handleCopy}
+          loading={copyState === 'copying'}
+          loadingLabel="Copying"
+          variant="ghost"
+          style={styles.copyButton}
+          textStyle={styles.copyButtonText}
+        />
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator style={styles.payloadScroll}>
         <Text style={styles.payloadText}>{payloadText}</Text>
       </ScrollView>
-    </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#0A1020',
-    borderRadius: radius.lg,
     marginTop: spacing.md,
-    padding: spacing.md,
   },
   headerRow: {
     alignItems: 'center',
@@ -98,16 +118,13 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   copyButton: {
-    backgroundColor: '#1E293B',
-    borderRadius: radius.md,
+    minHeight: 34,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
   },
   copyButtonText: {
     color: palette.card,
+    fontSize: typography.label,
     fontWeight: '700',
-  },
-  pressed: {
-    opacity: 0.8,
   },
 });

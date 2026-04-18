@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useAddressState, usePreviewState } from '@/app/state';
 import {
   AddressInputCard,
@@ -19,9 +19,9 @@ import {
   CreateHabitPreviewCard,
   TransactionPreviewPanel,
 } from '@/features/transactions';
-import { EmptyState, LoadingState, Screen, SectionHeader } from '@/shared/components';
+import { Card, EmptyState, LoadingState, MetricRow, Screen, SectionHeader } from '@/shared/components';
 import { toMicroSTX } from '@/shared/utils';
-import { palette, spacing, typography } from '@/shared/theme';
+import { spacing } from '@/shared/theme';
 
 
 export function DashboardScreen() {
@@ -33,24 +33,24 @@ export function DashboardScreen() {
   const poolBalanceQuery = usePoolBalanceQuery();
   const statsQuery = useUserStatsQuery(activeAddress);
 
-  const handleCreatePreview = (name: string, stakeAmountStx: number) => {
+  const handleCreatePreview = async (name: string, stakeAmountStx: number) => {
     if (!activeAddress) {
-      return;
+      throw new Error('Save a Stacks address before generating a create-habit preview.');
     }
 
     const stakeAmountMicroStx = toMicroSTX(stakeAmountStx);
     setPreview(buildCreateHabitPreview(activeAddress, name, stakeAmountMicroStx));
   };
 
-  const handleCheckInPreview = (habitId: number) => {
+  const handleCheckInPreview = async (habitId: number) => {
     setPreview(buildCheckInPreview(habitId));
   };
 
-  const handleWithdrawPreview = (habitId: number, stakeAmount: number) => {
+  const handleWithdrawPreview = async (habitId: number, stakeAmount: number) => {
     setPreview(buildWithdrawStakePreview(habitId, stakeAmount));
   };
 
-  const handleClaimPreview = (habitId: number) => {
+  const handleClaimPreview = async (habitId: number) => {
     setPreview(buildClaimBonusPreview(habitId));
   };
 
@@ -83,10 +83,9 @@ export function DashboardScreen() {
       />
 
       {activeAddress ? (
-        <View style={styles.statsRow}>
-          <Text style={styles.statsLabel}>Total habits</Text>
-          <Text style={styles.statsValue}>{statsQuery.data?.totalHabits ?? 0}</Text>
-        </View>
+        <Card style={styles.statsCard}>
+          <MetricRow label="Total habits" value={statsQuery.data?.totalHabits ?? 0} tone="accent" />
+        </Card>
       ) : (
         <EmptyState message="Save a Stacks address to load habits and stats." />
       )}
@@ -117,26 +116,8 @@ const styles = StyleSheet.create({
   content: {
     gap: spacing.md,
   },
-  statsRow: {
-    alignItems: 'center',
-    backgroundColor: palette.card,
-    borderColor: palette.cloud,
-    borderRadius: 12,
-    borderWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  statsLabel: {
-    color: palette.slate,
-    fontSize: typography.body,
-    fontWeight: '600',
-  },
-  statsValue: {
-    color: palette.ink,
-    fontSize: typography.heading,
-    fontWeight: '800',
+  statsCard: {
+    marginTop: spacing.xs,
   },
   sectionSpacing: {
     marginTop: spacing.sm,

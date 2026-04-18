@@ -1,18 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
-import { Card } from '@/shared/components';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActionButton, Card } from '@/shared/components';
 import { palette, radius, spacing, typography } from '@/shared/theme';
 import { MAX_HABIT_NAME_LENGTH, MAX_STAKE_AMOUNT, MIN_STAKE_AMOUNT } from '@/core/config';
 import { validateHabitName, validateHabitStake } from '@/shared/utils';
 
 interface CreateHabitPreviewCardProps {
-  onPreview: (name: string, stakeAmountStx: number) => void;
+  onPreview: (name: string, stakeAmountStx: number) => Promise<void> | void;
 }
 
 function normalizeStake(value: string): number {
@@ -28,15 +22,21 @@ export function CreateHabitPreviewCard({ onPreview }: CreateHabitPreviewCardProp
   const maxStakeStx = MAX_STAKE_AMOUNT / 1_000_000;
   const [habitName, setHabitName] = useState('');
   const [stake, setStake] = useState('0.02');
+  const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
-  const isDisabled = useMemo(() => !habitName.trim() || !stake.trim(), [habitName, stake]);
+  const isDisabled = useMemo(
+    () => !habitName.trim() || !stake.trim() || isGenerating,
+    [habitName, isGenerating, stake],
+  );
 
   useEffect(() => {
     setError(null);
+    setSuccess(null);
   }, [habitName, stake]);
 
-  const handlePreview = () => {
+  const handlePreview = async () => {
     const normalizedName = habitName.trim();
     const stakeAmount = normalizeStake(stake);
 
@@ -52,8 +52,23 @@ export function CreateHabitPreviewCard({ onPreview }: CreateHabitPreviewCardProp
       return;
     }
 
+    setIsGenerating(true);
     setError(null);
-    onPreview(normalizedName, stakeAmount);
+    setSuccess(null);
+
+    try {
+      await onPreview(normalizedName, stakeAmount);
+      setSuccess('Create-habit preview generated.');
+    } catch (previewError) {
+      setError(
+        previewError instanceof Error
+          ? previewError.message
+          : 'Unable to generate create-habit preview.',
+      );
+      setSuccess(null);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
@@ -80,18 +95,16 @@ export function CreateHabitPreviewCard({ onPreview }: CreateHabitPreviewCardProp
         Min {minStakeStx} STX · Max {maxStakeStx} STX · Up to {MAX_HABIT_NAME_LENGTH} characters
       </Text>
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      <Pressable
-        accessibilityRole="button"
+      {success ? <Text style={styles.success}>{success}</Text> : null}
+      <ActionButton
+        fullWidth
+        label="Generate create-habit preview"
         disabled={isDisabled}
+        loading={isGenerating}
+        loadingLabel="Generating"
         onPress={handlePreview}
-        style={({ pressed }) => [
-          styles.previewButton,
-          isDisabled && styles.disabled,
-          pressed && styles.pressed,
-        ]}
-      >
-        <Text style={styles.previewButtonText}>Generate create-habit preview</Text>
-      </Pressable>
+        style={styles.previewButton}
+      />
     </Card>
   );
 }
@@ -122,26 +135,16 @@ const styles = StyleSheet.create({
     color: palette.danger,
     marginBottom: spacing.sm,
   },
+  success: {
+    color: palette.success,
+    marginBottom: spacing.sm,
+  },
   hint: {
     color: palette.steel,
     fontSize: typography.label,
     marginBottom: spacing.sm,
   },
   previewButton: {
-    alignItems: 'center',
-    backgroundColor: palette.accent,
-    borderRadius: radius.md,
-    justifyContent: 'center',
-    minHeight: 44,
-  },
-  previewButtonText: {
-    color: palette.card,
-    fontWeight: '700',
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-  pressed: {
-    opacity: 0.85,
+    marginTop: spacing.sm,
   },
 });

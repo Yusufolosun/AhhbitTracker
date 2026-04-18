@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import type { MainTabScreenProps } from '@/app/navigation/types';
 import { MAIN_TAB_ROUTES, ROOT_ROUTES } from '@/app/navigation/types';
 import { RequireAddress } from '@/app/navigation/RequireAddress';
@@ -13,8 +13,8 @@ import {
   buildClaimBonusPreview,
   buildWithdrawStakePreview,
 } from '@/features/transactions';
-import { EmptyState, ErrorState, LoadingState, Screen, SectionHeader } from '@/shared/components';
-import { palette, radius, spacing, typography } from '@/shared/theme';
+import { ActionButton, EmptyState, ErrorState, LoadingState, Screen, SectionHeader } from '@/shared/components';
+import { spacing } from '@/shared/theme';
 
 type HabitsScreenProps = MainTabScreenProps<'Habits'>;
 
@@ -28,17 +28,17 @@ export function HabitsScreen({ navigation }: HabitsScreenProps) {
     navigation.navigate(MAIN_TAB_ROUTES.Preview);
   };
 
-  const handleCheckInPreview = (habitId: number) => {
+  const handleCheckInPreview = async (habitId: number) => {
     setPreview(buildCheckInPreview(habitId));
     openPreviewTab();
   };
 
-  const handleWithdrawPreview = (habitId: number, stakeAmount: number) => {
+  const handleWithdrawPreview = async (habitId: number, stakeAmount: number) => {
     setPreview(buildWithdrawStakePreview(habitId, stakeAmount));
     openPreviewTab();
   };
 
-  const handleClaimPreview = (habitId: number) => {
+  const handleClaimPreview = async (habitId: number) => {
     setPreview(buildClaimBonusPreview(habitId));
     openPreviewTab();
   };
@@ -72,12 +72,13 @@ export function HabitsScreen({ navigation }: HabitsScreenProps) {
                   onWithdrawPreview={handleWithdrawPreview}
                   onClaimPreview={handleClaimPreview}
                 />
-                <Pressable
+                <ActionButton
                   onPress={() => navigation.navigate(ROOT_ROUTES.HabitDetails, { habitId: habit.habitId })}
-                  style={({ pressed }) => [styles.detailsButton, pressed && styles.pressed]}
-                >
-                  <Text style={styles.detailsButtonText}>View habit details</Text>
-                </Pressable>
+                  label="View habit details"
+                  variant="secondary"
+                  fullWidth
+                  style={styles.detailsButton}
+                />
               </View>
             ))
           : null}
@@ -94,21 +95,6 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   detailsButton: {
-    alignItems: 'center',
-    backgroundColor: palette.surface,
-    borderColor: palette.cloud,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    justifyContent: 'center',
     marginTop: spacing.xs,
-    minHeight: 40,
-  },
-  detailsButtonText: {
-    color: palette.ink,
-    fontSize: typography.label,
-    fontWeight: '700',
-  },
-  pressed: {
-    opacity: 0.8,
   },
 });

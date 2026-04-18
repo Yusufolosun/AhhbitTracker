@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { TOAST_DURATION } from '../utils/constants';
+import { ActionButton, CalloutCard } from './ui';
 
 interface ToastProps {
   message: string;
@@ -22,21 +23,28 @@ export function Toast({ message, type, onClose }: ToastProps) {
     info: 'bg-blue-500',
   };
 
+  const tones = {
+    success: 'success',
+    error: 'danger',
+    info: 'info',
+  } as const;
+
   return (
-    <div
-      role={type === 'error' ? 'alert' : 'status'}
-      className={`${bgColors[type]} text-white px-6 py-4 rounded-lg shadow-lg animate-fade-in pointer-events-auto`}
-    >
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-medium">{message}</p>
-        <button
-          onClick={onClose}
-          className="ml-4 text-white hover:text-gray-200"
-          aria-label="Close notification"
-        >
-          ✕
-        </button>
-      </div>
+    <div role={type === 'error' ? 'alert' : 'status'} className="pointer-events-auto">
+      <CalloutCard
+        title={message}
+        tone={tones[type]}
+        action={
+          <ActionButton
+            onClick={onClose}
+            variant="ghost"
+            className="px-2 py-1 text-white hover:bg-white/10"
+            aria-label="Close notification"
+          >
+            ✕
+          </ActionButton>
+        }
+      />
     </div>
   );
 }

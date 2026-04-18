@@ -4,10 +4,12 @@
  * final layout shape, eliminating content-shift when data loads.
  */
 
+import { SurfaceCard } from './ui';
+
 /** A single stat card skeleton matching StatsCard dimensions */
 export function StatCardSkeleton() {
   return (
-    <div className="card animate-pulse" aria-hidden="true">
+    <SurfaceCard className="animate-pulse" aria-hidden="true">
       <div className="flex items-center justify-between">
         <div className="space-y-2 flex-1">
           <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -16,14 +18,14 @@ export function StatCardSkeleton() {
         </div>
         <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg" />
       </div>
-    </div>
+    </SurfaceCard>
   );
 }
 
 /** A skeleton matching the HabitCard layout */
 export function HabitCardSkeleton() {
   return (
-    <div className="card animate-pulse" aria-hidden="true">
+    <SurfaceCard className="animate-pulse" aria-hidden="true">
       {/* Header row */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1 space-y-2">
@@ -50,14 +52,14 @@ export function HabitCardSkeleton() {
 
       {/* Button placeholder */}
       <div className="h-11 w-full bg-gray-200 dark:bg-gray-700 rounded-lg" />
-    </div>
+    </SurfaceCard>
   );
 }
 
 /** A skeleton matching the PoolDisplay card */
 export function PoolSkeleton() {
   return (
-    <div className="card bg-gradient-to-br from-primary-50 to-primary-100 border-primary-200 dark:from-primary-500/10 dark:to-primary-500/5 dark:border-primary-500/20 animate-pulse" aria-hidden="true">
+    <SurfaceCard tone="accent" className="bg-gradient-to-br from-primary-50 to-primary-100 animate-pulse" aria-hidden="true">
       <div className="flex items-center justify-between">
         <div className="space-y-2 flex-1">
           <div className="h-3 w-32 bg-primary-200 rounded" />
@@ -66,7 +68,7 @@ export function PoolSkeleton() {
         </div>
         <div className="w-16 h-16 bg-primary-200 rounded-full" />
       </div>
-    </div>
+    </SurfaceCard>
   );
 }
 

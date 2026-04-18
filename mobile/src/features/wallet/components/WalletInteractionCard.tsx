@@ -1,9 +1,10 @@
 import * as Clipboard from 'expo-clipboard';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { buildWalletPreviewLink, buildWalletReturnLink } from '../linking';
 import type { WalletInteractionState } from '../types';
 import type { ContractCallPreview } from '@/core/types';
+import { ActionButton, Card } from '@/shared/components';
 import { palette, radius, spacing, typography } from '@/shared/theme';
 
 interface WalletInteractionCardProps {
@@ -18,7 +19,7 @@ function CopyButton({
   label: string;
   value: string;
 }) {
-  const [copied, setCopied] = useState(false);
+  const [copyState, setCopyState] = useState<'idle' | 'copying' | 'copied' | 'error'>('idle');
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -30,25 +31,44 @@ function CopyButton({
   }, []);
 
   const handleCopy = async () => {
-    await Clipboard.setStringAsync(value);
-    setCopied(true);
+    setCopyState('copying');
 
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
 
-    timeoutRef.current = setTimeout(() => {
-      setCopied(false);
-    }, 1200);
+    try {
+      await Clipboard.setStringAsync(value);
+      setCopyState('copied');
+
+      timeoutRef.current = setTimeout(() => {
+        setCopyState('idle');
+      }, 1200);
+    } catch {
+      setCopyState('error');
+
+      timeoutRef.current = setTimeout(() => {
+        setCopyState('idle');
+      }, 1800);
+    }
   };
 
   return (
-    <Pressable
+    <ActionButton
+      label={
+        copyState === 'copied'
+          ? 'Copied'
+          : copyState === 'error'
+            ? 'Copy failed'
+            : label
+      }
       onPress={handleCopy}
-      style={({ pressed }) => [styles.copyButton, pressed && styles.pressed]}
-    >
-      <Text style={styles.copyButtonText}>{copied ? 'Copied' : label}</Text>
-    </Pressable>
+      loading={copyState === 'copying'}
+      loadingLabel="Copying"
+      variant="ghost"
+      style={styles.copyButton}
+      textStyle={styles.copyButtonText}
+    />
   );
 }
 
@@ -84,7 +104,7 @@ export function WalletInteractionCard({ preview, walletInteraction }: WalletInte
   }
 
   return (
-    <View style={styles.card}>
+    <Card style={styles.card} tone="inverse">
       <Text style={styles.label}>Wallet deep links</Text>
       {walletInteraction?.txId && walletInteraction.status ? (
         <View style={styles.summary}>
@@ -108,14 +128,12 @@ export function WalletInteractionCard({ preview, walletInteraction }: WalletInte
           <CopyButton label="Copy return link" value={returnLink} />
         </View>
       ) : null}
-    </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#0A1020',
-    borderRadius: radius.lg,
     padding: spacing.md,
   },
   label: {
@@ -159,17 +177,14 @@ const styles = StyleSheet.create({
   },
   copyButton: {
     alignSelf: 'flex-start',
-    backgroundColor: '#1E293B',
-    borderRadius: radius.md,
     marginTop: spacing.xs,
+    minHeight: 34,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
   },
   copyButtonText: {
     color: palette.card,
+    fontSize: typography.label,
     fontWeight: '700',
-  },
-  pressed: {
-    opacity: 0.82,
   },
 });

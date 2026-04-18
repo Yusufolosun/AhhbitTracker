@@ -10,7 +10,7 @@
  *   3. WITHDRAW      — Each wallet withdraws stake from completed habits
  *
  * Config:
- *   - Fee per txn: 1200 microSTX
+ *   - Fee per txn: randomized 2100-2140 microSTX
  *   - Stake per habit: 20,000 microSTX (0.02 STX — contract minimum)
  *   - Delay between txns: 8 seconds
  *   - Wallet count: ACTIVE_WALLETS_COUNT in batch-25-wallets.env (1–55, default 55)
@@ -38,6 +38,7 @@ import {
     fetchCallReadOnlyFunction,
     principalCV,
 } from '@stacks/transactions';
+import { randomInt } from 'node:crypto';
 import { generateWallet, getStxAddress } from '@stacks/wallet-sdk';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
@@ -72,7 +73,8 @@ if (!fs.existsSync(envPath)) {
 dotenv.config({ path: envPath });
 
 // ── Constants ──
-const FEE_MICROSTX = 1_200;
+const MIN_TX_FEE_MICROSTX = 2_100;
+const MAX_TX_FEE_MICROSTX = 2_140;
 const DELAY_BETWEEN_TX_MS = 8_000; // 8 seconds
 // How many wallets to include in this batch run (1–55). Edit ACTIVE_WALLETS_COUNT
 // in batch-25-wallets.env to use fewer wallets, e.g. 30 or 40.
@@ -111,6 +113,7 @@ interface HabitRecord {
     habitId: number | null;
     habitName: string;
     txId: string;
+    feeMicroStx?: number;
     status: 'submitted' | 'failed' | 'confirmed';
     timestamp: number;
     error?: string;
@@ -127,6 +130,34 @@ interface BatchState {
 
 function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function getRandomizedTxnFeeMicroStx(): number {
+    return randomInt(MIN_TX_FEE_MICROSTX, MAX_TX_FEE_MICROSTX + 1);
+}
+
+function summarizeSubmittedFees(records: HabitRecord[]): {
+    totalFeeMicroStx: number;
+    minFeeMicroStx: number | null;
+    maxFeeMicroStx: number | null;
+} {
+    const submittedFees = records
+        .filter(record => record.status === 'submitted' && typeof record.feeMicroStx === 'number')
+        .map(record => record.feeMicroStx as number);
+
+    if (submittedFees.length === 0) {
+        return {
+            totalFeeMicroStx: 0,
+            minFeeMicroStx: null,
+            maxFeeMicroStx: null,
+        };
+    }
+
+    return {
+        totalFeeMicroStx: submittedFees.reduce((sum, fee) => sum + fee, 0),
+        minFeeMicroStx: Math.min(...submittedFees),
+        maxFeeMicroStx: Math.max(...submittedFees),
+    };
 }
 
 async function getCurrentBlockHeight(): Promise<number> {
@@ -356,33 +387,55 @@ async function getNonce(address: string): Promise<bigint> {
 }
 
 /**
- * Get user habits from contract (read-only)
- * get-user-habits returns { habit-ids: (list 100 uint) } — NOT wrapped in (ok ...)
+ * Get user habits from contract (read-only).
+ * get-user-habits returns the full historical habit list for the wallet.
  */
 async function getUserHabits(address: string): Promise<number[]> {
-    try {
-        const result = await fetchCallReadOnlyFunction({
-            contractAddress: CONTRACT_ADDRESS,
-            contractName: CONTRACT_NAME,
-            functionName: 'get-user-habits',
-            functionArgs: [principalCV(address)],
-            senderAddress: address,
-            network: 'mainnet',
-        });
+    const result = await fetchCallReadOnlyFunction({
+        contractAddress: CONTRACT_ADDRESS,
+        contractName: CONTRACT_NAME,
+        functionName: 'get-user-habits',
+        functionArgs: [principalCV(address)],
+        senderAddress: address,
+        network: 'mainnet',
+    });
 
-        const json = cvToJSON(result);
+    const json = cvToJSON(result);
 
-        // get-user-habits returns a tuple { habit-ids: [...] } directly (not a response)
-        // cvToJSON shape: { type: 'tuple', value: { 'habit-ids': { type: 'list', value: [...] } } }
-        const habitIdsList = json.value?.['habit-ids']?.value
-            ?? json.value?.value  // fallback for response-wrapped shape
-            ?? [];
-        return Array.isArray(habitIdsList)
-            ? habitIdsList.map((v: any) => parseInt(v.value))
-            : [];
-    } catch {
+    // get-user-habits returns a tuple { habit-ids: [...] } directly (not a response)
+    // cvToJSON shape: { type: 'tuple', value: { 'habit-ids': { type: 'list', value: [...] } } }
+    const habitIdsList = json.value?.['habit-ids']?.value
+        ?? json.value?.value  // fallback for response-wrapped shape
+        ?? [];
+    return Array.isArray(habitIdsList)
+        ? habitIdsList.map((v: any) => parseInt(v.value))
+        : [];
+}
+
+/**
+ * Get the currently active habit IDs for a wallet.
+ *
+ * The contract's get-user-habits view is historical, so we inspect each habit
+ * and keep only the records that still have `is-active: true` on-chain.
+ */
+async function getActiveHabitIds(address: string): Promise<number[]> {
+    const habitIds = await getUserHabits(address);
+
+    if (habitIds.length === 0) {
         return [];
     }
+
+    const activeHabitIds: number[] = [];
+
+    for (const habitId of habitIds) {
+        const habit = await readonlyClient.getHabit(habitId);
+
+        if (habit?.isActive) {
+            activeHabitIds.push(habitId);
+        }
+    }
+
+    return activeHabitIds;
 }
 
 /**
@@ -438,7 +491,8 @@ async function broadcastTx(
     functionName: string,
     args: any[],
     nonce: bigint,
-): Promise<string> {
+): Promise<{ txId: string; feeMicroStx: number }> {
+    const feeMicroStx = getRandomizedTxnFeeMicroStx();
     const txOptions: any = {
         contractAddress: CONTRACT_ADDRESS,
         contractName: CONTRACT_NAME,
@@ -448,7 +502,7 @@ async function broadcastTx(
         network: 'mainnet',
         anchorMode: AnchorMode.Any,
         postConditionMode: PostConditionMode.Allow,
-        fee: BigInt(FEE_MICROSTX),
+        fee: BigInt(feeMicroStx),
         nonce,
     };
 
@@ -460,7 +514,10 @@ async function broadcastTx(
         throw new Error(errMsg || JSON.stringify(broadcastResponse));
     }
 
-    return broadcastResponse.txid;
+    return {
+        txId: broadcastResponse.txid,
+        feeMicroStx,
+    };
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -479,18 +536,20 @@ async function batchCreateHabits(wallets: WalletInfo[]): Promise<void> {
     console.log('═'.repeat(70));
     console.log();
     console.log(`  Contract: ${CONTRACT_ADDRESS}.${CONTRACT_NAME}`);
-    console.log(`  Fee/tx:   ${FEE_MICROSTX} microSTX (${(FEE_MICROSTX / 1_000_000).toFixed(6)} STX)`);
+    console.log(
+        `  Fee/tx:   randomized ${MIN_TX_FEE_MICROSTX}-${MAX_TX_FEE_MICROSTX} microSTX (${(MIN_TX_FEE_MICROSTX / 1_000_000).toFixed(6)}-${(MAX_TX_FEE_MICROSTX / 1_000_000).toFixed(6)} STX)`
+    );
     console.log(`  Stake:    ${STAKE_AMOUNT} microSTX (${(STAKE_AMOUNT / 1_000_000).toFixed(4)} STX)`);
     console.log(`  Delay:    ${DELAY_BETWEEN_TX_MS / 1000}s between transactions`);
     console.log(`  Total txns: ${TOTAL_TXN_PER_BATCH}`);
     console.log(`  Est time: ~${Math.ceil((TOTAL_TXN_PER_BATCH * DELAY_BETWEEN_TX_MS) / 60_000)} minutes`);
     console.log();
 
-    // Pre-flight balance checks — only for wallets not yet recorded in state.
-    // Wallets that already have HABITS_PER_WALLET entries will be skipped during
-    // execution, so checking their (drained) balance would be a false failure.
+    // Pre-flight balance checks only apply to wallets that do not currently
+    // have an active habit on-chain.
     console.log('💰 Pre-flight Balance Checks...');
-    const requiredPerWallet = STAKE_AMOUNT * HABITS_PER_WALLET + FEE_MICROSTX * HABITS_PER_WALLET;
+    const requiredPerWallet = STAKE_AMOUNT * HABITS_PER_WALLET + MAX_TX_FEE_MICROSTX * HABITS_PER_WALLET;
+    const activeHabitIdsByWallet = new Map<number, number[]>();
     let allFunded = true;
     let walletsToProcess = 0;
 
@@ -501,21 +560,27 @@ async function batchCreateHabits(wallets: WalletInfo[]): Promise<void> {
             console.log(`  ⏭️  Wallet ${wallet.index}: disabled — skipping balance check`);
             continue;
         }
-        // Only count records where a txId was actually broadcast.
-        // Failed records with txId === '' never reached the chain and must
-        // not prevent this wallet from being retried.
-        const prior = state.createHabitBatch.filter(
-            r => r.walletIndex === wallet.index && r.txId !== ''
-        );
-        if (prior.length >= HABITS_PER_WALLET) {
-            console.log(`  ⏭️  Wallet ${wallet.index} (${wallet.address}): already done — skipping balance check`);
+        try {
+            const activeHabitIds = await getActiveHabitIds(wallet.address);
+            activeHabitIdsByWallet.set(wallet.index, activeHabitIds);
+
+            if (activeHabitIds.length >= HABITS_PER_WALLET) {
+                console.log(
+                    `  ⏭️  Wallet ${wallet.index} (${wallet.address}): active habit on-chain [${activeHabitIds.join(', ')}] — skipping balance check`
+                );
+                continue;
+            }
+        } catch (err: any) {
+            console.error(`  ❌ Wallet ${wallet.index} (${wallet.address}): active habit lookup failed — ${err.message}`);
+            allFunded = false;
             continue;
         }
+
         walletsToProcess++;
         try {
             const balance = await getBalance(wallet.address);
             if (balance < requiredPerWallet) {
-                console.error(`  ❌ Wallet ${wallet.index} (${wallet.address}): ${(balance / 1_000_000).toFixed(4)} STX — needs ${(requiredPerWallet / 1_000_000).toFixed(4)} STX`);
+                console.error(`  ❌ Wallet ${wallet.index} (${wallet.address}): ${(balance / 1_000_000).toFixed(4)} STX — needs ${(requiredPerWallet / 1_000_000).toFixed(5)} STX`);
                 allFunded = false;
             } else {
                 console.log(`  ✅ Wallet ${wallet.index} (${wallet.address}): ${(balance / 1_000_000).toFixed(4)} STX`);
@@ -530,8 +595,8 @@ async function batchCreateHabits(wallets: WalletInfo[]): Promise<void> {
 
     if (walletsToProcess === 0) {
         console.log();
-        console.log('✅ All wallets already processed. Nothing to do.');
-        console.log('   Run resolve to extract habit IDs, then check-in.');
+        console.log('✅ All eligible wallets already have an active habit on-chain. Nothing to do.');
+        console.log('   Withdraw or complete the active habit before creating a new one.');
         return;
     }
 
@@ -564,14 +629,9 @@ async function batchCreateHabits(wallets: WalletInfo[]): Promise<void> {
             continue;
         }
 
-        // Skip wallets that already have a full set of BROADCAST records.
-        // Only records with a real txId count — failed records with txId === ''
-        // mean the broadcast never happened, so the wallet must be retried.
-        const prior = state.createHabitBatch.filter(
-            r => r.walletIndex === wallet.index && r.txId !== ''
-        );
-        if (prior.length >= HABITS_PER_WALLET) {
-            console.log(`  ⏭️  Wallet ${wallet.index}: already broadcast ${prior.length} habit txn(s) — skipping`);
+        const activeHabitIds = activeHabitIdsByWallet.get(wallet.index) || [];
+        if (activeHabitIds.length >= HABITS_PER_WALLET) {
+            console.log(`  ⏭️  Wallet ${wallet.index}: active habit on-chain [${activeHabitIds.join(', ')}] — skipping`);
             continue;
         }
 
@@ -591,14 +651,14 @@ async function batchCreateHabits(wallets: WalletInfo[]): Promise<void> {
             console.log(`[${txCount}/${totalToExecute}] Wallet ${wallet.index} — "${habitName}"...`);
 
             try {
-                const txId = await broadcastTx(
+                const { txId, feeMicroStx } = await broadcastTx(
                     wallet.privateKey,
                     'create-habit',
                     [stringUtf8CV(habitName), uintCV(STAKE_AMOUNT)],
                     nonce,
                 );
 
-                console.log(`   ✅ ${txId}`);
+                console.log(`   ✅ ${txId} (fee ${feeMicroStx} microSTX)`);
                 console.log(`   🔗 https://explorer.hiro.so/txid/${txId}?chain=mainnet`);
 
                 results.push({
@@ -607,6 +667,7 @@ async function batchCreateHabits(wallets: WalletInfo[]): Promise<void> {
                     habitId: null, // Will be resolved after confirmation
                     habitName,
                     txId,
+                    feeMicroStx,
                     status: 'submitted',
                     timestamp: Date.now(),
                 });
@@ -642,6 +703,7 @@ async function batchCreateHabits(wallets: WalletInfo[]): Promise<void> {
     // Summary
     const submitted = results.filter(r => r.status === 'submitted').length;
     const failed = results.filter(r => r.status === 'failed').length;
+    const feeSummary = summarizeSubmittedFees(results);
 
     console.log();
     console.log('═'.repeat(70));
@@ -650,7 +712,10 @@ async function batchCreateHabits(wallets: WalletInfo[]): Promise<void> {
     console.log();
     console.log(`  Submitted: ${submitted}/${totalToExecute}`);
     console.log(`  Failed:    ${failed}/${totalToExecute}`);
-    console.log(`  Total fee: ${((submitted * FEE_MICROSTX) / 1_000_000).toFixed(6)} STX`);
+    console.log(`  Total fee: ${feeSummary.totalFeeMicroStx} microSTX (${(feeSummary.totalFeeMicroStx / 1_000_000).toFixed(6)} STX)`);
+    if (feeSummary.minFeeMicroStx !== null && feeSummary.maxFeeMicroStx !== null) {
+        console.log(`  Fee range: ${feeSummary.minFeeMicroStx}-${feeSummary.maxFeeMicroStx} microSTX per submitted txn`);
+    }
     console.log(`  Total staked: ${((submitted * STAKE_AMOUNT) / 1_000_000).toFixed(4)} STX`);
     console.log();
     console.log(`💾 State saved to: ${STATE_FILE}`);
@@ -671,7 +736,9 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
     console.log(`🎯 BATCH CHECK-IN — ${WALLETS_COUNT} Wallet${WALLETS_COUNT !== 1 ? 's' : ''} × ${HABITS_PER_WALLET} Habit${HABITS_PER_WALLET !== 1 ? 's' : ''} = ${TOTAL_TXN_PER_BATCH} Transactions`);
     console.log('═'.repeat(70));
     console.log();
-    console.log(`  Fee/tx: ${FEE_MICROSTX} microSTX (${(FEE_MICROSTX / 1_000_000).toFixed(6)} STX)`);
+    console.log(
+        `  Fee/tx: randomized ${MIN_TX_FEE_MICROSTX}-${MAX_TX_FEE_MICROSTX} microSTX (${(MIN_TX_FEE_MICROSTX / 1_000_000).toFixed(6)}-${(MAX_TX_FEE_MICROSTX / 1_000_000).toFixed(6)} STX)`
+    );
     console.log(`  Delay:  ${DELAY_BETWEEN_TX_MS / 1000}s between transactions`);
     console.log();
 
@@ -840,14 +907,14 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
             console.log(`[${txCount}/${totalCheckIns}] Wallet ${wallet.index} — check-in habit #${habitId}...`);
 
             try {
-                const txId = await broadcastTx(
+                const { txId, feeMicroStx } = await broadcastTx(
                     wallet.privateKey,
                     'check-in',
                     [uintCV(habitId)],
                     nonce,
                 );
 
-                console.log(`   ✅ ${txId}`);
+                console.log(`   ✅ ${txId} (fee ${feeMicroStx} microSTX)`);
                 console.log(`   🔗 https://explorer.hiro.so/txid/${txId}?chain=mainnet`);
 
                 results.push({
@@ -856,6 +923,7 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
                     habitId,
                     habitName: '',
                     txId,
+                    feeMicroStx,
                     status: 'submitted',
                     timestamp: Date.now(),
                 });
@@ -889,6 +957,7 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
 
     const submitted = results.filter(r => r.status === 'submitted').length;
     const failed = results.filter(r => r.status === 'failed').length;
+    const feeSummary = summarizeSubmittedFees(results);
 
     console.log();
     console.log('═'.repeat(70));
@@ -897,7 +966,10 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
     console.log();
     console.log(`  Submitted: ${submitted}/${totalCheckIns}`);
     console.log(`  Failed:    ${failed}/${totalCheckIns}`);
-    console.log(`  Total fee: ${((submitted * FEE_MICROSTX) / 1_000_000).toFixed(6)} STX`);
+    console.log(`  Total fee: ${feeSummary.totalFeeMicroStx} microSTX (${(feeSummary.totalFeeMicroStx / 1_000_000).toFixed(6)} STX)`);
+    if (feeSummary.minFeeMicroStx !== null && feeSummary.maxFeeMicroStx !== null) {
+        console.log(`  Fee range: ${feeSummary.minFeeMicroStx}-${feeSummary.maxFeeMicroStx} microSTX per submitted txn`);
+    }
     console.log();
     console.log(`💾 State saved to: ${STATE_FILE}`);
 }
@@ -915,7 +987,9 @@ async function batchWithdraw(wallets: WalletInfo[]): Promise<void> {
     console.log(`💰 BATCH WITHDRAW — ${WALLETS_COUNT} Wallet${WALLETS_COUNT !== 1 ? 's' : ''} × ${HABITS_PER_WALLET} Habit${HABITS_PER_WALLET !== 1 ? 's' : ''} = ${TOTAL_TXN_PER_BATCH} Transactions`);
     console.log('═'.repeat(70));
     console.log();
-    console.log(`  Fee/tx: ${FEE_MICROSTX} microSTX (${(FEE_MICROSTX / 1_000_000).toFixed(6)} STX)`);
+    console.log(
+        `  Fee/tx: randomized ${MIN_TX_FEE_MICROSTX}-${MAX_TX_FEE_MICROSTX} microSTX (${(MIN_TX_FEE_MICROSTX / 1_000_000).toFixed(6)}-${(MAX_TX_FEE_MICROSTX / 1_000_000).toFixed(6)} STX)`
+    );
     console.log(`  Delay:  ${DELAY_BETWEEN_TX_MS / 1000}s between transactions`);
     console.log(`  ⚠️  Requires min ${MIN_STREAK_FOR_WITHDRAWAL}-day streak per habit`);
     console.log();
@@ -1066,14 +1140,14 @@ async function batchWithdraw(wallets: WalletInfo[]): Promise<void> {
             console.log(`[${txCount}/${totalWithdrawals}] Wallet ${wallet.index} — withdraw habit #${habitId}...`);
 
             try {
-                const txId = await broadcastTx(
+                const { txId, feeMicroStx } = await broadcastTx(
                     wallet.privateKey,
                     'withdraw-stake',
                     [uintCV(habitId)],
                     nonce,
                 );
 
-                console.log(`   ✅ ${txId}`);
+                console.log(`   ✅ ${txId} (fee ${feeMicroStx} microSTX)`);
                 console.log(`   🔗 https://explorer.hiro.so/txid/${txId}?chain=mainnet`);
 
                 results.push({
@@ -1082,6 +1156,7 @@ async function batchWithdraw(wallets: WalletInfo[]): Promise<void> {
                     habitId,
                     habitName: '',
                     txId,
+                    feeMicroStx,
                     status: 'submitted',
                     timestamp: Date.now(),
                 });
@@ -1114,6 +1189,7 @@ async function batchWithdraw(wallets: WalletInfo[]): Promise<void> {
 
     const submitted = results.filter(r => r.status === 'submitted').length;
     const failed = results.filter(r => r.status === 'failed').length;
+    const feeSummary = summarizeSubmittedFees(results);
 
     console.log();
     console.log('═'.repeat(70));
@@ -1122,7 +1198,10 @@ async function batchWithdraw(wallets: WalletInfo[]): Promise<void> {
     console.log();
     console.log(`  Submitted: ${submitted}/${totalWithdrawals}`);
     console.log(`  Failed:    ${failed}/${totalWithdrawals}`);
-    console.log(`  Total fee: ${((submitted * FEE_MICROSTX) / 1_000_000).toFixed(6)} STX`);
+    console.log(`  Total fee: ${feeSummary.totalFeeMicroStx} microSTX (${(feeSummary.totalFeeMicroStx / 1_000_000).toFixed(6)} STX)`);
+    if (feeSummary.minFeeMicroStx !== null && feeSummary.maxFeeMicroStx !== null) {
+        console.log(`  Fee range: ${feeSummary.minFeeMicroStx}-${feeSummary.maxFeeMicroStx} microSTX per submitted txn`);
+    }
     console.log();
     console.log(`💾 State saved to: ${STATE_FILE}`);
 }
@@ -1153,7 +1232,7 @@ async function showStatus(wallets: WalletInfo[]): Promise<void> {
 
     console.log('🔗 On-chain streak sync');
     console.log(`  Check-in window: ${MIN_CHECK_IN_INTERVAL_BLOCKS}-${CHECK_IN_WINDOW_BLOCKS} blocks after the last check-in`);
-    console.log(`  Withdrawal threshold: ${MIN_STREAK_FOR_WITHDRAWAL} consecutive day${MIN_STREAK_FOR_WITHDRAWAL === 1 ? '' : 's'}`);
+    console.log(`  Withdrawal threshold: ${MIN_STREAK_FOR_WITHDRAWAL} consecutive days`);
     console.log();
 
     // Create-habit batch
@@ -1590,7 +1669,7 @@ async function dryRunTest(): Promise<void> {
 
     // ── Test 8: Balance & Nonce Checks ──
     console.log('[8/9] Balance & nonce check (per wallet)...');
-    const requiredPerWallet = STAKE_AMOUNT * HABITS_PER_WALLET + FEE_MICROSTX * HABITS_PER_WALLET;
+    const requiredPerWallet = STAKE_AMOUNT * HABITS_PER_WALLET + MAX_TX_FEE_MICROSTX * HABITS_PER_WALLET;
     let allFunded = true;
 
     for (const w of wallets) {
@@ -1601,7 +1680,7 @@ async function dryRunTest(): Promise<void> {
             if (balance >= requiredPerWallet) {
                 pass(`Wallet ${w.index}: ${(balance / 1_000_000).toFixed(4)} STX, nonce=${nonce}`);
             } else {
-                fail(`Wallet ${w.index}: ${(balance / 1_000_000).toFixed(4)} STX — needs ${(requiredPerWallet / 1_000_000).toFixed(4)} STX`);
+                fail(`Wallet ${w.index}: ${(balance / 1_000_000).toFixed(4)} STX — needs ${(requiredPerWallet / 1_000_000).toFixed(5)} STX`);
                 allFunded = false;
             }
         } catch (err: any) {
