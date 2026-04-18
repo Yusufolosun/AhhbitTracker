@@ -28,17 +28,17 @@ export function HabitsScreen({ navigation }: HabitsScreenProps) {
     navigation.navigate(MAIN_TAB_ROUTES.Preview);
   };
 
-  const handleCheckInPreview = (habitId: number) => {
+  const handleCheckInPreview = async (habitId: number) => {
     setPreview(buildCheckInPreview(habitId));
     openPreviewTab();
   };
 
-  const handleWithdrawPreview = (habitId: number, stakeAmount: number) => {
+  const handleWithdrawPreview = async (habitId: number, stakeAmount: number) => {
     setPreview(buildWithdrawStakePreview(habitId, stakeAmount));
     openPreviewTab();
   };
 
-  const handleClaimPreview = (habitId: number) => {
+  const handleClaimPreview = async (habitId: number) => {
     setPreview(buildClaimBonusPreview(habitId));
     openPreviewTab();
   };
