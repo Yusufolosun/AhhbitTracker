@@ -12,6 +12,7 @@ export const QUERY_KEYS = {
   poolBalance: ['pool-balance'] as const,
   userHabits: (address: string) => ['user-habits', address] as const,
   userStats: (address: string) => ['user-stats', address] as const,
+  currentBlock: ['current-block-height'] as const,
 };
 
 export const POLLING_INTERVAL_MS = 120_000;
