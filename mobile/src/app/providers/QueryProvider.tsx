@@ -6,7 +6,22 @@ function createQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        retry: 1,
+        retry: (failureCount, error: unknown) => {
+          if (failureCount >= 2) {
+            return false;
+          }
+
+          if (typeof error === 'object' && error !== null && 'status' in error) {
+            const status = (error as { status?: number }).status;
+            if (status === 404) {
+              return false;
+            }
+          }
+
+          return true;
+        },
+        staleTime: 30_000,
+        gcTime: 15 * 60_000,
         refetchOnMount: false,
         refetchOnReconnect: true,
         refetchOnWindowFocus: false,
