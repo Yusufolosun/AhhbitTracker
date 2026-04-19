@@ -1,5 +1,4 @@
-import { networkConfig } from '@/core/config';
-import { invalidateReadCache, readThroughCache } from '@/core/data/readCache';
+import { invalidateReadCache, readThroughCache } from '../data/readCache';
 
 const CACHE_PREFIX = 'mobile-hiro-api:';
 const DEFAULT_TIMEOUT_MS = 10_000;
@@ -26,8 +25,20 @@ function shouldRetry(status?: number): boolean {
   return status === undefined || status === 429 || status >= 500;
 }
 
+function getHiroApiBaseUrl(): string {
+  const configured = process.env.EXPO_PUBLIC_HIRO_API_BASE_URL?.trim();
+
+  if (configured) {
+    return configured.replace(/\/$/, '');
+  }
+
+  return process.env.EXPO_PUBLIC_STACKS_NETWORK === 'testnet'
+    ? 'https://api.testnet.hiro.so'
+    : 'https://api.mainnet.hiro.so';
+}
+
 function makeCacheKey(path: string): string {
-  return `${CACHE_PREFIX}${networkConfig.hiroApiBaseUrl}${path}`;
+  return `${CACHE_PREFIX}${getHiroApiBaseUrl()}${path}`;
 }
 
 export function invalidateHiroApiCache(pathPrefix = '/'): void {
@@ -36,7 +47,7 @@ export function invalidateHiroApiCache(pathPrefix = '/'): void {
 
 async function fetchJson<T>(path: string, timeoutMs: number, retries: number): Promise<T> {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-  const url = `${networkConfig.hiroApiBaseUrl}${normalizedPath}`;
+  const url = `${getHiroApiBaseUrl()}${normalizedPath}`;
 
   for (let attempt = 0; attempt <= retries; attempt += 1) {
     const controller = new AbortController();

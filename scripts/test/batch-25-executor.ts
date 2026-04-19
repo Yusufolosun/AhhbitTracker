@@ -919,12 +919,15 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
             walletHabits.set(wallet.index, []);
             continue;
         }
-        const confirmedHabits = state.createHabitBatch
-            .filter(r => r.walletIndex === wallet.index && r.habitId !== null && r.status === 'confirmed')
-            .map(r => r.habitId as number);
+        const confirmedHabits = [...new Set(
+            state.createHabitBatch
+                .filter(r => r.walletIndex === wallet.index && r.habitId !== null && r.status === 'confirmed')
+                .map(r => r.habitId as number)
+        )];
 
         if (confirmedHabits.length >= HABITS_PER_WALLET) {
-            walletHabits.set(wallet.index, confirmedHabits.slice(0, HABITS_PER_WALLET));
+            // Take the LATEST habits (end of list) — old habits are completed/inactive
+            walletHabits.set(wallet.index, confirmedHabits.slice(-HABITS_PER_WALLET));
             console.log(`  Wallet ${wallet.index}: [${confirmedHabits.join(', ')}] ✅`);
         } else if (confirmedHabits.length > 0) {
             walletHabits.set(wallet.index, confirmedHabits);
@@ -1007,7 +1010,7 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
 
         for (const habitId of habitIds) {
             try {
-                const habit = await readonlyClient.getHabit(habitId);
+                const habit = await readHabitWithRetry(habitId, wallet.index);
 
                 if (!habit) {
                     console.log(`  Wallet ${wallet.index}: habit #${habitId} not found on-chain — skipping`);
@@ -1025,6 +1028,9 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
             } catch (err: any) {
                 console.error(`  Wallet ${wallet.index}: habit #${habitId} eligibility lookup failed — ${err.message}`);
             }
+
+            // Rate-limit: delay between eligibility lookups to avoid Hiro 429s
+            await sleep(1_500);
         }
 
         if (eligibleIds.length < habitIds.length) {
