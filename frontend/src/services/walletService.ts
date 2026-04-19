@@ -4,6 +4,7 @@
  */
 import { AppConfig, UserSession, showConnect, clearSelectedProviderId, FinishedAuthData } from '@stacks/connect';
 import { NETWORK } from '../utils/constants';
+import { fetchHiroApiJson } from './hiroApiClient';
 
 /** Application configuration for Stacks wallet permissions. */
 const appConfig = new AppConfig(['store_write', 'publish_data']);
@@ -96,31 +97,16 @@ export const walletService = {
    * @throws Error if the API request fails
    */
   fetchBalance: async (address: string): Promise<number> => {
-    const isDev = import.meta.env.DEV;
-    const baseUrl = isDev
-      ? `${window.location.origin}/api/stacks`
-      : 'https://api.mainnet.hiro.so';
-    const url = `${baseUrl}/v2/accounts/${address}`;
-
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10_000);
-
-    try {
-      const response = await fetch(url, { signal: controller.signal });
-      if (!response.ok) {
-        throw new Error(`Failed to fetch balance: ${response.status}`);
-      }
-      const data = await response.json();
-      const raw = BigInt(data.balance);
-      if (raw > BigInt(Number.MAX_SAFE_INTEGER)) {
-        console.warn(
-          'Balance exceeds Number.MAX_SAFE_INTEGER — display may lose precision:',
-          data.balance,
-        );
-      }
-      return Number(raw);
-    } finally {
-      clearTimeout(timeout);
+    const payload = await fetchHiroApiJson<{ balance: string }>(`/v2/accounts/${address}`, {
+      ttlMs: 15_000,
+    });
+    const raw = BigInt(payload.balance);
+    if (raw > BigInt(Number.MAX_SAFE_INTEGER)) {
+      console.warn(
+        'Balance exceeds Number.MAX_SAFE_INTEGER — display may lose precision:',
+        payload.balance,
+      );
     }
+    return Number(raw);
   },
 };
