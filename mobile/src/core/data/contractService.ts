@@ -7,9 +7,44 @@ import {
 } from '@yusufolosun/ahhbit-tracker-sdk';
 import { cvToJSON, fetchCallReadOnlyFunction } from '@stacks/transactions';
 import { formatSTX } from '@yusufolosun/stx-utils';
-import { networkConfig } from '@/core/config';
+import { networkConfig, POLLING_INTERVAL_MS } from '@/core/config';
 import { stacksNetwork } from '@/core/network';
 import type { Habit, PoolBalance, UserStats } from '@/core/types';
+import { invalidateReadCache, readThroughCache } from './readCache';
+
+const CACHE_PREFIX = 'mobile-contract-read:';
+
+const cacheKeys = {
+  habit: (habitId: number) => `${CACHE_PREFIX}habit:${habitId}`,
+  userHabits: (address: string) => `${CACHE_PREFIX}user-habits:${address}`,
+  userStats: (address: string) => `${CACHE_PREFIX}user-stats:${address}`,
+  poolBalance: () => `${CACHE_PREFIX}pool-balance`,
+  estimatedBonusShare: () => `${CACHE_PREFIX}estimated-bonus-share`,
+  unclaimedCompletedHabits: () => `${CACHE_PREFIX}unclaimed-completed-habits`,
+};
+
+export function invalidateHabitReadCache(habitId: number): void {
+  invalidateReadCache(cacheKeys.habit(habitId));
+}
+
+export function invalidateAddressReadCache(address: string | null | undefined): void {
+  if (!address) {
+    return;
+  }
+
+  invalidateReadCache(cacheKeys.userHabits(address));
+  invalidateReadCache(cacheKeys.userStats(address));
+}
+
+export function invalidatePoolReadCache(): void {
+  invalidateReadCache(cacheKeys.poolBalance());
+  invalidateReadCache(cacheKeys.estimatedBonusShare());
+  invalidateReadCache(cacheKeys.unclaimedCompletedHabits());
+}
+
+export function clearContractReadCache(): void {
+  invalidateReadCache(CACHE_PREFIX);
+}
 
 function unwrapOkNumber(json: any): number {
   if (json?.success === true) {
@@ -48,7 +83,13 @@ function toMobileHabit(habitId: number, value: SdkHabit): Habit {
 }
 
 export async function fetchHabitsByAddress(address: string): Promise<Habit[]> {
-  const userHabits = await getUserHabits(address, stacksNetwork, networkConfig.contract);
+  const userHabits = await readThroughCache(
+    cacheKeys.userHabits(address),
+    () => getUserHabits(address, stacksNetwork, networkConfig.contract),
+    {
+      ttlMs: POLLING_INTERVAL_MS,
+    },
+  );
   const habitIds = userHabits.habitIds;
 
   if (!habitIds.length) {
@@ -57,7 +98,13 @@ export async function fetchHabitsByAddress(address: string): Promise<Habit[]> {
 
   const habits = await Promise.all(
     habitIds.map(async (habitId) => {
-      const habit = await getHabit(habitId, stacksNetwork, networkConfig.contract);
+      const habit = await readThroughCache(
+        cacheKeys.habit(habitId),
+        () => getHabit(habitId, stacksNetwork, networkConfig.contract),
+        {
+          ttlMs: POLLING_INTERVAL_MS,
+        },
+      );
       if (!habit) {
         return null;
       }
@@ -73,9 +120,27 @@ export async function fetchHabitsByAddress(address: string): Promise<Habit[]> {
 
 export async function fetchPoolBalance(): Promise<PoolBalance> {
   const [microStx, estimatedBonusShareMicroStx, unclaimedCompletedHabits] = await Promise.all([
-    getPoolBalance(stacksNetwork, networkConfig.contract),
-    readPoolDistributionValue('get-estimated-bonus-share'),
-    readPoolDistributionValue('get-unclaimed-completed-habits'),
+    readThroughCache(
+      cacheKeys.poolBalance(),
+      () => getPoolBalance(stacksNetwork, networkConfig.contract),
+      {
+        ttlMs: POLLING_INTERVAL_MS,
+      },
+    ),
+    readThroughCache(
+      cacheKeys.estimatedBonusShare(),
+      () => readPoolDistributionValue('get-estimated-bonus-share'),
+      {
+        ttlMs: POLLING_INTERVAL_MS,
+      },
+    ),
+    readThroughCache(
+      cacheKeys.unclaimedCompletedHabits(),
+      () => readPoolDistributionValue('get-unclaimed-completed-habits'),
+      {
+        ttlMs: POLLING_INTERVAL_MS,
+      },
+    ),
   ]);
 
   return {
@@ -88,7 +153,13 @@ export async function fetchPoolBalance(): Promise<PoolBalance> {
 }
 
 export async function fetchUserStats(address: string): Promise<UserStats> {
-  const stats = await getUserStats(address, stacksNetwork, networkConfig.contract);
+  const stats = await readThroughCache(
+    cacheKeys.userStats(address),
+    () => getUserStats(address, stacksNetwork, networkConfig.contract),
+    {
+      ttlMs: POLLING_INTERVAL_MS,
+    },
+  );
 
   return {
     totalHabits: stats.totalHabits,
