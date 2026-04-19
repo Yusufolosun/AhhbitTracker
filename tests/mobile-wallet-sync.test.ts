@@ -53,9 +53,9 @@ describe('mobile wallet transaction sync targets', () => {
       ok: true,
       status: 200,
       json: async () => ({ tx_status: 'success' }),
-    } as Response) as unknown as typeof fetch;
+    } as Response) as any;
 
-    await expect(fetchWalletTransactionStatus('0xtx')).resolves.toBe('confirmed');
+    await expect(fetchWalletTransactionStatus('0xtx-success')).resolves.toBe('confirmed');
   });
 
   it('maps aborted tx status to failed', async () => {
@@ -63,9 +63,9 @@ describe('mobile wallet transaction sync targets', () => {
       ok: true,
       status: 200,
       json: async () => ({ tx_status: 'abort_by_response' }),
-    } as Response) as unknown as typeof fetch;
+    } as Response) as any;
 
-    await expect(fetchWalletTransactionStatus('0xtx')).resolves.toBe('failed');
+    await expect(fetchWalletTransactionStatus('0xtx-abort')).resolves.toBe('failed');
   });
 
   it('treats missing tx status as pending', async () => {
@@ -73,8 +73,8 @@ describe('mobile wallet transaction sync targets', () => {
       ok: false,
       status: 404,
       json: async () => ({}),
-    } as Response) as unknown as typeof fetch;
+    } as Response) as any;
 
-    await expect(fetchWalletTransactionStatus('0xtx')).resolves.toBe('pending');
+    await expect(fetchWalletTransactionStatus('0xtx-missing')).resolves.toBe('pending');
   });
 });

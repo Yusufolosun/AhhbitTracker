@@ -46,14 +46,6 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { createContractReadonlyClient } from '../shared/contract-readonly.ts';
 import {
-    CHECK_IN_WINDOW_BLOCKS,
-    MIN_CHECK_IN_INTERVAL_BLOCKS,
-} from '../shared/checkin-timing.ts';
-import {
-    evaluateDailyCheckInEligibility,
-    type CheckInEligibility,
-} from '../shared/checkin-eligibility.ts';
-import {
     canWithdrawHabit,
     describeWithdrawHabitStatus,
     MIN_STREAK_FOR_WITHDRAWAL,
@@ -971,20 +963,13 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
         walletHabits.set(walletIdx, pending);
     }
 
-    console.log('🔗 Verifying on-chain check-in eligibility...');
-    console.log(`  On-chain window: ${MIN_CHECK_IN_INTERVAL_BLOCKS}-${CHECK_IN_WINDOW_BLOCKS} blocks since the last check-in`);
+    // Pre-flight: skip habits that are already completed or inactive on-chain.
+    // Block-timing eligibility is NOT enforced here — the on-chain contract
+    // decides whether the check-in is valid. This avoids mismatches between
+    // the script's timing constants and the deployed contract's actual rules.
+    console.log('🔍 Verifying on-chain habit status (active/completed)...');
 
     const onChainEligibleHabits: Map<number, number[]> = new Map();
-    let currentBlockSnapshot: number;
-
-    try {
-        currentBlockSnapshot = await getCurrentBlockHeight();
-    } catch (err: any) {
-        console.error(`  ❌ Unable to fetch current block for eligibility checks — ${err.message}`);
-        process.exit(1);
-    }
-
-    let walletsSinceLastBlockRefresh = 0;
 
     for (const wallet of wallets) {
         const habitIds = walletHabits.get(wallet.index) || [];
@@ -992,18 +977,6 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
         if (habitIds.length === 0) {
             onChainEligibleHabits.set(wallet.index, []);
             continue;
-        }
-
-        // Refresh every 10 wallets so very large batches stay aligned with chain progress.
-        walletsSinceLastBlockRefresh += 1;
-        if (walletsSinceLastBlockRefresh >= 10) {
-            walletsSinceLastBlockRefresh = 0;
-            invalidateReadCache('stacks:current-block');
-            try {
-                currentBlockSnapshot = await getCurrentBlockHeight();
-            } catch (err: any) {
-                console.error(`  Wallet ${wallet.index}: unable to refresh current block — ${err.message}`);
-            }
         }
 
         const eligibleIds: number[] = [];
@@ -1017,24 +990,28 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
                     continue;
                 }
 
-                const eligibility = evaluateDailyCheckInEligibility(habit, currentBlockSnapshot);
+                if (habit.isCompleted) {
+                    console.log(`  Wallet ${wallet.index}: habit #${habitId} already completed — skipping`);
+                    continue;
+                }
 
-                if (!eligibility.eligible) {
-                    console.log(`  Wallet ${wallet.index}: habit #${habitId} ${describeCheckInEligibility(eligibility)} — skipping`);
+                if (!habit.isActive) {
+                    console.log(`  Wallet ${wallet.index}: habit #${habitId} inactive — skipping`);
                     continue;
                 }
 
                 eligibleIds.push(habitId);
+                console.log(`  Wallet ${wallet.index}: habit #${habitId} active ✅`);
             } catch (err: any) {
-                console.error(`  Wallet ${wallet.index}: habit #${habitId} eligibility lookup failed — ${err.message}`);
+                console.error(`  Wallet ${wallet.index}: habit #${habitId} lookup failed — ${err.message}`);
             }
 
-            // Rate-limit: delay between eligibility lookups to avoid Hiro 429s
+            // Rate-limit: delay between lookups to avoid Hiro 429s
             await sleep(1_500);
         }
 
         if (eligibleIds.length < habitIds.length) {
-            console.log(`  Wallet ${wallet.index}: ${habitIds.length - eligibleIds.length} habit(s) skipped after on-chain eligibility check`);
+            console.log(`  Wallet ${wallet.index}: ${habitIds.length - eligibleIds.length} habit(s) skipped`);
         }
 
         onChainEligibleHabits.set(wallet.index, eligibleIds);
@@ -1044,7 +1021,7 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
         walletHabits.set(walletIndex, habitIds);
     }
 
-    // Count total check-ins that are still eligible on-chain
+    // Count total check-ins
     let totalCheckIns = 0;
     for (const [, ids] of walletHabits) {
         totalCheckIns += ids.length;
@@ -1052,8 +1029,7 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
 
     if (totalCheckIns === 0) {
         console.log();
-        console.log('✅ No habits are currently eligible for check-in on-chain.');
-        console.log(`   Check-ins are only valid between ${MIN_CHECK_IN_INTERVAL_BLOCKS} and ${CHECK_IN_WINDOW_BLOCKS} blocks after the last confirmed check-in.`);
+        console.log('✅ No active habits found for check-in.');
         return;
     }
 
