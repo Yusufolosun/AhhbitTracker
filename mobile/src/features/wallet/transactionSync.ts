@@ -1,5 +1,5 @@
 import type { MobileTxType } from '../../core/types';
-import { fetchHiroJson, HiroApiError } from '@/core/network';
+import { fetchHiroJson, HiroApiError } from '../../core/network';
 
 export interface WalletInteractionSyncTargets {
   invalidateHabits: boolean;
