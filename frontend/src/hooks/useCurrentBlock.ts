@@ -5,6 +5,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { POLLING_INTERVAL, CACHE_TIME } from '../utils/constants';
 import { fetchHiroApiJson } from '../services/hiroApiClient';
+import { queryKeys } from '../utils/queryKeys';
 
 /**
  * Fetch the current Stacks block height from the Hiro API.
@@ -39,7 +40,7 @@ async function fetchCurrentBlock(): Promise<number> {
  */
 export function useCurrentBlock(): number | null {
   const { data } = useQuery({
-    queryKey: ['currentBlock'],
+    queryKey: queryKeys.currentBlock,
     queryFn: fetchCurrentBlock,
     staleTime: CACHE_TIME,
     refetchInterval: POLLING_INTERVAL,

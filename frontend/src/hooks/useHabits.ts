@@ -8,6 +8,7 @@ import {
 } from '../types/habit';
 import { POLLING_INTERVAL, CACHE_TIME, POOL_CACHE_TIME } from '../utils/constants';
 import { getHabitSyncTargets } from './habitTransactionSync';
+import { queryKeys } from '../utils/queryKeys';
 
 export interface DailyCheckInEntry {
   habitId: number;
@@ -44,7 +45,7 @@ export const useHabits = () => {
     isLoading: isLoadingHabits,
     error: habitsError,
   } = useQuery({
-    queryKey: ['habits', walletState.address],
+    queryKey: queryKeys.habits(walletState.address),
     queryFn: async () => {
       if (!walletState.address) return [];
       const habitIds = await contractService.readUserHabits(walletState.address);
@@ -75,7 +76,7 @@ export const useHabits = () => {
     data: userStats,
     isLoading: isLoadingStats,
   } = useQuery({
-    queryKey: ['userStats', walletState.address],
+    queryKey: queryKeys.userStats(walletState.address),
     queryFn: async () => {
       if (!walletState.address) return null;
       return contractService.readUserStats(walletState.address);
@@ -88,7 +89,7 @@ export const useHabits = () => {
 
   // Fetch pool balance
   const { data: poolBalance, error: poolError } = useQuery({
-    queryKey: ['poolBalance'],
+    queryKey: queryKeys.poolBalance,
     queryFn: () => contractService.readPoolBalance(),
     staleTime: POOL_CACHE_TIME,
     retry: 3,
@@ -155,15 +156,18 @@ export const useHabits = () => {
       }
 
       if (syncTargets.invalidateHabits) {
-        void queryClient.invalidateQueries({ queryKey: ['habits', walletState.address] });
+        contractService.invalidateAddressReadCache(walletState.address);
+        void queryClient.invalidateQueries({ queryKey: queryKeys.habits(walletState.address) });
       }
 
       if (syncTargets.invalidateUserStats) {
-        void queryClient.invalidateQueries({ queryKey: ['userStats', walletState.address] });
+        contractService.invalidateAddressReadCache(walletState.address);
+        void queryClient.invalidateQueries({ queryKey: queryKeys.userStats(walletState.address) });
       }
 
       if (syncTargets.invalidatePoolBalance) {
-        void queryClient.invalidateQueries({ queryKey: ['poolBalance'] });
+        contractService.invalidatePoolReadCache();
+        void queryClient.invalidateQueries({ queryKey: queryKeys.poolBalance });
         void queryClient.invalidateQueries({ queryKey: ['estimatedBonusShare'] });
         void queryClient.invalidateQueries({ queryKey: ['unclaimedCompletedHabits'] });
       }
@@ -175,9 +179,9 @@ export const useHabits = () => {
   }, [queryClient, refreshBalance, transactions, walletState.address]);
 
   const scheduleRefetch = useCallback(
-    (queryKeys: string[][]) => {
+    (keys: ReadonlyArray<readonly unknown[]>) => {
       const invalidate = () => {
-        for (const key of queryKeys) {
+        for (const key of keys) {
           void queryClient.invalidateQueries({ queryKey: key });
         }
       };
@@ -194,9 +198,10 @@ export const useHabits = () => {
     onSuccess: (txId) => {
       addTransaction(txId, 'create-habit');
       void refreshBalance();
+      contractService.invalidateAddressReadCache(walletState.address);
       scheduleRefetch([
-        ['habits', walletState.address!],
-        ['userStats', walletState.address!],
+        queryKeys.habits(walletState.address),
+        queryKeys.userStats(walletState.address),
       ]);
     },
   });
@@ -217,7 +222,8 @@ export const useHabits = () => {
     },
     onSuccess: (txId) => {
       addTransaction(txId, 'check-in');
-      scheduleRefetch([['habits', walletState.address!], ['userStats', walletState.address!]]);
+      contractService.invalidateAddressReadCache(walletState.address);
+      scheduleRefetch([queryKeys.habits(walletState.address), queryKeys.userStats(walletState.address)]);
     },
   });
 
@@ -239,10 +245,12 @@ export const useHabits = () => {
     onSuccess: (txId) => {
       addTransaction(txId, 'withdraw-stake');
       void refreshBalance();
+      contractService.invalidateAddressReadCache(walletState.address);
+      contractService.invalidatePoolReadCache();
       scheduleRefetch([
-        ['habits', walletState.address!],
-        ['userStats', walletState.address!],
-        ['poolBalance'],
+        queryKeys.habits(walletState.address),
+        queryKeys.userStats(walletState.address),
+        queryKeys.poolBalance,
         ['estimatedBonusShare'],
         ['unclaimedCompletedHabits'],
       ]);
@@ -266,9 +274,11 @@ export const useHabits = () => {
     onSuccess: (txId) => {
       addTransaction(txId, 'claim-bonus');
       void refreshBalance();
+      contractService.invalidateAddressReadCache(walletState.address);
+      contractService.invalidatePoolReadCache();
       scheduleRefetch([
-        ['habits', walletState.address!],
-        ['poolBalance'],
+        queryKeys.habits(walletState.address),
+        queryKeys.poolBalance,
         ['estimatedBonusShare'],
         ['unclaimedCompletedHabits'],
       ]);
@@ -290,9 +300,11 @@ export const useHabits = () => {
     },
     onSuccess: (txId) => {
       addTransaction(txId, 'slash-habit');
+      contractService.invalidateAddressReadCache(walletState.address);
+      contractService.invalidatePoolReadCache();
       scheduleRefetch([
-        ['habits', walletState.address!],
-        ['poolBalance'],
+        queryKeys.habits(walletState.address),
+        queryKeys.poolBalance,
         ['estimatedBonusShare'],
       ]);
     },

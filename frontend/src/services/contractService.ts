@@ -61,7 +61,10 @@ export const contractService = {
     clearHabitReadCache(habitId);
   },
 
-  invalidateAddressReadCache(userAddress: string): void {
+  invalidateAddressReadCache(userAddress: string | null | undefined): void {
+    if (!userAddress) {
+      return;
+    }
     clearUserReadCache(userAddress);
   },
 
