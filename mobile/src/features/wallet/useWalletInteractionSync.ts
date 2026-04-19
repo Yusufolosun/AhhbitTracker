@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAppStateContext } from '@/app/state';
 import { QUERY_KEYS } from '@/core/config';
+import { invalidateAddressReadCache, invalidatePoolReadCache } from '@/core/data';
 import {
   fetchWalletTransactionStatus,
   getWalletInteractionSyncTargets,
@@ -34,14 +35,17 @@ export function useWalletInteractionSync() {
 
     const invalidateQueries = () => {
       if (syncTargets.invalidateHabits) {
+        invalidateAddressReadCache(queryAddress);
         void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.userHabits(queryAddress) });
       }
 
       if (syncTargets.invalidateUserStats) {
+        invalidateAddressReadCache(queryAddress);
         void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.userStats(queryAddress) });
       }
 
       if (syncTargets.invalidatePoolBalance) {
+        invalidatePoolReadCache();
         void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.poolBalance });
       }
     };
