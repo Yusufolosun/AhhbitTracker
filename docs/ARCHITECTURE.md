@@ -58,6 +58,30 @@ Adoption points:
 - Mobile service layer uses the shared SDK network factory and typed SDK reads.
 - Scripts use a shared read-only client module (`scripts/shared/contract-readonly.ts`) to avoid one-off parsing and endpoint handling.
 
+## Blockchain Read Caching and Synchronization
+
+The application now uses layered caching and transaction-aware invalidation to reduce redundant Hiro/API reads while keeping on-chain views fresh after writes.
+
+### Frontend strategy
+
+- A shared Hiro client centralizes timeout, retry, and optional short-lived response caching for REST endpoints such as `/v2/info`, account lookups, and transaction status polling.
+- Contract read methods (`readHabit`, `readUserHabits`, `readUserStats`, `readPoolBalance`) use read-through caching with TTLs aligned to React Query stale windows.
+- After write confirmations (`create-habit`, `check-in`, `withdraw-stake`, `claim-bonus`, `slash-habit`), the app invalidates both React Query keys and the underlying contract read cache to avoid stale cache hits.
+- Deferred refetch windows (30s, 120s) remain as a safety net for post-mining state propagation.
+
+### Mobile strategy
+
+- Mobile contract data access uses an in-memory read-through cache with in-flight de-duplication for user habits, habit details, stats, and pool balance.
+- Mobile REST reads for block height and transaction status are routed through a shared Hiro network client with retries and short TTL caching.
+- Wallet interaction synchronization now invalidates both query keys and data-layer cache namespaces when writes confirm, ensuring the next UI read rehydrates from chain-backed sources.
+- Address transitions in app state now clear address-scoped caches to prevent cross-account data bleed.
+
+### Batch automation strategy
+
+- The batch executor now caches frequently repeated read-only calls (current block, user habits, habit lookups) during a run.
+- Cached read namespaces are invalidated immediately after broadcasted writes, so eligibility and status checks do not rely on stale pre-write snapshots.
+- Long check-in eligibility scans use a coalesced current-block snapshot with periodic refreshes to reduce rate-limit pressure without losing timing accuracy.
+
 ## Smart Contract Architecture
 
 ### Core Logic Flow
@@ -324,6 +348,8 @@ Daily check-ins use the same flow with additional safeguards:
 3. **Optimistic Updates:** UI updates immediately, reverts on error
 4. **Skeleton Loading:** Layout-stable loading states prevent CLS
 5. **Memoization:** useMemo for expensive calculations (Dashboard stats)
+6. **Read-through Caching:** Data-layer caching with in-flight de-duplication for blockchain reads
+7. **Transaction-aware Invalidation:** Cache + query invalidation synchronized with confirmed writes
 
 ## Deployment Strategy
 

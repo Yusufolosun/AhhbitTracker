@@ -60,6 +60,7 @@ Missed check-ins forfeit your stake to the shared pool, distributed as rewards t
 | Smart Contract | Clarity 2.0 on Stacks Mainnet |
 | Frontend | React 18 · TypeScript · Vite 5 · Tailwind CSS |
 | State | @tanstack/react-query |
+| Blockchain Read Sync | Layered read-through caching + transaction-aware invalidation |
 | Wallet | @stacks/connect (Leather · Xverse · Asigna) |
 | Testing | Vitest + Clarinet SDK |
 | Deployment | Vercel |

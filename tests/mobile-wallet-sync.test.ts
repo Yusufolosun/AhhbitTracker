@@ -1,5 +1,15 @@
-import { describe, expect, it } from 'vitest';
-import { getWalletInteractionSyncTargets } from '../mobile/src/features/wallet/transactionSync';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import {
+  fetchWalletTransactionStatus,
+  getWalletInteractionSyncTargets,
+} from '../mobile/src/features/wallet/transactionSync';
+
+const originalFetch = globalThis.fetch;
+
+afterEach(() => {
+  globalThis.fetch = originalFetch;
+  vi.restoreAllMocks();
+});
 
 describe('mobile wallet transaction sync targets', () => {
   it('keeps habit queries fresh for create and check-in actions', () => {
@@ -36,5 +46,35 @@ describe('mobile wallet transaction sync targets', () => {
       invalidateUserStats: true,
       invalidatePoolBalance: true,
     });
+  });
+
+  it('maps successful tx status to confirmed', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ tx_status: 'success' }),
+    } as Response) as any;
+
+    await expect(fetchWalletTransactionStatus('0xtx-success')).resolves.toBe('confirmed');
+  });
+
+  it('maps aborted tx status to failed', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ tx_status: 'abort_by_response' }),
+    } as Response) as any;
+
+    await expect(fetchWalletTransactionStatus('0xtx-abort')).resolves.toBe('failed');
+  });
+
+  it('treats missing tx status as pending', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 404,
+      json: async () => ({}),
+    } as Response) as any;
+
+    await expect(fetchWalletTransactionStatus('0xtx-missing')).resolves.toBe('pending');
   });
 });

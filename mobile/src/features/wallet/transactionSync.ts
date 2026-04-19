@@ -1,4 +1,5 @@
 import type { MobileTxType } from '../../core/types';
+import { fetchHiroJson, HiroApiError } from '../../core/network/hiroApiClient';
 
 export interface WalletInteractionSyncTargets {
   invalidateHabits: boolean;
@@ -37,15 +38,6 @@ const SYNC_TARGETS: Record<MobileTxType, WalletInteractionSyncTargets> = {
 
 export type WalletTransactionStatus = 'pending' | 'confirmed' | 'failed';
 
-function getHiroApiBaseUrl(): string {
-  return (
-    process.env.EXPO_PUBLIC_HIRO_API_BASE_URL ??
-    (process.env.EXPO_PUBLIC_STACKS_NETWORK === 'testnet'
-      ? 'https://api.testnet.hiro.so'
-      : 'https://api.mainnet.hiro.so')
-  );
-}
-
 export function getWalletInteractionSyncTargets(
   functionName: MobileTxType | null,
 ): WalletInteractionSyncTargets {
@@ -57,22 +49,27 @@ export function getWalletInteractionSyncTargets(
 }
 
 export async function fetchWalletTransactionStatus(txId: string): Promise<WalletTransactionStatus> {
-  const response = await fetch(`${getHiroApiBaseUrl()}/extended/v1/tx/${txId}`);
+  try {
+    const payload = await fetchHiroJson<any>(`/extended/v1/tx/${txId}`, {
+      ttlMs: 5_000,
+      retries: 1,
+    });
+    const status = String(payload.tx_status ?? payload.status ?? '').toLowerCase();
 
-  if (!response.ok) {
-    return response.status === 404 ? 'pending' : 'pending';
+    if (status === 'success') {
+      return 'confirmed';
+    }
+
+    if (status.startsWith('abort')) {
+      return 'failed';
+    }
+
+    return 'pending';
+  } catch (error) {
+    if (error instanceof HiroApiError && error.status === 404) {
+      return 'pending';
+    }
+
+    return 'pending';
   }
-
-  const payload: any = await response.json();
-  const status = String(payload.tx_status ?? payload.status ?? '').toLowerCase();
-
-  if (status === 'success') {
-    return 'confirmed';
-  }
-
-  if (status.startsWith('abort')) {
-    return 'failed';
-  }
-
-  return 'pending';
 }

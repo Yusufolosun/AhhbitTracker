@@ -10,6 +10,7 @@ import {
 import type { PropsWithChildren } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/core/config';
+import { invalidateAddressReadCache } from '@/core/data';
 import { validateStacksAddress } from '@/shared/utils';
 import type { WalletInteractionState } from '@/features/wallet/types';
 import { appStateActions } from './actions';
@@ -78,6 +79,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     }
 
     if (previousAddress) {
+      invalidateAddressReadCache(previousAddress);
       queryClient.removeQueries({ queryKey: QUERY_KEYS.userHabits(previousAddress) });
       queryClient.removeQueries({ queryKey: QUERY_KEYS.userStats(previousAddress) });
     }
@@ -86,6 +88,7 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     queryClient.removeQueries({ queryKey: QUERY_KEYS.userStats('anonymous') });
 
     if (currentAddress) {
+      invalidateAddressReadCache(currentAddress);
       void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.userHabits(currentAddress) });
       void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.userStats(currentAddress) });
     }

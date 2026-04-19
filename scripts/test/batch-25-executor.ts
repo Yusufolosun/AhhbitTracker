@@ -1,7 +1,7 @@
 /**
- * 55-Wallet Batch Transaction Automation System
+ * 48-Wallet Batch Transaction Automation System
  *
- * Executes batch operations across up to 55 wallets on Stacks mainnet
+ * Executes batch operations across up to 48 active wallets on Stacks mainnet
  * against the habit-tracker-v2 contract.
  *
  * Operations:
@@ -13,7 +13,7 @@
  *   - Fee per txn: randomized 2100-2140 microSTX
  *   - Stake per habit: 20,000 microSTX (0.02 STX — contract minimum)
  *   - Delay between txns: 8 seconds
- *   - Wallet count: ACTIVE_WALLETS_COUNT in batch-25-wallets.env (1–55, default 55)
+ *   - Wallet count: ACTIVE_WALLETS_COUNT in batch-25-wallets.env (1–55, default 48)
  *
  * Usage:
  *   npx ts-node --project scripts/tsconfig.scripts.json scripts/test/batch-25-executor.ts dry-run
@@ -46,14 +46,6 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { createContractReadonlyClient } from '../shared/contract-readonly.ts';
 import {
-    CHECK_IN_WINDOW_BLOCKS,
-    MIN_CHECK_IN_INTERVAL_BLOCKS,
-} from '../shared/checkin-timing.ts';
-import {
-    evaluateDailyCheckInEligibility,
-    type CheckInEligibility,
-} from '../shared/checkin-eligibility.ts';
-import {
     canWithdrawHabit,
     describeWithdrawHabitStatus,
     MIN_STREAK_FOR_WITHDRAWAL,
@@ -75,11 +67,14 @@ dotenv.config({ path: envPath });
 // ── Constants ──
 const MIN_TX_FEE_MICROSTX = 2_100;
 const MAX_TX_FEE_MICROSTX = 2_140;
+const ACTIVE_HABIT_LOOKUP_DELAY_MS = 5_000;
+const BALANCE_CHECK_DELAY_MS = 800; // delay between per-wallet balance checks to avoid Hiro 429s
 const DELAY_BETWEEN_TX_MS = 8_000; // 8 seconds
 // How many wallets to include in this batch run (1–55). Edit ACTIVE_WALLETS_COUNT
-// in batch-25-wallets.env to use fewer wallets, e.g. 30 or 40.
+// in batch-25-wallets.env to use fewer wallets. Default 48 — wallets 49-55 are
+// left inactive to stay under Hiro API rate limits and reduce STX burn.
 const WALLETS_COUNT = Math.min(
-    parseInt(process.env.ACTIVE_WALLETS_COUNT || '55', 10) || 55,
+    parseInt(process.env.ACTIVE_WALLETS_COUNT || '48', 10) || 48,
     55, // hard cap at the number of mnemonics configured
 );
 const HABITS_PER_WALLET = 1;
@@ -126,10 +121,71 @@ interface BatchState {
     lastUpdated: number;
 }
 
+interface ReadCacheEntry<T> {
+    value: T;
+    expiresAt: number;
+}
+
+const readCache = new Map<string, ReadCacheEntry<unknown>>();
+const inFlightReads = new Map<string, Promise<unknown>>();
+
 // ── Utility Functions ──
 
 function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function readThroughCache<T>(key: string, ttlMs: number, fetcher: () => Promise<T>): Promise<T> {
+    const now = Date.now();
+    const cached = readCache.get(key);
+
+    if (cached && cached.expiresAt > now) {
+        return cached.value as T;
+    }
+
+    const inFlight = inFlightReads.get(key);
+    if (inFlight) {
+        return inFlight as Promise<T>;
+    }
+
+    const request = fetcher()
+        .then((value) => {
+            readCache.set(key, {
+                value,
+                expiresAt: Date.now() + ttlMs,
+            });
+            return value;
+        })
+        .finally(() => {
+            inFlightReads.delete(key);
+        });
+
+    inFlightReads.set(key, request);
+    return request;
+}
+
+function invalidateReadCache(prefix: string): void {
+    for (const key of readCache.keys()) {
+        if (key.startsWith(prefix)) {
+            readCache.delete(key);
+        }
+    }
+
+    for (const key of inFlightReads.keys()) {
+        if (key.startsWith(prefix)) {
+            inFlightReads.delete(key);
+        }
+    }
+}
+
+function invalidateWalletReadCaches(walletAddress: string, habitId?: number): void {
+    invalidateReadCache(`readonly:user-habits:${walletAddress}`);
+    invalidateReadCache(`readonly:user-stats:${walletAddress}`);
+    invalidateReadCache(`account:${walletAddress}`);
+
+    if (typeof habitId === 'number') {
+        invalidateReadCache(`readonly:habit:${habitId}`);
+    }
 }
 
 function getRandomizedTxnFeeMicroStx(): number {
@@ -161,20 +217,22 @@ function summarizeSubmittedFees(records: HabitRecord[]): {
 }
 
 async function getCurrentBlockHeight(): Promise<number> {
-    const response = await fetch(`${API_URL}/v2/info`);
+    return readThroughCache('stacks:current-block', 15_000, async () => {
+        const response = await fetch(`${API_URL}/v2/info`);
 
-    if (!response.ok) {
-        throw new Error(`Failed to fetch current block height: ${response.status} ${response.statusText}`);
-    }
+        if (!response.ok) {
+            throw new Error(`Failed to fetch current block height: ${response.status} ${response.statusText}`);
+        }
 
-    const payload: any = await response.json();
-    const currentBlock = Number(payload.stacks_tip_height);
+        const payload: any = await response.json();
+        const currentBlock = Number(payload.stacks_tip_height);
 
-    if (!Number.isFinite(currentBlock)) {
-        throw new Error('Stacks API returned an invalid current block height');
-    }
+        if (!Number.isFinite(currentBlock)) {
+            throw new Error('Stacks API returned an invalid current block height');
+        }
 
-    return currentBlock;
+        return currentBlock;
+    });
 }
 
 function loadState(): BatchState {
@@ -391,51 +449,132 @@ async function getNonce(address: string): Promise<bigint> {
  * get-user-habits returns the full historical habit list for the wallet.
  */
 async function getUserHabits(address: string): Promise<number[]> {
-    const result = await fetchCallReadOnlyFunction({
-        contractAddress: CONTRACT_ADDRESS,
-        contractName: CONTRACT_NAME,
-        functionName: 'get-user-habits',
-        functionArgs: [principalCV(address)],
-        senderAddress: address,
-        network: 'mainnet',
+    return readThroughCache(`readonly:user-habits:${address}`, 20_000, async () => {
+        const result = await fetchCallReadOnlyFunction({
+            contractAddress: CONTRACT_ADDRESS,
+            contractName: CONTRACT_NAME,
+            functionName: 'get-user-habits',
+            functionArgs: [principalCV(address)],
+            senderAddress: address,
+            network: 'mainnet',
+        });
+
+        const json = cvToJSON(result);
+
+        // get-user-habits returns a tuple { habit-ids: [...] } directly (not a response)
+        // cvToJSON shape: { type: 'tuple', value: { 'habit-ids': { type: 'list', value: [...] } } }
+        const habitIdsList = json.value?.['habit-ids']?.value
+            ?? json.value?.value  // fallback for response-wrapped shape
+            ?? [];
+        return Array.isArray(habitIdsList)
+            ? habitIdsList.map((v: any) => parseInt(v.value))
+            : [];
     });
+}
 
-    const json = cvToJSON(result);
+async function getUserHabitsWithRetry(address: string, walletIndex: number): Promise<number[]> {
+    const maxAttempts = 4;
 
-    // get-user-habits returns a tuple { habit-ids: [...] } directly (not a response)
-    // cvToJSON shape: { type: 'tuple', value: { 'habit-ids': { type: 'list', value: [...] } } }
-    const habitIdsList = json.value?.['habit-ids']?.value
-        ?? json.value?.value  // fallback for response-wrapped shape
-        ?? [];
-    return Array.isArray(habitIdsList)
-        ? habitIdsList.map((v: any) => parseInt(v.value))
-        : [];
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+            return await getUserHabits(address);
+        } catch (err: any) {
+            const message = err instanceof Error ? err.message : String(err);
+            const isRateLimit = message.includes('429') || message.includes('Too Many Requests');
+
+            if (!isRateLimit || attempt === maxAttempts) {
+                throw new Error(`Wallet ${walletIndex}: get-user-habits lookup failed — ${message}`);
+            }
+
+            await sleep(4_000 * attempt);
+        }
+    }
+
+    throw new Error(`Wallet ${walletIndex}: get-user-habits lookup failed after retries`);
+}
+
+/**
+ * Get the latest habit ID known for a wallet from local batch state.
+ */
+function getLatestKnownHabitId(state: BatchState, walletIndex: number): number | null {
+    for (let i = state.createHabitBatch.length - 1; i >= 0; i--) {
+        const record = state.createHabitBatch[i];
+        if (record.walletIndex === walletIndex && record.habitId !== null) {
+            return record.habitId;
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Read a habit from the contract with retry/backoff when Hiro rate limits us.
+ */
+async function readHabitWithRetry(habitId: number, walletIndex: number): Promise<NonNullable<Awaited<ReturnType<typeof readonlyClient.getHabit>>>> {
+    const maxAttempts = 4;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+            const habit = await readThroughCache(`readonly:habit:${habitId}`, 20_000, () => readonlyClient.getHabit(habitId));
+            if (!habit) {
+                throw new Error(`habit #${habitId} not found`);
+            }
+            return habit;
+        } catch (err: any) {
+            const message = err instanceof Error ? err.message : String(err);
+            const isRateLimit = message.includes('429') || message.includes('Too Many Requests');
+
+            if (!isRateLimit || attempt === maxAttempts) {
+                throw new Error(`Wallet ${walletIndex}: habit #${habitId} lookup failed — ${message}`);
+            }
+
+            await sleep(4_000 * attempt);
+        }
+    }
+
+    throw new Error(`Wallet ${walletIndex}: habit #${habitId} lookup failed after retries`);
+}
+
+/**
+ * Determine whether a habit is genuinely in-progress (should block new creation).
+ *
+ * A habit is "truly active" only when ALL of:
+ *   1. isActive = true        (not forfeited / expired)
+ *   2. isCompleted = false     (not finished / withdrawn)
+ *   3. stakeAmount > 0         (stake hasn't been zeroed by withdrawal)
+ *
+ * After `withdraw-stake`, the contract may leave isActive=true while setting
+ * isCompleted=true (or zeroing the stake). The old check only tested isActive,
+ * which caused the script to permanently block new habit creation for wallets
+ * whose previous habit had been withdrawn on-chain.
+ */
+function isHabitTrulyActive(habit: { isActive: boolean; isCompleted: boolean; stakeAmount: number }): boolean {
+    return habit.isActive && !habit.isCompleted && habit.stakeAmount > 0;
 }
 
 /**
  * Get the currently active habit IDs for a wallet.
  *
- * The contract's get-user-habits view is historical, so we inspect each habit
- * and keep only the records that still have `is-active: true` on-chain.
+ * The create-habit workflow only needs the most recent tracked habit in the
+ * common one-habit-per-wallet path. We read that habit first to keep the API
+ * usage low, then fall back to the historical list only when state is empty.
  */
-async function getActiveHabitIds(address: string): Promise<number[]> {
-    const habitIds = await getUserHabits(address);
+async function getActiveHabitIdsFromState(state: BatchState, wallet: WalletInfo): Promise<number[]> {
+    const latestKnownHabitId = getLatestKnownHabitId(state, wallet.index);
 
+    if (latestKnownHabitId !== null) {
+        const habit = await readHabitWithRetry(latestKnownHabitId, wallet.index);
+        return isHabitTrulyActive(habit) ? [latestKnownHabitId] : [];
+    }
+
+    const habitIds = await getUserHabitsWithRetry(wallet.address, wallet.index);
     if (habitIds.length === 0) {
         return [];
     }
 
-    const activeHabitIds: number[] = [];
-
-    for (const habitId of habitIds) {
-        const habit = await readonlyClient.getHabit(habitId);
-
-        if (habit?.isActive) {
-            activeHabitIds.push(habitId);
-        }
-    }
-
-    return activeHabitIds;
+    const latestOnChainHabitId = habitIds[habitIds.length - 1];
+    const habit = await readHabitWithRetry(latestOnChainHabitId, wallet.index);
+    return isHabitTrulyActive(habit) ? [latestOnChainHabitId] : [];
 }
 
 /**
@@ -532,7 +671,7 @@ async function batchCreateHabits(wallets: WalletInfo[]): Promise<void> {
     const state = loadState();
 
     console.log('═'.repeat(70));
-    console.log(`📝 BATCH CREATE-HABIT — ${WALLETS_COUNT} Wallet${WALLETS_COUNT !== 1 ? 's' : ''} × ${HABITS_PER_WALLET} Habit${HABITS_PER_WALLET !== 1 ? 's' : ''} = ${TOTAL_TXN_PER_BATCH} Transactions`);
+    console.log(`📝 BATCH CREATE-HABIT — ${WALLETS_COUNT} Wallet${WALLETS_COUNT !== 1 ? 's' : ''} × ${HABITS_PER_WALLET} Habit${HABITS_PER_WALLET !== 1 ? 's' : ''} = ${TOTAL_TXN_PER_BATCH} Transaction${TOTAL_TXN_PER_BATCH !== 1 ? 's' : ''}`);
     console.log('═'.repeat(70));
     console.log();
     console.log(`  Contract: ${CONTRACT_ADDRESS}.${CONTRACT_NAME}`);
@@ -550,7 +689,8 @@ async function batchCreateHabits(wallets: WalletInfo[]): Promise<void> {
     console.log('💰 Pre-flight Balance Checks...');
     const requiredPerWallet = STAKE_AMOUNT * HABITS_PER_WALLET + MAX_TX_FEE_MICROSTX * HABITS_PER_WALLET;
     const activeHabitIdsByWallet = new Map<number, number[]>();
-    let allFunded = true;
+    let allBalancesSufficient = true;
+    let activeHabitLookupFailed = false;
     let walletsToProcess = 0;
 
     for (const wallet of wallets) {
@@ -561,18 +701,24 @@ async function batchCreateHabits(wallets: WalletInfo[]): Promise<void> {
             continue;
         }
         try {
-            const activeHabitIds = await getActiveHabitIds(wallet.address);
+            const activeHabitIds = await getActiveHabitIdsFromState(state, wallet);
             activeHabitIdsByWallet.set(wallet.index, activeHabitIds);
 
             if (activeHabitIds.length >= HABITS_PER_WALLET) {
                 console.log(
                     `  ⏭️  Wallet ${wallet.index} (${wallet.address}): active habit on-chain [${activeHabitIds.join(', ')}] — skipping balance check`
                 );
+                await sleep(ACTIVE_HABIT_LOOKUP_DELAY_MS);
                 continue;
             }
+
+            // Delay after a successful habit lookup that did NOT skip — prevents the
+            // subsequent balance check from arriving too quickly after the lookup.
+            await sleep(BALANCE_CHECK_DELAY_MS);
         } catch (err: any) {
             console.error(`  ❌ Wallet ${wallet.index} (${wallet.address}): active habit lookup failed — ${err.message}`);
-            allFunded = false;
+            activeHabitLookupFailed = true;
+            await sleep(ACTIVE_HABIT_LOOKUP_DELAY_MS);
             continue;
         }
 
@@ -581,15 +727,16 @@ async function batchCreateHabits(wallets: WalletInfo[]): Promise<void> {
             const balance = await getBalance(wallet.address);
             if (balance < requiredPerWallet) {
                 console.error(`  ❌ Wallet ${wallet.index} (${wallet.address}): ${(balance / 1_000_000).toFixed(4)} STX — needs ${(requiredPerWallet / 1_000_000).toFixed(5)} STX`);
-                allFunded = false;
+                allBalancesSufficient = false;
             } else {
                 console.log(`  ✅ Wallet ${wallet.index} (${wallet.address}): ${(balance / 1_000_000).toFixed(4)} STX`);
             }
-            // Small delay between balance checks to avoid rate limiting
-            await sleep(300);
+            // Delay between balance checks to avoid Hiro API rate limiting (429)
+            await sleep(BALANCE_CHECK_DELAY_MS);
         } catch (err: any) {
-            console.error(`  ❌ Wallet ${wallet.index}: balance check failed — ${err.message}`);
-            allFunded = false;
+            // Log error but do NOT set allBalancesSufficient = false for transient
+            // API failures (e.g. rate limits). Only insufficient funds should block.
+            console.error(`  ⚠️  Wallet ${wallet.index}: balance check failed — ${err.message} (will retry at broadcast time)`);
         }
     }
 
@@ -600,7 +747,14 @@ async function batchCreateHabits(wallets: WalletInfo[]): Promise<void> {
         return;
     }
 
-    if (!allFunded) {
+    if (activeHabitLookupFailed) {
+        console.error();
+        console.error('❌ Could not verify active habit state for every wallet due to API rate limits.');
+        console.error('   Wait a few minutes and run create-habit again, or reduce ACTIVE_WALLETS_COUNT.');
+        process.exit(1);
+    }
+
+    if (!allBalancesSufficient) {
         console.error();
         console.error('❌ Some wallets are underfunded. Fund them before proceeding.');
         process.exit(1);
@@ -671,6 +825,8 @@ async function batchCreateHabits(wallets: WalletInfo[]): Promise<void> {
                     status: 'submitted',
                     timestamp: Date.now(),
                 });
+
+                invalidateWalletReadCaches(wallet.address);
 
                 nonce = nonce + 1n;
             } catch (err: any) {
@@ -755,12 +911,15 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
             walletHabits.set(wallet.index, []);
             continue;
         }
-        const confirmedHabits = state.createHabitBatch
-            .filter(r => r.walletIndex === wallet.index && r.habitId !== null && r.status === 'confirmed')
-            .map(r => r.habitId as number);
+        const confirmedHabits = [...new Set(
+            state.createHabitBatch
+                .filter(r => r.walletIndex === wallet.index && r.habitId !== null && r.status === 'confirmed')
+                .map(r => r.habitId as number)
+        )];
 
         if (confirmedHabits.length >= HABITS_PER_WALLET) {
-            walletHabits.set(wallet.index, confirmedHabits.slice(0, HABITS_PER_WALLET));
+            // Take the LATEST habits (end of list) — old habits are completed/inactive
+            walletHabits.set(wallet.index, confirmedHabits.slice(-HABITS_PER_WALLET));
             console.log(`  Wallet ${wallet.index}: [${confirmedHabits.join(', ')}] ✅`);
         } else if (confirmedHabits.length > 0) {
             walletHabits.set(wallet.index, confirmedHabits);
@@ -804,10 +963,14 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
         walletHabits.set(walletIdx, pending);
     }
 
-    console.log('🔗 Verifying on-chain check-in eligibility...');
-    console.log(`  On-chain window: ${MIN_CHECK_IN_INTERVAL_BLOCKS}-${CHECK_IN_WINDOW_BLOCKS} blocks since the last check-in`);
+    // Pre-flight: skip habits that are already completed or inactive on-chain.
+    // Block-timing eligibility is NOT enforced here — the on-chain contract
+    // decides whether the check-in is valid. This avoids mismatches between
+    // the script's timing constants and the deployed contract's actual rules.
+    console.log('🔍 Verifying on-chain habit status (active/completed)...');
 
     const onChainEligibleHabits: Map<number, number[]> = new Map();
+
     for (const wallet of wallets) {
         const habitIds = walletHabits.get(wallet.index) || [];
 
@@ -816,41 +979,39 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
             continue;
         }
 
-        let currentBlock: number;
-        try {
-            currentBlock = await getCurrentBlockHeight();
-        } catch (err: any) {
-            console.error(`  Wallet ${wallet.index}: unable to fetch current block — ${err.message}`);
-            onChainEligibleHabits.set(wallet.index, []);
-            continue;
-        }
-
         const eligibleIds: number[] = [];
 
         for (const habitId of habitIds) {
             try {
-                const habit = await readonlyClient.getHabit(habitId);
+                const habit = await readHabitWithRetry(habitId, wallet.index);
 
                 if (!habit) {
                     console.log(`  Wallet ${wallet.index}: habit #${habitId} not found on-chain — skipping`);
                     continue;
                 }
 
-                const eligibility = evaluateDailyCheckInEligibility(habit, currentBlock);
+                if (habit.isCompleted) {
+                    console.log(`  Wallet ${wallet.index}: habit #${habitId} already completed — skipping`);
+                    continue;
+                }
 
-                if (!eligibility.eligible) {
-                    console.log(`  Wallet ${wallet.index}: habit #${habitId} ${describeCheckInEligibility(eligibility)} — skipping`);
+                if (!habit.isActive) {
+                    console.log(`  Wallet ${wallet.index}: habit #${habitId} inactive — skipping`);
                     continue;
                 }
 
                 eligibleIds.push(habitId);
+                console.log(`  Wallet ${wallet.index}: habit #${habitId} active ✅`);
             } catch (err: any) {
-                console.error(`  Wallet ${wallet.index}: habit #${habitId} eligibility lookup failed — ${err.message}`);
+                console.error(`  Wallet ${wallet.index}: habit #${habitId} lookup failed — ${err.message}`);
             }
+
+            // Rate-limit: delay between lookups to avoid Hiro 429s
+            await sleep(1_500);
         }
 
         if (eligibleIds.length < habitIds.length) {
-            console.log(`  Wallet ${wallet.index}: ${habitIds.length - eligibleIds.length} habit(s) skipped after on-chain eligibility check`);
+            console.log(`  Wallet ${wallet.index}: ${habitIds.length - eligibleIds.length} habit(s) skipped`);
         }
 
         onChainEligibleHabits.set(wallet.index, eligibleIds);
@@ -860,7 +1021,7 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
         walletHabits.set(walletIndex, habitIds);
     }
 
-    // Count total check-ins that are still eligible on-chain
+    // Count total check-ins
     let totalCheckIns = 0;
     for (const [, ids] of walletHabits) {
         totalCheckIns += ids.length;
@@ -868,8 +1029,7 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
 
     if (totalCheckIns === 0) {
         console.log();
-        console.log('✅ No habits are currently eligible for check-in on-chain.');
-        console.log(`   Check-ins are only valid between ${MIN_CHECK_IN_INTERVAL_BLOCKS} and ${CHECK_IN_WINDOW_BLOCKS} blocks after the last confirmed check-in.`);
+        console.log('✅ No active habits found for check-in.');
         return;
     }
 
@@ -927,6 +1087,8 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
                     status: 'submitted',
                     timestamp: Date.now(),
                 });
+
+                invalidateWalletReadCaches(wallet.address, habitId);
 
                 nonce = nonce + 1n;
             } catch (err: any) {
@@ -1161,6 +1323,8 @@ async function batchWithdraw(wallets: WalletInfo[]): Promise<void> {
                     timestamp: Date.now(),
                 });
 
+                invalidateWalletReadCaches(wallet.address, habitId);
+
                 nonce = nonce + 1n;
             } catch (err: any) {
                 console.log(`   ❌ ${err.message}`);
@@ -1227,6 +1391,8 @@ async function showStatus(wallets: WalletInfo[]): Promise<void> {
         } catch {
             console.log(`  ${wallet.index.toString().padStart(2, '0')}. ${wallet.address} — balance unavailable`);
         }
+        // Rate-limit: delay between per-wallet balance lookups to avoid Hiro 429s
+        await sleep(BALANCE_CHECK_DELAY_MS);
     }
     console.log();
 
@@ -1526,7 +1692,7 @@ async function recoverHabitIds(wallets: WalletInfo[]): Promise<void> {
  */
 async function dryRunTest(): Promise<void> {
     console.log('═'.repeat(70));
-    console.log('🧪 DRY-RUN TEST — 55-Wallet Batch Validation');
+    console.log(`🧪 DRY-RUN TEST — ${WALLETS_COUNT}-Wallet Batch Validation`);
     console.log('═'.repeat(70));
     console.log();
     console.log('This test validates ALL configuration WITHOUT executing transactions.');
@@ -1779,7 +1945,7 @@ async function main() {
     }
 
     // Load wallets (derives keys from mnemonics)
-    console.log(`🔐 Loading ${WALLETS_COUNT} wallet${WALLETS_COUNT !== 1 ? 's' : ''} (deriving keys from mnemonics)...`);
+    console.log(`🔐 Loading ${WALLETS_COUNT} wallet${WALLETS_COUNT !== 1 ? 's' : ''} (deriving keys from mnemonics, wallets 1-${WALLETS_COUNT})...`);
     const wallets = await loadWallets();
     console.log(`   ✅ ${wallets.length} wallets derived and verified`);
     console.log();

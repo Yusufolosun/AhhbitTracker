@@ -1,10 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import { POLLING_INTERVAL_MS, QUERY_KEYS, networkConfig } from '@/core/config';
+import { POLLING_INTERVAL_MS, QUERY_KEYS } from '@/core/config';
 import {
   fetchHabitsByAddress,
   fetchPoolBalance,
   fetchUserStats,
 } from '@/core/data';
+import { fetchHiroJson } from '@/core/network';
 
 export function usePoolBalanceQuery() {
   return useQuery({
@@ -55,15 +56,11 @@ export function useUserStatsQuery(address: string | null) {
 
 export function useCurrentBlockQuery() {
   return useQuery({
-    queryKey: ['current-block-height'],
+    queryKey: QUERY_KEYS.currentBlock,
     queryFn: async () => {
-      const response = await fetch(`${networkConfig.hiroApiBaseUrl}/v2/info`);
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch current block (${response.status})`);
-      }
-
-      const payload = await response.json();
+      const payload = await fetchHiroJson<{ stacks_tip_height: number }>('/v2/info', {
+        ttlMs: POLLING_INTERVAL_MS,
+      });
       return Number(payload.stacks_tip_height ?? 0);
     },
     staleTime: POLLING_INTERVAL_MS,
