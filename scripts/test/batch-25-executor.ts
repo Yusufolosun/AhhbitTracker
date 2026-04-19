@@ -186,6 +186,16 @@ function invalidateReadCache(prefix: string): void {
     }
 }
 
+function invalidateWalletReadCaches(walletAddress: string, habitId?: number): void {
+    invalidateReadCache(`readonly:user-habits:${walletAddress}`);
+    invalidateReadCache(`readonly:user-stats:${walletAddress}`);
+    invalidateReadCache(`account:${walletAddress}`);
+
+    if (typeof habitId === 'number') {
+        invalidateReadCache(`readonly:habit:${habitId}`);
+    }
+}
+
 function getRandomizedTxnFeeMicroStx(): number {
     return randomInt(MIN_TX_FEE_MICROSTX, MAX_TX_FEE_MICROSTX + 1);
 }
@@ -824,6 +834,8 @@ async function batchCreateHabits(wallets: WalletInfo[]): Promise<void> {
                     timestamp: Date.now(),
                 });
 
+                invalidateWalletReadCaches(wallet.address);
+
                 nonce = nonce + 1n;
             } catch (err: any) {
                 console.log(`   ❌ ${err.message}`);
@@ -960,6 +972,17 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
     console.log(`  On-chain window: ${MIN_CHECK_IN_INTERVAL_BLOCKS}-${CHECK_IN_WINDOW_BLOCKS} blocks since the last check-in`);
 
     const onChainEligibleHabits: Map<number, number[]> = new Map();
+    let currentBlockSnapshot: number;
+
+    try {
+        currentBlockSnapshot = await getCurrentBlockHeight();
+    } catch (err: any) {
+        console.error(`  ❌ Unable to fetch current block for eligibility checks — ${err.message}`);
+        process.exit(1);
+    }
+
+    let walletsSinceLastBlockRefresh = 0;
+
     for (const wallet of wallets) {
         const habitIds = walletHabits.get(wallet.index) || [];
 
@@ -968,13 +991,16 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
             continue;
         }
 
-        let currentBlock: number;
-        try {
-            currentBlock = await getCurrentBlockHeight();
-        } catch (err: any) {
-            console.error(`  Wallet ${wallet.index}: unable to fetch current block — ${err.message}`);
-            onChainEligibleHabits.set(wallet.index, []);
-            continue;
+        // Refresh every 10 wallets so very large batches stay aligned with chain progress.
+        walletsSinceLastBlockRefresh += 1;
+        if (walletsSinceLastBlockRefresh >= 10) {
+            walletsSinceLastBlockRefresh = 0;
+            invalidateReadCache('stacks:current-block');
+            try {
+                currentBlockSnapshot = await getCurrentBlockHeight();
+            } catch (err: any) {
+                console.error(`  Wallet ${wallet.index}: unable to refresh current block — ${err.message}`);
+            }
         }
 
         const eligibleIds: number[] = [];
@@ -988,7 +1014,7 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
                     continue;
                 }
 
-                const eligibility = evaluateDailyCheckInEligibility(habit, currentBlock);
+                const eligibility = evaluateDailyCheckInEligibility(habit, currentBlockSnapshot);
 
                 if (!eligibility.eligible) {
                     console.log(`  Wallet ${wallet.index}: habit #${habitId} ${describeCheckInEligibility(eligibility)} — skipping`);
@@ -1079,6 +1105,8 @@ async function batchCheckIn(wallets: WalletInfo[]): Promise<void> {
                     status: 'submitted',
                     timestamp: Date.now(),
                 });
+
+                invalidateWalletReadCaches(wallet.address, habitId);
 
                 nonce = nonce + 1n;
             } catch (err: any) {
@@ -1312,6 +1340,8 @@ async function batchWithdraw(wallets: WalletInfo[]): Promise<void> {
                     status: 'submitted',
                     timestamp: Date.now(),
                 });
+
+                invalidateWalletReadCaches(wallet.address, habitId);
 
                 nonce = nonce + 1n;
             } catch (err: any) {
