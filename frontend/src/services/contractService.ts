@@ -18,6 +18,16 @@ import {
 import { CONTRACT_ADDRESS, CONTRACT_NAME, NETWORK } from '../utils/constants';
 import { walletService } from './walletService';
 import type { Habit, UserStats } from '../types/habit';
+import {
+  cacheHabitRead,
+  cachePoolBalanceRead,
+  cacheUserHabitsRead,
+  cacheUserStatsRead,
+  clearAllContractReadCache,
+  clearHabitReadCache,
+  clearPoolReadCache,
+  clearUserReadCache,
+} from './contractReadCache';
 
 function unwrapOkNumber(json: any): number {
   if (json?.success === true) {
@@ -39,26 +49,48 @@ const appDetails = {
  */
 export const contractService = {
   async readHabit(habitId: number): Promise<Habit | null> {
-    return sdkGetHabit(habitId, NETWORK, {
-      contractAddress: CONTRACT_ADDRESS,
-      contractName: CONTRACT_NAME,
-    });
+    return cacheHabitRead(habitId, () =>
+      sdkGetHabit(habitId, NETWORK, {
+        contractAddress: CONTRACT_ADDRESS,
+        contractName: CONTRACT_NAME,
+      })
+    );
+  },
+
+  invalidateHabitReadCache(habitId: number): void {
+    clearHabitReadCache(habitId);
+  },
+
+  invalidateAddressReadCache(userAddress: string): void {
+    clearUserReadCache(userAddress);
+  },
+
+  invalidatePoolReadCache(): void {
+    clearPoolReadCache();
+  },
+
+  invalidateAllReadCache(): void {
+    clearAllContractReadCache();
   },
 
   async readUserHabits(userAddress: string): Promise<number[]> {
-    const result = await sdkGetUserHabits(userAddress, NETWORK, {
-      contractAddress: CONTRACT_ADDRESS,
-      contractName: CONTRACT_NAME,
-    });
+    const result = await cacheUserHabitsRead(userAddress, () =>
+      sdkGetUserHabits(userAddress, NETWORK, {
+        contractAddress: CONTRACT_ADDRESS,
+        contractName: CONTRACT_NAME,
+      })
+    );
 
     return result.habitIds;
   },
 
   async readPoolBalance(): Promise<number> {
-    return sdkGetPoolBalance(NETWORK, {
-      contractAddress: CONTRACT_ADDRESS,
-      contractName: CONTRACT_NAME,
-    });
+    return cachePoolBalanceRead(() =>
+      sdkGetPoolBalance(NETWORK, {
+        contractAddress: CONTRACT_ADDRESS,
+        contractName: CONTRACT_NAME,
+      })
+    );
   },
 
   async readEstimatedBonusShare(): Promise<number> {
@@ -88,10 +120,12 @@ export const contractService = {
   },
 
   async readUserStats(userAddress: string): Promise<UserStats> {
-    return sdkGetUserStats(userAddress, NETWORK, {
-      contractAddress: CONTRACT_ADDRESS,
-      contractName: CONTRACT_NAME,
-    });
+    return cacheUserStatsRead(userAddress, () =>
+      sdkGetUserStats(userAddress, NETWORK, {
+        contractAddress: CONTRACT_ADDRESS,
+        contractName: CONTRACT_NAME,
+      })
+    );
   },
 
   /**
