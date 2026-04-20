@@ -3,6 +3,7 @@ import {
   AccountScreen,
   HabitsScreen,
   OverviewScreen,
+  NotificationsScreen,
   PreviewScreen,
 } from '@/app/screens';
 import { mainTabScreenOptions } from './options';
@@ -25,6 +26,13 @@ export function MainTabsNavigator() {
         component={HabitsScreen}
         options={{
           title: 'Habits',
+        }}
+      />
+      <Tab.Screen
+        name={MAIN_TAB_ROUTES.Notifications}
+        component={NotificationsScreen}
+        options={{
+          title: 'Notifications',
         }}
       />
       <Tab.Screen

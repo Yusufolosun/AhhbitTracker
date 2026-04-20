@@ -1,6 +1,7 @@
 export * from './DashboardScreen';
 export * from './OverviewScreen';
 export * from './HabitsScreen';
+export * from './NotificationsScreen';
 export * from './HabitDetailsScreen';
 export * from './CreateHabitScreen';
 export * from './PreviewScreen';
