@@ -10,6 +10,7 @@ export const linkingConfig: LinkingOptions<RootStackParamList> = {
         screens: {
           Overview: 'overview',
           Habits: 'habits',
+          Notifications: 'notifications',
           Preview: {
             path: 'preview',
             parse: {

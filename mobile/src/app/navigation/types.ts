@@ -15,6 +15,7 @@ export const ROOT_ROUTES = {
 export const MAIN_TAB_ROUTES = {
   Overview: 'Overview',
   Habits: 'Habits',
+  Notifications: 'Notifications',
   Preview: 'Preview',
   Account: 'Account',
 } as const;
@@ -24,6 +25,7 @@ export type PreviewRouteParams = WalletInteractionRouteParams;
 export type MainTabParamList = {
   Overview: undefined;
   Habits: undefined;
+  Notifications: undefined;
   Preview: PreviewRouteParams | undefined;
   Account: undefined;
 };

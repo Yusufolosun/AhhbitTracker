@@ -1,8 +1,8 @@
-import { Habit } from '@/core/types';
+import type { Habit } from '../../core/types/habit';
 import {
   CHECK_IN_WINDOW_BLOCKS,
   MIN_CHECK_IN_INTERVAL_BLOCKS,
-} from '@/core/config';
+} from '../../core/config/constants';
 
 const URGENT_THRESHOLD_BLOCKS = 132;
 

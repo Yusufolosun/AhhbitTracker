@@ -20,6 +20,7 @@ mobile/src/
 ├── features/
 │   ├── address/                  # Address state + address UI
 │   ├── habits/                   # Habits query hooks and habit UI
+│   ├── notifications/            # Reminder scheduling, event alerts, and history
 │   ├── pool/                     # Pool balance UI
 │   ├── wallet/                   # Wallet deep-link helpers and handoff UI
 │   └── transactions/             # Transaction preview builders + UI
@@ -46,6 +47,7 @@ mobile/src/
     - Address lifecycle: tracked address + hydration status (persisted in AsyncStorage)
     - Transaction preview lifecycle: in-memory preview payload shared across tabs/screens
 - Wallet deep-link state: Session-scoped preview payloads and return callbacks stay in memory only
+- Notification state: permission status, scheduled reminder keys, and recent alerts persist in AsyncStorage
 - Query state remains in React Query; app state changes trigger cache pruning/invalidation for user-scoped keys
 - Feature-level context exports remain as compatibility adapters and now delegate to app state hooks
 - Daily check-in previews are gated by on-chain timing (120-144 block window) using live block height polling
@@ -54,9 +56,11 @@ mobile/src/
 
 - Root: Native stack with `MainTabs`, `HabitDetails`, and `CreateHabit`
 - Tabs: `Overview`, `Habits`, `Preview`, and `Account`
+- Tabs: `Overview`, `Habits`, `Notifications`, `Preview`, and `Account`
 - Deep links:
     - `ahhbittracker://overview`
     - `ahhbittracker://habits`
+    - `ahhbittracker://notifications`
     - `ahhbittracker://habits/:habitId`
     - `ahhbittracker://habits/create`
     - `ahhbittracker://preview`
@@ -65,9 +69,11 @@ mobile/src/
     - `ahhbittracker://preview?payload=...` for a serialized contract call preview
     - `ahhbittracker://preview?result=...` for a wallet return callback with `txId` and `status`
 - The preview tab is the canonical wallet handoff surface for copying signing links and reviewing callback summaries
+- The notifications tab surfaces permission state, upcoming reminder plans, and recent event alerts
 - Address-dependent routes are protected with a reusable guard component
 - Transaction previews are shared between screens through a dedicated context provider
 - The create-habit preview flow enforces the contract's 0.02-100 STX stake range and 50-character name limit before building the wallet handoff payload
+- Local reminders and event alerts use `expo-notifications`; the app requests permission on first use and stores notification history locally
 
 ## Local Development
 
