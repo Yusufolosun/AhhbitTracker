@@ -14,6 +14,7 @@ import {
   buildWithdrawStakePreview,
 } from '@/features/transactions';
 import { ActionButton, EmptyState, ErrorState, LoadingState, Screen, SectionHeader } from '@/shared/components';
+import { useProtectedAction } from '@/shared/hooks/useProtectedAction';
 import { spacing } from '@/shared/theme';
 
 type HabitsScreenProps = MainTabScreenProps<'Habits'>;
@@ -21,6 +22,7 @@ type HabitsScreenProps = MainTabScreenProps<'Habits'>;
 export function HabitsScreen({ navigation }: HabitsScreenProps) {
   const { activeAddress } = useAddressState();
   const { setPreview } = usePreviewState();
+  const { runProtectedAction } = useProtectedAction();
   const habitsQuery = useUserHabitsQuery(activeAddress);
   const currentBlockQuery = useCurrentBlockQuery();
 
@@ -29,18 +31,24 @@ export function HabitsScreen({ navigation }: HabitsScreenProps) {
   };
 
   const handleCheckInPreview = async (habitId: number) => {
-    setPreview(buildCheckInPreview(habitId));
-    openPreviewTab();
+    await runProtectedAction('check-in', () => {
+      setPreview(buildCheckInPreview(habitId));
+      openPreviewTab();
+    });
   };
 
   const handleWithdrawPreview = async (habitId: number, stakeAmount: number) => {
-    setPreview(buildWithdrawStakePreview(habitId, stakeAmount));
-    openPreviewTab();
+    await runProtectedAction('withdraw-stake', () => {
+      setPreview(buildWithdrawStakePreview(habitId, stakeAmount));
+      openPreviewTab();
+    });
   };
 
   const handleClaimPreview = async (habitId: number) => {
-    setPreview(buildClaimBonusPreview(habitId));
-    openPreviewTab();
+    await runProtectedAction('claim-bonus', () => {
+      setPreview(buildClaimBonusPreview(habitId));
+      openPreviewTab();
+    });
   };
 
   return (

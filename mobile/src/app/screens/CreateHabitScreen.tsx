@@ -7,6 +7,7 @@ import {
   CreateHabitPreviewCard,
 } from '@/features/transactions';
 import { ActionButton, Screen, SectionHeader } from '@/shared/components';
+import { useProtectedAction } from '@/shared/hooks/useProtectedAction';
 import { toMicroSTX } from '@/shared/utils';
 import { spacing } from '@/shared/theme';
 
@@ -15,15 +16,17 @@ type CreateHabitScreenProps = RootStackScreenProps<'CreateHabit'>;
 export function CreateHabitScreen({ navigation }: CreateHabitScreenProps) {
   const { activeAddress } = useAddressState();
   const { setPreview } = usePreviewState();
+  const { runProtectedAction } = useProtectedAction();
 
   const handleCreatePreview = async (name: string, stakeAmountStx: number) => {
     if (!activeAddress) {
       throw new Error('Save a Stacks address before generating a create-habit preview.');
     }
 
-    setPreview(buildCreateHabitPreview(activeAddress, name, toMicroSTX(stakeAmountStx)));
-
-    navigation.navigate('MainTabs', { screen: MAIN_TAB_ROUTES.Preview });
+    await runProtectedAction('create-habit', () => {
+      setPreview(buildCreateHabitPreview(activeAddress, name, toMicroSTX(stakeAmountStx)));
+      navigation.navigate('MainTabs', { screen: MAIN_TAB_ROUTES.Preview });
+    });
   };
 
   return (

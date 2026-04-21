@@ -4,6 +4,7 @@ import { useAddressState } from '@/app/state';
 import { useState } from 'react';
 import { ActionButton, Card, EmptyState, InteractionStatusBanner, MetricRow, Screen, SectionHeader } from '@/shared/components';
 import { useInteractionStatus } from '@/shared/hooks/useInteractionStatus';
+import { useProtectedAction } from '@/shared/hooks/useProtectedAction';
 import { formatAddress } from '@/shared/utils';
 import { spacing } from '@/shared/theme';
 
@@ -12,6 +13,7 @@ export function AccountScreen() {
   const [isOpeningExplorer, setIsOpeningExplorer] = useState(false);
   const [isClearingAddress, setIsClearingAddress] = useState(false);
   const { status, showError, showSuccess } = useInteractionStatus();
+  const { runProtectedAction } = useProtectedAction();
 
   const openExplorer = async () => {
     if (!activeAddress) {
@@ -36,7 +38,7 @@ export function AccountScreen() {
     setIsClearingAddress(true);
 
     try {
-      await clearAddress();
+      await runProtectedAction('clear-address', () => clearAddress());
       showSuccess('Saved address cleared.');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unable to clear saved address.';

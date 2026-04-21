@@ -150,7 +150,15 @@ const config: ExpoConfig = {
     edgeToEdgeEnabled: true,
     predictiveBackGestureEnabled: false,
   },
-  plugins: ['expo-notifications'],
+  plugins: [
+    [
+      'expo-local-authentication',
+      {
+        faceIDPermission: 'Allow AhhbitTracker Mobile to use Face ID for protected actions.',
+      },
+    ],
+    'expo-notifications',
+  ],
   extra: {
     appStage: networkConfig.appStage,
     contractAddress: networkConfig.contract.contractAddress,

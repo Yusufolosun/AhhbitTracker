@@ -42,6 +42,8 @@ Successful users can claim bonuses from the forfeited pool created by users who 
 4. Set your stake amount (0.02 to 100 STX)
 5. Confirm the transaction
 
+On mobile, the app will ask for biometric confirmation before opening the wallet prompt when the device supports it.
+
 **Transaction cost:** ~0.15-0.25 STX
 
 ### Daily Check-ins
@@ -50,6 +52,8 @@ Successful users can claim bonuses from the forfeited pool created by users who 
 2. Use the Dashboard "Run Daily Check-In" action to submit all eligible habits, or click "Check In" on a single habit
 3. Confirm each wallet prompt
 4. Watch the transaction tracker for pending, confirmed, or failed on-chain status
+
+On mobile, check-in previews and wallet handoff are protected by biometric confirmation on supported devices.
 
 **Transaction cost:** ~0.10-0.20 STX per check-in
 
@@ -60,6 +64,8 @@ After completing 7+ consecutive check-ins:
 1. Click "Withdraw Stake" on your completed habit
 2. Confirm the transaction
 3. Your stake is returned to your wallet
+
+On mobile, withdrawal and bonus claim actions also require biometric confirmation when available.
 
 **Transaction cost:** ~0.15-0.25 STX
 
