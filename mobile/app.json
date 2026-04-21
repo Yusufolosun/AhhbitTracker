@@ -26,7 +26,15 @@
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
-    "plugins": ["expo-notifications"],
+    "plugins": [
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow AhhbitTracker Mobile to use Face ID for protected actions."
+        }
+      ],
+      "expo-notifications"
+    ],
     "extra": {
       "appStage": "production",
       "contractAddress": "SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z",
