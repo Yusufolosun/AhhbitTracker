@@ -87,6 +87,10 @@ Security guidelines for AhhbitTracker developers and users.
 
 4. **Confirm network** (mainnet vs testnet)
 
+### Mobile Biometric Protection
+
+- Sensitive mobile actions such as create habit, check-in, withdraw, claim bonus, save address, and clear address require biometric confirmation when the device supports it
+
 **Never sign:**
 - Transactions from unknown sources
 - Requests for full wallet access
