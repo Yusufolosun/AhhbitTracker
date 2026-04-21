@@ -39,6 +39,7 @@ mobile/src/
 - Wallet handoffs are modeled as session-scoped deep links, not persisted account state
 - Legacy paths in `src/components`, `src/services`, etc. are maintained as re-export shims for compatibility
 - Shared UI primitives keep card surfaces, action buttons, and metric rows visually aligned without duplicating styles
+- Sensitive mobile actions prompt for device biometrics when available before generating previews or clearing tracked account state
 
 ## Global State Management
 
