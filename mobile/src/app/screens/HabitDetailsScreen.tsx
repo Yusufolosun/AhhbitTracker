@@ -11,6 +11,7 @@ import {
 } from '@/features/transactions';
 import { ActionButton, Card, EmptyState, ErrorState, InteractionStatusBanner, LoadingState, MetricRow, Screen, SectionHeader } from '@/shared/components';
 import { useInteractionStatus } from '@/shared/hooks/useInteractionStatus';
+import { useProtectedAction } from '@/shared/hooks/useProtectedAction';
 import {
   canWithdrawHabit,
   canSubmitMobileDailyCheckIn,
@@ -28,6 +29,7 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
   const { habitId } = route.params;
   const { activeAddress } = useAddressState();
   const { setPreview } = usePreviewState();
+  const { runProtectedAction } = useProtectedAction();
   const [pendingAction, setPendingAction] = useState<'check-in' | 'withdraw' | 'claim' | null>(null);
   const { status, showError, showSuccess } = useInteractionStatus();
 
@@ -77,8 +79,10 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
       throw new Error('This habit is not eligible for check-in yet.');
     }
 
-    setPreview(buildCheckInPreview(habit.habitId));
-    navigateToPreview();
+    return runProtectedAction('check-in', () => {
+      setPreview(buildCheckInPreview(habit.habitId));
+      navigateToPreview();
+    });
   };
 
   const handleWithdrawPreview = () => {
@@ -86,24 +90,28 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
       throw new Error('This habit is not eligible for withdrawal yet.');
     }
 
-    setPreview(buildWithdrawStakePreview(habit.habitId, habit.stakeAmount));
-    navigateToPreview();
+    return runProtectedAction('withdraw-stake', () => {
+      setPreview(buildWithdrawStakePreview(habit.habitId, habit.stakeAmount));
+      navigateToPreview();
+    });
   };
 
   const handleClaimPreview = () => {
-    setPreview(buildClaimBonusPreview(habit.habitId));
-    navigateToPreview();
+    return runProtectedAction('claim-bonus', () => {
+      setPreview(buildClaimBonusPreview(habit.habitId));
+      navigateToPreview();
+    });
   };
 
   const runAction = async (
     action: 'check-in' | 'withdraw' | 'claim',
-    callback: () => void,
+    callback: () => Promise<void> | void,
     successMessage: string,
   ) => {
     setPendingAction(action);
 
     try {
-      callback();
+      await callback();
       showSuccess(successMessage);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unable to generate preview.';
