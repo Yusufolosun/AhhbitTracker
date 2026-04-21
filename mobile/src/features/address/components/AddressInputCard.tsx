@@ -7,6 +7,8 @@ import {
   View,
 } from 'react-native';
 import { ActionButton, Card } from '@/shared/components';
+import { useProtectedAction } from '@/shared/hooks/useProtectedAction';
+import { validateStacksAddress } from '@/shared/utils';
 import { palette, radius, spacing, typography } from '@/shared/theme';
 
 interface AddressInputCardProps {
@@ -25,6 +27,7 @@ export function AddressInputCard({
   const [isClearing, setIsClearing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const { runProtectedAction } = useProtectedAction();
 
   const pending = isSaving || isClearing;
 
@@ -33,12 +36,21 @@ export function AddressInputCard({
   }, [initialValue]);
 
   const handleSave = async () => {
+    const normalizedValue = value.trim();
+    const validationError = validateStacksAddress(normalizedValue);
+
+    if (validationError) {
+      setError(validationError);
+      setSuccess(null);
+      return;
+    }
+
     setIsSaving(true);
     setError(null);
     setSuccess(null);
 
     try {
-      await onSubmit(value);
+      await runProtectedAction('save-address', () => onSubmit(normalizedValue));
       setSuccess('Address saved successfully.');
     } catch (submissionError) {
       setError(
@@ -58,7 +70,7 @@ export function AddressInputCard({
     setSuccess(null);
 
     try {
-      await onClear();
+      await runProtectedAction('clear-address', () => onClear());
       setValue('');
       setSuccess('Address cleared.');
     } catch (clearError) {
