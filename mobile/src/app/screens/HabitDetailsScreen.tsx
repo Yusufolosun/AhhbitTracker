@@ -22,6 +22,7 @@ import {
   getMobileCheckInWindowState,
 } from '@/shared/utils';
 import { spacing } from '@/shared/theme';
+import { trackMobileEvent } from '@/analytics';
 
 type HabitDetailsScreenProps = RootStackScreenProps<'HabitDetails'>;
 
@@ -81,6 +82,11 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
 
     return runProtectedAction('check-in', () => {
       setPreview(buildCheckInPreview(habit.habitId));
+      trackMobileEvent('preview_generated', {
+        functionName: 'check-in',
+        habitId: habit.habitId,
+        source: 'habit-details',
+      });
       navigateToPreview();
     });
   };
@@ -92,6 +98,11 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
 
     return runProtectedAction('withdraw-stake', () => {
       setPreview(buildWithdrawStakePreview(habit.habitId, habit.stakeAmount));
+      trackMobileEvent('preview_generated', {
+        functionName: 'withdraw-stake',
+        habitId: habit.habitId,
+        source: 'habit-details',
+      });
       navigateToPreview();
     });
   };
@@ -99,6 +110,11 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
   const handleClaimPreview = () => {
     return runProtectedAction('claim-bonus', () => {
       setPreview(buildClaimBonusPreview(habit.habitId));
+      trackMobileEvent('preview_generated', {
+        functionName: 'claim-bonus',
+        habitId: habit.habitId,
+        source: 'habit-details',
+      });
       navigateToPreview();
     });
   };

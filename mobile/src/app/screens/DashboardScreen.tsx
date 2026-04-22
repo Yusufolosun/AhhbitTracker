@@ -21,6 +21,7 @@ import { Card, EmptyState, LoadingState, MetricRow, Screen, SectionHeader } from
 import { useProtectedAction } from '@/shared/hooks/useProtectedAction';
 import { toMicroSTX } from '@/shared/utils';
 import { spacing } from '@/shared/theme';
+import { trackMobileEvent } from '@/analytics';
 
 export function DashboardScreen() {
   const { activeAddress, isHydrating, setAddress, clearAddress } = useAddressState();
@@ -40,24 +41,43 @@ export function DashboardScreen() {
     await runProtectedAction('create-habit', () => {
       const stakeAmountMicroStx = toMicroSTX(stakeAmountStx);
       setPreview(buildCreateHabitPreview(activeAddress, name, stakeAmountMicroStx));
+      trackMobileEvent('preview_generated', {
+        functionName: 'create-habit',
+        source: 'dashboard',
+      });
     });
   };
 
   const handleCheckInPreview = async (habitId: number) => {
     await runProtectedAction('check-in', () => {
       setPreview(buildCheckInPreview(habitId));
+      trackMobileEvent('preview_generated', {
+        functionName: 'check-in',
+        habitId,
+        source: 'dashboard',
+      });
     });
   };
 
   const handleWithdrawPreview = async (habitId: number, stakeAmount: number) => {
     await runProtectedAction('withdraw-stake', () => {
       setPreview(buildWithdrawStakePreview(habitId, stakeAmount));
+      trackMobileEvent('preview_generated', {
+        functionName: 'withdraw-stake',
+        habitId,
+        source: 'dashboard',
+      });
     });
   };
 
   const handleClaimPreview = async (habitId: number) => {
     await runProtectedAction('claim-bonus', () => {
       setPreview(buildClaimBonusPreview(habitId));
+      trackMobileEvent('preview_generated', {
+        functionName: 'claim-bonus',
+        habitId,
+        source: 'dashboard',
+      });
     });
   };
 

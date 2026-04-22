@@ -42,6 +42,9 @@ npm run dev                  # → http://localhost:3000
 | `VITE_STACKS_API_URL` | stage-based | Stacks API base URL used by the dev proxy |
 | `VITE_CONTRACT_ADDRESS` | `SP1N3809...` | Contract principal |
 | `VITE_CONTRACT_NAME` | `habit-tracker-v2` | Contract name |
+| `VITE_ANALYTICS_ENABLED` | `true` | Enable or disable frontend analytics emission |
+| `VITE_ANALYTICS_ENDPOINT` | _(unset)_ | Optional analytics ingestion endpoint |
+| `VITE_ANALYTICS_WRITE_KEY` | _(unset)_ | Optional ingestion auth key sent as `X-Analytics-Key` |
 
 Use stage templates for safer setup:
 
@@ -81,3 +84,4 @@ src/
 - **Dev proxy** — In development, Vite proxies `/api/stacks/*` to `https://api.mainnet.hiro.so` to avoid CORS
 - **Production** — Uses `STACKS_MAINNET` from `@stacks/network` directly (no proxy needed)
 - **Create habit flow** — The habit form enforces the contract's 0.02-100 STX stake range and 50-character name limit before submitting a `create-habit` call
+- **Analytics tracking** — Emits typed events for app load, route views, wallet lifecycle, create-habit flow, individual habit actions, and daily check-in batch runs

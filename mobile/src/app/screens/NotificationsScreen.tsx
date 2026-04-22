@@ -5,6 +5,7 @@ import { useNotificationCenter } from '@/features/notifications/context/Notifica
 import { ActionButton, Card, EmptyState, InteractionStatusBanner, MetricRow, Screen, SectionHeader } from '@/shared/components';
 import { useInteractionStatus } from '@/shared/hooks/useInteractionStatus';
 import { palette, spacing, typography } from '@/shared/theme';
+import { trackMobileEvent } from '@/analytics';
 
 type PendingAction = 'enable-all' | 'toggle-reminders' | 'toggle-events' | 'refresh' | 'clear' | null;
 
@@ -67,6 +68,20 @@ export function NotificationsScreen() {
 
     try {
       await callback();
+
+      if (action === 'toggle-reminders' || action === 'toggle-events') {
+        trackMobileEvent('notifications_toggled', {
+          source: 'notifications-screen',
+          state: action === 'toggle-reminders' ? String(!state.remindersEnabled) : String(!state.eventAlertsEnabled),
+        });
+      }
+
+      if (action === 'clear') {
+        trackMobileEvent('notification_history_cleared', {
+          source: 'notifications-screen',
+        });
+      }
+
       showSuccess(successMessage);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unable to update notification settings.';

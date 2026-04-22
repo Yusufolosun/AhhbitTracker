@@ -5,6 +5,7 @@ import { validateHabitName, validateStakeAmount } from '../utils/validation';
 import { toMicroSTX } from '../utils/formatting';
 import { MAX_HABIT_NAME_LENGTH, MAX_STAKE_AMOUNT, MIN_STAKE_AMOUNT } from '../utils/constants';
 import { ActionButton, SurfaceCard } from './ui';
+import { trackEvent } from '../analytics';
 
 /** How long (ms) the form stays locked after the wallet signs a transaction.
  *  Long enough to outlive typical mempool propagation; short enough that a
@@ -58,7 +59,17 @@ export function HabitForm() {
 
     try {
       const stakeAmount = toMicroSTX(stakeNum);
+      trackEvent('habit_create_submitted', {
+        habitNameLength: trimmedName.length,
+        stakeAmountMicroStx: stakeAmount,
+      });
+
       await createHabit({ name: trimmedName, stakeAmount });
+
+      trackEvent('habit_create_succeeded', {
+        habitNameLength: trimmedName.length,
+        stakeAmountMicroStx: stakeAmount,
+      });
 
       setName('');
       setStake(minStakeStx.toString());
@@ -73,6 +84,11 @@ export function HabitForm() {
       showToast('Transaction signed! Your habit will appear once confirmed on-chain.', 'success');
     } catch (err: unknown) {
       const message = getErrorMessage(err);
+      trackEvent('habit_create_failed', {
+        habitNameLength: trimmedName.length,
+        errorMessage: message,
+      });
+
       if (message === 'Transaction cancelled') {
         showToast('Transaction was cancelled.', 'error');
       } else {

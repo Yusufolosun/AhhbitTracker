@@ -7,6 +7,7 @@ import { useInteractionStatus } from '@/shared/hooks/useInteractionStatus';
 import { useProtectedAction } from '@/shared/hooks/useProtectedAction';
 import { formatAddress } from '@/shared/utils';
 import { spacing } from '@/shared/theme';
+import { trackMobileEvent, toWalletAddressHash } from '@/analytics';
 
 export function AccountScreen() {
   const { activeAddress, clearAddress } = useAddressState();
@@ -25,6 +26,10 @@ export function AccountScreen() {
     try {
       const explorerUrl = `https://explorer.hiro.so/address/${activeAddress}?chain=mainnet`;
       await Linking.openURL(explorerUrl);
+      trackMobileEvent('explorer_opened', {
+        source: 'account-screen',
+        walletAddressHash: toWalletAddressHash(activeAddress),
+      });
       showSuccess('Explorer opened successfully.');
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unable to open explorer link.';

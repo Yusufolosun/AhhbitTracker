@@ -15,6 +15,7 @@ import {
   isEligibleForDailyCheckIn,
   isEligibleToWithdraw,
 } from '../utils/habitStatus';
+import { trackEvent } from '../analytics';
 
 interface HabitCardProps {
   habit: Habit;
@@ -52,11 +53,15 @@ export function HabitCard({ habit }: HabitCardProps) {
   const isOwnHabit = walletState.address?.toLowerCase() === habit.owner.toLowerCase();
 
   const handleCheckIn = async () => {
+    trackEvent('habit_check_in_clicked', { habitId: habit.habitId });
+
     try {
       await checkIn(habit.habitId);
+      trackEvent('habit_check_in_succeeded', { habitId: habit.habitId });
       showToast('Check-in signed! It will update once confirmed on-chain.', 'success');
     } catch (err: unknown) {
       const message = getErrorMessage(err);
+      trackEvent('habit_check_in_failed', { habitId: habit.habitId, errorMessage: message });
       if (message === 'Transaction cancelled') {
         showToast('Check-in was cancelled.', 'error');
       } else if (message.includes('u114') || message.includes('ERR-HABIT-AUTO-SLASHED')) {
@@ -68,14 +73,17 @@ export function HabitCard({ habit }: HabitCardProps) {
   };
 
   const handleWithdraw = () => {
+    trackEvent('habit_withdraw_clicked', { habitId: habit.habitId });
     setConfirmAction('withdraw');
   };
 
   const handleClaimBonus = () => {
+    trackEvent('habit_claim_clicked', { habitId: habit.habitId });
     setConfirmAction('claim');
   };
 
   const handleSlashHabit = () => {
+    trackEvent('habit_finalize_clicked', { habitId: habit.habitId });
     setConfirmAction('slash');
   };
 
@@ -85,16 +93,27 @@ export function HabitCard({ habit }: HabitCardProps) {
     try {
       if (action === 'withdraw') {
         await withdrawStake({ habitId: habit.habitId, stakeAmount: habit.stakeAmount });
+        trackEvent('habit_withdraw_succeeded', { habitId: habit.habitId });
         showToast('Withdrawal signed! Your STX will return once confirmed on-chain.', 'success');
       } else if (action === 'claim') {
         await claimBonus(habit.habitId);
+        trackEvent('habit_claim_succeeded', { habitId: habit.habitId });
         showToast('Bonus claim signed! It will arrive once confirmed on-chain.', 'success');
       } else if (action === 'slash') {
         await slashHabit(habit.habitId);
+        trackEvent('habit_finalize_succeeded', { habitId: habit.habitId });
         showToast('Habit finalized! Stake will be moved to the pool once confirmed on-chain.', 'success');
       }
     } catch (err: unknown) {
       const message = getErrorMessage(err);
+      if (action === 'withdraw') {
+        trackEvent('habit_withdraw_failed', { habitId: habit.habitId, errorMessage: message });
+      } else if (action === 'claim') {
+        trackEvent('habit_claim_failed', { habitId: habit.habitId, errorMessage: message });
+      } else if (action === 'slash') {
+        trackEvent('habit_finalize_failed', { habitId: habit.habitId, errorMessage: message });
+      }
+
       if (message === 'Transaction cancelled') {
         showToast('Transaction was cancelled.', 'error');
       } else {

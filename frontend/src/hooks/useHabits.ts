@@ -9,6 +9,7 @@ import {
 import { POLLING_INTERVAL, CACHE_TIME, POOL_CACHE_TIME } from '../utils/constants';
 import { getHabitSyncTargets } from './habitTransactionSync';
 import { queryKeys } from '../utils/queryKeys';
+import { trackEvent } from '../analytics';
 
 export interface DailyCheckInEntry {
   habitId: number;
@@ -320,6 +321,10 @@ export const useHabits = () => {
       };
     }
 
+    trackEvent('daily_check_in_started', {
+      attempted: habitIds.length,
+    });
+
     setIsRunningDailyCheckIn(true);
     const entries: DailyCheckInEntry[] = [];
 
@@ -345,6 +350,12 @@ export const useHabits = () => {
 
     const submitted = entries.filter((entry) => entry.txId).length;
     const failed = entries.length - submitted;
+
+    trackEvent('daily_check_in_completed', {
+      attempted: entries.length,
+      submitted,
+      failed,
+    });
 
     return {
       attempted: entries.length,

@@ -6,6 +6,7 @@ import { addressUrl } from '@yusufolosun/stx-utils';
 import { ThemeToggle } from './ThemeToggle';
 import { useHashRoute } from '../hooks/useHashRoute';
 import { ActionButton } from './ui';
+import { trackEvent } from '../analytics';
 
 const NAV_LINKS = [
   { href: '#dashboard', label: 'Dashboard' },
@@ -44,6 +45,8 @@ export function Header() {
   }, [mobileMenuOpen]);
 
   const handleDisconnect = async () => {
+    trackEvent('wallet_disconnect_clicked', { source: 'header' });
+
     try {
       await disconnect();
       showToast('Wallet disconnected.', 'success');

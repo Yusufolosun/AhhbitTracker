@@ -76,6 +76,46 @@ The application now uses layered caching and transaction-aware invalidation to r
 - Wallet interaction synchronization now invalidates both query keys and data-layer cache namespaces when writes confirm, ensuring the next UI read rehydrates from chain-backed sources.
 - Address transitions in app state now clear address-scoped caches to prevent cross-account data bleed.
 
+## Analytics and Event Tracking
+
+AhhbitTracker now includes first-party analytics event tracking in both frontend and mobile clients.
+
+### Design goals
+
+- Capture product behavior signals (navigation, wallet lifecycle, habit actions, notification controls) without leaking sensitive wallet or transaction details.
+- Keep analytics transport optional and environment-driven.
+- Protect user privacy by hashing wallet addresses and truncating error payloads.
+
+### Frontend implementation
+
+- Analytics lives under `frontend/src/analytics` with a typed event contract, payload sanitizer, and batched transport client.
+- Route and app-load events are emitted from `App.tsx`.
+- Wallet, create-habit, and habit action events are emitted from existing state/action boundaries (`WalletContext`, `HabitForm`, `HabitCard`, `useHabits`).
+- Dispatch uses `sendBeacon` when available and falls back to `fetch` with `keepalive`.
+
+### Mobile implementation
+
+- Analytics lives under `mobile/src/analytics` with typed events, privacy helpers, and a queued HTTP transport.
+- App lifecycle and navigation events are emitted from `AppRoot` and `AppNavigation`.
+- Address lifecycle, preview generation, wallet transaction outcomes, account explorer actions, and notification toggles are instrumented across existing screen/context boundaries.
+- Queue flush is triggered on interval and when app state leaves `active`.
+
+### Runtime configuration
+
+Frontend variables:
+
+- `VITE_ANALYTICS_ENABLED` (default `true`)
+- `VITE_ANALYTICS_ENDPOINT` (optional)
+- `VITE_ANALYTICS_WRITE_KEY` (optional)
+
+Mobile variables:
+
+- `EXPO_PUBLIC_ANALYTICS_ENABLED` (default `true`)
+- `EXPO_PUBLIC_ANALYTICS_ENDPOINT` (optional)
+- `EXPO_PUBLIC_ANALYTICS_WRITE_KEY` (optional)
+
+When endpoint values are unset, events stay in local in-memory queues and no network transmission occurs.
+
 ### Batch automation strategy
 
 - The batch executor now caches frequently repeated read-only calls (current block, user habits, habit lookups) during a run.

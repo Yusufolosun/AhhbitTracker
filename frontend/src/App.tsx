@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { lazy, Suspense, useMemo } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef } from 'react';
 import { emitRateLimitEvent } from './utils/rateLimitEvents';
 import { WalletProvider, useWallet } from './context/WalletContext';
 import { TransactionProvider } from './context/TransactionContext';
@@ -16,6 +16,7 @@ import { LongestStreakBanner } from './components/LongestStreakBanner';
 import { useHabits } from './hooks/useHabits';
 import { DashboardSkeleton } from './components/Skeletons';
 import { useHashRoute } from './hooks/useHashRoute';
+import { trackEvent } from './analytics';
 import './styles/global.css';
 
 // Code-split route-level components
@@ -69,6 +70,26 @@ function AppContent() {
     isRunningDailyCheckIn,
   } = useHabits();
   const { route } = useHashRoute();
+  const trackedAppLoadRef = useRef(false);
+
+  useEffect(() => {
+    if (trackedAppLoadRef.current) {
+      return;
+    }
+
+    trackedAppLoadRef.current = true;
+    trackEvent('app_loaded', {
+      route,
+      source: 'frontend',
+    });
+  }, [route]);
+
+  useEffect(() => {
+    trackEvent('route_viewed', {
+      route,
+      source: 'frontend',
+    });
+  }, [route]);
 
   const longestStreakData = useMemo(() => {
     return habits.reduce(
