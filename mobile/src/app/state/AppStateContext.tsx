@@ -18,6 +18,7 @@ import { appStateReducer, createInitialAppState } from './reducer';
 import { clearPersistedAppState, loadPersistedAppState, saveTrackedAddress } from './storage';
 import type { AppState } from './types';
 import type { ContractCallPreview } from '@/core/types';
+import { trackMobileEvent, toWalletAddressHash } from '@/analytics';
 
 interface AppStateContextValue {
   state: AppState;
@@ -106,12 +107,21 @@ export function AppStateProvider({ children }: PropsWithChildren) {
 
     await saveTrackedAddress(normalizedAddress);
     dispatch(appStateActions.setAddress(normalizedAddress));
+    trackMobileEvent('address_saved', {
+      walletAddressHash: toWalletAddressHash(normalizedAddress),
+      source: 'app-state',
+    });
   }, []);
 
   const clearTrackedAddress = useCallback(async () => {
+    const previousAddress = state.trackedAddress;
     await clearPersistedAppState();
     dispatch(appStateActions.clearAddress());
-  }, []);
+    trackMobileEvent('address_cleared', {
+      walletAddressHash: toWalletAddressHash(previousAddress),
+      source: 'app-state',
+    });
+  }, [state.trackedAddress]);
 
   const setPreview = useCallback((nextPreview: ContractCallPreview) => {
     dispatch(appStateActions.setPreview(nextPreview));

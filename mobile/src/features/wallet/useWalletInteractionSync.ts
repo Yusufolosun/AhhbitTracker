@@ -15,6 +15,7 @@ import {
   fetchWalletTransactionStatus,
   getWalletInteractionSyncTargets,
 } from './transactionSync';
+import { trackMobileEvent } from '@/analytics';
 
 const TX_POLL_INTERVAL_MS = 15_000;
 const TX_POLL_TIMEOUT_MS = 30 * 60_000;
@@ -118,6 +119,10 @@ export function useWalletInteractionSync() {
 
         if (status === 'confirmed') {
           markHandled();
+          trackMobileEvent('wallet_tx_confirmed', {
+            functionName: walletInteraction.functionName,
+            source: 'wallet-sync',
+          });
           void notifyTransaction('confirmed').catch(() => undefined);
           invalidateQueries();
           return;
@@ -125,6 +130,10 @@ export function useWalletInteractionSync() {
 
         if (status === 'failed') {
           markHandled();
+          trackMobileEvent('wallet_tx_failed', {
+            functionName: walletInteraction.functionName,
+            source: 'wallet-sync',
+          });
           void notifyTransaction('failed').catch(() => undefined);
           return;
         }
