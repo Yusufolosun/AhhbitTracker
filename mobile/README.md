@@ -92,5 +92,10 @@ Runtime configuration is sourced from Expo public env vars first, then `app.json
 - `EXPO_PUBLIC_CONTRACT_NAME`
 - `EXPO_PUBLIC_HIRO_API_BASE_URL`
 - `EXPO_PUBLIC_STACKS_NETWORK`
+- `EXPO_PUBLIC_ANALYTICS_ENABLED`
+- `EXPO_PUBLIC_ANALYTICS_ENDPOINT`
+- `EXPO_PUBLIC_ANALYTICS_WRITE_KEY`
 
 Defaults target mainnet AhhbitTracker contract values.
+
+Mobile analytics emits typed product events for app lifecycle, navigation, tracked address updates, preview generation, wallet transaction outcomes, account explorer usage, and notification setting changes.
