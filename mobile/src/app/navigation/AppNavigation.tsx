@@ -3,11 +3,12 @@ import { NavigationContainer, useNavigationContainerRef } from '@react-navigatio
 import { RootNavigator } from './RootNavigator';
 import { linkingConfig } from './linking';
 import { navigationTheme } from './theme';
+import type { RootStackParamList } from './types';
 import { trackMobileEvent } from '@/analytics';
 
 export function AppNavigation() {
   const previousRouteRef = useRef<string | undefined>(undefined);
-  const navigationRef = useNavigationContainerRef();
+  const navigationRef = useNavigationContainerRef<RootStackParamList>();
 
   return (
     <NavigationContainer

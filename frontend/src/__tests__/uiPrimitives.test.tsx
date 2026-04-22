@@ -16,11 +16,11 @@ describe('SurfaceCard', () => {
 
 describe('ActionButton', () => {
   it('renders loading copy and disables interaction', () => {
-    render(<ActionButton label="Save" loading loadingLabel="Saving" />);
+    render(<ActionButton isLoading>Save</ActionButton>);
 
     const button = screen.getByRole('button');
     expect(button).toHaveProperty('disabled', true);
-    expect(screen.getByText('Saving')).toBeDefined();
+    expect(screen.getByText('Loading…')).toBeDefined();
   });
 });
 

@@ -54,6 +54,8 @@ vi.mock('../services/contractService', () => ({
     readPoolBalance: vi.fn().mockResolvedValue(0),
     readEstimatedBonusShare: vi.fn().mockResolvedValue(0),
     readUnclaimedCompletedHabits: vi.fn().mockResolvedValue(0),
+    invalidateAddressReadCache: vi.fn(),
+    invalidatePoolReadCache: vi.fn(),
     createHabit: vi.fn(),
     checkIn: vi.fn(),
     withdrawStake: vi.fn(),
