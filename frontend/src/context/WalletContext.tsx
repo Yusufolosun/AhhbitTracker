@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { walletService } from '../services/walletService';
 import { WalletState } from '../types/habit';
+import { trackEvent, toWalletAddressHash } from '../analytics';
 
 interface WalletContextType {
   walletState: WalletState;
@@ -82,6 +83,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
 
   const connect = () => {
     setIsLoading(true);
+    trackEvent('wallet_connect_started', { source: 'header' });
     try {
       walletService.connect(
         (_payload) => {
@@ -94,10 +96,14 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
           if (address) {
             void fetchAndSetBalance(address);
           }
+          trackEvent('wallet_connected', {
+            walletAddressHash: toWalletAddressHash(address),
+          });
           setIsLoading(false);
         },
         () => {
           // User cancelled the wallet picker
+          trackEvent('wallet_connect_cancelled');
           setIsLoading(false);
         }
       );
@@ -113,6 +119,9 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
 
     try {
       walletService.disconnect();
+      trackEvent('wallet_disconnected', {
+        walletAddressHash: toWalletAddressHash(walletState.address),
+      });
       setWalletState({
         isConnected: false,
         address: null,
