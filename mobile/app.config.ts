@@ -165,6 +165,9 @@ const config: ExpoConfig = {
     contractName: networkConfig.contract.contractName,
     hiroApiBaseUrl: networkConfig.hiroApiBaseUrl,
     stacksNetwork: networkConfig.networkMode,
+    analyticsEnabled: process.env.EXPO_PUBLIC_ANALYTICS_ENABLED,
+    analyticsEndpoint: process.env.EXPO_PUBLIC_ANALYTICS_ENDPOINT,
+    analyticsWriteKey: process.env.EXPO_PUBLIC_ANALYTICS_WRITE_KEY,
   },
   web: {
     favicon: './assets/favicon.png',

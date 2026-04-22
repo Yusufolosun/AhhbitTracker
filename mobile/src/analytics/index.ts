@@ -1,4 +1,4 @@
-import { networkConfig } from '@/core/config';
+import { analyticsRuntimeConfig, networkConfig } from '@/core/config';
 import type { MobileAnalyticsEventName, MobileAnalyticsPayload } from './events';
 import { anonymizeAddress, sanitizePayload } from './privacy';
 
@@ -11,9 +11,9 @@ interface MobileAnalyticsEnvelope {
   sessionId: string;
 }
 
-const ANALYTICS_ENDPOINT = process.env.EXPO_PUBLIC_ANALYTICS_ENDPOINT?.trim();
-const ANALYTICS_WRITE_KEY = process.env.EXPO_PUBLIC_ANALYTICS_WRITE_KEY?.trim();
-const ANALYTICS_ENABLED = process.env.EXPO_PUBLIC_ANALYTICS_ENABLED !== 'false';
+const ANALYTICS_ENDPOINT = analyticsRuntimeConfig.endpoint?.trim();
+const ANALYTICS_WRITE_KEY = analyticsRuntimeConfig.writeKey?.trim();
+const ANALYTICS_ENABLED = analyticsRuntimeConfig.enabled;
 const FLUSH_INTERVAL_MS = 5_000;
 const MAX_QUEUE_SIZE = 100;
 const sessionId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;

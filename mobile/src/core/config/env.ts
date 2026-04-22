@@ -7,6 +7,11 @@ function getExtra(key: 'appStage' | 'contractAddress' | 'contractName' | 'hiroAp
   return extra?.[key];
 }
 
+function getAnalyticsExtra(key: 'analyticsEnabled' | 'analyticsEndpoint' | 'analyticsWriteKey') {
+  const extra = Constants.expoConfig?.extra as Record<string, string> | undefined;
+  return extra?.[key];
+}
+
 export const networkConfig: AppNetworkConfig = Object.freeze(
   resolveMobileNetworkConfig({
     appStage: process.env.EXPO_PUBLIC_APP_STAGE ?? getExtra('appStage'),
@@ -16,3 +21,11 @@ export const networkConfig: AppNetworkConfig = Object.freeze(
     contractName: process.env.EXPO_PUBLIC_CONTRACT_NAME ?? getExtra('contractName'),
   }),
 );
+
+export const analyticsRuntimeConfig = Object.freeze({
+  enabled:
+    (process.env.EXPO_PUBLIC_ANALYTICS_ENABLED ?? getAnalyticsExtra('analyticsEnabled') ?? 'true') !==
+    'false',
+  endpoint: process.env.EXPO_PUBLIC_ANALYTICS_ENDPOINT ?? getAnalyticsExtra('analyticsEndpoint'),
+  writeKey: process.env.EXPO_PUBLIC_ANALYTICS_WRITE_KEY ?? getAnalyticsExtra('analyticsWriteKey'),
+});
