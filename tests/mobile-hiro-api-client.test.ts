@@ -1,5 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fetchHiroJson, invalidateHiroApiCache } from '../mobile/src/core/network/hiroApiClient';
+import {
+  fetchHiroJson,
+  HiroApiError,
+  invalidateHiroApiCache,
+} from '../mobile/src/core/network/hiroApiClient';
 
 const originalFetch = globalThis.fetch;
 const originalEnv = process.env;
@@ -13,6 +17,7 @@ describe('mobile hiro api client', () => {
     process.env = originalEnv;
     globalThis.fetch = originalFetch;
     invalidateHiroApiCache('/');
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
@@ -80,5 +85,68 @@ describe('mobile hiro api client', () => {
     });
 
     expect(globalThis.fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('retries rate-limited requests and resolves on a later attempt', async () => {
+    process.env.EXPO_PUBLIC_HIRO_API_BASE_URL = 'https://api.mainnet.hiro.so';
+    vi.useFakeTimers();
+
+    globalThis.fetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 429,
+        json: async () => ({ error: 'rate_limited' }),
+      } as Response)
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ tip: 500 }),
+      } as Response) as any;
+
+    const request = fetchHiroJson<{ tip: number }>('/extended/v1/block', {
+      bypassCache: true,
+      retries: 1,
+    });
+
+    await vi.advanceTimersByTimeAsync(1_000);
+    await expect(request).resolves.toEqual({ tip: 500 });
+    expect(globalThis.fetch).toHaveBeenCalledTimes(2);
+    vi.useRealTimers();
+  });
+
+  it('throws HiroApiError for non-retryable 4xx responses', async () => {
+    process.env.EXPO_PUBLIC_HIRO_API_BASE_URL = 'https://api.mainnet.hiro.so';
+
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 400,
+      json: async () => ({ error: 'bad_request' }),
+    } as Response) as any;
+
+    await expect(
+      fetchHiroJson('/extended/v1/tx/example', {
+        bypassCache: true,
+        retries: 2,
+      }),
+    ).rejects.toEqual(
+      expect.objectContaining({
+        name: 'HiroApiError',
+        status: 400,
+      }),
+    );
+  });
+
+  it('wraps network failures into HiroApiError', async () => {
+    process.env.EXPO_PUBLIC_HIRO_API_BASE_URL = 'https://api.mainnet.hiro.so';
+
+    globalThis.fetch = vi.fn().mockRejectedValue(new Error('socket hang up')) as any;
+
+    await expect(
+      fetchHiroJson('/extended/v1/tx/example', {
+        bypassCache: true,
+        retries: 0,
+      }),
+    ).rejects.toBeInstanceOf(HiroApiError);
   });
 });
