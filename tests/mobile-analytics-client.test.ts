@@ -101,4 +101,59 @@ describe('mobile analytics client', () => {
     expect(first).toBe(second);
     expect(first).not.toContain('SP1N3809');
   });
+
+  it('requeues failed flush batches and retries on the next flush', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('network down'))
+      .mockResolvedValueOnce({ ok: true, status: 200 } as Response);
+    globalThis.fetch = fetchMock as any;
+
+    const analytics = await loadAnalyticsModule({
+      enabled: true,
+      endpoint: 'https://analytics.example.com/collect',
+    });
+
+    analytics.trackMobileEvent('wallet_tx_failed', {
+      source: 'wallet-sync',
+      functionName: 'check-in',
+    });
+
+    await analytics.flushMobileAnalytics();
+    await analytics.flushMobileAnalytics();
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    const [, request] = fetchMock.mock.calls[1];
+    const body = JSON.parse(request.body);
+    expect(body.events).toHaveLength(1);
+    expect(body.events[0]).toMatchObject({
+      event: 'wallet_tx_failed',
+      payload: expect.objectContaining({ source: 'wallet-sync' }),
+    });
+  });
+
+  it('caps queued analytics events to 100 before flushing', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue({ ok: true, status: 200 } as Response) as any;
+
+    const analytics = await loadAnalyticsModule({
+      enabled: true,
+      endpoint: 'https://analytics.example.com/collect',
+    });
+
+    for (let index = 0; index < 120; index += 1) {
+      analytics.trackMobileEvent('route_viewed', {
+        source: `event-${index}`,
+      });
+    }
+
+    await analytics.flushMobileAnalytics();
+
+    const [, request] = (globalThis.fetch as any).mock.calls[0];
+    const body = JSON.parse(request.body);
+
+    expect(body.events).toHaveLength(100);
+    expect(body.events[0].payload.source).toBe('event-20');
+    expect(body.events[99].payload.source).toBe('event-119');
+  });
 });
