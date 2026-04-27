@@ -27,6 +27,16 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./mobile/src", import.meta.url)),
+      "react-native": fileURLToPath(new URL("./tests/mocks/react-native.ts", import.meta.url)),
+      "expo-constants": fileURLToPath(new URL("./tests/mocks/expo-constants.ts", import.meta.url)),
+      "expo-linking": fileURLToPath(new URL("./tests/mocks/expo-linking.ts", import.meta.url)),
+      "expo-notifications": fileURLToPath(new URL("./tests/mocks/expo-notifications.ts", import.meta.url)),
+      "expo-local-authentication": fileURLToPath(
+        new URL("./tests/mocks/expo-local-authentication.ts", import.meta.url),
+      ),
+      "@react-native-async-storage/async-storage": fileURLToPath(
+        new URL("./tests/mocks/async-storage.ts", import.meta.url),
+      ),
     },
   },
   test: {
