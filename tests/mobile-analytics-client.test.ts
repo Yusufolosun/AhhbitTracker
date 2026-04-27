@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const originalFetch = globalThis.fetch;
+const originalSetInterval = globalThis.setInterval;
+const originalClearInterval = globalThis.clearInterval;
 
 async function loadAnalyticsModule(options?: {
   enabled?: boolean;
@@ -9,6 +11,8 @@ async function loadAnalyticsModule(options?: {
   stage?: string;
 }) {
   vi.resetModules();
+  globalThis.setInterval = vi.fn(() => 0 as unknown as ReturnType<typeof setInterval>);
+  globalThis.clearInterval = vi.fn();
 
   vi.doMock('@/core/config', () => ({
     analyticsRuntimeConfig: {
@@ -26,6 +30,8 @@ async function loadAnalyticsModule(options?: {
 
 afterEach(() => {
   globalThis.fetch = originalFetch;
+  globalThis.setInterval = originalSetInterval;
+  globalThis.clearInterval = originalClearInterval;
   vi.restoreAllMocks();
 });
 
