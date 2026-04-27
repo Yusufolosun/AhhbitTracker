@@ -149,4 +149,53 @@ describe('mobile hiro api client', () => {
       }),
     ).rejects.toBeInstanceOf(HiroApiError);
   });
+
+  it('serves cached responses when ttl is active', async () => {
+    process.env.EXPO_PUBLIC_HIRO_API_BASE_URL = 'https://api.mainnet.hiro.so';
+
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ nonce: 88 }),
+    } as Response) as any;
+
+    const first = await fetchHiroJson<{ nonce: number }>('/extended/v1/address/SP123/nonces', {
+      ttlMs: 10_000,
+      retries: 0,
+    });
+    const second = await fetchHiroJson<{ nonce: number }>('/extended/v1/address/SP123/nonces', {
+      ttlMs: 10_000,
+      retries: 0,
+    });
+
+    expect(first).toEqual({ nonce: 88 });
+    expect(second).toEqual({ nonce: 88 });
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('deduplicates concurrent requests for the same cache key', async () => {
+    process.env.EXPO_PUBLIC_HIRO_API_BASE_URL = 'https://api.mainnet.hiro.so';
+
+    globalThis.fetch = vi.fn().mockImplementation(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ({ balance: '1000000' }),
+      } as Response;
+    }) as any;
+
+    const [first, second] = await Promise.all([
+      fetchHiroJson<{ balance: string }>('/extended/v1/address/SP123/stx', {
+        ttlMs: 5_000,
+      }),
+      fetchHiroJson<{ balance: string }>('/extended/v1/address/SP123/stx', {
+        ttlMs: 5_000,
+      }),
+    ]);
+
+    expect(first.balance).toBe('1000000');
+    expect(second.balance).toBe('1000000');
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+  });
 });
