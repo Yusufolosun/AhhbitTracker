@@ -121,4 +121,54 @@ describe('mobile notification storage', () => {
     expect(trimmed[0]).toEqual({ id: 'n-0' });
     expect(trimmed[24]).toEqual({ id: 'n-24' });
   });
+
+  it('removes persisted data when stored JSON is malformed', async () => {
+    storage.set('ahhbittracker.mobile.notifications.v1', '{bad-json');
+
+    const loaded = await loadPersistedNotificationState();
+
+    expect(loaded).toBeNull();
+    expect(storage.has('ahhbittracker.mobile.notifications.v1')).toBe(false);
+  });
+
+  it('removes persisted data when schema version is invalid', async () => {
+    storage.set(
+      'ahhbittracker.mobile.notifications.v1',
+      JSON.stringify({
+        version: 2,
+        remindersEnabled: true,
+        eventAlertsEnabled: true,
+        deliveredEventKeys: [],
+        recentNotifications: [],
+        scheduledReminders: {},
+      }),
+    );
+
+    const loaded = await loadPersistedNotificationState();
+
+    expect(loaded).toBeNull();
+    expect(storage.has('ahhbittracker.mobile.notifications.v1')).toBe(false);
+  });
+
+  it('caps recent notifications at 25 records during save', async () => {
+    await savePersistedNotificationState(
+      buildPersistedState({
+        recentNotifications: Array.from({ length: 30 }, (_, index) => ({
+          id: `notif-${index}`,
+          kind: 'transaction-confirmed',
+          tone: 'success',
+          title: `Notification ${index}`,
+          body: 'Body',
+          routePath: '/preview',
+          createdAt: new Date().toISOString(),
+        })),
+      }),
+    );
+
+    const loaded = await loadPersistedNotificationState();
+
+    expect(loaded?.recentNotifications).toHaveLength(25);
+    expect(loaded?.recentNotifications[0].id).toBe('notif-0');
+    expect(loaded?.recentNotifications[24].id).toBe('notif-24');
+  });
 });
