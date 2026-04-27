@@ -63,4 +63,14 @@ describe('mobile transaction preview builder', () => {
     expect(claimPreview.functionArgsHex).toHaveLength(1);
     expect(claimPreview.postConditions).toHaveLength(1);
   });
+
+  it('produces deterministic preview output for identical create-habit input', () => {
+    const sender = 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z';
+    const first = buildCreateHabitPreview(sender, 'Read for 30 minutes', 250_000);
+    const second = buildCreateHabitPreview(sender, 'Read for 30 minutes', 250_000);
+
+    expect(first.functionArgsHex).toEqual(second.functionArgsHex);
+    expect(first.postConditions).toEqual(second.postConditions);
+    expect(first.contractAddress).toBe(sender);
+  });
 });
