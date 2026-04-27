@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { buildHabitNotificationPlans, buildTransactionNotificationPlan, notificationPlanner } from '../mobile/src/features/notifications/planner';
+import {
+  buildHabitNotificationPlans,
+  buildTransactionNotificationPlan,
+  getHabitNotificationSummary,
+  notificationPlanner,
+  notificationTiming,
+  toNotificationRecord,
+} from '../mobile/src/features/notifications/planner';
 import type { Habit } from '../mobile/src/core/types/habit';
 
 function createHabit(overrides: Partial<Habit> = {}): Habit {
@@ -110,5 +117,59 @@ describe('mobile notification planner', () => {
       routePath: '/preview',
       txId: '0xtx-failed',
     });
+  });
+
+  it('skips reminder generation when address is missing or habit is inactive', () => {
+    const noAddressPlans = buildHabitNotificationPlans({
+      address: null,
+      habit: createHabit(),
+      currentBlock: 120,
+    });
+
+    const inactivePlans = buildHabitNotificationPlans({
+      address: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
+      habit: createHabit({ isActive: false }),
+      currentBlock: 120,
+    });
+
+    expect(noAddressPlans).toEqual({
+      upcomingReminders: [],
+      immediateNotifications: [],
+    });
+    expect(inactivePlans).toEqual({
+      upcomingReminders: [],
+      immediateNotifications: [],
+    });
+  });
+
+  it('creates serializable notification records from plans', () => {
+    const plan = buildTransactionNotificationPlan({
+      txId: '0xtx-confirmed-2',
+      functionName: 'create-habit',
+      status: 'confirmed',
+    });
+
+    const record = toNotificationRecord(plan, 'record-1', new Date('2026-04-27T09:30:00.000Z'));
+
+    expect(record).toMatchObject({
+      id: 'record-1',
+      kind: 'transaction-confirmed',
+      txId: '0xtx-confirmed-2',
+      routePath: '/preview',
+      createdAt: '2026-04-27T09:30:00.000Z',
+    });
+  });
+
+  it('returns notification summaries and timing constants for UI surfaces', () => {
+    const habit = createHabit({ currentStreak: 7, lastCheckInBlock: 100 });
+
+    expect(getHabitNotificationSummary(habit, null)).toBe('Waiting for block height');
+    expect(getHabitNotificationSummary(habit, 235)).toBe('Check-in is urgent');
+    expect(getHabitNotificationSummary(createHabit({ currentStreak: 7 }), 220)).toBe(
+      'Withdrawal unlocked after 7 days',
+    );
+
+    expect(notificationTiming.approxBlockDurationMs).toBe(600_000);
+    expect(notificationTiming.reminderLeadMs).toBeGreaterThan(0);
   });
 });
