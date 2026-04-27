@@ -33,12 +33,21 @@ let parseWalletInteractionState: (url: string) => {
   functionName: string | null;
   preview: ContractCallPreview | null;
 } | null;
+let parseWalletInteractionParams: (params: { payload?: string; result?: string } | undefined) => {
+  txId: string | null;
+  status: string | null;
+  functionName: string | null;
+  preview: ContractCallPreview | null;
+} | null;
+let hasWalletInteractionPayload: (url: string) => boolean;
 
 beforeAll(async () => {
   ({
     buildWalletPreviewLink,
     buildWalletReturnLink,
     parseWalletInteractionState,
+    parseWalletInteractionParams,
+    hasWalletInteractionPayload,
   } = await import('../mobile/src/features/wallet/linking'));
 });
 
@@ -88,5 +97,37 @@ describe('mobile wallet linking', () => {
 
   it('returns null when link query is missing wallet payload', () => {
     expect(parseWalletInteractionState('ahhbittracker://preview')).toBeNull();
+  });
+
+  it('rejects links for unsupported schemes', () => {
+    const preview = createPreview('check-in');
+    const validLink = buildWalletPreviewLink(preview);
+    const invalidSchemeLink = validLink.replace('ahhbittracker://', 'bitcoin://');
+
+    expect(parseWalletInteractionState(invalidSchemeLink)).toBeNull();
+    expect(hasWalletInteractionPayload(invalidSchemeLink)).toBe(false);
+  });
+
+  it('parses payload and result params from route params object', () => {
+    const preview = createPreview('withdraw-stake');
+    const previewLink = buildWalletPreviewLink(preview);
+    const previewPayload = new URL(previewLink).searchParams.get('payload') ?? undefined;
+
+    const previewState = parseWalletInteractionParams({ payload: previewPayload });
+    expect(previewState?.preview).toEqual(preview);
+    expect(previewState?.status).toBeNull();
+
+    const returnLink = buildWalletReturnLink('0xtx-expired', 'expired', 'withdraw-stake');
+    const resultPayload = new URL(returnLink).searchParams.get('result') ?? undefined;
+    const returnState = parseWalletInteractionParams({ result: resultPayload });
+
+    expect(returnState?.preview).toBeNull();
+    expect(returnState?.txId).toBe('0xtx-expired');
+    expect(returnState?.status).toBe('expired');
+  });
+
+  it('returns null for malformed encoded payloads', () => {
+    expect(parseWalletInteractionParams({ payload: 'not-json' })).toBeNull();
+    expect(parseWalletInteractionParams({ result: 'still-not-json' })).toBeNull();
   });
 });
