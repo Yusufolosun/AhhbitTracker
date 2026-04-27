@@ -12,6 +12,25 @@ afterEach(() => {
 });
 
 describe('mobile wallet transaction sync targets', () => {
+  it('keeps sync targets deterministic for all supported transaction types', () => {
+    const cases = [
+      ['create-habit', false],
+      ['check-in', false],
+      ['withdraw-stake', true],
+      ['claim-bonus', true],
+    ] as const;
+
+    for (const [functionName, expectsPoolRefresh] of cases) {
+      const result = getWalletInteractionSyncTargets(functionName);
+
+      expect(result).toEqual({
+        invalidateHabits: true,
+        invalidateUserStats: true,
+        invalidatePoolBalance: expectsPoolRefresh,
+      });
+    }
+  });
+
   it('keeps habit queries fresh for create and check-in actions', () => {
     expect(getWalletInteractionSyncTargets('create-habit')).toEqual({
       invalidateHabits: true,
@@ -42,6 +61,12 @@ describe('mobile wallet transaction sync targets', () => {
 
   it('falls back to refreshing every habit query when the function is unknown', () => {
     expect(getWalletInteractionSyncTargets(null)).toEqual({
+      invalidateHabits: true,
+      invalidateUserStats: true,
+      invalidatePoolBalance: true,
+    });
+
+    expect(getWalletInteractionSyncTargets('unexpected' as any)).toEqual({
       invalidateHabits: true,
       invalidateUserStats: true,
       invalidatePoolBalance: true,
