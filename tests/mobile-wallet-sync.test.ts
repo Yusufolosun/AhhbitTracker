@@ -77,4 +77,30 @@ describe('mobile wallet transaction sync targets', () => {
 
     await expect(fetchWalletTransactionStatus('0xtx-missing')).resolves.toBe('pending');
   });
+
+  it('maps uppercase status field from fallback payload key to confirmed', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ status: 'SUCCESS' }),
+    } as Response) as any;
+
+    await expect(fetchWalletTransactionStatus('0xtx-uppercase')).resolves.toBe('confirmed');
+  });
+
+  it('treats unknown successful statuses as pending', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ tx_status: 'pending' }),
+    } as Response) as any;
+
+    await expect(fetchWalletTransactionStatus('0xtx-pending')).resolves.toBe('pending');
+  });
+
+  it('returns pending when Hiro API request throws unexpectedly', async () => {
+    globalThis.fetch = vi.fn().mockRejectedValue(new Error('network interrupted')) as any;
+
+    await expect(fetchWalletTransactionStatus('0xtx-error')).resolves.toBe('pending');
+  });
 });
