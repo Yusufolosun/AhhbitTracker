@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { HabitForm } from '../components/HabitForm';
 import { MAX_HABIT_NAME_LENGTH, MAX_STAKE_AMOUNT, MIN_STAKE_AMOUNT } from '../utils/constants';
 
@@ -81,5 +81,39 @@ describe('HabitForm', () => {
     expect(await screen.findByText('Maximum stake is 100 STX')).toBeDefined();
     expect(createHabit).not.toHaveBeenCalled();
     expect(showToast).not.toHaveBeenCalled();
+  });
+
+  it('locks the form after signing and unlocks after the cooldown', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2025-01-01T00:00:00Z'));
+    render(<HabitForm />);
+
+    fireEvent.change(screen.getByLabelText('Habit Name'), {
+      target: { value: 'Daily Exercise' },
+    });
+    fireEvent.change(screen.getByLabelText('Stake Amount (STX)'), {
+      target: { value: '0.5' },
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Create Habit' }));
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(createHabit).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('button', { name: /Waiting for confirmation/ })).toBeDisabled();
+
+    act(() => {
+      vi.advanceTimersByTime(45_000);
+    });
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(screen.getByRole('button', { name: 'Create Habit' })).toBeEnabled();
+
+    vi.useRealTimers();
   });
 });
