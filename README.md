@@ -88,6 +88,11 @@ cd frontend && npm test   # Run frontend tests (30 tests)
 clarinet check        # Validate Clarity syntax
 ```
 
+Critical user-flow coverage lives alongside the test suites:
+
+- Contract E2E flows: `tests/*.e2e.test.ts`
+- Frontend E2E flows: `frontend/src/__tests__/*` (daily check-ins, withdraws, claims)
+
 ### Environment Stages
 
 The repository now supports three explicit runtime stages without committing secrets:
