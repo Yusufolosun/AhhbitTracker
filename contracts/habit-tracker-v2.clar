@@ -510,12 +510,34 @@
 
 ;; Check if check-in is within valid window
 ;; Returns true if blocks since last check-in <= CHECK-IN-WINDOW
-(define-private (is-check-in-valid (last-check-in-block uint))
+
+;; Get anchored check-in window for a habit
+;; Returns a tuple (earliest-allowed-block, latest-allowed-block)
+(define-private (get-checkin-window (created-at-block uint))
   (let
     (
-      (blocks-elapsed (- block-height last-check-in-block))
+      ;; Anchor is the habit's creation block
+      (anchor created-at-block)
+      ;; Nominal window is 24 hours after anchor
+      (nominal-latest (+ anchor BLOCKS-PER-DAY))
+      ;; Earliest allowed = nominal - EARLY-GRACE-BLOCKS
+      (earliest (if (>= nominal-latest EARLY-GRACE-BLOCKS) (- nominal-latest EARLY-GRACE-BLOCKS) u0))
+      ;; Latest allowed = nominal + LATE-GRACE-BLOCKS
+      (latest (+ nominal-latest LATE-GRACE-BLOCKS))
     )
-    (<= blocks-elapsed CHECK-IN-WINDOW)
+    (tuple earliest latest)
+  )
+)
+
+;; Check if check-in is within valid window relative to habit creation
+(define-private (is-check-in-valid (created-at-block uint))
+  (let
+    (
+      (window (get-checkin-window created-at-block))
+      (earliest (tuple-get window 0))
+      (latest (tuple-get window 1))
+    )
+    (and (>= block-height earliest) (<= block-height latest))
   )
 )
 
