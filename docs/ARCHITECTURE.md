@@ -144,11 +144,11 @@ User → check-in(habit-id) → Contract
   ├─ Verify caller is owner
   ├─ Calculate blocks since last check-in
   ├─ Require blocks elapsed ≥ MIN-CHECK-IN-INTERVAL (120)
-  ├─ If > CHECK-IN-WINDOW blocks:
-  │   ├─ Mark streak as broken
-  │   ├─ Forfeit stake to pool
-  │   └─ Reset habit
-  ├─ If ≤ CHECK-IN-WINDOW blocks:
+  ├─ If check-in window missed:
+  │   ├─ Apply partial forfeit (10% per missed day)
+  │   ├─ Reset streak
+  │   └─ Deactivate habit if remaining stake is zero
+  ├─ If within window:
   │   ├─ Increment streak counter
   │   └─ Update last-check-in-block
   └─ Emit check-in event
