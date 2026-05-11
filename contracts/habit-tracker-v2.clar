@@ -646,10 +646,10 @@
     ;; Verify habit is still active
     (asserts! (get is-active habit) ERR-HABIT-ALREADY-COMPLETED)
     
-    ;; Check if already checked in today
+    ;; Check if already checked in within minimum interval
     (asserts! (not (already-checked-in-today last-check-in)) ERR-ALREADY-CHECKED-IN)
-    ;; Check if within valid window
-    (if (is-check-in-valid last-check-in)
+    ;; Check if within anchored valid window (relative to creation)
+    (if (is-check-in-valid (get created-at-block habit))
       ;; Valid check-in: increment streak
       (begin
         (map-set habits
