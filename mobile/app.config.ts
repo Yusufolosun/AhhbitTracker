@@ -20,7 +20,7 @@ const STAGE_DEFAULTS: Readonly<Record<AppStage, ResolvedNetworkConfig>> = {
     hiroApiBaseUrl: 'https://api.testnet.hiro.so',
     contract: {
       contractAddress: 'ST1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK1GA0CF0',
-      contractName: 'habit-tracker-v2',
+      contractName: 'habit-tracker-v3',
     },
   },
   staging: {
@@ -29,7 +29,7 @@ const STAGE_DEFAULTS: Readonly<Record<AppStage, ResolvedNetworkConfig>> = {
     hiroApiBaseUrl: 'https://api.testnet.hiro.so',
     contract: {
       contractAddress: 'ST1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK1GA0CF0',
-      contractName: 'habit-tracker-v2',
+      contractName: 'habit-tracker-v3',
     },
   },
   production: {
@@ -38,7 +38,7 @@ const STAGE_DEFAULTS: Readonly<Record<AppStage, ResolvedNetworkConfig>> = {
     hiroApiBaseUrl: 'https://api.mainnet.hiro.so',
     contract: {
       contractAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
-      contractName: 'habit-tracker-v2',
+      contractName: 'habit-tracker-v3',
     },
   },
 };

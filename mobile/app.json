@@ -38,7 +38,7 @@
     "extra": {
       "appStage": "production",
       "contractAddress": "SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z",
-      "contractName": "habit-tracker-v2",
+      "contractName": "habit-tracker-v3",
       "hiroApiBaseUrl": "https://api.mainnet.hiro.so",
       "stacksNetwork": "mainnet"
     },
