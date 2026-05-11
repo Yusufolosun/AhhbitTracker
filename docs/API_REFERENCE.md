@@ -448,6 +448,18 @@ Companion contract error ranges:
 { habit-ids: (list 100 uint) }
 ```
 
+### habit-penalties Map
+
+**Key:**
+```clarity
+{ habit-id: uint }
+```
+
+**Value:**
+```clarity
+{ initial-stake-amount: uint, missed-checkins: uint }
+```
+
 ### Data Variables
 
 **habit-id-nonce:** `uint`  
@@ -455,6 +467,9 @@ Counter for generating unique habit IDs
 
 **forfeited-pool-balance:** `uint`  
 Total STX in forfeited pool (in microSTX)
+
+**unclaimed-completed-habits:** `uint`  
+Completed habits eligible to claim a bonus
 
 ---
 
