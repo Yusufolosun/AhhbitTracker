@@ -210,6 +210,18 @@ User → claim-bonus(habit-id) → Contract
 
 **Purpose:** Enables efficient querying of all habits for a given user
 
+### Habit-Penalties Map
+```clarity
+{
+  habit-id: uint → {
+    initial-stake-amount: uint,
+    missed-checkins: uint
+  }
+}
+```
+
+**Purpose:** Tracks original stake and applied missed check-ins for partial forfeits
+
 ## Time-based Logic
 
 Stacks produces blocks approximately every **10 minutes**.
