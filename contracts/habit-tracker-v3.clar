@@ -105,7 +105,7 @@
 (define-data-var unclaimed-completed-habits uint u0)
 
 ;; ============================================
-;; ACCOUNTABILITY GROUPS (merged from habit-accountability-group.clar)
+;; ACCOUNTABILITY GROUPS (merged from habit-accountability-group-v3.clar)
 ;; ============================================
 
 ;; Group size limits
@@ -512,20 +512,16 @@
 ;; Returns true if blocks since last check-in <= CHECK-IN-WINDOW
 
 ;; Get anchored check-in window for a habit
-;; Returns a tuple (earliest-allowed-block, latest-allowed-block)
+;; Returns a named tuple { earliest: uint, latest: uint }
 (define-private (get-checkin-window (created-at-block uint))
   (let
     (
-      ;; Anchor is the habit's creation block
       (anchor created-at-block)
-      ;; Nominal window is 24 hours after anchor
       (nominal-latest (+ anchor BLOCKS-PER-DAY))
-      ;; Earliest allowed = nominal - EARLY-GRACE-BLOCKS
       (earliest (if (>= nominal-latest EARLY-GRACE-BLOCKS) (- nominal-latest EARLY-GRACE-BLOCKS) u0))
-      ;; Latest allowed = nominal + LATE-GRACE-BLOCKS
       (latest (+ nominal-latest LATE-GRACE-BLOCKS))
     )
-    (tuple earliest latest)
+    (tuple (earliest earliest) (latest latest))
   )
 )
 
@@ -534,8 +530,8 @@
   (let
     (
       (window (get-checkin-window created-at-block))
-      (earliest (tuple-get window 0))
-      (latest (tuple-get window 1))
+      (earliest (get earliest window))
+      (latest (get latest window))
     )
     (and (>= block-height earliest) (<= block-height latest))
   )
