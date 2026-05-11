@@ -21,7 +21,7 @@ Every 24 hours, check in to prove you're following through. Each successful chec
 ### 3. Complete or Forfeit
 
 - **Complete:** Check in for 7+ consecutive days, then withdraw your stake
-- **Forfeit:** Miss a check-in window and your stake goes to the community pool
+- **Forfeit:** Miss a check-in window and 10% of your stake is forfeited per missed day
 
 ### 4. Earn Bonuses
 
@@ -75,7 +75,7 @@ On mobile, withdrawal and bonus claim actions also require biometric confirmatio
 
 - **First check-in:** Starts your streak at 1
 - **Each consecutive check-in:** Adds 1 to your streak
-- **Missed window:** Resets streak to 0 and forfeits stake
+- **Missed window:** Resets streak and forfeits 10% per missed day (habit continues unless stake is fully depleted)
 
 ### Check-in Window
 
@@ -84,7 +84,7 @@ You must check in within 144 blocks (~24 hours) of your last check-in.
 **Example timeline:**
 - Monday 9:00 AM: First check-in (streak = 1)
 - Tuesday before 9:00 AM: Second check-in (streak = 2)
-- Tuesday after 9:00 AM: Window expires, stake forfeited
+- Tuesday after 9:00 AM: Window expires, 10% penalty applied and streak resets
 
 ### Multiple Habits
 
@@ -97,7 +97,7 @@ You can track multiple habits simultaneously. Each habit:
 
 ### How It Works
 
-When users miss check-ins, their stakes are added to a shared pool.
+When users miss check-ins, 10% per missed day is added to a shared pool.
 
 ### Claiming Bonuses
 
@@ -174,7 +174,7 @@ You've already checked in today. The next check-in is valid between 120 and 144 
 
 ### "Window Expired" Error
 
-You missed your 24-hour check-in window. Your stake has been forfeited to the pool.
+You missed your 24-hour check-in window. A 10% per missed day penalty was applied to your remaining stake.
 
 ### "Insufficient Streak" Error
 
