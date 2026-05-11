@@ -633,6 +633,12 @@
         bonus-claimed: false
       }
     )
+
+    ;; Track penalty metadata
+    (map-set habit-penalties
+      { habit-id: habit-id }
+      { initial-stake-amount: stake-amount, missed-checkins: u0 }
+    )
     
     ;; Add habit to user's habit list
     (match (map-get? user-habits { user: caller })
