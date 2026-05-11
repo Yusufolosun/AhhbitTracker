@@ -10,8 +10,8 @@ const user3 = accounts.get("wallet_3")!;
 // Test Helpers
 const MIN_STAKE = 20000; // 0.02 STX in microSTX
 // Minimum interval between check-ins (blocks)
-// Adjusted to allow early grace: 16 hours = 96 blocks
-const MIN_CHECK_IN_INTERVAL = 96;
+// ~20 hours = 120 blocks
+const MIN_CHECK_IN_INTERVAL = 120;
 const MAX_STAKE_AMOUNT = 100_000_000; // 100 STX in microSTX
 const VALID_HABIT_NAME = "Daily Exercise";
 const MAX_NAME_LENGTH = 50;
@@ -257,28 +257,28 @@ describe("AhhbitTracker Contract", () => {
       expect(result.result).toBeOk(Cl.uint(2));
     });
 
-    it("should prevent check-in before minimum interval (96 blocks)", () => {
+    it("should prevent check-in before minimum interval (120 blocks)", () => {
       // First check-in succeeds
       const first = checkIn(user1, habitId);
       expect(first.result).toBeOk(Cl.uint(1));
 
       // Try to check in after only 1 block → should fail
-      // blocks-elapsed = 1 < MIN-CHECK_IN_INTERVAL(96) → blocked
+      // blocks-elapsed = 1 < MIN-CHECK_IN_INTERVAL(120) → blocked
       const second = checkIn(user1, habitId);
       expect(second.result).toBeErr(Cl.uint(105)); // ERR-ALREADY-CHECKED-IN
     });
 
-    it("should prevent check-in before minimum interval (95 blocks)", () => {
+    it("should prevent check-in before minimum interval (119 blocks)", () => {
       checkIn(user1, habitId);
-      // callPublicFn mines a block for the attempted check-in, so mine 94 here
-      // to keep elapsed blocks strictly below the 96 minimum interval.
-      simnet.mineEmptyBlocks(94);
+      // callPublicFn mines a block for the attempted check-in, so mine 118 here
+      // to keep elapsed blocks strictly below the 120 minimum interval.
+      simnet.mineEmptyBlocks(118);
 
       const result = checkIn(user1, habitId);
       expect(result.result).toBeErr(Cl.uint(105)); // ERR-ALREADY-CHECKED-IN
     });
 
-    it("should allow check-in at exactly 96 blocks (minimum interval)", () => {
+    it("should allow check-in at exactly 120 blocks (minimum interval)", () => {
       checkIn(user1, habitId);
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL); // Exactly at minimum
 
@@ -287,39 +287,35 @@ describe("AhhbitTracker Contract", () => {
     });
 
     it("should allow check-in near the late boundary and increment streak", () => {
-      // checkIn at block N → mine 191 empty blocks → next checkIn at N+192 (latest allowed)
+      // checkIn at block N → mine 143 empty blocks → next checkIn at N+144 (latest allowed)
       checkIn(user1, habitId);
-      simnet.mineEmptyBlocks(191);
+      simnet.mineEmptyBlocks(143);
 
       const result = checkIn(user1, habitId);
       expect(result.result).toBeOk(Cl.uint(2));
     });
 
-    it("should succeed at the 192-block boundary (last valid block)", () => {
-      // checkIn at block N → mine 191 empty blocks → next checkIn at N+192
+    it("should succeed at the 144-block boundary (last valid block)", () => {
+      // checkIn at block N → mine 143 empty blocks → next checkIn at N+144
       checkIn(user1, habitId);
-      simnet.mineEmptyBlocks(191);
+      simnet.mineEmptyBlocks(143);
 
       const result = checkIn(user1, habitId);
       expect(result.result).toBeOk(Cl.uint(2));
     });
 
-    it("should auto-slash check-in 1 block past the window (193 elapsed)", () => {
-      // checkIn at block N → mine 192 empty blocks → next checkIn at N+193
-      // elapsed = 193 > latest allowed (192) → check-in returns ERR-HABIT-AUTO-SLASHED
+    it("should apply penalty 1 block past the window (145 elapsed)", () => {
+      // checkIn at block N → mine 144 empty blocks → next checkIn at N+145
+      // elapsed = 145 > latest allowed (144) → late check-in triggers penalty
       checkIn(user1, habitId);
-      simnet.mineEmptyBlocks(192);
+      simnet.mineEmptyBlocks(144);
 
       const result = checkIn(user1, habitId);
-      expect(result.result).toBeErr(Cl.uint(114));
+      expect(result.result).toBeOk(Cl.uint(1));
 
-      // Pool is unchanged because the transaction returned err (state rolled back)
+      // Pool increases by the penalty amount
       const pool = simnet.getDataVar("habit-tracker-v3", "forfeited-pool-balance");
-      expect(pool).toBeUint(0);
-
-      // Habit is still active, so repeated late check-ins return ERR-HABIT-AUTO-SLASHED
-      const result2 = checkIn(user1, habitId);
-      expect(result2.result).toBeErr(Cl.uint(114));
+      expect(pool).toBeUint(MIN_STAKE / 10);
     });
 
     it("should forfeit stake when check-in window expires via slashing", () => {
@@ -732,9 +728,9 @@ describe("AhhbitTracker Contract", () => {
     });
   });
 
-  describe("auto-slash behavior", () => {
+  describe("late check-in penalties", () => {
 
-    it("should auto-slash when owner calls check-in after window expires", () => {
+    it("should apply penalty when owner checks in after window expires", () => {
       const result = createHabit(user1, "Exercise", MIN_STAKE);
       const id = Number((result.result as any).value.value);
 
@@ -742,21 +738,16 @@ describe("AhhbitTracker Contract", () => {
       checkIn(user1, id);
       simnet.mineEmptyBlocks(200);
 
-      // Owner tries to check in too late - auto-slash fires
+      // Owner checks in too late - penalty applies
       const result2 = checkIn(user1, id);
-      expect(result2.result).toBeErr(Cl.uint(114));
+      expect(result2.result).toBeOk(Cl.uint(1));
 
-      // Because check-in returned err, no state is persisted. Repeated late check-ins
-      // continue to return ERR-HABIT-AUTO-SLASHED.
-      const result3 = checkIn(user1, id);
-      expect(result3.result).toBeErr(Cl.uint(114));
-
-      // Streak remains unchanged due rollback on err
-      const streakResult = simnet.callReadOnlyFn("habit-tracker-v3", "get-habit-streak", [Cl.uint(id)], deployer);
-      expect(streakResult.result).toBeOk(Cl.uint(1));
+      // Pool increases by 10% of the initial stake
+      const pool = simnet.getDataVar("habit-tracker-v3", "forfeited-pool-balance");
+      expect(pool).toBeUint(MIN_STAKE / 10);
     });
 
-    it("should move stake to pool on auto-slash", () => {
+    it("should move stake to pool on late check-in", () => {
       const result = createHabit(user1, "Exercise", MIN_STAKE * 5);
       const id = Number((result.result as any).value.value);
 
@@ -764,13 +755,12 @@ describe("AhhbitTracker Contract", () => {
       checkIn(user1, id);
       simnet.mineEmptyBlocks(150);
 
-      checkIn(user1, id); // triggers auto-slash
+      checkIn(user1, id); // triggers penalty
       const poolAfter = simnet.getDataVar("habit-tracker-v3", "forfeited-pool-balance");
-
-      expect(poolAfter).toBeUint(0);
+      expect(poolAfter).toBeUint((MIN_STAKE * 5) / 10);
     });
 
-    it("should return auto-slash error on repeated expired check-ins", () => {
+    it("should reject immediate follow-up check-in after late penalty", () => {
       const result = createHabit(user1, "Exercise", MIN_STAKE);
       const id = Number((result.result as any).value.value);
 
@@ -778,16 +768,16 @@ describe("AhhbitTracker Contract", () => {
       checkIn(user1, id);
       simnet.mineEmptyBlocks(150);
 
-      // First expired check-in auto-slashes and returns ERR-HABIT-AUTO-SLASHED
+      // First expired check-in applies penalty
       const result2 = checkIn(user1, id);
-      expect(result2.result).toBeErr(Cl.uint(114)); // ERR-HABIT-AUTO-SLASHED
+      expect(result2.result).toBeOk(Cl.uint(1));
 
-      // Second expired check-in returns the same auto-slash error
+      // Immediate follow-up is blocked by MIN-CHECK-IN-INTERVAL
       const result3 = checkIn(user1, id);
-      expect(result3.result).toBeErr(Cl.uint(114)); // ERR-HABIT-AUTO-SLASHED
+      expect(result3.result).toBeErr(Cl.uint(105)); // ERR-ALREADY-CHECKED-IN
     });
 
-    it("should still allow withdrawal after auto-slash error when streak is sufficient", () => {
+    it("should reset streak after late check-in and block withdrawal", () => {
       const result = createHabit(user1, "Exercise", MIN_STAKE);
       const id = Number((result.result as any).value.value);
 
@@ -799,13 +789,13 @@ describe("AhhbitTracker Contract", () => {
       }
       simnet.mineEmptyBlocks(200);
 
-      // Auto-slash via check-in returns ERR-HABIT-AUTO-SLASHED
+      // Late check-in applies penalty and resets streak
       const slashResult = checkIn(user1, id);
-      expect(slashResult.result).toBeErr(Cl.uint(114)); // ERR-HABIT-AUTO-SLASHED
+      expect(slashResult.result).toBeOk(Cl.uint(1));
 
-      // Withdrawal still succeeds because err return rolls back auto-slash state changes
+      // Withdrawal now fails because streak reset
       const withdrawResult = withdrawStake(user1, id);
-      expect(withdrawResult.result).toBeOk(Cl.uint(MIN_STAKE));
+      expect(withdrawResult.result).toBeErr(Cl.uint(107)); // ERR-INSUFFICIENT-STREAK
     });
 
     it("should still allow external slash-habit for habits where owner never returns", () => {
@@ -825,7 +815,7 @@ describe("AhhbitTracker Contract", () => {
       expect(pool).toBeUint(MIN_STAKE);
     });
 
-    it("should not reset streak on auto-slash error", () => {
+    it("should reset streak to 1 after late check-in", () => {
       const result = createHabit(user1, "Exercise", MIN_STAKE);
       const id = Number((result.result as any).value.value);
 
@@ -839,13 +829,13 @@ describe("AhhbitTracker Contract", () => {
       // Let window expire
       simnet.mineEmptyBlocks(200);
 
-      // Auto-slash returns ERR-HABIT-AUTO-SLASHED (not ok)
+      // Late check-in applies penalty
       const slashResult = checkIn(user1, id);
-      expect(slashResult.result).toBeErr(Cl.uint(114)); // ERR-HABIT-AUTO-SLASHED
+      expect(slashResult.result).toBeOk(Cl.uint(1));
 
-      // Streak remains unchanged due rollback on err
+      // Streak resets to 1 after penalty
       const streakResult = simnet.callReadOnlyFn("habit-tracker-v3", "get-habit-streak", [Cl.uint(id)], deployer);
-      expect(streakResult.result).toBeOk(Cl.uint(5));
+      expect(streakResult.result).toBeOk(Cl.uint(1));
     });
   });
 

@@ -35,10 +35,6 @@
 (define-constant BLOCKS-PER-HOUR u6)
 ;; Blocks per 24h day
 (define-constant BLOCKS-PER-DAY u144)
-;; Early and late grace windows (8 hours each -> 48 blocks)
-(define-constant EARLY-GRACE-BLOCKS u48)
-(define-constant LATE-GRACE-BLOCKS u48)
-
 ;; Minimum interval between check-ins (in blocks)
 ;; ~120 blocks = ~20 hours minimum between check-ins
 ;; Prevents streak farming while allowing flexibility for users
@@ -525,29 +521,15 @@
 ;; Check if check-in is within valid window
 ;; Returns true if blocks since last check-in <= CHECK-IN-WINDOW
 
-;; Get anchored check-in window for a habit
-;; Returns a named tuple { earliest: uint, latest: uint }
-(define-private (get-checkin-window (last-check-in-block uint))
-  (let
-    (
-      (anchor last-check-in-block)
-      (nominal-latest (+ anchor BLOCKS-PER-DAY))
-      (earliest (if (>= nominal-latest EARLY-GRACE-BLOCKS) (- nominal-latest EARLY-GRACE-BLOCKS) u0))
-      (latest (+ nominal-latest LATE-GRACE-BLOCKS))
-    )
-    (tuple (earliest earliest) (latest latest))
-  )
+;; Get latest valid check-in block (relative to last check-in)
+(define-private (get-checkin-latest (last-check-in-block uint))
+  (+ last-check-in-block CHECK-IN-WINDOW)
 )
 
 ;; Check if check-in is within valid window relative to last check-in
 (define-private (is-check-in-valid (last-check-in-block uint))
-  (let
-    (
-      (window (get-checkin-window last-check-in-block))
-      (earliest (get earliest window))
-      (latest (get latest window))
-    )
-    (and (>= block-height earliest) (<= block-height latest))
+  (let ((latest (get-checkin-latest last-check-in-block)))
+    (<= block-height latest)
   )
 )
 
@@ -573,11 +555,7 @@
 
 ;; Calculate how many check-in windows were missed since last check-in
 (define-private (get-missed-checkins (last-check-in-block uint))
-  (let
-    (
-      (window (get-checkin-window last-check-in-block))
-      (latest (get latest window))
-    )
+  (let ((latest (get-checkin-latest last-check-in-block)))
     (if (<= block-height latest)
       u0
       (let ((overdue (- block-height latest)))
@@ -1015,7 +993,7 @@
   (match (map-get? habits { habit-id: habit-id })
     habit
       (if (and (get is-active habit)
-               (not (is-check-in-valid (get created-at-block habit))))
+           (not (is-check-in-valid (get last-check-in-block habit))))
         habit-id
         u0
       )

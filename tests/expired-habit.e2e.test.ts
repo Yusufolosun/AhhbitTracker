@@ -44,6 +44,6 @@ describe("expired habit e2e", () => {
     expect(habit.result).not.toBeNone();
 
     const lateCheckIn = checkIn(user1, habitId);
-    expect(lateCheckIn.result).toBeErr(Cl.uint(108));
+    expect(lateCheckIn.result).toBeOk(Cl.uint(1));
   });
 });

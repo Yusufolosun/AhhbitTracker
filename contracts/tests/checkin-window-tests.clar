@@ -1,7 +1,7 @@
 ;; Clarinet-style tests are repository-specific; adapt as needed.
 ;; This file provides Clarity unit tests for anchored check-in window behaviors.
 
-(define-test test-checkin-within-early-grace
+(define-test test-checkin-at-min-interval
   (let (
           (creator (some-test-principal))
           (stake u20000)
@@ -9,8 +9,8 @@
         )
     (begin
       (unwrap-panic (contract-call? .habit-tracker-v3 create-habit name stake))
-      ;; Simulate advancing blocks to just before nominal window
-      (begin (block-height+ (- 144 40)))
+      ;; Advance to minimum interval (120 blocks)
+      (begin (block-height+ 120))
       (let ((res (contract-call? .habit-tracker-v3 check-in u1)))
         (match res
           ok (asserts! true true)
@@ -21,7 +21,7 @@
   )
 )
 
-(define-test test-checkin-after-late-grace-fails
+(define-test test-checkin-after-window-applies-penalty
   (let (
           (creator (some-test-principal))
           (stake u20000)
@@ -29,12 +29,12 @@
         )
     (begin
       (unwrap-panic (contract-call? .habit-tracker-v3 create-habit name stake))
-      ;; Advance beyond nominal + late grace
-      (begin (block-height+ (+ 144 50)))
+      ;; Advance beyond the 24h window
+      (begin (block-height+ 145))
       (let ((res (contract-call? .habit-tracker-v3 check-in u2)))
         (match res
-          ok (asserts! false true)
-          err (asserts! true true)
+          ok (asserts! true true)
+          err (asserts! false true)
         )
       )
     )

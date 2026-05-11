@@ -4,35 +4,29 @@ import { describe, it, expect } from 'vitest'
 // or the repo's existing test harness that runs against Clarinet. Adjust as needed.
 
 describe('Check-in window calculations (JS reference)', () => {
-  const BLOCKS_PER_HOUR = 6
-  const BLOCKS_PER_DAY = 144
-  const EARLY_GRACE = 48
-  const LATE_GRACE = 48
+  const MIN_INTERVAL = 120
+  const MAX_WINDOW = 144
 
-  function getCheckinWindow(createdAtBlock: number) {
-    const nominalLatest = createdAtBlock + BLOCKS_PER_DAY
-    const earliest = Math.max(0, nominalLatest - EARLY_GRACE)
-    const latest = nominalLatest + LATE_GRACE
+  function getCheckinWindow(lastCheckInBlock: number) {
+    const earliest = lastCheckInBlock + MIN_INTERVAL
+    const latest = lastCheckInBlock + MAX_WINDOW
     return { earliest, latest }
   }
 
   it('calculates earliest and latest correctly', () => {
     const created = 1000
     const { earliest, latest } = getCheckinWindow(created)
-    expect(earliest).toBe((created + BLOCKS_PER_DAY) - EARLY_GRACE)
-    expect(latest).toBe((created + BLOCKS_PER_DAY) + LATE_GRACE)
+    expect(earliest).toBe(created + MIN_INTERVAL)
+    expect(latest).toBe(created + MAX_WINDOW)
   })
 
-  it('allows check-in within grace window', () => {
+  it('allows check-in within the valid window', () => {
     const created = 0
     const { earliest, latest } = getCheckinWindow(created)
-    expect(earliest).toBe((0 + BLOCKS_PER_DAY) - EARLY_GRACE)
-    expect(latest).toBe((0 + BLOCKS_PER_DAY) + LATE_GRACE)
+    expect(earliest).toBe(created + MIN_INTERVAL)
+    expect(latest).toBe(created + MAX_WINDOW)
 
-    // within early window
-    expect(earliest).toBeLessThanOrEqual((created + BLOCKS_PER_DAY) - 10)
-
-    // within late window
-    expect(latest).toBeGreaterThanOrEqual((created + BLOCKS_PER_DAY) + 10)
+    expect(earliest).toBeLessThanOrEqual(created + MAX_WINDOW)
+    expect(latest).toBeGreaterThanOrEqual(created + MIN_INTERVAL)
   })
 })
