@@ -230,7 +230,7 @@
       existing
         (map-set member-groups
           { member: caller }
-          { group-ids: (unwrap! (as-max-len? (append (get group-ids existing) group-id) u20) ERR-GROUP-LIMIT-REACHED) }
+          { group-ids: (unwrap! (as-max-len? (append (get group-ids existing) (list group-id)) u20) ERR-GROUP-LIMIT-REACHED) }
         )
       (map-set member-groups
         { member: caller }
@@ -308,7 +308,7 @@
       existing
         (map-set member-groups
           { member: caller }
-          { group-ids: (unwrap! (as-max-len? (append (get group-ids existing) group-id) u20) ERR-GROUP-LIMIT-REACHED) }
+          { group-ids: (unwrap! (as-max-len? (append (get group-ids existing) (list group-id)) u20) ERR-GROUP-LIMIT-REACHED) }
         )
       (map-set member-groups
         { member: caller }
