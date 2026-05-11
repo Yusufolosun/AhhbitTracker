@@ -34,11 +34,16 @@ Records daily check-in for a habit.
 
 **Returns:** Updated streak count (uint)
 
+**Notes:**
+- Missed windows apply a partial forfeit (10% per missed day)
+- Streak resets after a missed window
+- Habit stays active unless the remaining stake reaches zero
+
 **Errors:**
 - `ERR-HABIT-NOT-FOUND` - Habit doesn't exist
 - `ERR-NOT-HABIT-OWNER` - Caller not owner
 - `ERR-ALREADY-CHECKED-IN` - Already checked in today
-- `ERR-HABIT-AUTO-SLASHED` - Missed check-in window and stake forfeited
+- `ERR-HABIT-ALREADY-COMPLETED` - Habit already inactive
 
 #### withdraw-stake
 Withdraws stake after completing minimum streak.
@@ -68,7 +73,7 @@ Claims bonus from forfeited pool.
 - `ERR-POOL-INSUFFICIENT-BALANCE` - Pool empty
 
 #### slash-habit
-Forfeits expired habit stake to pool.
+Applies partial forfeit for missed windows and updates remaining stake.
 
 **Parameters:**
 - `habit-id` (uint) - Expired habit to slash
@@ -141,6 +146,9 @@ Links users to their habit IDs.
 - `habit-id-nonce` - Counter for generating unique IDs
 - `forfeited-pool-balance` - Total STX in forfeiture pool
 - `unclaimed-completed-habits` - Eligible completed habits pending bonus claim
+
+### Penalty Tracking
+- `habit-penalties` - Tracks initial stake and missed check-in count per habit
 
 ## Testing
 
