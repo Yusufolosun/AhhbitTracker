@@ -513,10 +513,10 @@
 
 ;; Get anchored check-in window for a habit
 ;; Returns a named tuple { earliest: uint, latest: uint }
-(define-private (get-checkin-window (created-at-block uint))
+(define-private (get-checkin-window (last-check-in-block uint))
   (let
     (
-      (anchor created-at-block)
+      (anchor last-check-in-block)
       (nominal-latest (+ anchor BLOCKS-PER-DAY))
       (earliest (if (>= nominal-latest EARLY-GRACE-BLOCKS) (- nominal-latest EARLY-GRACE-BLOCKS) u0))
       (latest (+ nominal-latest LATE-GRACE-BLOCKS))
@@ -525,11 +525,11 @@
   )
 )
 
-;; Check if check-in is within valid window relative to habit creation
-(define-private (is-check-in-valid (created-at-block uint))
+;; Check if check-in is within valid window relative to last check-in
+(define-private (is-check-in-valid (last-check-in-block uint))
   (let
     (
-      (window (get-checkin-window created-at-block))
+      (window (get-checkin-window last-check-in-block))
       (earliest (get earliest window))
       (latest (get latest window))
     )
@@ -644,8 +644,8 @@
     
     ;; Check if already checked in within minimum interval
     (asserts! (not (already-checked-in-today last-check-in)) ERR-ALREADY-CHECKED-IN)
-    ;; Check if within anchored valid window (relative to creation)
-    (if (is-check-in-valid (get created-at-block habit))
+    ;; Check if within anchored valid window (relative to last check-in)
+    (if (is-check-in-valid last-check-in)
       ;; Valid check-in: increment streak
       (begin
         (map-set habits
@@ -703,8 +703,8 @@
     ;; Verify habit is still active
     (asserts! (get is-active habit) ERR-HABIT-ALREADY-COMPLETED)
     
-    ;; Verify window has actually expired relative to creation anchor
-    (asserts! (not (is-check-in-valid (get created-at-block habit))) ERR-NOT-AUTHORIZED)
+    ;; Verify window has actually expired relative to last check-in
+    (asserts! (not (is-check-in-valid last-check-in)) ERR-NOT-AUTHORIZED)
     
     ;; Move stake to pool
     (var-set forfeited-pool-balance (+ (var-get forfeited-pool-balance) stake-amount))
