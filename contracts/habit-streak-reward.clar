@@ -132,7 +132,7 @@
     (
       (caller tx-sender)
       (habit-data (unwrap! (contract-call? .habit-tracker-v2 get-habit habit-id)
-                           ERR-HABIT-NOT-FOUND))
+               ERR-HABIT-NOT-FOUND))
       (streak (get current-streak habit-data))
       (reward-data (unwrap! (map-get? milestone-rewards { milestone: milestone })
                             ERR-REWARD-NOT-SET))
