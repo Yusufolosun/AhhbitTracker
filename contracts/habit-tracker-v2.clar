@@ -707,8 +707,8 @@
     ;; Verify habit is still active
     (asserts! (get is-active habit) ERR-HABIT-ALREADY-COMPLETED)
     
-    ;; Verify window has actually expired
-    (asserts! (not (is-check-in-valid last-check-in)) ERR-NOT-AUTHORIZED)
+    ;; Verify window has actually expired relative to creation anchor
+    (asserts! (not (is-check-in-valid (get created-at-block habit))) ERR-NOT-AUTHORIZED)
     
     ;; Move stake to pool
     (var-set forfeited-pool-balance (+ (var-get forfeited-pool-balance) stake-amount))
@@ -922,7 +922,7 @@
   (match (map-get? habits { habit-id: habit-id })
     habit
       (if (and (get is-active habit)
-               (not (is-check-in-valid (get last-check-in-block habit))))
+               (not (is-check-in-valid (get created-at-block habit))))
         habit-id
         u0
       )
