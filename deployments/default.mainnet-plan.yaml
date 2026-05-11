@@ -16,17 +16,11 @@ plan:
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
-            contract-name: habit-accountability-group
-            expected-sender: SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z
-            cost: 166070
-            path: "contracts\\habit-accountability-group.clar"
-            anchor-block-only: true
-            clarity-version: 2
-        - contract-publish:
             contract-name: habit-streak-reward
             expected-sender: SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z
             cost: 71140
             path: "contracts\\habit-streak-reward.clar"
             anchor-block-only: true
             clarity-version: 2
+        # habit-accountability-group was merged into habit-tracker-v2; separate publish removed
       epoch: "2.5"
