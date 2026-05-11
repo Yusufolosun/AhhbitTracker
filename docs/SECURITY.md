@@ -225,7 +225,7 @@ for (let i = 0; i < 10; i++) {
 
 **1. Time-Based Forfeiture**
 
-**Risk:** Network congestion could prevent timely check-in
+**Risk:** Network congestion could prevent timely check-in and trigger 10% per missed day penalties
 
 **Mitigation:**
 - Check in early (don't wait until last minute)
