@@ -28,7 +28,7 @@ Please include the following information:
 
 1. **Never share your private keys or seed phrases**
 2. **Always verify the contract address before transacting:**
-   - `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2`
+   - `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3`
 3. **Use hardware wallets when possible**
 4. **Verify transaction parameters before signing**
 

@@ -11,14 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Mainnet redeployment** to new deployer address `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z`
 - Minimum stake reduced from 0.1 STX to 0.02 STX across all contracts
-- All 3 contracts deployed: `habit-tracker-v2`, `habit-streak-reward`, `habit-accountability-group`
+- All 3 contracts deployed: `habit-tracker-v3`, `habit-streak-reward-v3`, `habit-accountability-group-v3`
 
 ### Deployment
 
 - **Deployer:** `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z`
-- **habit-tracker-v2:** [Explorer](https://explorer.hiro.so/txid/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2?chain=mainnet)
-- **habit-streak-reward:** [Explorer](https://explorer.hiro.so/txid/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-streak-reward?chain=mainnet)
-- **habit-accountability-group:** [Explorer](https://explorer.hiro.so/txid/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-accountability-group?chain=mainnet)
+- **habit-tracker-v3:** [Explorer](https://explorer.hiro.so/txid/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3?chain=mainnet)
+- **habit-streak-reward-v3:** [Explorer](https://explorer.hiro.so/txid/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-streak-reward-v3?chain=mainnet)
+- **habit-accountability-group-v3:** [Explorer](https://explorer.hiro.so/txid/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-accountability-group-v3?chain=mainnet)
 - **Previous deployment (deprecated):** `SP1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK0DYG193.habit-tracker-v2`
 
 ---

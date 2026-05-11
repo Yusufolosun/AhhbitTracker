@@ -217,7 +217,7 @@ A: All transactions are public on the Stacks blockchain.
 
 ## Getting Help
 
-- **Contract Address:** `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2`
+- **Contract Address:** `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3`
 - **Documentation:** [GitHub Repository](https://github.com/Yusufolosun/AhhbitTracker)
 - **Issues:** Report bugs via GitHub Issues
 

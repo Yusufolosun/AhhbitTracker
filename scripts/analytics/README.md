@@ -50,7 +50,7 @@ The analytics scripts use these environment variables (with defaults):
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `CONTRACT_ADDRESS` | `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z` | Contract deployer address |
-| `CONTRACT_NAME` | `habit-tracker-v2` | Contract name |
+| `CONTRACT_NAME` | `habit-tracker-v3` | Contract name |
 | `STACKS_API_URL` | `https://api.mainnet.hiro.so` | Stacks API endpoint |
 
 ## Data Files

@@ -4,7 +4,7 @@ Complete reference for all contract functions and data structures.
 
 ## Contract Information
 
-**Address:** `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2`  
+**Address:** `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3`  
 **Network:** Stacks Mainnet  
 **Language:** Clarity v2  
 **Epoch:** 2.5
@@ -43,7 +43,7 @@ Creates a new habit with stake commitment.
 
 **Example:**
 ```clarity
-(contract-call? '.habit-tracker-v2 create-habit u"Morning Run" u500000)
+(contract-call? '.habit-tracker-v3 create-habit u"Morning Run" u500000)
 ;; Returns: (ok u1)
 ```
 
@@ -76,7 +76,7 @@ Records a daily check-in for a habit.
 
 **Example:**
 ```clarity
-(contract-call? '.habit-tracker-v2 check-in u1)
+(contract-call? '.habit-tracker-v3 check-in u1)
 ;; Returns: (ok u5) - Streak is now 5
 ```
 
@@ -114,7 +114,7 @@ Withdraws stake after completing minimum streak.
 
 **Example:**
 ```clarity
-(contract-call? '.habit-tracker-v2 withdraw-stake u1)
+(contract-call? '.habit-tracker-v3 withdraw-stake u1)
 ;; Returns: (ok u500000) - 0.5 STX returned
 ```
 
@@ -152,7 +152,7 @@ Claims bonus from forfeited pool.
 
 **Example:**
 ```clarity
-(contract-call? '.habit-tracker-v2 claim-bonus u1)
+(contract-call? '.habit-tracker-v3 claim-bonus u1)
 ;; Returns: (ok u250000) - Claimed 0.25 STX bonus
 ```
 
@@ -205,7 +205,7 @@ Retrieves habit details by ID.
 
 **Example:**
 ```clarity
-(contract-call? '.habit-tracker-v2 get-habit u1)
+(contract-call? '.habit-tracker-v3 get-habit u1)
 ;; Returns habit data or none
 ```
 
@@ -230,7 +230,7 @@ Gets all habit IDs for a user.
 
 **Example:**
 ```clarity
-(contract-call? '.habit-tracker-v2 get-user-habits 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z)
+(contract-call? '.habit-tracker-v3 get-user-habits 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z)
 ;; Returns: {habit-ids: (list u1 u2 u3)}
 ```
 
@@ -256,7 +256,7 @@ Gets current streak for a habit.
 
 **Example:**
 ```clarity
-(contract-call? '.habit-tracker-v2 get-habit-streak u1)
+(contract-call? '.habit-tracker-v3 get-habit-streak u1)
 ;; Returns: (ok u7)
 ```
 
@@ -280,7 +280,7 @@ Gets total balance in forfeited pool.
 
 **Example:**
 ```clarity
-(contract-call? '.habit-tracker-v2 get-pool-balance)
+(contract-call? '.habit-tracker-v3 get-pool-balance)
 ;; Returns: (ok u2500000) - Pool has 2.5 STX
 ```
 
@@ -342,7 +342,7 @@ Gets aggregated statistics for a user.
 
 **Example:**
 ```clarity
-(contract-call? '.habit-tracker-v2 get-user-stats 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z)
+(contract-call? '.habit-tracker-v3 get-user-stats 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z)
 ;; Returns: (ok {total-habits: u3, habit-ids: (list u1 u2 u3)})
 ```
 
@@ -397,8 +397,8 @@ Gets aggregated statistics for a user.
 | 114 | ERR-HABIT-AUTO-SLASHED | Habit auto-slashed after missed check-in window |
 
 Companion contract error ranges:
-- `u200`-`u209` are defined in `habit-streak-reward`
-- `u300`-`u313` are defined in `habit-accountability-group`
+- `u200`-`u209` are defined in `habit-streak-reward-v3`
+- `u300`-`u313` are defined in `habit-accountability-group-v3`
 
 ---
 
@@ -506,22 +506,22 @@ All public functions emit print events with relevant data.
 
 ```clarity
 ;; Step 1: Create habit
-(contract-call? '.habit-tracker-v2 create-habit u"Daily Meditation" u200000)
+(contract-call? '.habit-tracker-v3 create-habit u"Daily Meditation" u200000)
 ;; Returns: (ok u1)
 
 ;; Step 2: Check in daily for 7 days
-(contract-call? '.habit-tracker-v2 check-in u1)
+(contract-call? '.habit-tracker-v3 check-in u1)
 ;; Day 1: (ok u1)
 ;; ... wait 145 blocks
 ;; Day 2: (ok u2)
 ;; ... continue for 7 days
 
 ;; Step 3: Withdraw stake
-(contract-call? '.habit-tracker-v2 withdraw-stake u1)
+(contract-call? '.habit-tracker-v3 withdraw-stake u1)
 ;; Returns: (ok u200000)
 
 ;; Step 4: Claim bonus (if pool has balance)
-(contract-call? '.habit-tracker-v2 claim-bonus u1)
+(contract-call? '.habit-tracker-v3 claim-bonus u1)
 ;; Returns: (ok u[bonus-amount])
 ```
 
@@ -529,15 +529,15 @@ All public functions emit print events with relevant data.
 
 ```clarity
 ;; Get all user habits
-(contract-call? '.habit-tracker-v2 get-user-stats 'SP...)
+(contract-call? '.habit-tracker-v3 get-user-stats 'SP...)
 ;; Returns total habits and IDs
 
 ;; Get specific habit details
-(contract-call? '.habit-tracker-v2 get-habit u1)
+(contract-call? '.habit-tracker-v3 get-habit u1)
 ;; Returns full habit data
 
 ;; Check current streak
-(contract-call? '.habit-tracker-v2 get-habit-streak u1)
+(contract-call? '.habit-tracker-v3 get-habit-streak u1)
 ;; Returns streak count
 ```
 
@@ -556,7 +556,7 @@ import { STACKS_MAINNET } from '@stacks/network';
 
 const txOptions = {
   contractAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
-  contractName: 'habit-tracker-v2',
+  contractName: 'habit-tracker-v3',
   functionName: 'create-habit',
   functionArgs: [
     stringUtf8CV('Morning Exercise'),
@@ -587,6 +587,6 @@ No built-in rate limiting. Frontend should implement:
 
 ## Support
 
-- **Contract Explorer:** https://explorer.hiro.so/address/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2?chain=mainnet
+- **Contract Explorer:** https://explorer.hiro.so/address/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3?chain=mainnet
 - **Documentation:** https://github.com/Yusufolosun/AhhbitTracker
 - **Issues:** https://github.com/Yusufolosun/AhhbitTracker/issues

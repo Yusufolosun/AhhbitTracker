@@ -27,7 +27,7 @@ AhhbitTracker is a decentralized habit tracking application built on the Stacks 
                │
 ┌──────────────▼──────────────────────────┐
 │        Stacks Blockchain Layer          │
-│  - habit-tracker-v2.clar (Smart Contract)  │
+│  - habit-tracker-v3.clar (Smart Contract)  │
 │  - STX Token Transfers                  │
 │  - Block-based Timing                   │
 └──────────────┬──────────────────────────┘

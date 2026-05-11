@@ -24,7 +24,7 @@ npm run dev:test get-habit 1
 
 ## Contract Info
 
-**Address:** `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2`
+**Address:** `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3`
 **Network:** Mainnet
 **API:** https://api.mainnet.hiro.so
 

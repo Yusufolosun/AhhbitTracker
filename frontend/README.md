@@ -41,7 +41,7 @@ npm run dev                  # → http://localhost:3000
 | `VITE_STACKS_NETWORK` | stage-based | Selects `mainnet` or `testnet` defaults |
 | `VITE_STACKS_API_URL` | stage-based | Stacks API base URL used by the dev proxy |
 | `VITE_CONTRACT_ADDRESS` | `SP1N3809...` | Contract principal |
-| `VITE_CONTRACT_NAME` | `habit-tracker-v2` | Contract name |
+| `VITE_CONTRACT_NAME` | `habit-tracker-v3` | Contract name |
 | `VITE_ANALYTICS_ENABLED` | `true` | Enable or disable frontend analytics emission |
 | `VITE_ANALYTICS_ENDPOINT` | _(unset)_ | Optional analytics ingestion endpoint |
 | `VITE_ANALYTICS_WRITE_KEY` | _(unset)_ | Optional ingestion auth key sent as `X-Analytics-Key` |

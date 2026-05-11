@@ -13,7 +13,7 @@ clarinet console --mainnet
 ### Transaction 1: Create First Habit
 
 ```clarity
-(contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2 
+(contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3 
   create-habit 
   u"Morning Exercise" 
   u100000)
@@ -22,7 +22,7 @@ clarinet console --mainnet
 ### Transaction 2: Create Second Habit
 
 ```clarity
-(contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2 
+(contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3 
   create-habit 
   u"Daily Reading" 
   u1000000)
@@ -33,7 +33,7 @@ clarinet console --mainnet
 ### Transaction 3: First Check-in
 
 ```clarity
-(contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2 
+(contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3 
   check-in 
   u1)
 ```
@@ -41,7 +41,7 @@ clarinet console --mainnet
 ### Transaction 8: Second Check-in (After 144 blocks)
 
 ```clarity
-(contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2 
+(contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3 
   check-in 
   u1)
 ```
@@ -53,7 +53,7 @@ clarinet console --mainnet
 ### Query: Get Habit
 
 ```clarity
-(contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2 
+(contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3 
   get-habit 
   u1)
 ```
@@ -61,7 +61,7 @@ clarinet console --mainnet
 ### Query: Get User Habits
 
 ```clarity
-(contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2 
+(contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3 
   get-user-habits 
   'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z)
 ```
@@ -69,14 +69,14 @@ clarinet console --mainnet
 ### Query: Get Pool Balance
 
 ```clarity
-(contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2 
+(contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3 
   get-pool-balance)
 ```
 
 ### Query: Get User Stats
 
 ```clarity
-(contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2 
+(contract-call? 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3 
   get-user-stats 
   'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z)
 ```
@@ -92,7 +92,7 @@ block-height
 ### Check Contract Balance
 
 ```clarity
-(stx-get-balance 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2)
+(stx-get-balance 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3)
 ```
 
 ### Check User Balance
