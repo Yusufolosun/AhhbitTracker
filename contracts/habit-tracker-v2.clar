@@ -30,6 +30,15 @@
 ;; ~144 blocks per day on Stacks (10 min per block)
 (define-constant CHECK-IN-WINDOW u144)
 
+;; Derived timing constants
+;; ~6 blocks per hour (144 / 24)
+(define-constant BLOCKS-PER-HOUR u6)
+;; Blocks per 24h day
+(define-constant BLOCKS-PER-DAY u144)
+;; Early and late grace windows (8 hours each -> 48 blocks)
+(define-constant EARLY-GRACE-BLOCKS u48)
+(define-constant LATE-GRACE-BLOCKS u48)
+
 ;; Minimum interval between check-ins (in blocks)
 ;; ~120 blocks = ~20 hours minimum between check-ins
 ;; Prevents streak farming while allowing flexibility for users
