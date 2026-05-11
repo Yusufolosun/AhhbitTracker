@@ -47,6 +47,11 @@
 ;; Minimum streak required for withdrawal
 (define-constant MIN-STREAK-FOR-WITHDRAWAL u7)
 
+;; Partial forfeit settings (basis points)
+;; 10% per missed day => 1000 / 10000
+(define-constant FORFEIT-BPS-PER-MISS u1000)
+(define-constant BPS-DENOMINATOR u10000)
+
 ;; Bonus distribution uses dynamic equal-share allocation across
 ;; completed habits that have not claimed yet.
 
@@ -85,6 +90,15 @@
     is-active: bool,
     is-completed: bool,
     bonus-claimed: bool
+  }
+)
+
+;; Tracks original stake and applied missed check-ins per habit
+(define-map habit-penalties
+  { habit-id: uint }
+  {
+    initial-stake-amount: uint,
+    missed-checkins: uint
   }
 )
 
