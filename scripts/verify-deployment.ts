@@ -61,7 +61,7 @@ async function verifyDeployment(contractPrincipal: string) {
 const contractPrincipal = process.argv[2];
 if (!contractPrincipal) {
   console.log("Usage: ts-node verify-deployment.ts <CONTRACT_PRINCIPAL>");
-  console.log("Example: ts-node verify-deployment.ts SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2");
+  console.log("Example: ts-node verify-deployment.ts SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3");
   process.exit(1);
 }
 
