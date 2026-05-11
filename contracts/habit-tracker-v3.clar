@@ -771,35 +771,60 @@
       (habit (unwrap! (map-get? habits { habit-id: habit-id }) ERR-HABIT-NOT-FOUND))
       (last-check-in (get last-check-in-block habit))
       (stake-amount (get stake-amount habit))
+      (penalty-data (default-to { initial-stake-amount: stake-amount, missed-checkins: u0 }
+        (map-get? habit-penalties { habit-id: habit-id })))
+      (initial-stake (get initial-stake-amount penalty-data))
+      (applied-missed (get missed-checkins penalty-data))
+      (missed-total (get-missed-checkins last-check-in))
+      (new-missed (if (> missed-total applied-missed) (- missed-total applied-missed) u0))
     )
     ;; Verify habit is still active
     (asserts! (get is-active habit) ERR-HABIT-ALREADY-COMPLETED)
     
     ;; Verify window has actually expired relative to last check-in
     (asserts! (not (is-check-in-valid last-check-in)) ERR-NOT-AUTHORIZED)
-    
-    ;; Move stake to pool
-    (var-set forfeited-pool-balance (+ (var-get forfeited-pool-balance) stake-amount))
-    
-    ;; Mark habit as inactive
-    (map-set habits
-      { habit-id: habit-id }
-      (merge habit {
-        current-streak: u0,
-        is-active: false
+    ;; Only apply penalties for newly missed windows
+    (asserts! (> new-missed u0) ERR-NOT-AUTHORIZED)
+
+    (let
+      (
+        (raw-penalty (calculate-missed-penalty initial-stake new-missed))
+        (applied-penalty (if (> raw-penalty stake-amount) stake-amount raw-penalty))
+        (remaining-after (- stake-amount applied-penalty))
+        (is-active-after (> remaining-after u0))
+      )
+      ;; Move penalty to pool
+      (var-set forfeited-pool-balance (+ (var-get forfeited-pool-balance) applied-penalty))
+
+      ;; Update habit stake and streak
+      (map-set habits
+        { habit-id: habit-id }
+        (merge habit {
+          stake-amount: remaining-after,
+          current-streak: u0,
+          is-active: is-active-after
+        })
+      )
+
+      ;; Track applied missed check-ins
+      (map-set habit-penalties
+        { habit-id: habit-id }
+        (merge penalty-data { missed-checkins: (+ applied-missed new-missed) })
+      )
+
+      ;; Emit event
+      (print {
+        event: "habit-slashed",
+        habit-id: habit-id,
+        slasher: tx-sender,
+        missed-checkins: missed-total,
+        amount: applied-penalty,
+        remaining-stake: remaining-after,
+        block: block-height
       })
+
+      (ok true)
     )
-    
-    ;; Emit event
-    (print {
-      event: "habit-slashed",
-      habit-id: habit-id,
-      slasher: tx-sender,
-      amount: stake-amount,
-      block: block-height
-    })
-    
-    (ok true)
   )
 )
 
