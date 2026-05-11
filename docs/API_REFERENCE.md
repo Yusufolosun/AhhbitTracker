@@ -499,6 +499,33 @@ All public functions emit print events with relevant data.
 }
 ```
 
+### habit-check-in-penalized Event
+```clarity
+{
+  event: "habit-check-in-penalized",
+  habit-id: uint,
+  owner: principal,
+  missed-checkins: uint,
+  penalty: uint,
+  remaining-stake: uint,
+  new-streak: uint,
+  block: uint
+}
+```
+
+### habit-slashed Event
+```clarity
+{
+  event: "habit-slashed",
+  habit-id: uint,
+  slasher: principal,
+  missed-checkins: uint,
+  amount: uint,
+  remaining-stake: uint,
+  block: uint
+}
+```
+
 ### stake-withdrawn Event
 ```clarity
 {
