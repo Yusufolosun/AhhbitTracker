@@ -224,7 +224,7 @@ current-block-height - last-check-in-block ≥ MIN-CHECK-IN-INTERVAL (120 blocks
 current-block-height - last-check-in-block ≤ CHECK-IN-WINDOW (144 blocks)
 ```
 
-If user checks in after 144 blocks from last check-in, streak is broken and stake forfeited.
+If a user checks in after the window, the streak resets and a 10% per missed day penalty is applied to the remaining stake.
 
 ## Fee Structure
 
@@ -248,8 +248,8 @@ If user checks in after 144 blocks from last check-in, streak is broken and stak
 - 70 users maintain streaks
 - 30 users miss check-ins
 
-**Forfeited pool:** 30 STX
-**Per successful user bonus:** 30 STX ÷ 70 = **~0.43 STX**
+**Forfeited pool:** 3 STX (10% of 30 missed 1 STX stakes)
+**Per successful user bonus:** 3 STX ÷ 70 = **~0.043 STX**
 
 In implementation, payout is recalculated per claim as:
 `forfeited-pool-balance / unclaimed-completed-habits`
