@@ -678,6 +678,10 @@
       (habit (unwrap! (map-get? habits { habit-id: habit-id }) ERR-HABIT-NOT-FOUND))
       (last-check-in (get last-check-in-block habit))
       (current-streak (get current-streak habit))
+      (penalty-data (default-to { initial-stake-amount: (get stake-amount habit), missed-checkins: u0 }
+        (map-get? habit-penalties { habit-id: habit-id })))
+      (initial-stake (get initial-stake-amount penalty-data))
+      (applied-missed (get missed-checkins penalty-data))
     )
     ;; Verify caller is habit owner
     (asserts! (is-eq caller (get owner habit)) ERR-NOT-HABIT-OWNER)
@@ -698,6 +702,10 @@
             last-check-in-block: block-height
           })
         )
+        (map-set habit-penalties
+          { habit-id: habit-id }
+          (merge penalty-data { missed-checkins: u0 })
+        )
         ;; Emit event
         (print {
           event: "habit-checked-in",
@@ -708,25 +716,46 @@
         })
         (ok (+ current-streak u1))
       )
-      ;; Missed window: auto-slash - forfeit stake and deactivate
+      ;; Missed window: apply partial forfeits and reset streak
       (begin
-        (var-set forfeited-pool-balance
-          (+ (var-get forfeited-pool-balance) (get stake-amount habit)))
-        (map-set habits
-          { habit-id: habit-id }
-          (merge habit {
-            current-streak: u0,
-            is-active: false
+        (let
+          (
+            (missed-total (get-missed-checkins last-check-in))
+            (new-missed (if (> missed-total applied-missed) (- missed-total applied-missed) u0))
+            (raw-penalty (calculate-missed-penalty initial-stake new-missed))
+            (remaining-stake (get stake-amount habit))
+            (applied-penalty (if (> raw-penalty remaining-stake) remaining-stake raw-penalty))
+            (remaining-after (- remaining-stake applied-penalty))
+            (is-active-after (> remaining-after u0))
+            (new-streak (if is-active-after u1 u0))
+          )
+          (var-set forfeited-pool-balance
+            (+ (var-get forfeited-pool-balance) applied-penalty))
+          (map-set habits
+            { habit-id: habit-id }
+            (merge habit {
+              stake-amount: remaining-after,
+              current-streak: new-streak,
+              last-check-in-block: block-height,
+              is-active: is-active-after
+            })
+          )
+          (map-set habit-penalties
+            { habit-id: habit-id }
+            (merge penalty-data { missed-checkins: u0 })
+          )
+          (print {
+            event: "habit-check-in-penalized",
+            habit-id: habit-id,
+            owner: caller,
+            missed-checkins: missed-total,
+            penalty: applied-penalty,
+            remaining-stake: remaining-after,
+            new-streak: new-streak,
+            block: block-height
           })
+          (ok new-streak)
         )
-        (print {
-          event: "habit-auto-slashed",
-          habit-id: habit-id,
-          owner: caller,
-          amount: (get stake-amount habit),
-          block: block-height
-        })
-        ERR-HABIT-AUTO-SLASHED
       )
     )
   )
