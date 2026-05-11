@@ -5,6 +5,18 @@ All notable changes to AhhbitTracker will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Check-in windows now anchor to the last successful check-in
+- Missed check-ins apply partial forfeits (10% per missed day) instead of full stake loss
+- Penalty tracking added for missed check-ins and slashing
+
+### Documentation
+
+- Updated contract and user docs to reflect partial forfeits and new events
+
 ## [1.1.0] - 2026-02-18
 
 ### Changed
