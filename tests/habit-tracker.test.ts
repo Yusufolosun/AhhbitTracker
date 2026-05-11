@@ -9,7 +9,9 @@ const user3 = accounts.get("wallet_3")!;
 
 // Test Helpers
 const MIN_STAKE = 20000; // 0.02 STX in microSTX
-const MIN_CHECK_IN_INTERVAL = 120;
+// Minimum interval between check-ins (blocks)
+// Adjusted to allow early grace: 16 hours = 96 blocks
+const MIN_CHECK_IN_INTERVAL = 96;
 const MAX_STAKE_AMOUNT = 100_000_000; // 100 STX in microSTX
 const VALID_HABIT_NAME = "Daily Exercise";
 const MAX_NAME_LENGTH = 50;
@@ -249,65 +251,64 @@ describe("AhhbitTracker Contract", () => {
 
     it("should increment streak on consecutive check-ins", () => {
       checkIn(user1, habitId);
-      simnet.mineEmptyBlocks(120); // MIN-CHECK-IN-INTERVAL
+      simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL); // MIN-CHECK-IN-INTERVAL
       const result = checkIn(user1, habitId);
 
       expect(result.result).toBeOk(Cl.uint(2));
     });
 
-    it("should prevent check-in before minimum interval (120 blocks)", () => {
+    it("should prevent check-in before minimum interval (96 blocks)", () => {
       // First check-in succeeds
       const first = checkIn(user1, habitId);
       expect(first.result).toBeOk(Cl.uint(1));
 
       // Try to check in after only 1 block → should fail
-      // blocks-elapsed = 1 < MIN-CHECK-IN-INTERVAL(120) → blocked
+      // blocks-elapsed = 1 < MIN-CHECK_IN_INTERVAL(96) → blocked
       const second = checkIn(user1, habitId);
       expect(second.result).toBeErr(Cl.uint(105)); // ERR-ALREADY-CHECKED-IN
     });
 
-    it("should prevent check-in before minimum interval (119 blocks)", () => {
+    it("should prevent check-in before minimum interval (95 blocks)", () => {
       checkIn(user1, habitId);
-      // callPublicFn mines a block for the attempted check-in, so mine 118 here
-      // to keep elapsed blocks strictly below the 120 minimum interval.
-      simnet.mineEmptyBlocks(118);
+      // callPublicFn mines a block for the attempted check-in, so mine 94 here
+      // to keep elapsed blocks strictly below the 96 minimum interval.
+      simnet.mineEmptyBlocks(94);
 
       const result = checkIn(user1, habitId);
       expect(result.result).toBeErr(Cl.uint(105)); // ERR-ALREADY-CHECKED-IN
     });
 
-    it("should allow check-in at exactly 120 blocks (minimum interval)", () => {
+    it("should allow check-in at exactly 96 blocks (minimum interval)", () => {
       checkIn(user1, habitId);
-      simnet.mineEmptyBlocks(120); // Exactly at minimum
+      simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL); // Exactly at minimum
 
       const result = checkIn(user1, habitId);
       expect(result.result).toBeOk(Cl.uint(2));
     });
 
-    it("should allow check-in at exactly 143 blocks later (inside window)", () => {
+    it("should allow check-in near the late boundary and increment streak", () => {
+      // checkIn at block N → mine 191 empty blocks → next checkIn at N+192 (latest allowed)
       checkIn(user1, habitId);
-      simnet.mineEmptyBlocks(143);
+      simnet.mineEmptyBlocks(191);
 
       const result = checkIn(user1, habitId);
       expect(result.result).toBeOk(Cl.uint(2));
     });
 
-    it("should succeed at the 144-block boundary (last valid block)", () => {
-      // checkIn at block N → mine 143 empty blocks → next checkIn at N+144
-      // elapsed = 144 ≤ CHECK-IN-WINDOW(144) → valid
+    it("should succeed at the 192-block boundary (last valid block)", () => {
+      // checkIn at block N → mine 191 empty blocks → next checkIn at N+192
       checkIn(user1, habitId);
-      simnet.mineEmptyBlocks(143);
+      simnet.mineEmptyBlocks(191);
 
       const result = checkIn(user1, habitId);
       expect(result.result).toBeOk(Cl.uint(2));
     });
 
-    it("should auto-slash check-in 1 block past the window (145 elapsed)", () => {
-      // checkIn at block N → mine 144 empty blocks → next checkIn at N+145
-      // elapsed = 145 > CHECK-IN-WINDOW(144) → check-in returns ERR-HABIT-AUTO-SLASHED
-      // Note: because this is an err return, state changes in that branch are rolled back.
+    it("should auto-slash check-in 1 block past the window (193 elapsed)", () => {
+      // checkIn at block N → mine 192 empty blocks → next checkIn at N+193
+      // elapsed = 193 > latest allowed (192) → check-in returns ERR-HABIT-AUTO-SLASHED
       checkIn(user1, habitId);
-      simnet.mineEmptyBlocks(144);
+      simnet.mineEmptyBlocks(192);
 
       const result = checkIn(user1, habitId);
       expect(result.result).toBeErr(Cl.uint(114));
