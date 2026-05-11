@@ -20,7 +20,7 @@ describe("habit lifecycle e2e", () => {
     expect(withdrawal.result).toBeOk(Cl.uint(MIN_STAKE));
 
     const habit = simnet.callReadOnlyFn(
-      "habit-tracker-v2",
+      "habit-tracker-v3",
       "get-habit",
       [Cl.uint(habitId)],
       deployer,
@@ -28,7 +28,7 @@ describe("habit lifecycle e2e", () => {
     expect(habit.result).not.toBeNone();
 
     const streak = simnet.callReadOnlyFn(
-      "habit-tracker-v2",
+      "habit-tracker-v3",
       "get-habit-streak",
       [Cl.uint(habitId)],
       deployer,
@@ -36,7 +36,7 @@ describe("habit lifecycle e2e", () => {
     expect(streak.result).toBeOk(Cl.uint(7));
 
     const unclaimed = simnet.callReadOnlyFn(
-      "habit-tracker-v2",
+      "habit-tracker-v3",
       "get-unclaimed-completed-habits",
       [],
       deployer,

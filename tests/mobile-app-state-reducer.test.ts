@@ -8,7 +8,7 @@ function withState(overrides: Partial<AppState> = {}): AppState {
     isHydrating: false,
     preview: {
       contractAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
-      contractName: 'habit-tracker-v2',
+      contractName: 'habit-tracker-v3',
       functionName: 'check-in',
       functionArgsHex: ['0x01'],
       postConditionMode: 'Deny',
@@ -74,7 +74,7 @@ describe('mobile app state reducer', () => {
       payload: {
         preview: {
           contractAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
-          contractName: 'habit-tracker-v2',
+          contractName: 'habit-tracker-v3',
           functionName: 'withdraw-stake',
           functionArgsHex: ['0x02'],
           postConditionMode: 'Deny',

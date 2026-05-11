@@ -28,7 +28,7 @@ describe("expired habit e2e", () => {
     expect(slash.result).toBeOk(Cl.bool(true));
 
     const pool = simnet.callReadOnlyFn(
-      "habit-tracker-v2",
+      "habit-tracker-v3",
       "get-pool-balance",
       [],
       deployer,
@@ -36,7 +36,7 @@ describe("expired habit e2e", () => {
     expect(pool.result).toBeOk(Cl.uint(MIN_STAKE));
 
     const habit = simnet.callReadOnlyFn(
-      "habit-tracker-v2",
+      "habit-tracker-v3",
       "get-habit",
       [Cl.uint(habitId)],
       deployer,

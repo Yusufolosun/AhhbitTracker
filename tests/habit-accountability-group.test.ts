@@ -14,7 +14,7 @@ const GROUP_DURATION = 144; // ~1 day in blocks
 // Habit-tracker helpers
 function createHabit(caller: string, name: string, stake: number) {
   return simnet.callPublicFn(
-    "habit-tracker-v2",
+    "habit-tracker-v3",
     "create-habit",
     [Cl.stringUtf8(name), Cl.uint(stake)],
     caller
@@ -23,7 +23,7 @@ function createHabit(caller: string, name: string, stake: number) {
 
 function checkIn(caller: string, habitId: number) {
   return simnet.callPublicFn(
-    "habit-tracker-v2",
+    "habit-tracker-v3",
     "check-in",
     [Cl.uint(habitId)],
     caller
@@ -33,7 +33,7 @@ function checkIn(caller: string, habitId: number) {
 // Accountability group helpers
 function createGroup(caller: string, stake: number, duration: number, habitId: number) {
   return simnet.callPublicFn(
-    "habit-accountability-group",
+    "habit-accountability-group-v3",
     "create-group",
     [Cl.uint(stake), Cl.uint(duration), Cl.uint(habitId)],
     caller
@@ -42,7 +42,7 @@ function createGroup(caller: string, stake: number, duration: number, habitId: n
 
 function joinGroup(caller: string, groupId: number, habitId: number) {
   return simnet.callPublicFn(
-    "habit-accountability-group",
+    "habit-accountability-group-v3",
     "join-group",
     [Cl.uint(groupId), Cl.uint(habitId)],
     caller
@@ -51,7 +51,7 @@ function joinGroup(caller: string, groupId: number, habitId: number) {
 
 function settleMember(caller: string, groupId: number, member: string) {
   return simnet.callPublicFn(
-    "habit-accountability-group",
+    "habit-accountability-group-v3",
     "settle-member",
     [Cl.uint(groupId), Cl.principal(member)],
     caller
@@ -60,7 +60,7 @@ function settleMember(caller: string, groupId: number, member: string) {
 
 function claimGroupReward(caller: string, groupId: number) {
   return simnet.callPublicFn(
-    "habit-accountability-group",
+    "habit-accountability-group-v3",
     "claim-group-reward",
     [Cl.uint(groupId)],
     caller
@@ -69,7 +69,7 @@ function claimGroupReward(caller: string, groupId: number) {
 
 function getGroup(groupId: number) {
   return simnet.callReadOnlyFn(
-    "habit-accountability-group",
+    "habit-accountability-group-v3",
     "get-group",
     [Cl.uint(groupId)],
     deployer
@@ -78,7 +78,7 @@ function getGroup(groupId: number) {
 
 function getMemberInfo(groupId: number, member: string) {
   return simnet.callReadOnlyFn(
-    "habit-accountability-group",
+    "habit-accountability-group-v3",
     "get-member-info",
     [Cl.uint(groupId), Cl.principal(member)],
     deployer
@@ -87,7 +87,7 @@ function getMemberInfo(groupId: number, member: string) {
 
 function getMemberGroups(member: string) {
   return simnet.callReadOnlyFn(
-    "habit-accountability-group",
+    "habit-accountability-group-v3",
     "get-member-groups",
     [Cl.principal(member)],
     deployer
@@ -96,7 +96,7 @@ function getMemberGroups(member: string) {
 
 function finalizeGroup(caller: string, groupId: number) {
   return simnet.callPublicFn(
-    "habit-accountability-group",
+    "habit-accountability-group-v3",
     "finalize-group",
     [Cl.uint(groupId)],
     caller
@@ -237,7 +237,7 @@ describe("Habit Accountability Group Contract", () => {
       joinGroup(user2, 1, 2);
 
       const result = simnet.callReadOnlyFn(
-        "habit-accountability-group",
+        "habit-accountability-group-v3",
         "get-group-share",
         [Cl.uint(1)],
         deployer
@@ -247,7 +247,7 @@ describe("Habit Accountability Group Contract", () => {
 
       // Verify total groups
       const total = simnet.callReadOnlyFn(
-        "habit-accountability-group",
+        "habit-accountability-group-v3",
         "get-total-groups",
         [],
         deployer
@@ -578,7 +578,7 @@ describe("Habit Accountability Group Contract", () => {
       createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
 
       const total = simnet.callReadOnlyFn(
-        "habit-accountability-group",
+        "habit-accountability-group-v3",
         "get-total-groups",
         [],
         deployer
@@ -602,7 +602,7 @@ describe("Habit Accountability Group Contract", () => {
       settleMember(deployer, 1, user2);
 
       const share = simnet.callReadOnlyFn(
-        "habit-accountability-group",
+        "habit-accountability-group-v3",
         "get-group-share",
         [Cl.uint(1)],
         deployer
@@ -645,9 +645,9 @@ describe("Habit Accountability Group Contract", () => {
 
       // Build a check-in then let it expire and get slashed
       simnet.mineEmptyBlocks(1);
-      simnet.callPublicFn("habit-tracker-v2", "check-in", [Cl.uint(1)], user1);
+      simnet.callPublicFn("habit-tracker-v3", "check-in", [Cl.uint(1)], user1);
       simnet.mineEmptyBlocks(150);
-      simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(1)], user2);
+      simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(1)], user2);
 
       // Try to create a group with the slashed habit
       const result = createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
@@ -659,7 +659,7 @@ describe("Habit Accountability Group Contract", () => {
       buildStreak(user1, 1, 7);
 
       // Withdraw stake - habit becomes completed, is-active = false
-      simnet.callPublicFn("habit-tracker-v2", "withdraw-stake", [Cl.uint(1)], user1);
+      simnet.callPublicFn("habit-tracker-v3", "withdraw-stake", [Cl.uint(1)], user1);
 
       const result = createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
       expect(result.result).toBeErr(Cl.uint(312)); // ERR-INVALID-HABIT
@@ -672,9 +672,9 @@ describe("Habit Accountability Group Contract", () => {
 
       // Slash user2's habit
       simnet.mineEmptyBlocks(1);
-      simnet.callPublicFn("habit-tracker-v2", "check-in", [Cl.uint(2)], user2);
+      simnet.callPublicFn("habit-tracker-v3", "check-in", [Cl.uint(2)], user2);
       simnet.mineEmptyBlocks(150);
-      simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(2)], user3);
+      simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(2)], user3);
 
       // Try to join with slashed habit
       const result = joinGroup(user2, 1, 2);
@@ -688,7 +688,7 @@ describe("Habit Accountability Group Contract", () => {
 
       // Complete user2's habit
       buildStreak(user2, 2, 7);
-      simnet.callPublicFn("habit-tracker-v2", "withdraw-stake", [Cl.uint(2)], user2);
+      simnet.callPublicFn("habit-tracker-v3", "withdraw-stake", [Cl.uint(2)], user2);
 
       const result = joinGroup(user2, 1, 2);
       expect(result.result).toBeErr(Cl.uint(312)); // ERR-INVALID-HABIT
@@ -816,7 +816,7 @@ describe("Habit Accountability Group Contract", () => {
       createGroup(user1, GROUP_STAKE, GROUP_DURATION, 1);
 
       const result = simnet.callPublicFn(
-        "habit-accountability-group", "finalize-group",
+        "habit-accountability-group-v3", "finalize-group",
         [Cl.uint(1)], deployer
       );
       expect(result.result).toBeErr(Cl.uint(306)); // ERR-GROUP-STILL-ACTIVE
@@ -917,19 +917,19 @@ describe("Habit Accountability Group Contract", () => {
 
       // Finalize
       simnet.callPublicFn(
-        "habit-accountability-group", "finalize-group",
+        "habit-accountability-group-v3", "finalize-group",
         [Cl.uint(1)], deployer
       );
 
       // Both members get refunded
       const refund1 = simnet.callPublicFn(
-        "habit-accountability-group", "refund-failed-group",
+        "habit-accountability-group-v3", "refund-failed-group",
         [Cl.uint(1), Cl.principal(user1)], deployer
       );
       expect(refund1.result).toBeOk(Cl.uint(GROUP_STAKE));
 
       const refund2 = simnet.callPublicFn(
-        "habit-accountability-group", "refund-failed-group",
+        "habit-accountability-group-v3", "refund-failed-group",
         [Cl.uint(1), Cl.principal(user2)], deployer
       );
       expect(refund2.result).toBeOk(Cl.uint(GROUP_STAKE));
@@ -950,13 +950,13 @@ describe("Habit Accountability Group Contract", () => {
 
       // Finalize
       simnet.callPublicFn(
-        "habit-accountability-group", "finalize-group",
+        "habit-accountability-group-v3", "finalize-group",
         [Cl.uint(1)], deployer
       );
 
       // Refund should fail - successful-count > 0
       const result = simnet.callPublicFn(
-        "habit-accountability-group", "refund-failed-group",
+        "habit-accountability-group-v3", "refund-failed-group",
         [Cl.uint(1), Cl.principal(user2)], deployer
       );
       expect(result.result).toBeErr(Cl.uint(311)); // ERR-NOT-ELIGIBLE
@@ -972,7 +972,7 @@ describe("Habit Accountability Group Contract", () => {
 
       // Group not finalized yet → is-settled = false
       const result = simnet.callPublicFn(
-        "habit-accountability-group", "refund-failed-group",
+        "habit-accountability-group-v3", "refund-failed-group",
         [Cl.uint(1), Cl.principal(user1)], deployer
       );
       expect(result.result).toBeErr(Cl.uint(306)); // ERR-GROUP-STILL-ACTIVE
@@ -987,19 +987,19 @@ describe("Habit Accountability Group Contract", () => {
       settleMember(deployer, 1, user1);
 
       simnet.callPublicFn(
-        "habit-accountability-group", "finalize-group",
+        "habit-accountability-group-v3", "finalize-group",
         [Cl.uint(1)], deployer
       );
 
       // First refund works
       simnet.callPublicFn(
-        "habit-accountability-group", "refund-failed-group",
+        "habit-accountability-group-v3", "refund-failed-group",
         [Cl.uint(1), Cl.principal(user1)], deployer
       );
 
       // Second refund fails
       const result = simnet.callPublicFn(
-        "habit-accountability-group", "refund-failed-group",
+        "habit-accountability-group-v3", "refund-failed-group",
         [Cl.uint(1), Cl.principal(user1)], deployer
       );
       expect(result.result).toBeErr(Cl.uint(310)); // ERR-ALREADY-CLAIMED
@@ -1014,12 +1014,12 @@ describe("Habit Accountability Group Contract", () => {
       settleMember(deployer, 1, user1);
 
       simnet.callPublicFn(
-        "habit-accountability-group", "finalize-group",
+        "habit-accountability-group-v3", "finalize-group",
         [Cl.uint(1)], deployer
       );
 
       const result = simnet.callPublicFn(
-        "habit-accountability-group", "refund-failed-group",
+        "habit-accountability-group-v3", "refund-failed-group",
         [Cl.uint(1), Cl.principal(user2)], deployer
       );
       expect(result.result).toBeErr(Cl.uint(304)); // ERR-NOT-MEMBER
@@ -1034,13 +1034,13 @@ describe("Habit Accountability Group Contract", () => {
       settleMember(deployer, 1, user1);
 
       simnet.callPublicFn(
-        "habit-accountability-group", "finalize-group",
+        "habit-accountability-group-v3", "finalize-group",
         [Cl.uint(1)], deployer
       );
 
       // user3 (non-member) triggers refund for user1
       const result = simnet.callPublicFn(
-        "habit-accountability-group", "refund-failed-group",
+        "habit-accountability-group-v3", "refund-failed-group",
         [Cl.uint(1), Cl.principal(user1)], user3
       );
       expect(result.result).toBeOk(Cl.uint(GROUP_STAKE));
@@ -1063,25 +1063,25 @@ describe("Habit Accountability Group Contract", () => {
       settleMember(deployer, 1, user3);
 
       simnet.callPublicFn(
-        "habit-accountability-group", "finalize-group",
+        "habit-accountability-group-v3", "finalize-group",
         [Cl.uint(1)], deployer
       );
 
       // All 3 members get GROUP_STAKE back
       const r1 = simnet.callPublicFn(
-        "habit-accountability-group", "refund-failed-group",
+        "habit-accountability-group-v3", "refund-failed-group",
         [Cl.uint(1), Cl.principal(user1)], deployer
       );
       expect(r1.result).toBeOk(Cl.uint(GROUP_STAKE));
 
       const r2 = simnet.callPublicFn(
-        "habit-accountability-group", "refund-failed-group",
+        "habit-accountability-group-v3", "refund-failed-group",
         [Cl.uint(1), Cl.principal(user2)], deployer
       );
       expect(r2.result).toBeOk(Cl.uint(GROUP_STAKE));
 
       const r3 = simnet.callPublicFn(
-        "habit-accountability-group", "refund-failed-group",
+        "habit-accountability-group-v3", "refund-failed-group",
         [Cl.uint(1), Cl.principal(user3)], deployer
       );
       expect(r3.result).toBeOk(Cl.uint(GROUP_STAKE));
@@ -1108,20 +1108,20 @@ describe("Habit Accountability Group Contract", () => {
 
       // Finalize
       const fin = simnet.callPublicFn(
-        "habit-accountability-group", "finalize-group",
+        "habit-accountability-group-v3", "finalize-group",
         [Cl.uint(1)], deployer
       );
       expect(fin.result).toBeOk(Cl.bool(true));
 
       // Refund both
       const r1 = simnet.callPublicFn(
-        "habit-accountability-group", "refund-failed-group",
+        "habit-accountability-group-v3", "refund-failed-group",
         [Cl.uint(1), Cl.principal(user1)], deployer
       );
       expect(r1.result).toBeOk(Cl.uint(GROUP_STAKE));
 
       const r2 = simnet.callPublicFn(
-        "habit-accountability-group", "refund-failed-group",
+        "habit-accountability-group-v3", "refund-failed-group",
         [Cl.uint(1), Cl.principal(user2)], deployer
       );
       expect(r2.result).toBeOk(Cl.uint(GROUP_STAKE));

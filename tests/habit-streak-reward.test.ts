@@ -10,10 +10,10 @@ const MIN_STAKE = 20_000;
 const FUND_AMOUNT = 10_000_000; // 10 STX
 const REWARD_AMOUNT = 500_000; // 0.5 STX per milestone
 
-// Helpers for habit-tracker-v2 interactions
+// Helpers for habit-tracker-v3 interactions
 function createHabit(caller: string, name: string, stake: number) {
   return simnet.callPublicFn(
-    "habit-tracker-v2",
+    "habit-tracker-v3",
     "create-habit",
     [Cl.stringUtf8(name), Cl.uint(stake)],
     caller
@@ -22,17 +22,17 @@ function createHabit(caller: string, name: string, stake: number) {
 
 function checkIn(caller: string, habitId: number) {
   return simnet.callPublicFn(
-    "habit-tracker-v2",
+    "habit-tracker-v3",
     "check-in",
     [Cl.uint(habitId)],
     caller
   );
 }
 
-// Helpers for habit-streak-reward interactions
+// Helpers for habit-streak-reward-v3 interactions
 function fundPool(caller: string, amount: number) {
   return simnet.callPublicFn(
-    "habit-streak-reward",
+    "habit-streak-reward-v3",
     "fund-reward-pool",
     [Cl.uint(amount)],
     caller
@@ -41,7 +41,7 @@ function fundPool(caller: string, amount: number) {
 
 function setMilestoneReward(caller: string, milestone: number, reward: number) {
   return simnet.callPublicFn(
-    "habit-streak-reward",
+    "habit-streak-reward-v3",
     "set-milestone-reward",
     [Cl.uint(milestone), Cl.uint(reward)],
     caller
@@ -50,7 +50,7 @@ function setMilestoneReward(caller: string, milestone: number, reward: number) {
 
 function claimMilestoneReward(caller: string, habitId: number, milestone: number) {
   return simnet.callPublicFn(
-    "habit-streak-reward",
+    "habit-streak-reward-v3",
     "claim-milestone-reward",
     [Cl.uint(habitId), Cl.uint(milestone)],
     caller
@@ -59,7 +59,7 @@ function claimMilestoneReward(caller: string, habitId: number, milestone: number
 
 function getRewardPoolBalance() {
   return simnet.callReadOnlyFn(
-    "habit-streak-reward",
+    "habit-streak-reward-v3",
     "get-reward-pool-balance",
     [],
     deployer
@@ -68,7 +68,7 @@ function getRewardPoolBalance() {
 
 function getMilestoneReward(milestone: number) {
   return simnet.callReadOnlyFn(
-    "habit-streak-reward",
+    "habit-streak-reward-v3",
     "get-milestone-reward",
     [Cl.uint(milestone)],
     deployer
@@ -77,7 +77,7 @@ function getMilestoneReward(milestone: number) {
 
 function isMilestoneClaimed(habitId: number, milestone: number) {
   return simnet.callReadOnlyFn(
-    "habit-streak-reward",
+    "habit-streak-reward-v3",
     "is-milestone-claimed",
     [Cl.uint(habitId), Cl.uint(milestone)],
     deployer
@@ -328,7 +328,7 @@ describe("Habit Streak Reward Contract", () => {
       claimMilestoneReward(user1, 1, 7);
 
       const total = simnet.callReadOnlyFn(
-        "habit-streak-reward",
+        "habit-streak-reward-v3",
         "get-total-distributed",
         [],
         deployer
@@ -364,7 +364,7 @@ describe("Habit Streak Reward Contract", () => {
       buildStreak(user1, 1, 7);
 
       // Withdraw stake - habit becomes completed with frozen streak
-      simnet.callPublicFn("habit-tracker-v2", "withdraw-stake", [Cl.uint(1)], user1);
+      simnet.callPublicFn("habit-tracker-v3", "withdraw-stake", [Cl.uint(1)], user1);
 
       // Should still be able to claim milestone since streak was earned
       const result = claimMilestoneReward(user1, 1, 7);
@@ -380,7 +380,7 @@ describe("Habit Streak Reward Contract", () => {
 
       // Let window expire and get slashed
       simnet.mineEmptyBlocks(150);
-      simnet.callPublicFn("habit-tracker-v2", "slash-habit", [Cl.uint(1)], user2);
+      simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(1)], user2);
 
       // Streak is now 0, can't claim 7-day milestone
       const result = claimMilestoneReward(user1, 1, 7);

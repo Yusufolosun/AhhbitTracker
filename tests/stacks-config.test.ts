@@ -25,7 +25,7 @@ describe('stacks config validation', () => {
   });
 
   it('accepts valid contract names and rejects invalid names', () => {
-    expect(assertContractName('habit-tracker-v2', 'CONTRACT_NAME')).toBe('habit-tracker-v2');
+    expect(assertContractName('habit-tracker-v3', 'CONTRACT_NAME')).toBe('habit-tracker-v3');
     expect(() => assertContractName('2bad-name', 'CONTRACT_NAME')).toThrow('Invalid contract name');
   });
 
@@ -56,7 +56,7 @@ describe('stacks config validation', () => {
         STACKS_NETWORK: 'MAINNET',
         STACKS_API_URL: 'https://api.mainnet.hiro.so/',
         CONTRACT_ADDRESS: 'sp1n3809w9cbwwx04kn3tcqhp8a9gn520bd4jmp8z',
-        CONTRACT_NAME: 'habit-tracker-v2',
+        CONTRACT_NAME: 'habit-tracker-v3',
         DEPLOYER_ADDRESS: 'sp1n3809w9cbwwx04kn3tcqhp8a9gn520bd4jmp8z',
       },
       'production',
@@ -68,9 +68,9 @@ describe('stacks config validation', () => {
   });
 
   it('parses contract principal safely', () => {
-    expect(parseContractPrincipal('SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2')).toEqual({
+    expect(parseContractPrincipal('SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3')).toEqual({
       contractAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
-      contractName: 'habit-tracker-v2',
+      contractName: 'habit-tracker-v3',
     });
 
     expect(() => parseContractPrincipal('not-a-principal')).toThrow('ADDRESS.CONTRACT_NAME');
@@ -80,7 +80,7 @@ describe('stacks config validation', () => {
     const config = buildRuntimeConfig({}, 'production');
     const summary = getRuntimeConfigSummary(config);
 
-    expect(summary.contractPrincipal).toBe('SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v2');
+    expect(summary.contractPrincipal).toBe('SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3');
     expect(summary.stacksNetwork).toBe('mainnet');
   });
 });

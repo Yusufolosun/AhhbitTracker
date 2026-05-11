@@ -4,7 +4,7 @@ const MIN_CHECK_IN_INTERVAL = 120;
 
 export function createHabit(caller: string, name: string, stake: number) {
   return simnet.callPublicFn(
-    "habit-tracker-v2",
+    "habit-tracker-v3",
     "create-habit",
     [Cl.stringUtf8(name), Cl.uint(stake)],
     caller,
@@ -13,7 +13,7 @@ export function createHabit(caller: string, name: string, stake: number) {
 
 export function checkIn(caller: string, habitId: number) {
   return simnet.callPublicFn(
-    "habit-tracker-v2",
+    "habit-tracker-v3",
     "check-in",
     [Cl.uint(habitId)],
     caller,
@@ -22,7 +22,7 @@ export function checkIn(caller: string, habitId: number) {
 
 export function withdrawStake(caller: string, habitId: number) {
   return simnet.callPublicFn(
-    "habit-tracker-v2",
+    "habit-tracker-v3",
     "withdraw-stake",
     [Cl.uint(habitId)],
     caller,
@@ -31,7 +31,7 @@ export function withdrawStake(caller: string, habitId: number) {
 
 export function slashHabit(caller: string, habitId: number) {
   return simnet.callPublicFn(
-    "habit-tracker-v2",
+    "habit-tracker-v3",
     "slash-habit",
     [Cl.uint(habitId)],
     caller,

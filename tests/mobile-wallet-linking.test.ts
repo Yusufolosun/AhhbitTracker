@@ -54,7 +54,7 @@ beforeAll(async () => {
 function createPreview(functionName: ContractCallPreview['functionName']): ContractCallPreview {
   return {
     contractAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
-    contractName: 'habit-tracker-v2',
+    contractName: 'habit-tracker-v3',
     functionName,
     functionArgsHex: ['0x01'],
     postConditionMode: 'Deny',

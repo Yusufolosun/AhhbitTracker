@@ -15,7 +15,7 @@ describe('stacksConfig', () => {
       VITE_STACKS_NETWORK: 'mainnet',
       VITE_STACKS_API_URL: 'https://api.mainnet.hiro.so',
       VITE_CONTRACT_ADDRESS: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
-      VITE_CONTRACT_NAME: 'habit-tracker-v2',
+      VITE_CONTRACT_NAME: 'habit-tracker-v3',
       VITE_APP_URL: 'https://ahhbit-tracker.vercel.app',
     });
 
@@ -33,7 +33,7 @@ describe('stacksConfig', () => {
         VITE_STACKS_NETWORK: 'mainnet',
         VITE_STACKS_API_URL: 'https://api.testnet.hiro.so',
         VITE_CONTRACT_ADDRESS: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
-        VITE_CONTRACT_NAME: 'habit-tracker-v2',
+        VITE_CONTRACT_NAME: 'habit-tracker-v3',
         VITE_APP_URL: 'https://ahhbit-tracker.vercel.app',
       }),
     ).toThrow('points to testnet');
@@ -48,7 +48,7 @@ describe('stacksConfig', () => {
         VITE_STACKS_NETWORK: 'mainnet',
         VITE_STACKS_API_URL: 'https://api.mainnet.hiro.so',
         VITE_CONTRACT_ADDRESS: 'not-an-address',
-        VITE_CONTRACT_NAME: 'habit-tracker-v2',
+        VITE_CONTRACT_NAME: 'habit-tracker-v3',
         VITE_APP_URL: 'https://ahhbit-tracker.vercel.app',
       }),
     ).toThrow('Invalid Stacks address');

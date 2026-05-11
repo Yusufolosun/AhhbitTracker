@@ -40,7 +40,7 @@ describe("bonus claim e2e", () => {
     expect(withdrawal2.result).toBeOk(Cl.uint(MIN_STAKE));
 
     const unclaimed = simnet.callReadOnlyFn(
-      "habit-tracker-v2",
+      "habit-tracker-v3",
       "get-unclaimed-completed-habits",
       [],
       deployer,
@@ -48,7 +48,7 @@ describe("bonus claim e2e", () => {
     expect(unclaimed.result).toBeOk(Cl.uint(2));
 
     const pool = simnet.callReadOnlyFn(
-      "habit-tracker-v2",
+      "habit-tracker-v3",
       "get-pool-balance",
       [],
       deployer,
@@ -56,7 +56,7 @@ describe("bonus claim e2e", () => {
     expect(pool.result).toBeOk(Cl.uint(MIN_STAKE * 3));
 
     const claim1 = simnet.callPublicFn(
-      "habit-tracker-v2",
+      "habit-tracker-v3",
       "claim-bonus",
       [Cl.uint(habit1Id)],
       user1,
@@ -65,7 +65,7 @@ describe("bonus claim e2e", () => {
     expect(claim1.result).toBeOk(Cl.uint(claim1Amount));
 
     const claim2 = simnet.callPublicFn(
-      "habit-tracker-v2",
+      "habit-tracker-v3",
       "claim-bonus",
       [Cl.uint(habit2Id)],
       user2,
@@ -75,7 +75,7 @@ describe("bonus claim e2e", () => {
     expect(claim1Amount).toBe(claim2Amount);
 
     const poolAfter = simnet.callReadOnlyFn(
-      "habit-tracker-v2",
+      "habit-tracker-v3",
       "get-pool-balance",
       [],
       deployer,
@@ -83,7 +83,7 @@ describe("bonus claim e2e", () => {
     expect(poolAfter.result).toBeOk(Cl.uint(0));
 
     const unclaimedAfter = simnet.callReadOnlyFn(
-      "habit-tracker-v2",
+      "habit-tracker-v3",
       "get-unclaimed-completed-habits",
       [],
       deployer,

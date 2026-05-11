@@ -16,7 +16,7 @@ describe('mobile transaction preview builder', () => {
 
     expect(preview).toMatchObject({
       contractAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
-      contractName: 'habit-tracker-v2',
+      contractName: 'habit-tracker-v3',
       functionName: 'create-habit',
       postConditionMode: 'Deny',
     });
@@ -30,7 +30,7 @@ describe('mobile transaction preview builder', () => {
 
     expect(preview).toMatchObject({
       contractAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
-      contractName: 'habit-tracker-v2',
+      contractName: 'habit-tracker-v3',
       functionName: 'check-in',
       postConditionMode: 'Deny',
     });
@@ -43,7 +43,7 @@ describe('mobile transaction preview builder', () => {
 
     expect(preview).toMatchObject({
       contractAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
-      contractName: 'habit-tracker-v2',
+      contractName: 'habit-tracker-v3',
       functionName: 'withdraw-stake',
       postConditionMode: 'Deny',
     });
@@ -56,7 +56,7 @@ describe('mobile transaction preview builder', () => {
 
     expect(claimPreview).toMatchObject({
       contractAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
-      contractName: 'habit-tracker-v2',
+      contractName: 'habit-tracker-v3',
       functionName: 'claim-bonus',
       postConditionMode: 'Deny',
     });

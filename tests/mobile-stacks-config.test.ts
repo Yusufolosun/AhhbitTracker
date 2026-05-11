@@ -14,7 +14,7 @@ describe('mobile stacks config resolver', () => {
       stacksNetwork: 'mainnet',
       hiroApiBaseUrl: 'https://api.mainnet.hiro.so',
       contractAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
-      contractName: 'habit-tracker-v2',
+      contractName: 'habit-tracker-v3',
     });
 
     expect(config.networkMode).toBe('mainnet');
@@ -28,7 +28,7 @@ describe('mobile stacks config resolver', () => {
         stacksNetwork: 'mainnet',
         hiroApiBaseUrl: 'https://api.mainnet.hiro.so',
         contractAddress: 'bad-address',
-        contractName: 'habit-tracker-v2',
+        contractName: 'habit-tracker-v3',
       }),
     ).toThrow('Invalid Stacks address');
   });
@@ -40,7 +40,7 @@ describe('mobile stacks config resolver', () => {
         stacksNetwork: 'mainnet',
         hiroApiBaseUrl: 'https://api.testnet.hiro.so',
         contractAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
-        contractName: 'habit-tracker-v2',
+        contractName: 'habit-tracker-v3',
       }),
     ).toThrow('points to testnet');
   });
@@ -61,7 +61,7 @@ describe('mobile stacks config resolver', () => {
       stacksNetwork: 'testnet',
       hiroApiBaseUrl: 'http://localhost:3999',
       contractAddress: 'ST1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK1GA0CF0',
-      contractName: 'habit-tracker-v2',
+      contractName: 'habit-tracker-v3',
     });
 
     expect(config.hiroApiBaseUrl).toBe('http://localhost:3999');
@@ -74,7 +74,7 @@ describe('mobile stacks config resolver', () => {
         stacksNetwork: 'mainnet',
         hiroApiBaseUrl: 'http://api.mainnet.hiro.so',
         contractAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
-        contractName: 'habit-tracker-v2',
+        contractName: 'habit-tracker-v3',
       }),
     ).toThrow('must use https');
   });
