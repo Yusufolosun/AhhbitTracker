@@ -378,6 +378,14 @@ Gets aggregated statistics for a user.
 **Value:** `u7`  
 **Description:** Minimum consecutive check-ins required for withdrawal
 
+### FORFEIT-BPS-PER-MISS
+**Value:** `u1000` (10% in basis points)  
+**Description:** Percent of original stake forfeited per missed day
+
+### BPS-DENOMINATOR
+**Value:** `u10000`  
+**Description:** Basis point denominator
+
 ---
 
 ## Error Codes
@@ -396,7 +404,7 @@ Gets aggregated statistics for a user.
 | 111 | ERR-BONUS-ALREADY-CLAIMED | Bonus already claimed for this habit |
 | 112 | ERR-HABIT-LIMIT-REACHED | Maximum number of habits reached |
 | 113 | ERR-STAKE-TOO-HIGH | Stake exceeds 100 STX cap |
-| 114 | ERR-HABIT-AUTO-SLASHED | Habit auto-slashed after missed check-in window |
+| 114 | ERR-HABIT-AUTO-SLASHED | Legacy error (no longer returned by check-in) |
 
 Companion contract error ranges:
 - `u200`-`u209` are defined in `habit-streak-reward-v3`
