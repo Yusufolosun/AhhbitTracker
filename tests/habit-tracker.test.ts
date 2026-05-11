@@ -327,7 +327,7 @@ describe("AhhbitTracker Contract", () => {
       expect(result.result).toBeOk(Cl.bool(true));
 
       const poolBalance = simnet.getDataVar("habit-tracker-v3", "forfeited-pool-balance");
-      expect(poolBalance).toBeUint(MIN_STAKE);
+      expect(poolBalance).toBeUint(MIN_STAKE / 10);
     });
 
     it("should reject check-in to a completed habit", () => {
@@ -430,19 +430,19 @@ describe("AhhbitTracker Contract", () => {
 
       // 4. Claim bonus
       const result = simnet.callPublicFn("habit-tracker-v3", "claim-bonus", [Cl.uint(id1)], user1);
-      // Only one eligible claimant, so claim receives the full available pool.
-      expect(result.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE * 10)));
+      // Only one eligible claimant, so claim receives the full available pool (10% of failing stake).
+      expect(result.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE)));
     });
 
     it("should distribute nearly equal bonuses to consecutive claimants", () => {
-      // Fund the pool: slash a 1 STX habit
+      // Fund the pool: slash a 0.2 STX habit (10% penalty)
       const failHabit = createHabit(user3, "Will fail", MIN_STAKE * 10);
       const failId = Number((failHabit.result as any).value.value);
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       checkIn(user3, failId);
       simnet.mineEmptyBlocks(150);
       simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(failId)], user3);
-      // Pool = 1,000,000 microSTX (1 STX)
+      // Pool = 20,000 microSTX (10% of the failing stake)
 
       // User1 completes a habit
       const h1 = createHabit(user1, "Habit A", MIN_STAKE);
@@ -487,7 +487,7 @@ describe("AhhbitTracker Contract", () => {
       checkIn(user3, fid2);
       simnet.mineEmptyBlocks(150);
       simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(fid2)], user1);
-      // Pool = 200 STX and user1 is the only eligible claimant.
+      // Pool = 20 STX and user1 is the only eligible claimant.
 
       // User1 completes a habit and claims
       const h1 = createHabit(user1, "Capped habit", MIN_STAKE);
@@ -497,7 +497,7 @@ describe("AhhbitTracker Contract", () => {
       withdrawStake(user1, cid);
 
       const result = simnet.callPublicFn("habit-tracker-v3", "claim-bonus", [Cl.uint(cid)], user1);
-      expect(result.result).toEqual(Cl.ok(Cl.uint(MAX_STAKE_AMOUNT * 2)));
+      expect(result.result).toEqual(Cl.ok(Cl.uint((MAX_STAKE_AMOUNT / 10) * 2)));
     });
 
     it("should reject bonus claim by non-owner", () => {
@@ -524,12 +524,12 @@ describe("AhhbitTracker Contract", () => {
       expect(getUnclaimedCompletedHabits().result).toEqual(Cl.ok(Cl.uint(1)));
 
       const claim = simnet.callPublicFn("habit-tracker-v3", "claim-bonus", [Cl.uint(completedId)], user1);
-      expect(claim.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE)));
+      expect(claim.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE / 10)));
       expect(getUnclaimedCompletedHabits().result).toEqual(Cl.ok(Cl.uint(0)));
     });
 
     it("should report estimated bonus share from pool and claimant count", () => {
-      // Fund a 0.06 STX pool.
+      // Fund a 0.006 STX pool.
       const failing = createHabit(user3, "Pool source", MIN_STAKE * 3);
       const failingId = Number((failing.result as any).value.value);
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
@@ -550,14 +550,14 @@ describe("AhhbitTracker Contract", () => {
       for (let i = 0; i < 7; i++) { checkIn(user2, id2); simnet.mineEmptyBlocks(120); }
       withdrawStake(user2, id2);
 
-      // 60,000 / 2 claimants => 30,000 estimated bonus share.
-      expect(getEstimatedBonusShare().result).toEqual(Cl.ok(Cl.uint(MIN_STAKE + (MIN_STAKE / 2))));
+      // 6,000 / 2 claimants => 3,000 estimated bonus share.
+      expect(getEstimatedBonusShare().result).toEqual(Cl.ok(Cl.uint((MIN_STAKE * 3) / 20)));
 
       const firstClaim = simnet.callPublicFn("habit-tracker-v3", "claim-bonus", [Cl.uint(id1)], user1);
-      expect(firstClaim.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE + (MIN_STAKE / 2))));
+      expect(firstClaim.result).toEqual(Cl.ok(Cl.uint((MIN_STAKE * 3) / 20)));
 
-      // Remaining pool = 30,000 with one claimant left => 30,000.
-      expect(getEstimatedBonusShare().result).toEqual(Cl.ok(Cl.uint(MIN_STAKE + (MIN_STAKE / 2))));
+      // Remaining pool = 3,000 with one claimant left => 3,000.
+      expect(getEstimatedBonusShare().result).toEqual(Cl.ok(Cl.uint((MIN_STAKE * 3) / 20)));
 
       const secondClaim = simnet.callPublicFn("habit-tracker-v3", "claim-bonus", [Cl.uint(id2)], user2);
       expect(secondClaim.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE + (MIN_STAKE / 2))));

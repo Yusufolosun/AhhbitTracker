@@ -53,7 +53,7 @@ describe("bonus claim e2e", () => {
       [],
       deployer,
     );
-    expect(pool.result).toBeOk(Cl.uint(MIN_STAKE * 3));
+    expect(pool.result).toBeOk(Cl.uint((MIN_STAKE * 3) / 10));
 
     const claim1 = simnet.callPublicFn(
       "habit-tracker-v3",

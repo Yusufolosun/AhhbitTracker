@@ -33,7 +33,7 @@ describe("expired habit e2e", () => {
       [],
       deployer,
     );
-    expect(pool.result).toBeOk(Cl.uint(MIN_STAKE));
+    expect(pool.result).toBeOk(Cl.uint(MIN_STAKE / 10));
 
     const habit = simnet.callReadOnlyFn(
       "habit-tracker-v3",
