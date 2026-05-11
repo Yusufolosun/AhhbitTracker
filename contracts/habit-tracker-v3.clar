@@ -571,6 +571,29 @@
   )
 )
 
+;; Calculate how many check-in windows were missed since last check-in
+(define-private (get-missed-checkins (last-check-in-block uint))
+  (let
+    (
+      (window (get-checkin-window last-check-in-block))
+      (latest (get latest window))
+    )
+    (if (<= block-height latest)
+      u0
+      (let ((overdue (- block-height latest)))
+        (+ u1 (/ overdue BLOCKS-PER-DAY))
+      )
+    )
+  )
+)
+
+;; Calculate total penalty for missed check-ins
+(define-private (calculate-missed-penalty (initial-stake uint) (missed-checkins uint))
+  (let ((per-miss (/ (* initial-stake FORFEIT-BPS-PER-MISS) BPS-DENOMINATOR)))
+    (* per-miss missed-checkins)
+  )
+)
+
 ;; ============================================
 ;; PUBLIC FUNCTIONS - HABIT MANAGEMENT
 ;; ============================================
