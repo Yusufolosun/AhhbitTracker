@@ -11,7 +11,7 @@ AhhbitTracker is a decentralized application on the Stacks blockchain that helps
 1. Stake STX on a habit
 2. Check in every 24 hours
 3. Complete 7+ days to withdraw your stake
-4. Miss a check-in and forfeit your stake to the community pool
+4. Miss a check-in and forfeit 10% per missed day to the community pool
 
 ### Why use blockchain for habit tracking?
 
@@ -64,7 +64,7 @@ Once every 24 hours (144 blocks on Stacks).
 
 ### What if I miss a day?
 
-Your stake is forfeited to the community pool and your streak resets to zero.
+Your streak resets to zero and 10% of your stake is forfeited per missed day. The habit stays active unless the remaining stake reaches zero.
 
 ### Can I check in multiple times per day?
 
@@ -87,7 +87,7 @@ Minimum 7 consecutive check-ins required.
 
 ### Can I withdraw before 7 days?
 
-No. You must complete the minimum streak or forfeit your stake.
+No. You must complete the minimum streak to withdraw your remaining stake.
 
 ## Streaks and Timing
 
@@ -233,7 +233,7 @@ No. All blockchain transactions are public. Anyone can see:
 
 ### "Window Expired" error
 
-You missed your 24-hour window. Your stake was auto-slashed and moved to the forfeited pool (`err u114`).
+You missed your 24-hour window. A 10% per missed day penalty was applied to your remaining stake.
 
 ### "Insufficient Streak" error
 
