@@ -77,6 +77,7 @@ Records a daily check-in for a habit.
 ```clarity
 (contract-call? '.habit-tracker-v3 check-in u1)
 ;; Returns: (ok u5) - Streak is now 5
+;; Late check-in: (ok u1) - Streak reset after penalty
 ```
 
 **Requirements:**
