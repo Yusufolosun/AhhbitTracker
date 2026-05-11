@@ -542,6 +542,7 @@
 )
 
 ;; Check if already checked in today (same block height range)
+;; Check if already checked in within minimum interval
 (define-private (already-checked-in-today (last-check-in-block uint))
   (let
     (
