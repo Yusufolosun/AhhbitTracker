@@ -112,8 +112,8 @@ Records a daily check-in for a habit.
 **Requirements:**
 - Caller must be habit owner
 - Habit must be active
-- Must not have checked in within last 120 blocks (~20 hours)
-- Valid window for a non-penalized check-in is 120-144 blocks after last check-in
+- Must not have checked in within last 96 blocks (~16 hours)
+- Valid window for a non-penalized check-in is 96-192 blocks after last check-in
 
 **Notes:**
 - Late check-ins apply a 10% per missed day penalty
@@ -470,12 +470,12 @@ Gets aggregated statistics for a user.
 **Description:** Maximum characters in habit name
 
 ### CHECK-IN-WINDOW
-**Value:** `u144` (blocks)  
-**Description:** Maximum blocks between check-ins (~24 hours)
+**Value:** `u192` (blocks)  
+**Description:** Maximum blocks between check-ins (~32 hours)
 
 ### MIN-CHECK-IN-INTERVAL
-**Value:** `u120` (blocks)  
-**Description:** Minimum blocks required between check-ins (~20 hours)
+**Value:** `u96` (blocks)  
+**Description:** Minimum blocks required between check-ins (~16 hours)
 
 ### MIN-STREAK-FOR-WITHDRAWAL
 **Value:** `u7`  
@@ -483,7 +483,7 @@ Gets aggregated statistics for a user.
 
 ### FORFEIT-BPS-PER-MISS
 **Value:** `u1000` (10% in basis points)  
-**Description:** Percent of original stake forfeited per missed day
+**Description:** Percent of original stake forfeited per missed window
 
 ### BPS-DENOMINATOR
 **Value:** `u10000`  
@@ -727,7 +727,7 @@ All public functions emit print events with relevant data.
 ;; Step 2: Check in daily for 7 days
 (contract-call? '.habit-tracker-v3 check-in u1)
 ;; Day 1: (ok u1)
-;; ... wait 120-144 blocks
+;; ... wait 96-192 blocks
 ;; Day 2: (ok u2)
 ;; ... continue for 7 days
 

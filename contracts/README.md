@@ -48,8 +48,8 @@ Records daily check-in for a habit.
 **Returns:** Updated streak count (uint)
 
 **Notes:**
-- Check-ins are valid between 120 and 144 blocks after the previous check-in
-- Missed windows apply a partial forfeit (10% per missed day)
+- Check-ins are valid between 96 and 192 blocks after the previous check-in
+- Missed windows apply a partial forfeit (10% per missed window)
 - Streak resets after a missed window
 - Habit stays active unless the remaining stake reaches zero
 
@@ -168,8 +168,8 @@ Gets aggregated statistics for a user.
 - `MIN-STAKE-AMOUNT`: 20,000 microSTX (0.02 STX)
 - `MAX-STAKE-AMOUNT`: 100,000,000 microSTX (100 STX)
 - `MAX-HABIT-NAME-LENGTH`: 50 characters
-- `CHECK-IN-WINDOW`: 144 blocks (~24 hours)
-- `MIN-CHECK-IN-INTERVAL`: 120 blocks (~20 hours)
+- `CHECK-IN-WINDOW`: 192 blocks (~32 hours)
+- `MIN-CHECK-IN-INTERVAL`: 96 blocks (~16 hours)
 - `MIN-STREAK-FOR-WITHDRAWAL`: 7 days
 - `REFERRAL-BOOST-PER-COMPLETION`: 1 (bonus weight per successful referral)
 - `MAX-REFERRAL-BOOST`: 10 (cap on cumulative referral boost)

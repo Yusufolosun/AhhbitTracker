@@ -143,7 +143,7 @@ User → check-in(habit-id) → Contract
   ├─ Verify habit exists
   ├─ Verify caller is owner
   ├─ Calculate blocks since last check-in
-  ├─ Require blocks elapsed ≥ MIN-CHECK-IN-INTERVAL (120)
+  ├─ Require blocks elapsed ≥ MIN-CHECK-IN-INTERVAL (96)
   ├─ If check-in window missed:
   │   ├─ Apply partial forfeit (10% per missed day)
   │   ├─ Reset streak
@@ -227,14 +227,16 @@ User → claim-bonus(habit-id) → Contract
 
 Stacks produces blocks approximately every **10 minutes**.
 
+- **16 hours** ≈ 96 blocks
 - **24 hours** ≈ 144 blocks
+- **32 hours** ≈ 192 blocks
 - **7 days** ≈ 1,008 blocks
 - **30 days** ≈ 4,320 blocks
 
 **Check-in validation:**
 ```
-current-block-height - last-check-in-block ≥ MIN-CHECK-IN-INTERVAL (120 blocks)
-current-block-height - last-check-in-block ≤ CHECK-IN-WINDOW (144 blocks)
+current-block-height - last-check-in-block ≥ MIN-CHECK-IN-INTERVAL (96 blocks)
+current-block-height - last-check-in-block ≤ CHECK-IN-WINDOW (192 blocks)
 ```
 
 If a user checks in after the window, the streak resets and a 10% per missed day penalty is applied to the remaining stake.
@@ -372,7 +374,7 @@ User Action (Click) →
 
 Daily check-ins use the same flow with additional safeguards:
 
-- Dashboard-level daily runner only submits habits in the valid 120-144 block window
+- Dashboard-level daily runner only submits habits in the valid 96-192 block window
 - Check-ins are submitted sequentially to avoid overlapping wallet prompts
 - Transaction polling decodes Clarity abort codes so failed check-ins surface actionable reasons
 
