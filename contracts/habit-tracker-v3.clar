@@ -31,8 +31,6 @@
 (define-constant CHECK-IN-WINDOW u144)
 
 ;; Derived timing constants
-;; ~6 blocks per hour (144 / 24)
-(define-constant BLOCKS-PER-HOUR u6)
 ;; Blocks per 24h day
 (define-constant BLOCKS-PER-DAY u144)
 ;; Minimum interval between check-ins (in blocks)
@@ -71,7 +69,6 @@
 (define-constant ERR-BONUS-ALREADY-CLAIMED (err u111))
 (define-constant ERR-HABIT-LIMIT-REACHED (err u112))
 (define-constant ERR-STAKE-TOO-HIGH (err u113))
-(define-constant ERR-HABIT-AUTO-SLASHED (err u114))
 (define-constant ERR-REFERRER-ALREADY-SET (err u115))
 (define-constant ERR-INVALID-REFERRER (err u116))
 (define-constant ERR-SELF-REFERRAL (err u117))
@@ -149,7 +146,6 @@
 (define-constant MAX-GROUP-DURATION u12960)   ;; ~90 days
 
 ;; Error codes for groups (300 range)
-(define-constant ERR-NOT-AUTHORIZED-GROUP (err u300))
 (define-constant ERR-GROUP-NOT-FOUND (err u301))
 (define-constant ERR-GROUP-FULL (err u302))
 (define-constant ERR-ALREADY-MEMBER (err u303))
@@ -185,6 +181,7 @@
 (define-map group-members
   { group-id: uint, member: principal }
   {
+    member: principal,
     habit-id: uint,
     joined-at-block: uint,
     streak-at-join: uint,
@@ -222,6 +219,8 @@
       (habit (unwrap! (map-get? habits { habit-id: habit-id }) ERR-INVALID-HABIT))
       (streak-now (get current-streak habit))
     )
+    (asserts! (> habit-id u0) ERR-INVALID-HABIT)
+    (asserts! (<= habit-id (var-get habit-id-nonce)) ERR-INVALID-HABIT)
     ;; Verify caller owns the habit
     (asserts! (is-eq caller (get owner habit)) ERR-NOT-AUTHORIZED)
 
@@ -259,6 +258,7 @@
     (map-set group-members
       { group-id: group-id, member: caller }
       {
+        member: caller,
         habit-id: habit-id,
         joined-at-block: block-height,
         streak-at-join: streak-now,
@@ -303,6 +303,10 @@
       (stake-amount (get stake-amount group))
       (streak-now (get current-streak habit))
     )
+    (asserts! (> group-id u0) ERR-GROUP-NOT-FOUND)
+    (asserts! (<= group-id (var-get group-id-nonce)) ERR-GROUP-NOT-FOUND)
+    (asserts! (> habit-id u0) ERR-INVALID-HABIT)
+    (asserts! (<= habit-id (var-get habit-id-nonce)) ERR-INVALID-HABIT)
     ;; Verify caller owns the habit
     (asserts! (is-eq caller (get owner habit)) ERR-NOT-AUTHORIZED)
 
@@ -328,6 +332,7 @@
     (map-set group-members
       { group-id: group-id, member: caller }
       {
+        member: caller,
         habit-id: habit-id,
         joined-at-block: block-height,
         streak-at-join: streak-now,
@@ -375,6 +380,7 @@
     (
       (group (unwrap! (map-get? groups { group-id: group-id }) ERR-GROUP-NOT-FOUND))
       (member-data (unwrap! (map-get? group-members { group-id: group-id, member: member }) ERR-NOT-MEMBER))
+      (member-principal (get member member-data))
       (habit (unwrap! (map-get? habits { habit-id: (get habit-id member-data) }) ERR-INVALID-HABIT))
       (current-streak (get current-streak habit))
       (streak-delta (if (> current-streak (get streak-at-join member-data)) (- current-streak (get streak-at-join member-data)) u0))
@@ -383,6 +389,9 @@
       (half-required (/ required-days u2))
       (threshold (if (> half-required u0) half-required u1))
     )
+    (asserts! (> group-id u0) ERR-GROUP-NOT-FOUND)
+    (asserts! (<= group-id (var-get group-id-nonce)) ERR-GROUP-NOT-FOUND)
+    (asserts! (is-some (map-get? group-members { group-id: group-id, member: member })) ERR-NOT-MEMBER)
     ;; Group duration must have ended
     (asserts! (>= block-height (get end-block group)) ERR-GROUP-STILL-ACTIVE)
 
@@ -395,15 +404,15 @@
 
     (if (>= streak-delta threshold)
       (begin
-        (map-set group-members { group-id: group-id, member: member } (merge member-data { is-successful: true }))
+        (map-set group-members { group-id: group-id, member: member-principal } (merge member-data { is-successful: true }))
         (map-set groups { group-id: group-id } (merge group { successful-count: (+ (get successful-count group) u1), settled-count: (+ (get settled-count group) u1) }))
-        (print { event: "member-settled-success", group-id: group-id, member: member, streak-delta: streak-delta })
+        (print { event: "member-settled-success", group-id: group-id, member: member-principal, streak-delta: streak-delta })
         (ok true)
       )
       (begin
-        (map-set group-members { group-id: group-id, member: member } (merge member-data { has-claimed: true }))
+        (map-set group-members { group-id: group-id, member: member-principal } (merge member-data { has-claimed: true }))
         (map-set groups { group-id: group-id } (merge group { settled-count: (+ (get settled-count group) u1) }))
-        (print { event: "member-settled-failed", group-id: group-id, member: member, streak-delta: streak-delta })
+        (print { event: "member-settled-failed", group-id: group-id, member: member-principal, streak-delta: streak-delta })
         (ok false)
       )
     )
@@ -420,6 +429,8 @@
       (total-pool (get total-staked group))
       (successful (get successful-count group))
     )
+    (asserts! (> group-id u0) ERR-GROUP-NOT-FOUND)
+    (asserts! (<= group-id (var-get group-id-nonce)) ERR-GROUP-NOT-FOUND)
     ;; Group must have ended
     (asserts! (>= block-height (get end-block group)) ERR-GROUP-STILL-ACTIVE)
 
@@ -450,8 +461,12 @@
     (
       (group (unwrap! (map-get? groups { group-id: group-id }) ERR-GROUP-NOT-FOUND))
       (member-data (unwrap! (map-get? group-members { group-id: group-id, member: member }) ERR-NOT-MEMBER))
+      (member-principal (get member member-data))
       (stake-amount (get stake-amount group))
     )
+    (asserts! (> group-id u0) ERR-GROUP-NOT-FOUND)
+    (asserts! (<= group-id (var-get group-id-nonce)) ERR-GROUP-NOT-FOUND)
+    (asserts! (is-some (map-get? group-members { group-id: group-id, member: member })) ERR-NOT-MEMBER)
     ;; Group must have ended
     (asserts! (>= block-height (get end-block group)) ERR-GROUP-STILL-ACTIVE)
 
@@ -465,11 +480,11 @@
     ;; Member must not have already been refunded
     (asserts! (not (get is-successful member-data)) ERR-ALREADY-CLAIMED)
 
-    (try! (as-contract (stx-transfer? stake-amount tx-sender member)))
+    (try! (as-contract (stx-transfer? stake-amount tx-sender member-principal)))
 
-    (map-set group-members { group-id: group-id, member: member } (merge member-data { is-successful: true }))
+    (map-set group-members { group-id: group-id, member: member-principal } (merge member-data { is-successful: true }))
 
-    (print { event: "group-refund-claimed", group-id: group-id, member: member, amount: stake-amount })
+    (print { event: "group-refund-claimed", group-id: group-id, member: member-principal, amount: stake-amount })
 
     (ok stake-amount)
   )
@@ -478,6 +493,8 @@
 ;; Finalize a group after all members have been settled
 (define-public (finalize-group (group-id uint))
   (let ((group (unwrap! (map-get? groups { group-id: group-id }) ERR-GROUP-NOT-FOUND)))
+    (asserts! (> group-id u0) ERR-GROUP-NOT-FOUND)
+    (asserts! (<= group-id (var-get group-id-nonce)) ERR-GROUP-NOT-FOUND)
     ;; Group must have ended
     (asserts! (>= block-height (get end-block group)) ERR-GROUP-STILL-ACTIVE)
 
@@ -635,7 +652,11 @@
 ;; @param referrer: principal that referred the caller
 ;; @returns: true on success
 (define-public (register-referrer (referrer principal))
-  (set-referrer tx-sender referrer)
+  (begin
+    (asserts! (not (is-eq referrer tx-sender)) ERR-SELF-REFERRAL)
+    (asserts! (not (is-eq referrer (as-contract tx-sender))) ERR-INVALID-REFERRER)
+    (set-referrer tx-sender referrer)
+  )
 )
 
 ;; Create a new habit with stake
@@ -711,7 +732,7 @@
 
 ;; Daily check-in for habit
 ;; @param habit-id: ID of the habit to check in
-;; @returns: current streak on success, ERR-HABIT-AUTO-SLASHED if window expired
+;; @returns: current streak on success
 (define-public (check-in (habit-id uint))
   (let
     (
@@ -724,6 +745,8 @@
       (initial-stake (get initial-stake-amount penalty-data))
       (applied-missed (get missed-checkins penalty-data))
     )
+    (asserts! (> habit-id u0) ERR-HABIT-NOT-FOUND)
+    (asserts! (<= habit-id (var-get habit-id-nonce)) ERR-HABIT-NOT-FOUND)
     ;; Verify caller is habit owner
     (asserts! (is-eq caller (get owner habit)) ERR-NOT-HABIT-OWNER)
     
@@ -819,6 +842,8 @@
       (missed-total (get-missed-checkins last-check-in))
       (new-missed (if (> missed-total applied-missed) (- missed-total applied-missed) u0))
     )
+    (asserts! (> habit-id u0) ERR-HABIT-NOT-FOUND)
+    (asserts! (<= habit-id (var-get habit-id-nonce)) ERR-HABIT-NOT-FOUND)
     ;; Verify habit is still active
     (asserts! (get is-active habit) ERR-HABIT-ALREADY-COMPLETED)
     
@@ -881,6 +906,8 @@
       (current-streak (get current-streak habit))
       (bonus-weight (+ u1 (calculate-referral-boost caller)))
     )
+    (asserts! (> habit-id u0) ERR-HABIT-NOT-FOUND)
+    (asserts! (<= habit-id (var-get habit-id-nonce)) ERR-HABIT-NOT-FOUND)
     ;; Verify caller is habit owner
     (asserts! (is-eq caller (get owner habit)) ERR-NOT-HABIT-OWNER)
     
@@ -953,6 +980,8 @@
       (bonus-weight (get bonus-weight habit))
       (bonus-amount (calculate-bonus-share pool-balance eligible-weight bonus-weight))
     )
+    (asserts! (> habit-id u0) ERR-HABIT-NOT-FOUND)
+    (asserts! (<= habit-id (var-get habit-id-nonce)) ERR-HABIT-NOT-FOUND)
     ;; Verify caller is habit owner
     (asserts! (is-eq caller (get owner habit)) ERR-NOT-HABIT-OWNER)
     

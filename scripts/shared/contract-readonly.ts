@@ -25,6 +25,7 @@ interface HabitData {
   createdAtBlock: number;
   isActive: boolean;
   isCompleted: boolean;
+  bonusWeight?: number;
   bonusClaimed: boolean;
 }
 
