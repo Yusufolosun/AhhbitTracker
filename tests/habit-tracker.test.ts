@@ -776,9 +776,10 @@ describe("AhhbitTracker Contract", () => {
 
       simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(id)], user2);
 
-      // Double slash should fail
+      // After partial slash the habit stays active (18,000µSTX > MIN-ACTIVE-STAKE).
+      // Second slash fails because the check-in window was just reset — not expired yet.
       const result2 = simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(id)], user2);
-      expect(result2.result).toBeErr(Cl.uint(108)); // ERR-HABIT-ALREADY-COMPLETED
+      expect(result2.result).toBeErr(Cl.uint(100)); // ERR-NOT-AUTHORIZED (window not expired)
     });
 
     it("should reject check-in for nonexistent habit", () => {
