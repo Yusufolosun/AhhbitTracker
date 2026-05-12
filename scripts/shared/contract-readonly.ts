@@ -86,6 +86,7 @@ function parseHabit(json: unknown): HabitData | null {
     createdAtBlock: readNumber(tuple['created-at-block']),
     isActive: readBoolean(tuple['is-active']),
     isCompleted: readBoolean(tuple['is-completed']),
+    bonusWeight: readNumber(tuple['bonus-weight']),
     bonusClaimed: readBoolean(tuple['bonus-claimed']),
   };
 }
