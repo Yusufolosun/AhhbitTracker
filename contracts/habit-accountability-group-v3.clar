@@ -1,4 +1,4 @@
-;; Wrapper for accountability group functions — forwards to habit-tracker-v3
+;; Wrapper for accountability group functions - forwards to habit-tracker-v3
 ;; This thin adapter preserves the original contract namespace for tests
 
 (define-read-only (contract-info)
