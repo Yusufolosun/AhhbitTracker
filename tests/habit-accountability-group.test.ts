@@ -163,6 +163,7 @@ describe("Habit Accountability Group Contract", () => {
 
       const member = getMemberInfo(1, user1);
       expect(member.result).toBeSome(Cl.tuple({
+        member: Cl.principal(user1),
         "habit-id": Cl.uint(1),
         "joined-at-block": Cl.uint(simnet.blockHeight),
         "streak-at-join": Cl.uint(0),
