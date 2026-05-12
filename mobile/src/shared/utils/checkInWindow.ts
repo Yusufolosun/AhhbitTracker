@@ -4,7 +4,7 @@ import {
   MIN_CHECK_IN_INTERVAL_BLOCKS,
 } from '../../core/config/constants';
 
-const URGENT_THRESHOLD_BLOCKS = 132;
+const URGENT_THRESHOLD_BLOCKS = CHECK_IN_WINDOW_BLOCKS - 12;
 
 export type MobileCheckInWindowState =
   | 'unknown'
@@ -43,5 +43,5 @@ export function canSubmitMobileDailyCheckIn(
   currentBlock: number | null,
 ): boolean {
   const state = getMobileCheckInWindowState(habit, currentBlock);
-  return state === 'available' || state === 'urgent';
+  return state === 'available' || state === 'urgent' || state === 'expired';
 }

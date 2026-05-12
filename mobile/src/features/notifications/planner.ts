@@ -7,7 +7,7 @@ import { getMobileCheckInWindowState } from '../../shared/utils/checkInWindow';
 import type { NotificationPlan, NotificationRecord } from './types';
 
 const APPROX_BLOCK_DURATION_MS = 10 * 60 * 1000;
-const CHECK_IN_REMINDER_LEAD_BLOCKS = CHECK_IN_WINDOW_BLOCKS - 132;
+const CHECK_IN_REMINDER_LEAD_BLOCKS = 12;
 const CHECK_IN_REMINDER_LEAD_MS = CHECK_IN_REMINDER_LEAD_BLOCKS * APPROX_BLOCK_DURATION_MS;
 
 function normalizeAddress(address: string): string {
@@ -111,7 +111,7 @@ export function buildHabitNotificationPlans(params: {
         kind: 'habit-check-in-expired',
         tone: 'danger',
         title: 'Check-in window missed',
-        body: `${habit.name} missed the 24-hour check-in window.`,
+        body: `${habit.name} missed the 32-hour check-in window.`,
         routePath: buildHabitRoute(habit.habitId),
         habitId: habit.habitId,
       }),
