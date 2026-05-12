@@ -40,19 +40,19 @@
 
 ## What is AhhbitTracker?
 
-AhhbitTracker is a decentralized habit-tracking dApp on the [Stacks](https://www.stacks.co/) blockchain. Stake STX as a financial commitment to daily habits. Miss a day — 10% of your stake is forfeited per missed day to a shared pool. Complete a 7-day streak — reclaim your remaining stake and earn bonuses from forfeited stakes.
+AhhbitTracker is a decentralized habit-tracking dApp on the [Stacks](https://www.stacks.co/) blockchain. Stake STX as a financial commitment to daily habits. Miss a window — 10% of your stake is forfeited per missed window to a shared pool. Complete a 7-day streak — reclaim your remaining stake and earn bonuses from forfeited stakes.
 
 **Live contract:** [`SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3`](https://explorer.hiro.so/address/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3?chain=mainnet)
 
 ## How It Works
 
 1. **Stake** — Create a habit and deposit ≥ 0.02 STX as your commitment
-2. **Check In** — Record daily completion within the 20-24 hour window (120-144 blocks)
+2. **Check In** — Record daily completion within the 16-32 hour window (96-192 blocks)
 3. **Streak** — Maintain a 7-day streak to unlock withdrawal
 4. **Withdraw** — Reclaim your stake and claim your share of the bonus pool
 5. **Refer** — Register a referrer once; successful referrals boost future bonus shares
 
-Missed check-ins forfeit 10% per missed day to the shared pool, distributed as rewards to users who complete their streaks.
+Missed windows forfeit 10% per missed window to the shared pool, distributed as rewards to users who complete their streaks.
 
 ## Tech Stack
 

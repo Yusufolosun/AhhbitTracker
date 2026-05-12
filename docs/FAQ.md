@@ -9,9 +9,9 @@ AhhbitTracker is a decentralized application on the Stacks blockchain that helps
 ### How does it work?
 
 1. Stake STX on a habit
-2. Check in every 24 hours
+2. Check in every 16-32 hours
 3. Complete 7+ days to withdraw your stake
-4. Miss a check-in and forfeit 10% per missed day to the community pool
+4. Miss a check-in and forfeit 10% per missed window to the community pool
 
 ### Why use blockchain for habit tracking?
 
@@ -60,11 +60,11 @@ Habit names can be up to 50 UTF-8 characters.
 
 ### How often must I check in?
 
-Once every 24 hours (120-144 blocks on Stacks).
+Once every 16-32 hours (96-192 blocks on Stacks).
 
 ### What if I miss a day?
 
-Your streak resets to zero and 10% of your stake is forfeited per missed day. The habit stays active unless the remaining stake reaches zero.
+Your streak resets to zero and 10% of your stake is forfeited per missed window. The habit stays active unless the remaining stake reaches zero.
 
 ### Can I check in multiple times per day?
 
@@ -72,14 +72,14 @@ No. The contract prevents check-ins until at least 120 blocks have passed (~20 h
 
 ### Why can't I check in immediately after creating a habit?
 
-When you create a habit, the contract automatically sets the `last-check-in-block` to the creation block. You must wait at least 120 blocks (~20 hours) before your first manual check-in. This prevents:
+When you create a habit, the contract automatically sets the `last-check-in-block` to the creation block. You must wait at least 96 blocks (~16 hours) before your first manual check-in. This prevents:
 - Double-claiming rewards (creation + immediate check-in)
 - Gaming the system
 - Ensures genuine daily habit tracking
 
 **Error code:** If you try, you'll get `(err u105)` - ERR-ALREADY-CHECKED-IN
 
-**Solution:** Wait approximately 20 hours (120 blocks) after creating a habit before your first check-in.
+**Solution:** Wait approximately 16 hours (96 blocks) after creating a habit before your first check-in.
 
 ### How many days for withdrawal?
 
@@ -91,17 +91,17 @@ No. You must complete the minimum streak to withdraw your remaining stake.
 
 ## Streaks and Timing
 
-### When does my 24-hour window start?
+### When does my check-in window start?
 
 Immediately after your last check-in. If you check in at 9 AM Monday, you have until 9 AM Tuesday.
 
 ### What if I'm traveling across time zones?
 
-The contract uses blockchain time (block height), not wall clock time. Your check-in window is measured in blocks (120-144 after your last check-in) regardless of your location.
+The contract uses blockchain time (block height), not wall clock time. Your check-in window is measured in blocks (96-192 after your last check-in) regardless of your location.
 
 ### Can I check in early?
 
-Yes. Check in between 120 and 144 blocks (~20 to ~24 hours) after your last check-in. Earlier is safer than later.
+Yes. Check in between 96 and 192 blocks (~16 to ~32 hours) after your last check-in. Earlier is safer than later.
 
 ### What happens if Stacks network is slow?
 
@@ -230,16 +230,16 @@ No. All blockchain transactions are public. Anyone can see:
 **Common Causes:**
 1. You already checked in today
 2. You just created the habit and tried to check in immediately
-3. Less than 120 blocks have passed since last check-in
+3. Less than 96 blocks have passed since last check-in
 
 **Solution:**
-- If you just created the habit: Wait at least ~20 hours (120 Stacks blocks) before first check-in
+- If you just created the habit: Wait at least ~16 hours (96 Stacks blocks) before first check-in
 - If you already checked in: Wait until next day for your next check-in
 - Check the habit details with `get-habit` to see `last-check-in-block`
 
 ### "Window Expired" error
 
-You missed your 24-hour window. A 10% per missed day penalty was applied to your remaining stake.
+You missed your check-in window. A 10% per missed window penalty was applied to your remaining stake.
 
 ### "Insufficient Streak" error
 
@@ -285,7 +285,7 @@ No. Only you (the owner) can check in or withdraw from your habits.
 - `(err u111)` - ERR-BONUS-ALREADY-CLAIMED: Bonus already claimed for this habit
 - `(err u112)` - ERR-HABIT-LIMIT-REACHED: Maximum habit count reached for this user
 - `(err u113)` - ERR-STAKE-TOO-HIGH: Stake exceeds 100 STX cap
-- `(err u114)` - ERR-HABIT-AUTO-SLASHED: Missed 24-hour window; stake forfeited
+- `(err u114)` - ERR-HABIT-AUTO-SLASHED: Missed check-in window; penalty applied
 
 **Troubleshooting Tip:** Use `get-habit` to check habit status before transactions.
 

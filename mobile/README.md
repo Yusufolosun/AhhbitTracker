@@ -51,7 +51,7 @@ mobile/src/
 - Notification state: permission status, scheduled reminder keys, and recent alerts persist in AsyncStorage
 - Query state remains in React Query; app state changes trigger cache pruning/invalidation for user-scoped keys
 - Feature-level context exports remain as compatibility adapters and now delegate to app state hooks
-- Daily check-in previews are gated by on-chain timing (120-144 block window) using live block height polling
+- Daily check-in previews are gated by on-chain timing (96-192 block window) using live block height polling
 
 ## Navigation
 

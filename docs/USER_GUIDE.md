@@ -14,14 +14,14 @@ When you create a habit, you stake STX tokens as a commitment. The stake must be
 
 ### 2. Check In Daily
 
-Every 24 hours, check in to prove you're following through. Each successful check-in increases your streak.
+Every 16-32 hours, check in to prove you're following through. Each successful check-in increases your streak.
 
-**Important:** You have a 20-24 hour window (120-144 blocks) to check in.
+**Important:** You have a 16-32 hour window (96-192 blocks) to check in.
 
 ### 3. Complete or Forfeit
 
 - **Complete:** Check in for 7+ consecutive days, then withdraw your stake
-- **Forfeit:** Miss a check-in window and 10% of your stake is forfeited per missed day
+- **Forfeit:** Miss a check-in window and 10% of your stake is forfeited per missed window
 
 ### 4. Earn Bonuses
 
@@ -77,11 +77,11 @@ On mobile, withdrawal and bonus claim actions also require biometric confirmatio
 
 - **First check-in:** Starts your streak at 1
 - **Each consecutive check-in:** Adds 1 to your streak
-- **Missed window:** Resets streak and forfeits 10% per missed day (habit continues unless stake is fully depleted)
+- **Missed window:** Resets streak and forfeits 10% per missed window (habit continues unless stake is fully depleted)
 
 ### Check-in Window
 
-You must check in between 120 and 144 blocks (~20 to ~24 hours) after your last check-in.
+You must check in between 96 and 192 blocks (~16 to ~32 hours) after your last check-in.
 
 **Example timeline:**
 - Monday 9:00 AM: First check-in (streak = 1)
@@ -172,11 +172,11 @@ If you complete your habit:
 
 ### "Already Checked In" Error
 
-You've already checked in today. The next check-in is valid between 120 and 144 blocks after your last one (~20 to ~24 hours).
+You've already checked in today. The next check-in is valid between 96 and 192 blocks after your last one (~16 to ~32 hours).
 
 ### "Window Expired" Error
 
-You missed your 24-hour check-in window. A 10% per missed day penalty was applied to your remaining stake.
+You missed your check-in window. A 10% per missed window penalty was applied to your remaining stake.
 
 ### "Insufficient Streak" Error
 
@@ -195,11 +195,11 @@ Common causes:
 
 **Q: What if I'm traveling and can't check in?**
 
-A: Unfortunately, you'll forfeit your stake. Consider the check-in requirement before committing.
+A: You'll incur a 10% penalty per missed window. The habit continues while stake remains, so plan for timing before committing.
 
 **Q: Can I delete a habit?**
 
-A: No. Habits are permanent on the blockchain. You can only complete them or forfeit.
+A: No. Habits are permanent on the blockchain. You can only complete them or take penalties if you miss windows.
 
 **Q: How is the bonus pool distributed?**
 
