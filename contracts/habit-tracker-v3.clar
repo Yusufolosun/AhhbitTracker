@@ -30,9 +30,6 @@
 ;; 16-32 hours on Stacks (10 min per block)
 (define-constant CHECK-IN-WINDOW u192)
 
-;; Derived timing constants
-;; Blocks per 24h day
-(define-constant BLOCKS-PER-DAY u144)
 ;; Minimum interval between check-ins (in blocks)
 ;; ~96 blocks = ~16 hours minimum between check-ins
 ;; Prevents streak farming while allowing flexibility for users
@@ -46,10 +43,6 @@
 (define-constant FORFEIT-BPS-PER-MISS u1000)
 (define-constant BPS-DENOMINATOR u10000)
 
-;; Maximum consecutive missed windows before habit is force-terminated
-;; At 10% per miss, 10 misses = 100% of initial stake => natural cap
-;; Set to 10 so a habit auto-terminates cleanly at full forfeit
-(define-constant MAX-CONSECUTIVE-MISSES u10)
 
 ;; Minimum remaining stake to keep habit active (dust threshold)
 ;; If remaining stake after penalty falls below this, treat as fully forfeited
@@ -82,8 +75,6 @@
 (define-constant ERR-REFERRER-ALREADY-SET (err u115))
 (define-constant ERR-INVALID-REFERRER (err u116))
 (define-constant ERR-SELF-REFERRAL (err u117))
-(define-constant ERR-HABIT-FULLY-FORFEITED (err u118))
-(define-constant ERR-NO-PENALTY-DUE (err u119))
 
 ;; ============================================
 ;; DATA STRUCTURES
