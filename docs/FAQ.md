@@ -234,7 +234,7 @@ No. All blockchain transactions are public. Anyone can see:
 
 **Solution:**
 - If you just created the habit: Wait at least ~16 hours (96 Stacks blocks) before first check-in
-- If you already checked in: Wait until next day for your next check-in
+- If you already checked in: Wait until the next window opens (~16 hours)
 - Check the habit details with `get-habit` to see `last-check-in-block`
 
 ### "Window Expired" error
