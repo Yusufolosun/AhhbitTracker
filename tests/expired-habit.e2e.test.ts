@@ -22,7 +22,7 @@ describe("expired habit e2e", () => {
     const habitId = readOkUint(created);
 
     buildStreak(user1, habitId, 1);
-    mineBlocks(150);
+    mineBlocks(200);
 
     const slash = slashHabit(user2, habitId);
     expect(slash.result).toBeOk(Cl.bool(true));

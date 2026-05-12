@@ -23,7 +23,7 @@ describe("bonus claim e2e", () => {
     const failingId = readOkUint(failing);
     buildStreak(user3, failingId, 1);
 
-    mineBlocks(150);
+    mineBlocks(200);
     const slash = slashHabit(user2, failingId);
     expect(slash.result).toBeOk(Cl.bool(true));
 
