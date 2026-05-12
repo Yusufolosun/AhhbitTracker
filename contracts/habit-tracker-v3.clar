@@ -113,6 +113,18 @@
   { habit-ids: (list 100 uint) }
 )
 
+;; Referral relationships (one-time registration per user)
+(define-map referrals
+  { user: principal }
+  { referrer: principal, set-at-block: uint }
+)
+
+;; Referrer stats for bonus weight boosts
+(define-map referrer-stats
+  { referrer: principal }
+  { successful-referrals: uint }
+)
+
 ;; Global habit ID counter
 (define-data-var habit-id-nonce uint u0)
 
