@@ -10,6 +10,7 @@ const user3 = accounts.get("wallet_3")!;
 const MIN_STAKE = 20_000; // 0.02 STX
 const GROUP_STAKE = 1_000_000; // 1 STX
 const GROUP_DURATION = 144; // ~1 day in blocks
+const MIN_CHECK_IN_INTERVAL = 96; // ~16 hours in blocks
 
 // Habit-tracker helpers
 function createHabit(caller: string, name: string, stake: number) {
@@ -105,7 +106,7 @@ function finalizeGroup(caller: string, groupId: number) {
 
 function buildStreak(caller: string, habitId: number, days: number) {
   for (let i = 0; i < days; i++) {
-    simnet.mineEmptyBlocks(120);
+    simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
     const result = checkIn(caller, habitId);
     expect(result.result).toBeOk(Cl.uint(i + 1));
   }
@@ -116,7 +117,7 @@ function buildStreaksInLockstep(entries: Array<{ caller: string; habitId: number
   const maxDays = Math.max(...entries.map((entry) => entry.days));
 
   for (let day = 0; day < maxDays; day++) {
-    simnet.mineEmptyBlocks(120);
+    simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
 
     entries.forEach((entry, idx) => {
       if (progress[idx] >= entry.days) return;

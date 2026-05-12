@@ -85,10 +85,10 @@ function isMilestoneClaimed(habitId: number, milestone: number) {
 }
 
 // Build a streak by mining blocks and checking in
-// MIN-CHECK-IN-INTERVAL is 120 blocks, so we mine at least 120 blocks between check-ins
+// MIN-CHECK-IN-INTERVAL is 96 blocks, so we mine at least 96 blocks between check-ins
 function buildStreak(caller: string, habitId: number, days: number) {
   for (let i = 0; i < days; i++) {
-    simnet.mineEmptyBlocks(120);
+    simnet.mineEmptyBlocks(96);
     const result = checkIn(caller, habitId);
     expect(result.result).toBeOk(Cl.uint(i + 1));
   }
