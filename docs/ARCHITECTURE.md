@@ -145,7 +145,7 @@ User → check-in(habit-id) → Contract
   ├─ Calculate blocks since last check-in
   ├─ Require blocks elapsed ≥ MIN-CHECK-IN-INTERVAL (96)
   ├─ If check-in window missed:
-  │   ├─ Apply partial forfeit (10% per missed day)
+  │   ├─ Apply partial forfeit (10% per missed window)
   │   ├─ Reset streak
   │   └─ Deactivate habit if remaining stake is zero
   ├─ If within window:
@@ -239,7 +239,7 @@ current-block-height - last-check-in-block ≥ MIN-CHECK-IN-INTERVAL (96 blocks)
 current-block-height - last-check-in-block ≤ CHECK-IN-WINDOW (192 blocks)
 ```
 
-If a user checks in after the window, the streak resets and a 10% per missed day penalty is applied to the remaining stake.
+If a user checks in after the window, the streak resets and a 10% per missed window penalty is applied to the remaining stake.
 
 ## Fee Structure
 

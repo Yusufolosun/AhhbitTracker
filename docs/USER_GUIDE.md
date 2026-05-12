@@ -99,7 +99,7 @@ You can track multiple habits simultaneously. Each habit:
 
 ### How It Works
 
-When users miss check-ins, 10% per missed day is added to a shared pool.
+When users miss check-ins, 10% per missed window is added to a shared pool.
 
 ### Claiming Bonuses
 

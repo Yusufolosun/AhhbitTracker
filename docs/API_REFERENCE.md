@@ -116,7 +116,7 @@ Records a daily check-in for a habit.
 - Valid window for a non-penalized check-in is 96-192 blocks after last check-in
 
 **Notes:**
-- Late check-ins apply a 10% per missed day penalty
+- Late check-ins apply a 10% per missed window penalty
 - Streak resets after a missed window; if stake reaches zero the habit becomes inactive
 
 **Gas Cost:** ~50,000 microSTX
