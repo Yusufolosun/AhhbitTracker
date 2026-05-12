@@ -65,7 +65,7 @@ export function HabitCard({ habit }: HabitCardProps) {
       if (message === 'Transaction cancelled') {
         showToast('Check-in was cancelled.', 'error');
       } else if (message.includes('u114') || message.includes('ERR-HABIT-AUTO-SLASHED')) {
-        showToast('Your habit was forfeited because the check-in window expired.', 'error');
+        showToast('Your habit was penalized because the check-in window expired.', 'error');
       } else {
         showToast(message, 'error');
       }
@@ -182,10 +182,10 @@ export function HabitCard({ habit }: HabitCardProps) {
       {windowState === 'expired' && (
         <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 dark:bg-red-500/10 dark:border-red-500/20">
           <p className="text-sm font-medium text-red-800 dark:text-red-300">
-            Check-in window has expired
+            Check-in window missed
           </p>
           <p className="text-xs text-red-600 dark:text-red-400 mt-1">
-            Your {formatSTX(habit.stakeAmount)} STX stake will be forfeited to the pool. This habit cannot be recovered.
+            Late check-ins apply a 10% penalty per missed window and reset your streak. This habit continues while stake remains.
           </p>
         </div>
       )}
@@ -197,7 +197,7 @@ export function HabitCard({ habit }: HabitCardProps) {
             ~{blocksToTime(blocksRemaining)} remaining to check in
           </p>
           <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
-            Check in soon or your {formatSTX(habit.stakeAmount)} STX stake will be forfeited.
+            Check in soon or a 10% penalty will be applied to your stake.
           </p>
         </div>
       )}
@@ -209,7 +209,7 @@ export function HabitCard({ habit }: HabitCardProps) {
             Next check-in unlocks in ~{blocksToTime(blocksUntilNextCheckIn)}
           </p>
           <p className="text-xs text-sky-600 dark:text-sky-400 mt-1">
-            Check-ins are valid between 120 and 144 blocks after your last check-in.
+            Check-ins are valid between 96 and 192 blocks after your last check-in.
           </p>
         </div>
       )}
@@ -234,13 +234,13 @@ export function HabitCard({ habit }: HabitCardProps) {
 
       {/* Actions */}
       <div className="flex flex-col space-y-2">
-        {habit.isActive && windowState !== 'expired' && isOwnHabit && (
+        {habit.isActive && isOwnHabit && (
           <button
             onClick={handleCheckIn}
             disabled={isCheckingIn || !canSubmitCheckIn}
             className="btn-primary w-full"
           >
-            {isCheckingIn ? 'Checking In...' : canSubmitCheckIn ? 'Check In' : 'Check In Not Ready'}
+            {isCheckingIn ? 'Checking In...' : canSubmitCheckIn ? (windowState === 'expired' ? 'Check In (Late)' : 'Check In') : 'Check In Not Ready'}
           </button>
         )}
 
@@ -387,7 +387,7 @@ export function HabitCard({ habit }: HabitCardProps) {
         isLoading={isSlashing}
       >
         <div className="space-y-2">
-          <p>You are about to finalize an expired habit. This will move the forfeited stake to the pool:</p>
+          <p>You are about to finalize an expired habit. This will apply the missed-window penalty and move the forfeited portion to the pool:</p>
           <dl className="bg-surface-50 dark:bg-surface-700 rounded-lg p-3 space-y-1">
             <div className="flex justify-between">
               <dt className="text-surface-500 dark:text-surface-400">Habit</dt>
