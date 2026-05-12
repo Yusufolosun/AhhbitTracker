@@ -60,7 +60,7 @@ Habit names can be up to 50 UTF-8 characters.
 
 ### How often must I check in?
 
-Once every 24 hours (144 blocks on Stacks).
+Once every 24 hours (120-144 blocks on Stacks).
 
 ### What if I miss a day?
 
@@ -97,11 +97,11 @@ Immediately after your last check-in. If you check in at 9 AM Monday, you have u
 
 ### What if I'm traveling across time zones?
 
-The contract uses blockchain time (block height), not wall clock time. Your 24-hour window is always 144 blocks regardless of your location.
+The contract uses blockchain time (block height), not wall clock time. Your check-in window is measured in blocks (120-144 after your last check-in) regardless of your location.
 
 ### Can I check in early?
 
-Yes! Check in anytime within your 24-hour window. Earlier is safer than later.
+Yes. Check in between 120 and 144 blocks (~20 to ~24 hours) after your last check-in. Earlier is safer than later.
 
 ### What happens if Stacks network is slow?
 
@@ -128,6 +128,12 @@ Yes, once per completed habit.
 ### What if the pool is empty?
 
 You can still withdraw your original stake, but there won't be a bonus.
+
+### Do referrals affect bonuses?
+
+Yes. Register a referrer once using `register-referrer`. When a referred user
+completes a streak, the referrer earns a bonus-claim weight boost that increases
+their share of future bonus claims.
 
 ## Costs and Fees
 

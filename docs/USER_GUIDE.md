@@ -16,7 +16,7 @@ When you create a habit, you stake STX tokens as a commitment. The stake must be
 
 Every 24 hours, check in to prove you're following through. Each successful check-in increases your streak.
 
-**Important:** You have a 24-hour window (144 blocks) to check in.
+**Important:** You have a 20-24 hour window (120-144 blocks) to check in.
 
 ### 3. Complete or Forfeit
 
@@ -26,6 +26,8 @@ Every 24 hours, check in to prove you're following through. Each successful chec
 ### 4. Earn Bonuses
 
 Successful users can claim bonuses from the forfeited pool created by users who missed their check-ins.
+
+**Referral rewards:** Register a referrer once using `register-referrer`. When a referred user completes a streak, the referrer earns a bonus-claim weight boost that increases their future bonus shares.
 
 ## Getting Started
 
@@ -79,7 +81,7 @@ On mobile, withdrawal and bonus claim actions also require biometric confirmatio
 
 ### Check-in Window
 
-You must check in within 144 blocks (~24 hours) of your last check-in.
+You must check in between 120 and 144 blocks (~20 to ~24 hours) after your last check-in.
 
 **Example timeline:**
 - Monday 9:00 AM: First check-in (streak = 1)
@@ -108,7 +110,7 @@ Users who successfully complete habits can claim a share of the pool:
 3. Click "Claim Bonus"
 4. Receive your share of forfeited stakes
 
-**Bonus calculation:** Pool distributed among successful users
+**Bonus calculation:** Pool distributed among successful users, weighted by referral boosts
 
 ## Best Practices
 

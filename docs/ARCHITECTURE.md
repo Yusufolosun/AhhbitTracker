@@ -169,10 +169,10 @@ User → withdraw-stake(habit-id) → Contract
 ```
 User → claim-bonus(habit-id) → Contract
   ├─ Verify user has completed habits
-  ├─ Read forfeited pool and unclaimed completed claimant count
-  ├─ Calculate equal share using integer division
+  ├─ Read forfeited pool and total unclaimed bonus weight
+  ├─ Calculate weighted share using integer division
   ├─ Transfer bonus from pool to user
-  ├─ Update pool balance and claimant count
+  ├─ Update pool balance and claimant count/weight
   └─ Emit claim event
 ```
 
@@ -190,6 +190,7 @@ User → claim-bonus(habit-id) → Contract
     created-at-block: uint,
     is-active: bool,
     is-completed: bool,
+    bonus-weight: uint,
     bonus-claimed: bool
   }
 }
@@ -261,12 +262,19 @@ If a user checks in after the window, the streak resets and a 10% per missed day
 - 30 users miss check-ins
 
 **Forfeited pool:** 3 STX (10% of 30 missed 1 STX stakes)
-**Per successful user bonus:** 3 STX ÷ 70 = **~0.043 STX**
+**Per successful user bonus (weight=1):** 3 STX ÷ 70 = **~0.043 STX**
 
 In implementation, payout is recalculated per claim as:
-`forfeited-pool-balance / unclaimed-completed-habits`
+`(forfeited-pool-balance * bonus-weight) / unclaimed-completed-weight`
 
 This keeps accounting accurate on-chain while preserving any integer remainder for subsequent claims.
+
+### Referral Rewards
+
+Referrers can register once on-chain. When a referred user completes a streak,
+the referrer earns a bonus-claim weight boost applied to their future completed
+habits. This raises their share of the forfeited pool without changing stake
+refunds or penalty math.
 
 **ROI for successful user:**
 - Stake recovered: 1 STX

@@ -47,9 +47,10 @@ AhhbitTracker is a decentralized habit-tracking dApp on the [Stacks](https://www
 ## How It Works
 
 1. **Stake** — Create a habit and deposit ≥ 0.02 STX as your commitment
-2. **Check In** — Record daily completion within the 24-hour window (~144 blocks)
+2. **Check In** — Record daily completion within the 20-24 hour window (120-144 blocks)
 3. **Streak** — Maintain a 7-day streak to unlock withdrawal
 4. **Withdraw** — Reclaim your stake and claim your share of the bonus pool
+5. **Refer** — Register a referrer once; successful referrals boost future bonus shares
 
 Missed check-ins forfeit 10% per missed day to the shared pool, distributed as rewards to users who complete their streaks.
 
@@ -149,6 +150,7 @@ npm run preview       # Preview locally
 
 | Function | Description |
 |---|---|
+| `register-referrer` | Register a referrer for bonus boosts |
 | `create-habit` | Create a habit with STX stake |
 | `check-in` | Record daily check-in |
 | `withdraw-stake` | Reclaim stake after 7-day streak |
@@ -157,6 +159,7 @@ npm run preview       # Preview locally
 | `get-pool-balance` | View total forfeited STX |
 | `get-unclaimed-completed-habits` | View pending bonus claimant count |
 | `get-estimated-bonus-share` | View next estimated bonus share |
+| `get-referral-boost` | View current referral bonus weight |
 
 Full reference → [docs/API_REFERENCE.md](docs/API_REFERENCE.md)
 
