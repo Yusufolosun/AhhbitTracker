@@ -175,7 +175,7 @@ export function HabitForm() {
 
       <div className="mt-4 p-4 bg-primary-50 dark:bg-primary-500/10 rounded-lg border border-primary-200 dark:border-primary-500/20">
         <p className="text-sm text-primary-800 dark:text-primary-300">
-          <strong>Tip:</strong> Choose a realistic daily habit. You'll need to check in every 24 hours!
+          <strong>Tip:</strong> Choose a realistic daily habit. You'll need to check in every 16-32 hours!
         </p>
       </div>
     </SurfaceCard>

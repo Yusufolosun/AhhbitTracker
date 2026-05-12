@@ -76,7 +76,7 @@ export function Dashboard({
       {habits.length === 0 ? (
         <EmptyStateCard
           title="No habits yet"
-          description="Create your first on-chain habit below. Stake STX, check in daily, and earn rewards from the forfeited pool when you stay consistent."
+          description="Create your first on-chain habit below. Stake STX, check in every 16-32 hours, and earn rewards from the forfeited pool when you stay consistent."
           icon={
             <svg className="w-8 h-8 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -152,10 +152,10 @@ export function Dashboard({
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-red-900 dark:text-red-300">
-                {stats.expiredCount} habit{stats.expiredCount > 1 ? 's have' : ' has'} an expired check-in window
+                {stats.expiredCount} habit{stats.expiredCount > 1 ? 's have' : ' has'} a missed check-in window
               </p>
               <p className="text-xs text-red-700 dark:text-red-400 mt-1">
-                {formatSTX(stats.expiredStake)} STX at risk of forfeiture. These habits are no longer counted as active.
+                {formatSTX(stats.expiredStake)} STX at risk of penalty. These habits are no longer counted as active.
               </p>
             </div>
           </div>
