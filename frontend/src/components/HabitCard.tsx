@@ -403,7 +403,7 @@ export function HabitCard({ habit }: HabitCardProps) {
             </div>
           </dl>
           <p className="text-xs text-surface-500 dark:text-surface-400">
-            Anyone can finalize an expired habit. The stake will be added to the forfeited pool for future bonus claims.
+            Anyone can finalize an expired habit. The forfeited portion will be added to the pool for future bonus claims.
           </p>
           <p className="text-xs text-amber-600 dark:text-amber-400">
             This action will incur a gas fee.
