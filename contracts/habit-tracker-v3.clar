@@ -969,6 +969,9 @@
     
     ;; Verify minimum streak requirement
     (asserts! (>= current-streak MIN-STREAK-FOR-WITHDRAWAL) ERR-INSUFFICIENT-STREAK)
+
+    ;; Verify check-in window has not expired (prevents penalty dodging)
+    (asserts! (is-check-in-valid (get last-check-in-block habit)) ERR-NOT-AUTHORIZED)
     
     ;; Transfer stake back to user
     (try! (as-contract (stx-transfer? stake-amount tx-sender caller)))
