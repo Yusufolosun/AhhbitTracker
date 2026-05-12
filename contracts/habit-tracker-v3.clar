@@ -3,7 +3,7 @@
 ;; ============================================
 ;; 
 ;; A Stacks smart contract for habit accountability through financial commitment.
-;; Users stake STX on daily habits and check in every 24 hours to maintain streaks.
+;; Users stake STX on daily habits and check in every 16-32 hours to maintain streaks.
 ;; Missed check-ins result in stake forfeiture to a shared pool.
 ;;
 ;; Version: 0.1.0
@@ -27,16 +27,16 @@
 (define-constant MAX-HABIT-NAME-LENGTH u50)
 
 ;; Check-in window (in blocks)
-;; ~144 blocks per day on Stacks (10 min per block)
-(define-constant CHECK-IN-WINDOW u144)
+;; 16-32 hours on Stacks (10 min per block)
+(define-constant CHECK-IN-WINDOW u192)
 
 ;; Derived timing constants
 ;; Blocks per 24h day
 (define-constant BLOCKS-PER-DAY u144)
 ;; Minimum interval between check-ins (in blocks)
-;; ~120 blocks = ~20 hours minimum between check-ins
+;; ~96 blocks = ~16 hours minimum between check-ins
 ;; Prevents streak farming while allowing flexibility for users
-(define-constant MIN-CHECK-IN-INTERVAL u120)
+(define-constant MIN-CHECK-IN-INTERVAL u96)
 
 ;; Minimum streak required for withdrawal
 (define-constant MIN-STREAK-FOR-WITHDRAWAL u7)
@@ -599,7 +599,7 @@
     (if (<= block-height latest)
       u0
       (let ((overdue (- block-height latest)))
-        (+ u1 (/ overdue BLOCKS-PER-DAY))
+        (+ u1 (/ overdue CHECK-IN-WINDOW))
       )
     )
   )
