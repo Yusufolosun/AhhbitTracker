@@ -8,6 +8,19 @@ Core Clarity smart contract for on-chain habit tracking with staking.
 
 ### Public Functions
 
+#### register-referrer
+Registers a referrer for on-chain attribution (one-time per user).
+
+**Parameters:**
+- `referrer` (principal) - Referring wallet address
+
+**Returns:** true
+
+**Errors:**
+- `ERR-SELF-REFERRAL` - Caller cannot refer themselves
+- `ERR-REFERRER-ALREADY-SET` - Referrer already set
+- `ERR-INVALID-REFERRER` - Referrer cannot be the contract principal
+
 #### create-habit
 Creates a new habit with stake commitment.
 
@@ -35,6 +48,7 @@ Records daily check-in for a habit.
 **Returns:** Updated streak count (uint)
 
 **Notes:**
+- Check-ins are valid between 120 and 144 blocks after the previous check-in
 - Missed windows apply a partial forfeit (10% per missed day)
 - Streak resets after a missed window
 - Habit stays active unless the remaining stake reaches zero
@@ -66,7 +80,8 @@ Claims bonus from forfeited pool.
 **Returns:** Bonus amount (uint)
 
 **Distribution model:**
-- Bonus is computed as `forfeited-pool-balance / unclaimed-completed-habits`
+- Bonus is computed as `(forfeited-pool-balance * bonus-weight) / unclaimed-completed-weight`
+- Bonus weights default to 1 and increase with referral boosts
 - Integer division is used; any remainder is preserved in the pool for later claims
 
 **Errors:**
@@ -119,6 +134,29 @@ Gets the current estimated payout for the next successful claim.
 
 **Returns:** Estimated bonus amount in microSTX (uint)
 
+#### get-unclaimed-completed-weight
+Gets total bonus-claim weight across unclaimed completed habits.
+
+**Returns:** Total weight (uint)
+
+#### get-referrer
+Gets the registered referrer for a user.
+
+**Parameters:** `user` (principal)
+**Returns:** Referrer tuple or none
+
+#### get-referrer-stats
+Gets successful referral count for a referrer.
+
+**Parameters:** `referrer` (principal)
+**Returns:** Referrer stats tuple
+
+#### get-referral-boost
+Gets the current bonus weight boost for a referrer.
+
+**Parameters:** `referrer` (principal)
+**Returns:** Boost value (uint)
+
 #### get-user-stats
 Gets aggregated statistics for a user.
 
@@ -133,11 +171,14 @@ Gets aggregated statistics for a user.
 - `CHECK-IN-WINDOW`: 144 blocks (~24 hours)
 - `MIN-CHECK-IN-INTERVAL`: 120 blocks (~20 hours)
 - `MIN-STREAK-FOR-WITHDRAWAL`: 7 days
+- `REFERRAL-BOOST-PER-COMPLETION`: 1 (bonus weight per successful referral)
+- `MAX-REFERRAL-BOOST`: 10 (cap on cumulative referral boost)
 
 ## Data Structures
 
 ### habits map
 Stores individual habit data keyed by habit-id.
+Includes a `bonus-weight` field used for referral-boosted bonus claims.
 
 ### user-habits map
 Links users to their habit IDs.
@@ -146,6 +187,11 @@ Links users to their habit IDs.
 - `habit-id-nonce` - Counter for generating unique IDs
 - `forfeited-pool-balance` - Total STX in forfeiture pool
 - `unclaimed-completed-habits` - Eligible completed habits pending bonus claim
+- `unclaimed-completed-weight` - Total bonus-claim weight for eligible habits
+
+### Referral Data
+- `referrals` - One-time referrer mapping per user
+- `referrer-stats` - Successful referral counts per referrer
 
 ### Penalty Tracking
 - `habit-penalties` - Tracks initial stake and missed check-in count per habit

@@ -13,6 +13,35 @@ Complete reference for all contract functions and data structures.
 
 ## Public Functions
 
+### register-referrer
+
+Registers a referrer for on-chain attribution (one-time per user).
+
+**Signature:**
+```clarity
+(define-public (register-referrer (referrer principal)))
+```
+
+**Parameters:**
+- `referrer` (principal): Referring wallet address
+
+**Returns:**
+- Success: `(ok bool)` - true
+- Error: See error codes below
+
+**Errors:**
+- `u115` - ERR-REFERRER-ALREADY-SET
+- `u116` - ERR-INVALID-REFERRER
+- `u117` - ERR-SELF-REFERRAL
+
+**Example:**
+```clarity
+(contract-call? '.habit-tracker-v3 register-referrer 'SP2REFERRER...)
+;; Returns: (ok true)
+```
+
+**Gas Cost:** ~35,000 microSTX
+
 ### create-habit
 
 Creates a new habit with stake commitment.
@@ -84,6 +113,7 @@ Records a daily check-in for a habit.
 - Caller must be habit owner
 - Habit must be active
 - Must not have checked in within last 120 blocks (~20 hours)
+- Valid window for a non-penalized check-in is 120-144 blocks after last check-in
 
 **Notes:**
 - Late check-ins apply a 10% per missed day penalty
@@ -166,7 +196,8 @@ Claims bonus from forfeited pool.
 - At least one unclaimed completed habit must exist
 
 **Payout Formula:**
-- `bonus-amount = forfeited-pool-balance / unclaimed-completed-habits`
+- `bonus-amount = (forfeited-pool-balance * bonus-weight) / unclaimed-completed-weight`
+- Bonus weight defaults to 1 and increases with referral boosts
 - Integer remainder stays in the pool and is settled by later claims
 
 **Gas Cost:** ~60,000 microSTX
@@ -202,6 +233,7 @@ Retrieves habit details by ID.
   created-at-block: uint,
   is-active: bool,
   is-completed: bool,
+  bonus-weight: uint,
   bonus-claimed: bool
 }
 ```
@@ -321,6 +353,76 @@ Gets the estimated payout for the next successful bonus claim.
 **Returns:**
 - `(ok uint)` - Estimated next bonus amount in microSTX
 
+**Notes:**
+- This uses a base bonus weight of 1. Referrers with boosts receive larger shares.
+
+---
+
+### get-unclaimed-completed-weight
+
+Gets the total bonus-claim weight across eligible completed habits.
+
+**Signature:**
+```clarity
+(define-read-only (get-unclaimed-completed-weight))
+```
+
+**Parameters:** None
+
+**Returns:**
+- `(ok uint)` - Total weight
+
+---
+
+### get-referrer
+
+Gets the registered referrer for a user.
+
+**Signature:**
+```clarity
+(define-read-only (get-referrer (user principal)))
+```
+
+**Parameters:**
+- `user` (principal): User address
+
+**Returns:**
+- `(some { referrer: principal, set-at-block: uint })` or `none`
+
+---
+
+### get-referrer-stats
+
+Gets successful referral count for a referrer.
+
+**Signature:**
+```clarity
+(define-read-only (get-referrer-stats (referrer principal)))
+```
+
+**Parameters:**
+- `referrer` (principal): Referrer address
+
+**Returns:**
+- `{ successful-referrals: uint }`
+
+---
+
+### get-referral-boost
+
+Gets the current bonus weight boost for a referrer.
+
+**Signature:**
+```clarity
+(define-read-only (get-referral-boost (referrer principal)))
+```
+
+**Parameters:**
+- `referrer` (principal): Referrer address
+
+**Returns:**
+- `(ok uint)` - Boost value
+
 ---
 
 ### get-user-stats
@@ -387,6 +489,14 @@ Gets aggregated statistics for a user.
 **Value:** `u10000`  
 **Description:** Basis point denominator
 
+### REFERRAL-BOOST-PER-COMPLETION
+**Value:** `u1`  
+**Description:** Bonus weight added per successful referral completion
+
+### MAX-REFERRAL-BOOST
+**Value:** `u10`  
+**Description:** Maximum cumulative referral bonus weight
+
 ---
 
 ## Error Codes
@@ -406,6 +516,9 @@ Gets aggregated statistics for a user.
 | 112 | ERR-HABIT-LIMIT-REACHED | Maximum number of habits reached |
 | 113 | ERR-STAKE-TOO-HIGH | Stake exceeds 100 STX cap |
 | 114 | ERR-HABIT-AUTO-SLASHED | Legacy error (no longer returned by check-in) |
+| 115 | ERR-REFERRER-ALREADY-SET | Referrer already set for user |
+| 116 | ERR-INVALID-REFERRER | Referrer cannot be the contract principal |
+| 117 | ERR-SELF-REFERRAL | Caller cannot refer themselves |
 
 Companion contract error ranges:
 - `u200`-`u209` are defined in `habit-streak-reward-v3`
@@ -433,6 +546,7 @@ Companion contract error ranges:
   created-at-block: uint,
   is-active: bool,
   is-completed: bool,
+  bonus-weight: uint,
   bonus-claimed: bool
 }
 ```
@@ -461,6 +575,30 @@ Companion contract error ranges:
 { initial-stake-amount: uint, missed-checkins: uint }
 ```
 
+### referrals Map
+
+**Key:**
+```clarity
+{ user: principal }
+```
+
+**Value:**
+```clarity
+{ referrer: principal, set-at-block: uint }
+```
+
+### referrer-stats Map
+
+**Key:**
+```clarity
+{ referrer: principal }
+```
+
+**Value:**
+```clarity
+{ successful-referrals: uint }
+```
+
 ### Data Variables
 
 **habit-id-nonce:** `uint`  
@@ -471,6 +609,9 @@ Total STX in forfeited pool (in microSTX)
 
 **unclaimed-completed-habits:** `uint`  
 Completed habits eligible to claim a bonus
+
+**unclaimed-completed-weight:** `uint`  
+Total bonus-claim weight across eligible habits
 
 ---
 
@@ -551,6 +692,27 @@ All public functions emit print events with relevant data.
 }
 ```
 
+### referrer-registered Event
+```clarity
+{
+  event: "referrer-registered",
+  user: principal,
+  referrer: principal,
+  block: uint
+}
+```
+
+### referral-completed Event
+```clarity
+{
+  event: "referral-completed",
+  referrer: principal,
+  referred: principal,
+  habit-id: uint,
+  block: uint
+}
+```
+
 ---
 
 ## Usage Examples
@@ -565,7 +727,7 @@ All public functions emit print events with relevant data.
 ;; Step 2: Check in daily for 7 days
 (contract-call? '.habit-tracker-v3 check-in u1)
 ;; Day 1: (ok u1)
-;; ... wait 145 blocks
+;; ... wait 120-144 blocks
 ;; Day 2: (ok u2)
 ;; ... continue for 7 days
 
