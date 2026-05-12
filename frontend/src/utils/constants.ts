@@ -21,8 +21,8 @@ export const CONTRACT_NAME = runtimeConfig.contractName;
 export const MIN_STAKE_AMOUNT = DEFAULT_MIN_STAKE; // 0.02 STX in microSTX (from stx-utils)
 export const MAX_STAKE_AMOUNT = 100000000; // 100 STX in microSTX
 export const MAX_HABIT_NAME_LENGTH = 50;
-export const MIN_CHECK_IN_INTERVAL = 120; // blocks (~20 hours)
-export const CHECK_IN_WINDOW = 144; // blocks (~24 hours)
+export const MIN_CHECK_IN_INTERVAL = 96; // blocks (~16 hours)
+export const CHECK_IN_WINDOW = 192; // blocks (~32 hours)
 export const MIN_STREAK_FOR_WITHDRAWAL = 7;
 
 // Error Codes - register with stx-utils for decodeError() support
@@ -33,7 +33,7 @@ const ERROR_CODES: Record<number, string> = {
   103: 'Habit not found',
   104: 'You do not own this habit',
   105: 'Already checked in today',
-  106: 'Check-in window expired - stake forfeited',
+  106: 'Check-in window expired - penalty applied',
   107: 'Need 7+ consecutive days to withdraw',
   108: 'Habit already completed',
   109: 'Insufficient pool balance',
@@ -41,7 +41,7 @@ const ERROR_CODES: Record<number, string> = {
   111: 'Bonus already claimed for this habit',
   112: 'Maximum number of habits reached',
   113: 'Stake amount exceeds the maximum allowed',
-  114: 'Habit was auto-slashed due to expired check-in window',
+  114: 'Habit was slashed due to an expired check-in window',
   // Accountability group errors
   300: 'Not authorized',
   301: 'Group not found',
