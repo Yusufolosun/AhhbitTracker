@@ -896,12 +896,21 @@
       ;; Update habit stake and streak
       (map-set habits
         { habit-id: habit-id }
-        (merge habit {
-          stake-amount: remaining-after,
-          current-streak: u0,
-          last-check-in-block: block-height,
-          is-active: is-active-after
-        })
+        (if is-active-after
+          (merge habit {
+            stake-amount: remaining-after,
+            current-streak: u0,
+            last-check-in-block: block-height,
+            is-active: is-active-after
+          })
+          (merge habit {
+            stake-amount: remaining-after,
+            current-streak: u0,
+            last-check-in-block: block-height,
+            is-active: is-active-after,
+            is-completed: false
+          })
+        )
       )
 
       ;; Track applied missed check-ins
