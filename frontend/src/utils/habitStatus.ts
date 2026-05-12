@@ -9,9 +9,9 @@ import {
  * Threshold (in blocks) at which we warn the user the valid check-in period
  * is close to expiring.
  *
- * Valid window is [120, 144]. We mark [133, 144] as urgent.
+ * Valid window is [96, 192]. We mark the final 2 hours as urgent.
  */
-const URGENT_THRESHOLD = 132;
+const URGENT_THRESHOLD = CHECK_IN_WINDOW - 12;
 
 export type CheckInWindowState =
   | 'expired'
@@ -74,7 +74,7 @@ export function isEligibleForDailyCheckIn(
   currentBlock: number | null,
 ): boolean {
   const state = getCheckInWindowState(habit, currentBlock);
-  return state === 'available' || state === 'urgent';
+  return state === 'available' || state === 'urgent' || state === 'expired';
 }
 
 /**
