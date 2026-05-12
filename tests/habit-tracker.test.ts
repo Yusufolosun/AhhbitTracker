@@ -759,12 +759,12 @@ describe("AhhbitTracker Contract", () => {
 
       simnet.mineEmptyBlocks(200);
 
-      // Slashed first
+      // Slashed first — streak resets to 0, habit stays active (remaining > MIN-ACTIVE-STAKE)
       simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(id)], user2);
 
-      // Withdrawal after slash should fail
+      // Withdrawal fails because streak was reset to 0, not because habit is inactive
       const withdrawResult = withdrawStake(user1, id);
-      expect(withdrawResult.result).toBeErr(Cl.uint(108)); // ERR-HABIT-ALREADY-COMPLETED
+      expect(withdrawResult.result).toBeErr(Cl.uint(107)); // ERR-INSUFFICIENT-STREAK
     });
 
     it("should not allow slash on already-slashed habit", () => {
