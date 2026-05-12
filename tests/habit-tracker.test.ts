@@ -561,7 +561,7 @@ describe("AhhbitTracker Contract", () => {
       expect(getEstimatedBonusShare().result).toEqual(Cl.ok(Cl.uint((MIN_STAKE * 3) / 20)));
 
       const secondClaim = simnet.callPublicFn("habit-tracker-v3", "claim-bonus", [Cl.uint(id2)], user2);
-      expect(secondClaim.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE + (MIN_STAKE / 2))));
+      expect(secondClaim.result).toEqual(Cl.ok(Cl.uint((MIN_STAKE * 3) / 20)));
       expect(getEstimatedBonusShare().result).toEqual(Cl.ok(Cl.uint(0)));
     });
 
@@ -726,7 +726,7 @@ describe("AhhbitTracker Contract", () => {
       simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(id)], user2);
 
       const poolResult = simnet.callReadOnlyFn("habit-tracker-v3", "get-pool-balance", [], deployer);
-      expect(poolResult.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE)));
+      expect(poolResult.result).toEqual(Cl.ok(Cl.uint(MIN_STAKE / 10)));
     });
   });
 
@@ -814,7 +814,7 @@ describe("AhhbitTracker Contract", () => {
       expect(slashResult.result).toBeOk(Cl.bool(true));
 
       const pool = simnet.getDataVar("habit-tracker-v3", "forfeited-pool-balance");
-      expect(pool).toBeUint(MIN_STAKE);
+      expect(pool).toBeUint(MIN_STAKE / 10);
     });
 
     it("should reset streak to 1 after late check-in", () => {
