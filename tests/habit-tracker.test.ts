@@ -567,6 +567,117 @@ describe("AhhbitTracker Contract", () => {
 
   });
 
+  describe("referral rewards", () => {
+    it("should register a referrer and reject self-referral", () => {
+      const okResult = simnet.callPublicFn(
+        "habit-tracker-v3",
+        "register-referrer",
+        [Cl.principal(user1)],
+        user2
+      );
+      expect(okResult.result).toBeOk(Cl.bool(true));
+
+      const selfResult = simnet.callPublicFn(
+        "habit-tracker-v3",
+        "register-referrer",
+        [Cl.principal(user2)],
+        user2
+      );
+      expect(selfResult.result).toBeErr(Cl.uint(117)); // ERR-SELF-REFERRAL
+
+      const referrer = simnet.callReadOnlyFn(
+        "habit-tracker-v3",
+        "get-referrer",
+        [Cl.principal(user2)],
+        deployer
+      );
+      expect(referrer.result).toBeSome(
+        Cl.tuple({
+          referrer: Cl.principal(user1),
+          "set-at-block": Cl.uint(simnet.blockHeight),
+        })
+      );
+    });
+
+    it("should boost referrer bonus weight after referred completion", () => {
+      // user2 registers user1 as referrer
+      const reg = simnet.callPublicFn(
+        "habit-tracker-v3",
+        "register-referrer",
+        [Cl.principal(user1)],
+        user2
+      );
+      expect(reg.result).toBeOk(Cl.bool(true));
+
+      // user2 completes a habit -> user1 gets boost
+      const referredHabit = createHabit(user2, "Referred habit", MIN_STAKE);
+      const referredId = Number((referredHabit.result as any).value.value);
+      simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
+      for (let i = 0; i < 7; i++) {
+        checkIn(user2, referredId);
+        simnet.mineEmptyBlocks(120);
+      }
+      withdrawStake(user2, referredId);
+
+      const boost = simnet.callReadOnlyFn(
+        "habit-tracker-v3",
+        "get-referral-boost",
+        [Cl.principal(user1)],
+        deployer
+      );
+      expect(boost.result).toBeOk(Cl.uint(1));
+
+      // Fund the pool via slashing
+      const poolSource = createHabit(user3, "Pool Source", MIN_STAKE * 15);
+      const poolId = Number((poolSource.result as any).value.value);
+      simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
+      checkIn(user3, poolId);
+      simnet.mineEmptyBlocks(150);
+      simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(poolId)], user1);
+
+      // user1 completes a habit after receiving boost (weight = 2)
+      const boostedHabit = createHabit(user1, "Boosted habit", MIN_STAKE);
+      const boostedId = Number((boostedHabit.result as any).value.value);
+      simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
+      for (let i = 0; i < 7; i++) {
+        checkIn(user1, boostedId);
+        simnet.mineEmptyBlocks(120);
+      }
+      withdrawStake(user1, boostedId);
+
+      const boostedRecord = getHabit(boostedId);
+      const boostedWeight = (boostedRecord.result as any).value.data["bonus-weight"];
+      expect(boostedWeight).toEqual(Cl.uint(2));
+
+      // user3 completes a habit without boost (weight = 1)
+      const standardHabit = createHabit(user3, "Standard habit", MIN_STAKE);
+      const standardId = Number((standardHabit.result as any).value.value);
+      simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
+      for (let i = 0; i < 7; i++) {
+        checkIn(user3, standardId);
+        simnet.mineEmptyBlocks(120);
+      }
+      withdrawStake(user3, standardId);
+
+      // Pool = 30,000 microSTX (10% of 15 * MIN_STAKE)
+      const claimBoosted = simnet.callPublicFn(
+        "habit-tracker-v3",
+        "claim-bonus",
+        [Cl.uint(boostedId)],
+        user1
+      );
+      expect(claimBoosted.result).toBeOk(Cl.uint(MIN_STAKE));
+
+      const claimStandard = simnet.callPublicFn(
+        "habit-tracker-v3",
+        "claim-bonus",
+        [Cl.uint(standardId)],
+        user3
+      );
+      expect(claimStandard.result).toBeOk(Cl.uint(MIN_STAKE / 2));
+    });
+  });
+
   describe("read-only functions", () => {
     let habitId: number;
 
