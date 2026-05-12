@@ -11,10 +11,10 @@ export interface HabitCheckInSnapshot {
 
 export type CheckInEligibilityReason =
   | 'eligible'
+  | 'late'
   | 'inactive'
   | 'completed'
   | 'too-early'
-  | 'window-expired'
   | 'invalid-block-height';
 
 export interface CheckInEligibility {
@@ -73,8 +73,8 @@ export function evaluateDailyCheckInEligibility(
 
   if (blocksElapsed > CHECK_IN_WINDOW_BLOCKS) {
     return {
-      eligible: false,
-      reason: 'window-expired',
+      eligible: true,
+      reason: 'late',
       blocksElapsed,
       blocksUntilEligible: 0,
       blocksUntilWindowExpiry: 0,
