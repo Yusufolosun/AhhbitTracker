@@ -89,7 +89,7 @@ function getMemberInfo(groupId: number, member: string) {
 function getMemberGroups(member: string) {
   return simnet.callReadOnlyFn(
     "habit-accountability-group-v3",
-    "get-member-groups",
+    "get-member-groups-list",
     [Cl.principal(member)],
     deployer
   );
