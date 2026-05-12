@@ -56,7 +56,7 @@ describe('mobile notification planner', () => {
     const plans = buildHabitNotificationPlans({
       address: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
       habit,
-      currentBlock: 235,
+      currentBlock: 285,
       now: new Date('2026-04-20T12:00:00.000Z').getTime(),
     });
 
@@ -71,7 +71,7 @@ describe('mobile notification planner', () => {
     const plans = buildHabitNotificationPlans({
       address: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
       habit,
-      currentBlock: 250,
+      currentBlock: 300,
       now: new Date('2026-04-20T12:00:00.000Z').getTime(),
     });
 
@@ -164,7 +164,7 @@ describe('mobile notification planner', () => {
     const habit = createHabit({ currentStreak: 7, lastCheckInBlock: 100 });
 
     expect(getHabitNotificationSummary(habit, null)).toBe('Waiting for block height');
-    expect(getHabitNotificationSummary(habit, 235)).toBe('Check-in is urgent');
+    expect(getHabitNotificationSummary(habit, 285)).toBe('Check-in is urgent');
     expect(getHabitNotificationSummary(createHabit({ currentStreak: 7 }), 220)).toBe(
       'Withdrawal unlocked after 7 days',
     );

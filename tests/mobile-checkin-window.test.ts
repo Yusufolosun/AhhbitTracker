@@ -28,7 +28,7 @@ describe('mobile check-in window helpers', () => {
   });
 
   it('returns cooldown before minimum check-in interval', () => {
-    expect(getMobileCheckInWindowState(createHabit(), 219)).toBe('cooldown');
+    expect(getMobileCheckInWindowState(createHabit(), 190)).toBe('cooldown');
   });
 
   it('returns available inside normal check-in range', () => {
@@ -37,15 +37,15 @@ describe('mobile check-in window helpers', () => {
   });
 
   it('returns urgent in the final check-in window and expired after deadline', () => {
-    expect(getMobileCheckInWindowState(createHabit(), 233)).toBe('urgent');
-    expect(getMobileCheckInWindowState(createHabit(), 244)).toBe('urgent');
-    expect(getMobileCheckInWindowState(createHabit(), 245)).toBe('expired');
+    expect(getMobileCheckInWindowState(createHabit(), 281)).toBe('urgent');
+    expect(getMobileCheckInWindowState(createHabit(), 292)).toBe('urgent');
+    expect(getMobileCheckInWindowState(createHabit(), 293)).toBe('expired');
   });
 
-  it('allows check-ins only when available or urgent', () => {
+  it('allows check-ins when available, urgent, or late', () => {
     expect(canSubmitMobileDailyCheckIn(createHabit(), 220)).toBe(true);
-    expect(canSubmitMobileDailyCheckIn(createHabit(), 240)).toBe(true);
-    expect(canSubmitMobileDailyCheckIn(createHabit(), 219)).toBe(false);
-    expect(canSubmitMobileDailyCheckIn(createHabit(), 246)).toBe(false);
+    expect(canSubmitMobileDailyCheckIn(createHabit(), 290)).toBe(true);
+    expect(canSubmitMobileDailyCheckIn(createHabit(), 190)).toBe(false);
+    expect(canSubmitMobileDailyCheckIn(createHabit(), 295)).toBe(true);
   });
 });

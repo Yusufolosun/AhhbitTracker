@@ -24,26 +24,26 @@ describe('evaluateDailyCheckInEligibility', () => {
         isCompleted: false,
         lastCheckInBlock: 1000,
       },
-      1100,
+      1080,
     );
 
     expect(result.eligible).toBe(false);
     expect(result.reason).toBe('too-early');
-    expect(result.blocksUntilEligible).toBe(20);
+    expect(result.blocksUntilEligible).toBe(16);
   });
 
-  it('returns window-expired after check-in window', () => {
+  it('returns late after check-in window', () => {
     const result = evaluateDailyCheckInEligibility(
       {
         isActive: true,
         isCompleted: false,
         lastCheckInBlock: 1000,
       },
-      1145,
+      1195,
     );
 
-    expect(result.eligible).toBe(false);
-    expect(result.reason).toBe('window-expired');
+    expect(result.eligible).toBe(true);
+    expect(result.reason).toBe('late');
   });
 
   it('returns completed when habit is completed', () => {
