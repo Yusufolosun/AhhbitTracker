@@ -335,7 +335,7 @@ describe("AhhbitTracker Contract", () => {
       // Setup: Complete streak and withdraw
       for (let i = 0; i < 7; i++) {
         checkIn(user1, habitId);
-        simnet.mineEmptyBlocks(120); // MIN-CHECK-IN-INTERVAL
+        simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL); // MIN-CHECK-IN-INTERVAL
       }
       simnet.callPublicFn("habit-tracker-v3", "withdraw-stake", [Cl.uint(habitId)], user1);
 
@@ -366,7 +366,7 @@ describe("AhhbitTracker Contract", () => {
     it("should allow successful withdrawal after streak", () => {
       for (let i = 0; i < 7; i++) {
         checkIn(user1, habitId);
-        simnet.mineEmptyBlocks(120); // MIN-CHECK-IN-INTERVAL
+        simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL); // MIN-CHECK-IN-INTERVAL
       }
 
       const result = simnet.callPublicFn("habit-tracker-v3", "withdraw-stake", [Cl.uint(habitId)], user1);
@@ -423,7 +423,7 @@ describe("AhhbitTracker Contract", () => {
       for (let i = 0; i < 7; i++) {
         const res = checkIn(user1, id1);
         expect(res.result).toEqual(Cl.ok(Cl.uint(i + 1)));
-        simnet.mineEmptyBlocks(120);
+        simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       }
 
       const resW = simnet.callPublicFn("habit-tracker-v3", "withdraw-stake", [Cl.uint(id1)], user1);
@@ -449,14 +449,14 @@ describe("AhhbitTracker Contract", () => {
       const h1 = createHabit(user1, "Habit A", MIN_STAKE);
       const id1 = Number((h1.result as any).value.value);
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
-      for (let i = 0; i < 7; i++) { checkIn(user1, id1); simnet.mineEmptyBlocks(120); }
+      for (let i = 0; i < 7; i++) { checkIn(user1, id1); simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL); }
       withdrawStake(user1, id1);
 
       // User2 completes a habit
       const h2 = createHabit(user2, "Habit B", MIN_STAKE);
       const id2 = Number((h2.result as any).value.value);
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
-      for (let i = 0; i < 7; i++) { checkIn(user2, id2); simnet.mineEmptyBlocks(120); }
+      for (let i = 0; i < 7; i++) { checkIn(user2, id2); simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL); }
       withdrawStake(user2, id2);
 
       // Both claim from a fixed pool with two claimants.
@@ -494,7 +494,7 @@ describe("AhhbitTracker Contract", () => {
       const h1 = createHabit(user1, "Capped habit", MIN_STAKE);
       const cid = Number((h1.result as any).value.value);
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
-      for (let i = 0; i < 7; i++) { checkIn(user1, cid); simnet.mineEmptyBlocks(120); }
+      for (let i = 0; i < 7; i++) { checkIn(user1, cid); simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL); }
       withdrawStake(user1, cid);
 
       const result = simnet.callPublicFn("habit-tracker-v3", "claim-bonus", [Cl.uint(cid)], user1);
@@ -519,7 +519,7 @@ describe("AhhbitTracker Contract", () => {
       const completed = createHabit(user1, "Claim eligible", MIN_STAKE);
       const completedId = Number((completed.result as any).value.value);
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
-      for (let i = 0; i < 7; i++) { checkIn(user1, completedId); simnet.mineEmptyBlocks(120); }
+      for (let i = 0; i < 7; i++) { checkIn(user1, completedId); simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL); }
       withdrawStake(user1, completedId);
 
       expect(getUnclaimedCompletedHabits().result).toEqual(Cl.ok(Cl.uint(1)));
@@ -542,13 +542,13 @@ describe("AhhbitTracker Contract", () => {
       const h1 = createHabit(user1, "Estimator A", MIN_STAKE);
       const id1 = Number((h1.result as any).value.value);
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
-      for (let i = 0; i < 7; i++) { checkIn(user1, id1); simnet.mineEmptyBlocks(120); }
+      for (let i = 0; i < 7; i++) { checkIn(user1, id1); simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL); }
       withdrawStake(user1, id1);
 
       const h2 = createHabit(user2, "Estimator B", MIN_STAKE);
       const id2 = Number((h2.result as any).value.value);
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
-      for (let i = 0; i < 7; i++) { checkIn(user2, id2); simnet.mineEmptyBlocks(120); }
+      for (let i = 0; i < 7; i++) { checkIn(user2, id2); simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL); }
       withdrawStake(user2, id2);
 
       // 6,000 / 2 claimants => 3,000 estimated bonus share.
@@ -615,7 +615,7 @@ describe("AhhbitTracker Contract", () => {
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       for (let i = 0; i < 7; i++) {
         checkIn(user2, referredId);
-        simnet.mineEmptyBlocks(120);
+        simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       }
       withdrawStake(user2, referredId);
 
@@ -641,7 +641,7 @@ describe("AhhbitTracker Contract", () => {
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       for (let i = 0; i < 7; i++) {
         checkIn(user1, boostedId);
-        simnet.mineEmptyBlocks(120);
+        simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       }
       withdrawStake(user1, boostedId);
 
@@ -655,7 +655,7 @@ describe("AhhbitTracker Contract", () => {
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       for (let i = 0; i < 7; i++) {
         checkIn(user3, standardId);
-        simnet.mineEmptyBlocks(120);
+        simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       }
       withdrawStake(user3, standardId);
 
@@ -735,7 +735,7 @@ describe("AhhbitTracker Contract", () => {
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       for (let i = 0; i < 7; i++) {
         checkIn(user1, id);
-        simnet.mineEmptyBlocks(120);
+        simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       }
 
       // Expire the window
@@ -753,7 +753,7 @@ describe("AhhbitTracker Contract", () => {
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       for (let i = 0; i < 7; i++) {
         checkIn(user1, id);
-        simnet.mineEmptyBlocks(120);
+        simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       }
 
       simnet.mineEmptyBlocks(200);
@@ -814,7 +814,7 @@ describe("AhhbitTracker Contract", () => {
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       for (let i = 0; i < 7; i++) {
         checkIn(user1, id1);
-        simnet.mineEmptyBlocks(120);
+        simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       }
       withdrawStake(user1, id1);
 
