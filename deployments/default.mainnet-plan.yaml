@@ -12,21 +12,21 @@ plan:
             contract-name: habit-tracker-v3
             expected-sender: SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z
             cost: 145880
-            path: "contracts\\habit-tracker-v3.clar"
+            path: "contracts/habit-tracker-v3.clar"
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: habit-streak-reward-v3
             expected-sender: SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z
             cost: 71140
-            path: "contracts\\habit-streak-reward-v3.clar"
+            path: "contracts/habit-streak-reward-v3.clar"
             anchor-block-only: true
             clarity-version: 2
         - contract-publish:
             contract-name: habit-accountability-group-v3
             expected-sender: SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z
             cost: 50000
-            path: "contracts\\habit-accountability-group-v3.clar"
+            path: "contracts/habit-accountability-group-v3.clar"
             anchor-block-only: true
             clarity-version: 2
       epoch: "2.5"

@@ -66,16 +66,16 @@ plan:
         - emulated-contract-publish:
             contract-name: habit-tracker-v3
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: "contracts\\habit-tracker-v3.clar"
+            path: "contracts/habit-tracker-v3.clar"
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: habit-accountability-group-v3
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: "contracts\\habit-accountability-group-v3.clar"
+            path: "contracts/habit-accountability-group-v3.clar"
             clarity-version: 2
         - emulated-contract-publish:
             contract-name: habit-streak-reward-v3
             emulated-sender: ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM
-            path: "contracts\\habit-streak-reward-v3.clar"
+            path: "contracts/habit-streak-reward-v3.clar"
             clarity-version: 2
       epoch: "2.5"
