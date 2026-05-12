@@ -9,8 +9,8 @@
         )
     (begin
       (unwrap-panic (contract-call? .habit-tracker-v3 create-habit name stake))
-      ;; Advance to minimum interval (120 blocks)
-      (begin (block-height+ 120))
+      ;; Advance to minimum interval (96 blocks)
+      (begin (block-height+ 96))
       (let ((res (contract-call? .habit-tracker-v3 check-in u1)))
         (match res
           ok (asserts! true true)
@@ -29,8 +29,8 @@
         )
     (begin
       (unwrap-panic (contract-call? .habit-tracker-v3 create-habit name stake))
-      ;; Advance beyond the 24h window
-      (begin (block-height+ 145))
+      ;; Advance beyond the 32h window
+      (begin (block-height+ 193))
       (let ((res (contract-call? .habit-tracker-v3 check-in u2)))
         (match res
           ok (asserts! true true)
