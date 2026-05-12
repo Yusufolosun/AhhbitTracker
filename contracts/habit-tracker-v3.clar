@@ -46,6 +46,16 @@
 (define-constant FORFEIT-BPS-PER-MISS u1000)
 (define-constant BPS-DENOMINATOR u10000)
 
+;; Maximum consecutive missed windows before habit is force-terminated
+;; At 10% per miss, 10 misses = 100% of initial stake => natural cap
+;; Set to 10 so a habit auto-terminates cleanly at full forfeit
+(define-constant MAX-CONSECUTIVE-MISSES u10)
+
+;; Minimum remaining stake to keep habit active (dust threshold)
+;; If remaining stake after penalty falls below this, treat as fully forfeited
+;; Prevents zombie habits with unclaimable micro-stakes
+(define-constant MIN-ACTIVE-STAKE u1000)
+
 ;; Referral boost settings (bonus claim weights)
 (define-constant REFERRAL-BOOST-PER-COMPLETION u1)
 (define-constant MAX-REFERRAL-BOOST u10)
@@ -72,6 +82,8 @@
 (define-constant ERR-REFERRER-ALREADY-SET (err u115))
 (define-constant ERR-INVALID-REFERRER (err u116))
 (define-constant ERR-SELF-REFERRAL (err u117))
+(define-constant ERR-HABIT-FULLY-FORFEITED (err u118))
+(define-constant ERR-NO-PENALTY-DUE (err u119))
 
 ;; ============================================
 ;; DATA STRUCTURES
@@ -790,35 +802,54 @@
             (remaining-stake (get stake-amount habit))
             (applied-penalty (if (> raw-penalty remaining-stake) remaining-stake raw-penalty))
             (remaining-after (- remaining-stake applied-penalty))
-            (is-active-after (> remaining-after u0))
-            (new-streak (if is-active-after u1 u0))
+            (is-active-after (>= remaining-after MIN-ACTIVE-STAKE))
+            (updated-habit (if is-active-after
+              (merge habit {
+                stake-amount: remaining-after,
+                current-streak: u0,
+                last-check-in-block: block-height,
+                is-active: is-active-after
+              })
+              (merge habit {
+                stake-amount: remaining-after,
+                current-streak: u0,
+                last-check-in-block: block-height,
+                is-active: is-active-after,
+                is-completed: false
+              })
+            ))
           )
           (var-set forfeited-pool-balance
             (+ (var-get forfeited-pool-balance) applied-penalty))
           (map-set habits
             { habit-id: habit-id }
-            (merge habit {
-              stake-amount: remaining-after,
-              current-streak: new-streak,
-              last-check-in-block: block-height,
-              is-active: is-active-after
-            })
+            updated-habit
           )
           (map-set habit-penalties
             { habit-id: habit-id }
             (merge penalty-data { missed-checkins: u0 })
           )
+          (if (not is-active-after)
+            (begin (print {
+              event: "habit-fully-forfeited",
+              habit-id: habit-id,
+              owner: caller,
+              total-forfeited: initial-stake,
+              triggered-by: "check-in",
+              block: block-height
+            }) true)
+            true
+          )
           (print {
             event: "habit-check-in-penalized",
             habit-id: habit-id,
             owner: caller,
-            missed-checkins: missed-total,
+            missed-checkins: new-missed,
             penalty: applied-penalty,
             remaining-stake: remaining-after,
-            new-streak: new-streak,
             block: block-height
           })
-          (ok new-streak)
+          (ok u0)
         )
       )
     )
@@ -857,7 +888,7 @@
         (raw-penalty (calculate-missed-penalty initial-stake new-missed))
         (applied-penalty (if (> raw-penalty stake-amount) stake-amount raw-penalty))
         (remaining-after (- stake-amount applied-penalty))
-        (is-active-after (> remaining-after u0))
+        (is-active-after (>= remaining-after MIN-ACTIVE-STAKE))
       )
       ;; Move penalty to pool
       (var-set forfeited-pool-balance (+ (var-get forfeited-pool-balance) applied-penalty))
@@ -868,6 +899,7 @@
         (merge habit {
           stake-amount: remaining-after,
           current-streak: u0,
+          last-check-in-block: block-height,
           is-active: is-active-after
         })
       )
@@ -875,7 +907,19 @@
       ;; Track applied missed check-ins
       (map-set habit-penalties
         { habit-id: habit-id }
-        (merge penalty-data { missed-checkins: (+ applied-missed new-missed) })
+        (merge penalty-data { missed-checkins: u0 })
+      )
+
+      (if (not is-active-after)
+        (begin (print {
+          event: "habit-fully-forfeited",
+          habit-id: habit-id,
+          owner: (get owner habit),
+          total-forfeited: initial-stake,
+          triggered-by: "slash",
+          block: block-height
+        }) true)
+        true
       )
 
       ;; Emit event
@@ -883,8 +927,8 @@
         event: "habit-slashed",
         habit-id: habit-id,
         slasher: tx-sender,
-        missed-checkins: missed-total,
-        amount: applied-penalty,
+        missed-checkins: new-missed,
+        penalty: applied-penalty,
         remaining-stake: remaining-after,
         block: block-height
       })
@@ -1034,6 +1078,45 @@
 ;; Get habit details
 (define-read-only (get-habit (habit-id uint))
   (map-get? habits { habit-id: habit-id })
+)
+
+;; Get forfeit status for a habit
+(define-read-only (get-forfeit-status (habit-id uint))
+  (match (map-get? habits { habit-id: habit-id })
+    habit
+      (let
+        (
+          (penalty-data (default-to { initial-stake-amount: (get stake-amount habit), missed-checkins: u0 }
+            (map-get? habit-penalties { habit-id: habit-id })))
+          (initial-stake (get initial-stake-amount penalty-data))
+          (applied-missed (get missed-checkins penalty-data))
+          (last-check-in (get last-check-in-block habit))
+          (missed-windows (get-missed-checkins last-check-in))
+          (unapplied-missed (if (> missed-windows applied-missed) (- missed-windows applied-missed) u0))
+          (pending-penalty (calculate-missed-penalty initial-stake unapplied-missed))
+          (stake-amount (get stake-amount habit))
+          (applied-penalty (if (> pending-penalty stake-amount) stake-amount pending-penalty))
+          (stake-after-penalty (- stake-amount applied-penalty))
+          (latest (get-checkin-latest last-check-in))
+          (blocks-until-next-miss (if (>= latest block-height) (- latest block-height) u0))
+          (pct-stake-remaining (if (> initial-stake u0) (/ (* stake-amount u100) initial-stake) u0))
+        )
+        (ok {
+          habit-id: habit-id,
+          is-active: (get is-active habit),
+          stake-amount: stake-amount,
+          initial-stake: initial-stake,
+          missed-windows: missed-windows,
+          unapplied-missed: unapplied-missed,
+          pending-penalty: pending-penalty,
+          stake-after-penalty: stake-after-penalty,
+          is-in-penalty-zone: (> missed-windows u0),
+          blocks-until-next-miss: blocks-until-next-miss,
+          pct-stake-remaining: pct-stake-remaining
+        })
+      )
+    ERR-HABIT-NOT-FOUND
+  )
 )
 
 ;; Get all habit IDs for a user
