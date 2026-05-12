@@ -312,7 +312,8 @@ describe("AhhbitTracker Contract", () => {
       simnet.mineEmptyBlocks(192);
 
       const result = checkIn(user1, habitId);
-      expect(result.result).toBeOk(Cl.uint(1));
+      // Late check-in resets streak to 0 (recovery action, not a productive day)
+      expect(result.result).toBeOk(Cl.uint(0));
 
       // Pool increases by the penalty amount
       const pool = simnet.getDataVar("habit-tracker-v3", "forfeited-pool-balance");
@@ -851,9 +852,9 @@ describe("AhhbitTracker Contract", () => {
       checkIn(user1, id);
       simnet.mineEmptyBlocks(200);
 
-      // Owner checks in too late - penalty applies
+      // Owner checks in too late - penalty applies, streak resets to 0
       const result2 = checkIn(user1, id);
-      expect(result2.result).toBeOk(Cl.uint(1));
+      expect(result2.result).toBeOk(Cl.uint(0));
 
       // Pool increases by 10% of the initial stake
       const pool = simnet.getDataVar("habit-tracker-v3", "forfeited-pool-balance");
@@ -881,9 +882,9 @@ describe("AhhbitTracker Contract", () => {
       checkIn(user1, id);
       simnet.mineEmptyBlocks(200);
 
-      // First expired check-in applies penalty
+      // First expired check-in applies penalty, streak resets to 0
       const result2 = checkIn(user1, id);
-      expect(result2.result).toBeOk(Cl.uint(1));
+      expect(result2.result).toBeOk(Cl.uint(0));
 
       // Immediate follow-up is blocked by MIN-CHECK-IN-INTERVAL
       const result3 = checkIn(user1, id);
@@ -902,9 +903,9 @@ describe("AhhbitTracker Contract", () => {
       }
       simnet.mineEmptyBlocks(200);
 
-      // Late check-in applies penalty and resets streak
+      // Late check-in applies penalty and resets streak to 0
       const slashResult = checkIn(user1, id);
-      expect(slashResult.result).toBeOk(Cl.uint(1));
+      expect(slashResult.result).toBeOk(Cl.uint(0));
 
       // Withdrawal now fails because streak reset
       const withdrawResult = withdrawStake(user1, id);
@@ -928,7 +929,7 @@ describe("AhhbitTracker Contract", () => {
       expect(pool).toBeUint(MIN_STAKE / 10);
     });
 
-    it("should reset streak to 1 after late check-in", () => {
+    it("should reset streak to 0 after late check-in", () => {
       const result = createHabit(user1, "Exercise", MIN_STAKE);
       const id = Number((result.result as any).value.value);
 
@@ -942,13 +943,13 @@ describe("AhhbitTracker Contract", () => {
       // Let window expire
       simnet.mineEmptyBlocks(200);
 
-      // Late check-in applies penalty
+      // Late check-in applies penalty, streak resets to 0
       const slashResult = checkIn(user1, id);
-      expect(slashResult.result).toBeOk(Cl.uint(1));
+      expect(slashResult.result).toBeOk(Cl.uint(0));
 
-      // Streak resets to 1 after penalty
+      // Streak is 0 after penalty (late check-in is recovery, not productive)
       const streakResult = simnet.callReadOnlyFn("habit-tracker-v3", "get-habit-streak", [Cl.uint(id)], deployer);
-      expect(streakResult.result).toBeOk(Cl.uint(1));
+      expect(streakResult.result).toBeOk(Cl.uint(0));
     });
   });
 
