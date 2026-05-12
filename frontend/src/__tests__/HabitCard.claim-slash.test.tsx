@@ -72,7 +72,7 @@ const expiredHabit: Habit = {
   name: 'Expired Habit',
   owner: 'SP2ABC123',
   stakeAmount: 500_000,
-  lastCheckInBlock: 10,
+  lastCheckInBlock: 0,
   createdAtBlock: 5,
   currentStreak: 2,
   isActive: true,

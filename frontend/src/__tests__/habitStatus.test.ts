@@ -45,36 +45,36 @@ describe('getCheckInWindowState', () => {
     expect(getCheckInWindowState(habit, 1050)).toBe('cooldown');
   });
 
-  it('returns available at exactly 120 blocks elapsed', () => {
+  it('returns available at exactly 96 blocks elapsed', () => {
+    const habit = makeHabit({ lastCheckInBlock: 1000 });
+    expect(getCheckInWindowState(habit, 1096)).toBe('available');
+  });
+
+  it('returns available when elapsed is between 96 and 180 blocks', () => {
     const habit = makeHabit({ lastCheckInBlock: 1000 });
     expect(getCheckInWindowState(habit, 1120)).toBe('available');
   });
 
-  it('returns available when elapsed is between 120 and 132 blocks', () => {
+  it('returns urgent when elapsed > 180 but <= 192', () => {
     const habit = makeHabit({ lastCheckInBlock: 1000 });
-    expect(getCheckInWindowState(habit, 1130)).toBe('available');
+    expect(getCheckInWindowState(habit, 1181)).toBe('urgent');
   });
 
-  it('returns urgent when elapsed > 132 but <= 144', () => {
+  it('returns urgent at exactly 192 blocks elapsed', () => {
     const habit = makeHabit({ lastCheckInBlock: 1000 });
-    expect(getCheckInWindowState(habit, 1133)).toBe('urgent');
+    expect(getCheckInWindowState(habit, 1192)).toBe('urgent');
   });
 
-  it('returns urgent at exactly 144 blocks elapsed', () => {
+  it('returns expired when elapsed > 192', () => {
     const habit = makeHabit({ lastCheckInBlock: 1000 });
-    expect(getCheckInWindowState(habit, 1144)).toBe('urgent');
-  });
-
-  it('returns expired when elapsed > 144', () => {
-    const habit = makeHabit({ lastCheckInBlock: 1000 });
-    expect(getCheckInWindowState(habit, 1145)).toBe('expired');
+    expect(getCheckInWindowState(habit, 1193)).toBe('expired');
   });
 });
 
 describe('getBlocksRemaining', () => {
   it('returns correct remaining blocks', () => {
     const habit = makeHabit({ lastCheckInBlock: 1000 });
-    expect(getBlocksRemaining(habit, 1100)).toBe(44); // 144 - 100
+    expect(getBlocksRemaining(habit, 1100)).toBe(92); // 192 - 100
   });
 
   it('returns 0 when window is expired', () => {
@@ -84,20 +84,20 @@ describe('getBlocksRemaining', () => {
 
   it('returns full window at block 0 elapsed', () => {
     const habit = makeHabit({ lastCheckInBlock: 1000 });
-    expect(getBlocksRemaining(habit, 1000)).toBe(144);
+    expect(getBlocksRemaining(habit, 1000)).toBe(192);
   });
 });
 
 describe('getBlocksUntilNextCheckIn', () => {
   it('returns remaining cooldown blocks', () => {
     const habit = makeHabit({ lastCheckInBlock: 1000 });
-    expect(getBlocksUntilNextCheckIn(habit, 1100)).toBe(20);
+    expect(getBlocksUntilNextCheckIn(habit, 1050)).toBe(46);
   });
 
   it('returns 0 once check-in is available', () => {
     const habit = makeHabit({ lastCheckInBlock: 1000 });
-    expect(getBlocksUntilNextCheckIn(habit, 1120)).toBe(0);
-    expect(getBlocksUntilNextCheckIn(habit, 1140)).toBe(0);
+    expect(getBlocksUntilNextCheckIn(habit, 1096)).toBe(0);
+    expect(getBlocksUntilNextCheckIn(habit, 1180)).toBe(0);
   });
 });
 
@@ -119,26 +119,29 @@ describe('isEligibleToWithdraw', () => {
 
 describe('isEligibleForDailyCheckIn', () => {
   it('returns true for available and urgent windows', () => {
-    expect(isEligibleForDailyCheckIn(makeHabit({ lastCheckInBlock: 1000 }), 1120)).toBe(true);
-    expect(isEligibleForDailyCheckIn(makeHabit({ lastCheckInBlock: 1000 }), 1138)).toBe(true);
+    expect(isEligibleForDailyCheckIn(makeHabit({ lastCheckInBlock: 1000 }), 1096)).toBe(true);
+    expect(isEligibleForDailyCheckIn(makeHabit({ lastCheckInBlock: 1000 }), 1185)).toBe(true);
   });
 
-  it('returns false for cooldown, expired, and unknown', () => {
-    expect(isEligibleForDailyCheckIn(makeHabit({ lastCheckInBlock: 1000 }), 1100)).toBe(false);
-    expect(isEligibleForDailyCheckIn(makeHabit({ lastCheckInBlock: 1000 }), 1145)).toBe(false);
+  it('returns false for cooldown and unknown', () => {
+    expect(isEligibleForDailyCheckIn(makeHabit({ lastCheckInBlock: 1000 }), 1050)).toBe(false);
     expect(isEligibleForDailyCheckIn(makeHabit(), null)).toBe(false);
+  });
+
+  it('returns true for late check-ins after the window', () => {
+    expect(isEligibleForDailyCheckIn(makeHabit({ lastCheckInBlock: 1000 }), 1195)).toBe(true);
   });
 });
 
 describe('getEligibleDailyCheckInHabitIds', () => {
   it('returns only habit IDs that are currently check-in eligible', () => {
     const habits = [
-      makeHabit({ habitId: 1, lastCheckInBlock: 1000 }), // available at 1120
-      makeHabit({ habitId: 2, lastCheckInBlock: 1008 }), // cooldown at 1120
-      makeHabit({ habitId: 3, lastCheckInBlock: 988 }),  // urgent at 1120
-      makeHabit({ habitId: 4, lastCheckInBlock: 970 }),  // expired at 1120
+      makeHabit({ habitId: 1, lastCheckInBlock: 1104 }), // available at 1200
+      makeHabit({ habitId: 2, lastCheckInBlock: 1110 }), // cooldown at 1200
+      makeHabit({ habitId: 3, lastCheckInBlock: 1015 }), // urgent at 1200
+      makeHabit({ habitId: 4, lastCheckInBlock: 1000 }), // expired at 1200
     ];
 
-    expect(getEligibleDailyCheckInHabitIds(habits, 1120)).toEqual([1, 3]);
+    expect(getEligibleDailyCheckInHabitIds(habits, 1200)).toEqual([1, 3, 4]);
   });
 });

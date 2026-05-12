@@ -39,13 +39,13 @@ const completedHabit: Habit = {
   bonusClaimed: false,
 };
 
-// lastCheckInBlock 10, currentBlock 200 → 190 blocks elapsed > 144 → expired
+// lastCheckInBlock 0, currentBlock 200 → 200 blocks elapsed > 192 → expired
 const expiredHabit: Habit = {
   habitId: 3,
   name: 'Meditate',
   owner: 'SP2ABC123',
   stakeAmount: 2000000,
-  lastCheckInBlock: 10,
+  lastCheckInBlock: 0,
   createdAtBlock: 5,
   currentStreak: 3,
   isActive: true,
@@ -92,7 +92,7 @@ describe('Dashboard', () => {
 
   it('shows expired alert with forfeiture warning', () => {
     render(<Dashboard habits={[activeHabit, expiredHabit]} />);
-    expect(screen.getByText(/at risk of forfeiture/i)).toBeDefined();
+    expect(screen.getByText(/at risk of penalty/i)).toBeDefined();
     expect(screen.getByText(/no longer counted as active/i)).toBeDefined();
   });
 
