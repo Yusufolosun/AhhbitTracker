@@ -344,13 +344,16 @@ describe("AhhbitTracker Contract", () => {
       expect(result.result).toBeErr(Cl.uint(108)); // ERR-HABIT-ALREADY-COMPLETED
     });
 
-    it("should reject check-in to a slashed (inactive) habit", () => {
+    it("should reject check-in to a slashed (partially forfeited) habit", () => {
       checkIn(user1, habitId);
       simnet.mineEmptyBlocks(200);
       simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(habitId)], user2);
 
+      // With MIN_STAKE (20,000), partial slash takes 10% (2,000), leaving 18,000.
+      // Habit stays active. Slash reset last-check-in-block to current block,
+      // so immediate check-in fails with ERR-ALREADY-CHECKED-IN (interval not met).
       const result = checkIn(user1, habitId);
-      expect(result.result).toBeErr(Cl.uint(108)); // ERR-HABIT-ALREADY-COMPLETED (inactive)
+      expect(result.result).toBeErr(Cl.uint(105)); // ERR-ALREADY-CHECKED-IN
     });
 
   });
@@ -391,8 +394,10 @@ describe("AhhbitTracker Contract", () => {
       simnet.mineEmptyBlocks(200);
       simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(habitId)], user2);
 
+      // With MIN_STAKE (20,000), partial slash leaves 18,000 — habit stays active.
+      // Streak was reset to 0, so withdrawal fails with ERR-INSUFFICIENT-STREAK.
       const result = simnet.callPublicFn("habit-tracker-v3", "withdraw-stake", [Cl.uint(habitId)], user1);
-      expect(result.result).toBeErr(Cl.uint(108)); // ERR-HABIT-ALREADY-COMPLETED (inactive)
+      expect(result.result).toBeErr(Cl.uint(107)); // ERR-INSUFFICIENT-STREAK
     });
 
   });
@@ -592,10 +597,12 @@ describe("AhhbitTracker Contract", () => {
         [Cl.principal(user2)],
         deployer
       );
+      // register-referrer was called at blockHeight N, then self-referral
+      // advanced the block. Use blockHeight - 1 to match the registration block.
       expect(referrer.result).toBeSome(
         Cl.tuple({
           referrer: Cl.principal(user1),
-          "set-at-block": Cl.uint(simnet.blockHeight),
+          "set-at-block": Cl.uint(simnet.blockHeight - 1),
         })
       );
     });
@@ -647,7 +654,7 @@ describe("AhhbitTracker Contract", () => {
       withdrawStake(user1, boostedId);
 
       const boostedRecord = getHabit(boostedId);
-      const boostedWeight = (boostedRecord.result as any).value.data["bonus-weight"];
+      const boostedWeight = (boostedRecord.result as any).value.value.data["bonus-weight"];
       expect(boostedWeight).toEqual(Cl.uint(2));
 
       // user3 completes a habit without boost (weight = 1)
@@ -727,9 +734,9 @@ describe("AhhbitTracker Contract", () => {
 
   describe("edge cases & regression", () => {
 
-    it("should allow withdrawal even after check-in window expired (race condition)", () => {
-      // A user with streak >= 7 who missed their window can still withdraw
-      // before someone slashes them. This is by design.
+    it("should reject withdrawal after check-in window expired", () => {
+      // The contract blocks withdrawals after the window expires to prevent
+      // penalty dodging. Users must keep their window valid to withdraw.
       const result = createHabit(user1, "Exercise", MIN_STAKE);
       const id = Number((result.result as any).value.value);
 
@@ -742,9 +749,9 @@ describe("AhhbitTracker Contract", () => {
       // Expire the window
       simnet.mineEmptyBlocks(200);
 
-      // Withdraw BEFORE anyone slashes — should succeed
+      // Withdrawal fails — window expired, contract enforces is-check-in-valid
       const withdrawResult = withdrawStake(user1, id);
-      expect(withdrawResult.result).toBeOk(Cl.uint(MIN_STAKE));
+      expect(withdrawResult.result).toBeErr(Cl.uint(100)); // ERR-NOT-AUTHORIZED
     });
 
     it("should reject withdrawal after slash even if streak was sufficient", () => {
