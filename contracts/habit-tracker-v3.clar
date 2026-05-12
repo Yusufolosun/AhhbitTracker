@@ -48,6 +48,10 @@
 (define-constant FORFEIT-BPS-PER-MISS u1000)
 (define-constant BPS-DENOMINATOR u10000)
 
+;; Referral boost settings (bonus claim weights)
+(define-constant REFERRAL-BOOST-PER-COMPLETION u1)
+(define-constant MAX-REFERRAL-BOOST u10)
+
 ;; Bonus distribution uses dynamic equal-share allocation across
 ;; completed habits that have not claimed yet.
 
@@ -68,6 +72,9 @@
 (define-constant ERR-HABIT-LIMIT-REACHED (err u112))
 (define-constant ERR-STAKE-TOO-HIGH (err u113))
 (define-constant ERR-HABIT-AUTO-SLASHED (err u114))
+(define-constant ERR-REFERRER-ALREADY-SET (err u115))
+(define-constant ERR-INVALID-REFERRER (err u116))
+(define-constant ERR-SELF-REFERRAL (err u117))
 
 ;; ============================================
 ;; DATA STRUCTURES
@@ -85,6 +92,7 @@
     created-at-block: uint,
     is-active: bool,
     is-completed: bool,
+    bonus-weight: uint,
     bonus-claimed: bool
   }
 )
@@ -113,6 +121,9 @@
 
 ;; Number of completed habits that are still eligible to claim bonus
 (define-data-var unclaimed-completed-habits uint u0)
+
+;; Total bonus claim weight across unclaimed completed habits
+(define-data-var unclaimed-completed-weight uint u0)
 
 ;; ============================================
 ;; ACCOUNTABILITY GROUPS (merged from habit-accountability-group-v3.clar)
@@ -546,9 +557,9 @@
 
 ;; Calculate equal-share bonus amount for the next claimant.
 ;; Integer division intentionally leaves any remainder for later claimants.
-(define-private (calculate-bonus-share (pool-balance uint) (eligible-claimants uint))
-  (if (> eligible-claimants u0)
-    (/ pool-balance eligible-claimants)
+(define-private (calculate-bonus-share (pool-balance uint) (total-weight uint) (claim-weight uint))
+  (if (and (> total-weight u0) (> claim-weight u0))
+    (/ (* pool-balance claim-weight) total-weight)
     u0
   )
 )
@@ -565,6 +576,38 @@
   )
 )
 
+;; Calculate referral bonus weight boost for a user
+(define-private (calculate-referral-boost (user principal))
+  (let
+    (
+      (stats (default-to { successful-referrals: u0 } (map-get? referrer-stats { referrer: user })))
+      (raw-boost (* (get successful-referrals stats) REFERRAL-BOOST-PER-COMPLETION))
+    )
+    (if (> raw-boost MAX-REFERRAL-BOOST)
+      MAX-REFERRAL-BOOST
+      raw-boost
+    )
+  )
+)
+
+;; Register a referrer once per user (no self-referrals)
+(define-private (set-referrer (user principal) (referrer principal))
+  (match (map-get? referrals { user: user })
+    existing
+      (if (is-eq (get referrer existing) referrer)
+        (ok true)
+        ERR-REFERRER-ALREADY-SET
+      )
+    (begin
+      (asserts! (not (is-eq user referrer)) ERR-SELF-REFERRAL)
+      (asserts! (not (is-eq referrer (as-contract tx-sender))) ERR-INVALID-REFERRER)
+      (map-set referrals { user: user } { referrer: referrer, set-at-block: block-height })
+      (print { event: "referrer-registered", user: user, referrer: referrer, block: block-height })
+      (ok true)
+    )
+  )
+)
+
 ;; Calculate total penalty for missed check-ins
 (define-private (calculate-missed-penalty (initial-stake uint) (missed-checkins uint))
   (let ((per-miss (/ (* initial-stake FORFEIT-BPS-PER-MISS) BPS-DENOMINATOR)))
@@ -575,6 +618,13 @@
 ;; ============================================
 ;; PUBLIC FUNCTIONS - HABIT MANAGEMENT
 ;; ============================================
+
+;; Register a referrer for on-chain attribution (one-time)
+;; @param referrer: principal that referred the caller
+;; @returns: true on success
+(define-public (register-referrer (referrer principal))
+  (set-referrer tx-sender referrer)
+)
 
 ;; Create a new habit with stake
 ;; @param name: Habit description (max 50 characters)
@@ -608,6 +658,7 @@
         created-at-block: block-height,
         is-active: true,
         is-completed: false,
+        bonus-weight: u1,
         bonus-claimed: false
       }
     )
@@ -816,6 +867,7 @@
       (habit (unwrap! (map-get? habits { habit-id: habit-id }) ERR-HABIT-NOT-FOUND))
       (stake-amount (get stake-amount habit))
       (current-streak (get current-streak habit))
+      (bonus-weight (+ u1 (calculate-referral-boost caller)))
     )
     ;; Verify caller is habit owner
     (asserts! (is-eq caller (get owner habit)) ERR-NOT-HABIT-OWNER)
@@ -834,12 +886,32 @@
       { habit-id: habit-id }
       (merge habit {
         is-active: false,
-        is-completed: true
+        is-completed: true,
+        bonus-weight: bonus-weight
       })
     )
 
     ;; Completed habits become eligible for a single pool bonus claim.
     (var-set unclaimed-completed-habits (+ (var-get unclaimed-completed-habits) u1))
+    (var-set unclaimed-completed-weight (+ (var-get unclaimed-completed-weight) bonus-weight))
+
+    ;; Reward referrer (if any) by increasing their referral boost
+    (match (map-get? referrals { user: caller })
+      referral
+        (let
+          (
+            (referrer (get referrer referral))
+            (stats (default-to { successful-referrals: u0 } (map-get? referrer-stats { referrer: referrer })))
+          )
+          (map-set referrer-stats
+            { referrer: referrer }
+            { successful-referrals: (+ (get successful-referrals stats) u1) }
+          )
+          (print { event: "referral-completed", referrer: referrer, referred: caller, habit-id: habit-id, block: block-height })
+        )
+      none
+        true
+    )
     
     ;; Emit event
     (print {
@@ -865,7 +937,9 @@
       (habit (unwrap! (map-get? habits { habit-id: habit-id }) ERR-HABIT-NOT-FOUND))
       (pool-balance (var-get forfeited-pool-balance))
       (eligible-claimants (var-get unclaimed-completed-habits))
-      (bonus-amount (calculate-bonus-share pool-balance eligible-claimants))
+      (eligible-weight (var-get unclaimed-completed-weight))
+      (bonus-weight (get bonus-weight habit))
+      (bonus-amount (calculate-bonus-share pool-balance eligible-weight bonus-weight))
     )
     ;; Verify caller is habit owner
     (asserts! (is-eq caller (get owner habit)) ERR-NOT-HABIT-OWNER)
@@ -878,6 +952,7 @@
     
     ;; Verify pool has sufficient balance and bonus is non-zero
     (asserts! (> eligible-claimants u0) ERR-POOL-INSUFFICIENT-BALANCE)
+    (asserts! (> eligible-weight u0) ERR-POOL-INSUFFICIENT-BALANCE)
     (asserts! (> bonus-amount u0) ERR-POOL-INSUFFICIENT-BALANCE)
     (asserts! (>= pool-balance bonus-amount) ERR-POOL-INSUFFICIENT-BALANCE)
     
@@ -887,6 +962,7 @@
     ;; Update pool balance
     (var-set forfeited-pool-balance (- pool-balance bonus-amount))
     (var-set unclaimed-completed-habits (- eligible-claimants u1))
+    (var-set unclaimed-completed-weight (- eligible-weight bonus-weight))
 
     ;; Mark bonus as claimed to prevent re-entrancy
     (map-set habits
@@ -950,10 +1026,30 @@
   (let
     (
       (pool-balance (var-get forfeited-pool-balance))
-      (eligible-claimants (var-get unclaimed-completed-habits))
+      (eligible-weight (var-get unclaimed-completed-weight))
     )
-    (ok (calculate-bonus-share pool-balance eligible-claimants))
+    (ok (calculate-bonus-share pool-balance eligible-weight u1))
   )
+)
+
+;; Get total unclaimed bonus weight
+(define-read-only (get-unclaimed-completed-weight)
+  (ok (var-get unclaimed-completed-weight))
+)
+
+;; Get referrer for a user
+(define-read-only (get-referrer (user principal))
+  (map-get? referrals { user: user })
+)
+
+;; Get referrer stats (successful referrals)
+(define-read-only (get-referrer-stats (referrer principal))
+  (default-to { successful-referrals: u0 } (map-get? referrer-stats { referrer: referrer }))
+)
+
+;; Get current referral boost for a referrer
+(define-read-only (get-referral-boost (referrer principal))
+  (ok (calculate-referral-boost referrer))
 )
 
 ;; Get total habits created
