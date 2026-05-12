@@ -46,7 +46,7 @@ console.log("7. Get User Stats - Read-only Query");
 console.log("   - Test aggregated stats");
 console.log("   - Verify habit count");
 console.log();
-console.log("8. Check-in - Second Day (After 144 blocks)");
+console.log("8. Check-in - Second Day (After 192 blocks)");
 console.log("   - Test consecutive check-in");
 console.log("   - Verify streak increment to 2");
 console.log();

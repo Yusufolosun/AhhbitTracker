@@ -786,7 +786,7 @@ await openContractCall(txOptions);
 ### Rate Limiting
 
 No built-in rate limiting. Frontend should implement:
-- Check-in cooldown (120 blocks minimum)
+- Check-in cooldown (96 blocks minimum)
 - Transaction queue management
 - User-side validation before submission
 

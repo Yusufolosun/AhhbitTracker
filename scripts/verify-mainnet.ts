@@ -27,7 +27,7 @@ async function verifyDeployment() {
   console.log();
   console.log("Contract Configuration:");
   console.log("- Minimum stake: 20,000 microSTX (0.02 STX)");
-  console.log("- Check-in window: 144 blocks (~24 hours)");
+  console.log("- Check-in window: 192 blocks (~32 hours)");
   console.log("- Minimum withdrawal streak: 7 days");
   console.log("- Maximum habit name: 50 characters");
   console.log();

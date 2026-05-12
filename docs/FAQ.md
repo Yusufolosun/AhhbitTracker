@@ -68,7 +68,7 @@ Your streak resets to zero and 10% of your stake is forfeited per missed window.
 
 ### Can I check in multiple times per day?
 
-No. The contract prevents check-ins until at least 120 blocks have passed (~20 hours on Stacks).
+No. The contract prevents check-ins until at least 96 blocks have passed (~16 hours on Stacks).
 
 ### Why can't I check in immediately after creating a habit?
 
