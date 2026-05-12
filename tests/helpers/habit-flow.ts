@@ -1,6 +1,6 @@
 import { Cl } from "@stacks/transactions";
 
-const MIN_CHECK_IN_INTERVAL = 120;
+const MIN_CHECK_IN_INTERVAL = 96;
 
 export function createHabit(caller: string, name: string, stake: number) {
   return simnet.callPublicFn(

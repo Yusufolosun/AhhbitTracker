@@ -4,8 +4,8 @@ import { describe, it, expect } from 'vitest'
 // or the repo's existing test harness that runs against Clarinet. Adjust as needed.
 
 describe('Check-in window calculations (JS reference)', () => {
-  const MIN_INTERVAL = 120
-  const MAX_WINDOW = 144
+  const MIN_INTERVAL = 96
+  const MAX_WINDOW = 192
 
   function getCheckinWindow(lastCheckInBlock: number) {
     const earliest = lastCheckInBlock + MIN_INTERVAL

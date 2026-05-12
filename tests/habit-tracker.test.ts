@@ -10,8 +10,8 @@ const user3 = accounts.get("wallet_3")!;
 // Test Helpers
 const MIN_STAKE = 20000; // 0.02 STX in microSTX
 // Minimum interval between check-ins (blocks)
-// ~20 hours = 120 blocks
-const MIN_CHECK_IN_INTERVAL = 120;
+// ~16 hours = 96 blocks
+const MIN_CHECK_IN_INTERVAL = 96;
 const MAX_STAKE_AMOUNT = 100_000_000; // 100 STX in microSTX
 const VALID_HABIT_NAME = "Daily Exercise";
 const MAX_NAME_LENGTH = 50;
@@ -258,28 +258,28 @@ describe("AhhbitTracker Contract", () => {
       expect(result.result).toBeOk(Cl.uint(2));
     });
 
-    it("should prevent check-in before minimum interval (120 blocks)", () => {
+    it("should prevent check-in before minimum interval (96 blocks)", () => {
       // First check-in succeeds
       const first = checkIn(user1, habitId);
       expect(first.result).toBeOk(Cl.uint(1));
 
       // Try to check in after only 1 block → should fail
-      // blocks-elapsed = 1 < MIN-CHECK_IN_INTERVAL(120) → blocked
+      // blocks-elapsed = 1 < MIN-CHECK_IN_INTERVAL(96) → blocked
       const second = checkIn(user1, habitId);
       expect(second.result).toBeErr(Cl.uint(105)); // ERR-ALREADY-CHECKED-IN
     });
 
-    it("should prevent check-in before minimum interval (119 blocks)", () => {
+    it("should prevent check-in before minimum interval (95 blocks)", () => {
       checkIn(user1, habitId);
-      // callPublicFn mines a block for the attempted check-in, so mine 118 here
-      // to keep elapsed blocks strictly below the 120 minimum interval.
-      simnet.mineEmptyBlocks(118);
+      // callPublicFn mines a block for the attempted check-in, so mine 94 here
+      // to keep elapsed blocks strictly below the 96 minimum interval.
+      simnet.mineEmptyBlocks(94);
 
       const result = checkIn(user1, habitId);
       expect(result.result).toBeErr(Cl.uint(105)); // ERR-ALREADY-CHECKED-IN
     });
 
-    it("should allow check-in at exactly 120 blocks (minimum interval)", () => {
+    it("should allow check-in at exactly 96 blocks (minimum interval)", () => {
       checkIn(user1, habitId);
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL); // Exactly at minimum
 
@@ -288,28 +288,28 @@ describe("AhhbitTracker Contract", () => {
     });
 
     it("should allow check-in near the late boundary and increment streak", () => {
-      // checkIn at block N → mine 143 empty blocks → next checkIn at N+144 (latest allowed)
+      // checkIn at block N → mine 191 empty blocks → next checkIn at N+192 (latest allowed)
       checkIn(user1, habitId);
-      simnet.mineEmptyBlocks(143);
+      simnet.mineEmptyBlocks(191);
 
       const result = checkIn(user1, habitId);
       expect(result.result).toBeOk(Cl.uint(2));
     });
 
-    it("should succeed at the 144-block boundary (last valid block)", () => {
-      // checkIn at block N → mine 143 empty blocks → next checkIn at N+144
+    it("should succeed at the 192-block boundary (last valid block)", () => {
+      // checkIn at block N → mine 191 empty blocks → next checkIn at N+192
       checkIn(user1, habitId);
-      simnet.mineEmptyBlocks(143);
+      simnet.mineEmptyBlocks(191);
 
       const result = checkIn(user1, habitId);
       expect(result.result).toBeOk(Cl.uint(2));
     });
 
-    it("should apply penalty 1 block past the window (145 elapsed)", () => {
-      // checkIn at block N → mine 144 empty blocks → next checkIn at N+145
-      // elapsed = 145 > latest allowed (144) → late check-in triggers penalty
+    it("should apply penalty 1 block past the window (193 elapsed)", () => {
+      // checkIn at block N → mine 192 empty blocks → next checkIn at N+193
+      // elapsed = 193 > latest allowed (192) → late check-in triggers penalty
       checkIn(user1, habitId);
-      simnet.mineEmptyBlocks(144);
+      simnet.mineEmptyBlocks(192);
 
       const result = checkIn(user1, habitId);
       expect(result.result).toBeOk(Cl.uint(1));
@@ -321,7 +321,7 @@ describe("AhhbitTracker Contract", () => {
 
     it("should forfeit stake when check-in window expires via slashing", () => {
       checkIn(user1, habitId);
-      simnet.mineEmptyBlocks(150);
+      simnet.mineEmptyBlocks(200);
 
       // User2 slashes user1's expired habit
       const result = simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(habitId)], user2);
@@ -345,7 +345,7 @@ describe("AhhbitTracker Contract", () => {
 
     it("should reject check-in to a slashed (inactive) habit", () => {
       checkIn(user1, habitId);
-      simnet.mineEmptyBlocks(150);
+      simnet.mineEmptyBlocks(200);
       simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(habitId)], user2);
 
       const result = checkIn(user1, habitId);
@@ -387,7 +387,7 @@ describe("AhhbitTracker Contract", () => {
 
     it("should reject withdrawal after stake is slashed", () => {
       checkIn(user1, habitId);
-      simnet.mineEmptyBlocks(150);
+      simnet.mineEmptyBlocks(200);
       simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(habitId)], user2);
 
       const result = simnet.callPublicFn("habit-tracker-v3", "withdraw-stake", [Cl.uint(habitId)], user1);
@@ -411,7 +411,7 @@ describe("AhhbitTracker Contract", () => {
       const id2 = Number((h2.result as any).value.value);
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       checkIn(user2, id2);
-      simnet.mineEmptyBlocks(150); // Mines blocks, pushing height to ~152
+      simnet.mineEmptyBlocks(200); // Mines blocks, pushing height to expire the window
       simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(id2)], user2);
 
       // 2. Create User1's habit AFTER blocks are mined
@@ -441,7 +441,7 @@ describe("AhhbitTracker Contract", () => {
       const failId = Number((failHabit.result as any).value.value);
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       checkIn(user3, failId);
-      simnet.mineEmptyBlocks(150);
+      simnet.mineEmptyBlocks(200);
       simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(failId)], user3);
       // Pool = 20,000 microSTX (10% of the failing stake)
 
@@ -479,14 +479,14 @@ describe("AhhbitTracker Contract", () => {
       const fid1 = Number((fail1.result as any).value.value);
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       checkIn(user2, fid1);
-      simnet.mineEmptyBlocks(150);
+      simnet.mineEmptyBlocks(200);
       simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(fid1)], user1);
 
       const fail2 = createHabit(user3, "Big stake 2", MAX_STAKE_AMOUNT);
       const fid2 = Number((fail2.result as any).value.value);
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       checkIn(user3, fid2);
-      simnet.mineEmptyBlocks(150);
+      simnet.mineEmptyBlocks(200);
       simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(fid2)], user1);
       // Pool = 20 STX and user1 is the only eligible claimant.
 
@@ -512,7 +512,7 @@ describe("AhhbitTracker Contract", () => {
       const failId = Number((failHabit.result as any).value.value);
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       checkIn(user2, failId);
-      simnet.mineEmptyBlocks(150);
+      simnet.mineEmptyBlocks(200);
       simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(failId)], user1);
 
       // Complete and withdraw one habit (becomes an eligible claimant).
@@ -535,7 +535,7 @@ describe("AhhbitTracker Contract", () => {
       const failingId = Number((failing.result as any).value.value);
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       checkIn(user3, failingId);
-      simnet.mineEmptyBlocks(150);
+      simnet.mineEmptyBlocks(200);
       simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(failingId)], user1);
 
       // Prepare two eligible claimants.
@@ -632,7 +632,7 @@ describe("AhhbitTracker Contract", () => {
       const poolId = Number((poolSource.result as any).value.value);
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       checkIn(user3, poolId);
-      simnet.mineEmptyBlocks(150);
+      simnet.mineEmptyBlocks(200);
       simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(poolId)], user1);
 
       // user1 completes a habit after receiving boost (weight = 2)
@@ -771,7 +771,7 @@ describe("AhhbitTracker Contract", () => {
       const id = Number((result.result as any).value.value);
 
       checkIn(user1, id);
-      simnet.mineEmptyBlocks(150);
+      simnet.mineEmptyBlocks(200);
 
       simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(id)], user2);
 
@@ -805,7 +805,7 @@ describe("AhhbitTracker Contract", () => {
       const failId = Number((failHabit.result as any).value.value);
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       checkIn(user2, failId);
-      simnet.mineEmptyBlocks(150);
+      simnet.mineEmptyBlocks(200);
       simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(failId)], user1);
 
       // Complete a habit
@@ -833,7 +833,7 @@ describe("AhhbitTracker Contract", () => {
 
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       checkIn(user1, id);
-      simnet.mineEmptyBlocks(150);
+      simnet.mineEmptyBlocks(200);
       simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(id)], user2);
 
       const poolResult = simnet.callReadOnlyFn("habit-tracker-v3", "get-pool-balance", [], deployer);
@@ -866,7 +866,7 @@ describe("AhhbitTracker Contract", () => {
 
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       checkIn(user1, id);
-      simnet.mineEmptyBlocks(150);
+      simnet.mineEmptyBlocks(200);
 
       checkIn(user1, id); // triggers penalty
       const poolAfter = simnet.getDataVar("habit-tracker-v3", "forfeited-pool-balance");
@@ -879,7 +879,7 @@ describe("AhhbitTracker Contract", () => {
 
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       checkIn(user1, id);
-      simnet.mineEmptyBlocks(150);
+      simnet.mineEmptyBlocks(200);
 
       // First expired check-in applies penalty
       const result2 = checkIn(user1, id);
@@ -895,9 +895,9 @@ describe("AhhbitTracker Contract", () => {
       const id = Number((result.result as any).value.value);
 
       // Build streak then let window expire
-      // Must mine blocks BEFORE check-in (MIN-CHECK-IN-INTERVAL = 120)
+      // Must mine blocks BEFORE check-in (MIN-CHECK-IN-INTERVAL = 96)
       for (let i = 0; i < 7; i++) {
-        simnet.mineEmptyBlocks(120);
+        simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
         checkIn(user1, id);
       }
       simnet.mineEmptyBlocks(200);
@@ -915,8 +915,8 @@ describe("AhhbitTracker Contract", () => {
       const result = createHabit(user1, "Exercise", MIN_STAKE);
       const id = Number((result.result as any).value.value);
 
-      // Must mine blocks BEFORE check-in (MIN-CHECK-IN-INTERVAL = 120)
-      simnet.mineEmptyBlocks(120);
+      // Must mine blocks BEFORE check-in (MIN-CHECK-IN-INTERVAL = 96)
+      simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       checkIn(user1, id);
       simnet.mineEmptyBlocks(200);
 
@@ -933,9 +933,9 @@ describe("AhhbitTracker Contract", () => {
       const id = Number((result.result as any).value.value);
 
       // Build a good streak
-      // Must mine blocks BEFORE check-in (MIN-CHECK-IN-INTERVAL = 120)
+      // Must mine blocks BEFORE check-in (MIN-CHECK-IN-INTERVAL = 96)
       for (let i = 0; i < 5; i++) {
-        simnet.mineEmptyBlocks(120);
+        simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
         checkIn(user1, id);
       }
 
@@ -980,8 +980,8 @@ describe("AhhbitTracker Contract", () => {
       simnet.mineEmptyBlocks(MIN_CHECK_IN_INTERVAL);
       checkIn(user1, 1);
 
-      // Mine past the check-in window (144 blocks)
-      simnet.mineEmptyBlocks(150);
+      // Mine past the check-in window (192 blocks)
+      simnet.mineEmptyBlocks(200);
 
       const result = simnet.callReadOnlyFn(
         "habit-tracker-v3", "get-expired-habits",
@@ -997,7 +997,7 @@ describe("AhhbitTracker Contract", () => {
       checkIn(user1, 1);
 
       // Let window expire and slash
-      simnet.mineEmptyBlocks(150);
+      simnet.mineEmptyBlocks(200);
       simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(1)], user2);
 
       const result = simnet.callReadOnlyFn(
@@ -1019,7 +1019,7 @@ describe("AhhbitTracker Contract", () => {
       checkIn(user1, 2);
 
       // Mine past window - both expire
-      simnet.mineEmptyBlocks(150);
+      simnet.mineEmptyBlocks(200);
 
       // Slash habit 1 (becomes inactive)
       simnet.callPublicFn("habit-tracker-v3", "slash-habit", [Cl.uint(1)], user2);
