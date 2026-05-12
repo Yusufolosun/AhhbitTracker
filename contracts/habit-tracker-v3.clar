@@ -385,7 +385,7 @@
       (current-streak (get current-streak habit))
       (streak-delta (if (> current-streak (get streak-at-join member-data)) (- current-streak (get streak-at-join member-data)) u0))
       (duration-blocks (- (get end-block group) (get start-block group)))
-      (required-days (/ duration-blocks CHECK-IN-WINDOW))
+      (required-days (/ duration-blocks BLOCKS-PER-DAY))
       (half-required (/ required-days u2))
       (threshold (if (> half-required u0) half-required u1))
     )
