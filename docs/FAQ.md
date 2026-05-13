@@ -135,6 +135,19 @@ Yes. Register a referrer once using `register-referrer`. When a referred user
 completes a streak, the referrer earns a bonus-claim weight boost that increases
 their share of future bonus claims.
 
+## v3 Features
+
+### What are Accountability Groups?
+
+Groups allow you to stake STX together with others. If you miss a check-in, 
+the penalty goes to the other group members instead of the global pool.
+
+### How do Milestone Rewards work?
+
+In addition to the global forfeited pool, there is a community-funded Streak 
+Reward Pool. Reaching milestones like 7, 30, 90, or 365 days allows you to 
+claim extra rewards from this pool.
+
 ## Costs and Fees
 
 ### How much does it cost?
