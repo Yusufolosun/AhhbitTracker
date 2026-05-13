@@ -35,6 +35,21 @@ export const accountabilityService = {
     return json?.value;
   },
 
+  async readGroupMembers(groupId: number): Promise<string[]> {
+    const response = await fetchCallReadOnlyFunction({
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: ACCOUNTABILITY_CONTRACT_NAME,
+      functionName: 'get-group-members',
+      functionArgs: [{ type: 'uint', value: groupId.toString() } as any],
+      network: NETWORK,
+      senderAddress: CONTRACT_ADDRESS,
+    });
+
+    const json = cvToJSON(response);
+    const value = json?.success === true ? json.value?.value : json?.value;
+    return value?.members?.value?.map((v: any) => v.value) || [];
+  },
+
   async readMemberInfo(groupId: number, memberAddress: string): Promise<any> {
     const response = await fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
