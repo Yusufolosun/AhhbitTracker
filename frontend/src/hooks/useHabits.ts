@@ -124,6 +124,14 @@ export const useHabits = () => {
     retryDelay: (attempt) => Math.min(15000 * Math.pow(2, attempt - 1), 60000),
   });
 
+  const { data: unclaimedCompletedWeight } = useQuery({
+    queryKey: ['unclaimedCompletedWeight'],
+    queryFn: () => contractService.readUnclaimedCompletedWeight(),
+    staleTime: POOL_CACHE_TIME,
+    retry: 3,
+    retryDelay: (attempt) => Math.min(15000 * Math.pow(2, attempt - 1), 60000),
+  });
+
   // Helper: schedule a deferred refetch after the tx has time to mine.
   // Stacks blocks average ~10 min; we refetch at 30s and 2min as best-effort.
   // All timers are tracked so they can be cleaned up on unmount.
@@ -393,6 +401,7 @@ export const useHabits = () => {
     poolBalance: poolBalance || 0,
     estimatedBonusShare: estimatedBonusShare || 0,
     unclaimedCompletedHabits: unclaimedCompletedHabits || 0,
+    unclaimedCompletedWeight: unclaimedCompletedWeight || 0,
 
     // Loading states
     isLoadingHabits,

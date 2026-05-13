@@ -6,7 +6,7 @@ import { PoolSkeleton } from './Skeletons';
 import { CalloutCard, SurfaceCard, ActionButton } from './ui';
 
 export function PoolDisplay() {
-  const { poolBalance, poolError, isLoadingHabits: loading } = useHabits();
+  const { poolBalance, poolError, isLoadingHabits: loading, unclaimedCompletedWeight } = useHabits();
   const { rewardPoolBalance, fundRewardPool, isFundingRewardPool } = useRewards();
   const [fundAmount, setFundAmount] = useState('10');
 
@@ -41,6 +41,9 @@ export function PoolDisplay() {
               </p>
               <p className="text-xs text-primary-600 dark:text-primary-400/70 mt-1">
                 From missed check-in penalties
+              </p>
+              <p className="text-[10px] text-primary-500/60 dark:text-primary-400/40 mt-0.5">
+                Total Unclaimed Weight: {unclaimedCompletedWeight}
               </p>
             </div>
             <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/25">
