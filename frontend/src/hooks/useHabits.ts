@@ -88,6 +88,17 @@ export const useHabits = () => {
     retryDelay: (attempt) => Math.min(15000 * Math.pow(2, attempt - 1), 60000),
   });
 
+  // Fetch user referrer
+  const { data: referrer } = useQuery({
+    queryKey: ['referrer', walletState.address],
+    queryFn: () => {
+      if (!walletState.address) return null;
+      return contractService.readReferrer(walletState.address);
+    },
+    enabled: !!walletState.address,
+    staleTime: CACHE_TIME,
+  });
+
   // Fetch pool balance
   const { data: poolBalance, error: poolError } = useQuery({
     queryKey: queryKeys.poolBalance,
@@ -378,6 +389,7 @@ export const useHabits = () => {
     // Data
     habits: habits || [],
     userStats,
+    referrer,
     poolBalance: poolBalance || 0,
     estimatedBonusShare: estimatedBonusShare || 0,
     unclaimedCompletedHabits: unclaimedCompletedHabits || 0,
