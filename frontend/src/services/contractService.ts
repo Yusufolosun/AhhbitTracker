@@ -130,6 +130,19 @@ export const contractService = {
     return unwrapOkNumber(cvToJSON(response));
   },
 
+  async readUnclaimedCompletedWeight(): Promise<number> {
+    const response = await fetchCallReadOnlyFunction({
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+      functionName: 'get-unclaimed-completed-weight',
+      functionArgs: [],
+      network: NETWORK,
+      senderAddress: CONTRACT_ADDRESS,
+    });
+
+    return unwrapOkNumber(cvToJSON(response));
+  },
+
   async readUserStats(userAddress: string): Promise<UserStats> {
     return cacheUserStatsRead(userAddress, () =>
       sdkGetUserStats(userAddress, NETWORK, {
