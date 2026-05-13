@@ -303,4 +303,40 @@ export const contractService = {
       });
     });
   },
+
+  /**
+   * Register a referrer for on-chain attribution.
+   * This is a one-time registration per user.
+   *
+   * @param referrer - The Stacks address of the referrer
+   * @returns Transaction ID for tracking
+   * @throws Error if wallet not connected or transaction cancelled
+   */
+  async registerReferrer(referrer: string): Promise<string> {
+    const userAddress = walletService.getAddress();
+    if (!userAddress) {
+      throw new Error('Wallet not connected');
+    }
+
+    return new Promise((resolve, reject) => {
+      showContractCall({
+        contractAddress: CONTRACT_ADDRESS,
+        contractName: CONTRACT_NAME,
+        functionName: 'register-referrer',
+        functionArgs: [
+          // Using principal CV
+          { type: 'principal', value: referrer } as any,
+        ],
+        network: NETWORK,
+        appDetails,
+        userSession: walletService.getUserSession(),
+        onFinish: (data) => {
+          resolve(data.txId);
+        },
+        onCancel: () => {
+          reject(new Error('Transaction cancelled'));
+        },
+      });
+    });
+  },
 };
