@@ -123,7 +123,7 @@ export function HabitCard({ habit }: HabitCardProps) {
   };
 
   const windowState = getCheckInWindowState(habit, currentBlock);
-  const canWithdraw = isEligibleToWithdraw(habit);
+  const canWithdraw = isEligibleToWithdraw(habit, currentBlock);
   const canClaimBonus = habit.isCompleted && !habit.bonusClaimed;
   const blocksRemaining = currentBlock !== null ? getBlocksRemaining(habit, currentBlock) : null;
   const blocksUntilNextCheckIn =

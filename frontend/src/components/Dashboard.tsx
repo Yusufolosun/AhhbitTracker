@@ -50,7 +50,7 @@ export function Dashboard({
     const totalStaked = activeHabits.reduce((sum, h) => sum + h.stakeAmount, 0);
     const totalStreak = activeHabits.reduce((sum, h) => sum + h.currentStreak, 0);
     const avgStreak = activeCount > 0 ? (totalStreak / activeCount).toFixed(1) : '0';
-    const withdrawReady = habits.filter(h => isEligibleToWithdraw(h)).length;
+    const withdrawReady = habits.filter(h => isEligibleToWithdraw(h, currentBlock)).length;
 
     return {
       total: habits.length,

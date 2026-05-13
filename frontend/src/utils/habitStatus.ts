@@ -62,8 +62,11 @@ export function getBlocksUntilNextCheckIn(habit: Habit, currentBlock: number): n
 /**
  * Whether the habit owner can withdraw their stake right now.
  */
-export function isEligibleToWithdraw(habit: Habit): boolean {
-  return habit.isActive && habit.currentStreak >= MIN_STREAK_FOR_WITHDRAWAL;
+export function isEligibleToWithdraw(habit: Habit, currentBlock: number | null): boolean {
+  if (!habit.isActive || habit.currentStreak < MIN_STREAK_FOR_WITHDRAWAL) return false;
+  // The contract also requires the check-in window to still be valid
+  const state = getCheckInWindowState(habit, currentBlock);
+  return state !== 'expired' && state !== 'unknown';
 }
 
 /**
