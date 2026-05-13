@@ -181,10 +181,16 @@ export const contractService = {
     });
 
     const json = cvToJSON(response);
-    if (json?.success === true) {
-      return json.value?.value?.referrer?.value || null;
+    // get-referrer returns (optional { referrer, set-at-block }) — not ok/err.
+    // cvToJSON renders some as { type: 'some', value: { ... } } and none as { type: 'none' }.
+    if (json?.type === 'some') {
+      return json.value?.referrer?.value || null;
     }
-    return json?.value?.referrer?.value || null;
+    // Fallback: handle ok-wrapped optional (some contract calls wrap in ok)
+    if (json?.success === true && json.value?.value?.referrer?.value) {
+      return json.value.value.referrer.value;
+    }
+    return null;
   },
 
   async readReferrerStats(referrerAddress: string): Promise<number> {
