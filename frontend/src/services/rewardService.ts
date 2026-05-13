@@ -35,6 +35,23 @@ export const rewardService = {
     return Number(json?.value?.['reward-amount']?.value || 0);
   },
 
+  async readRewardPoolBalance(): Promise<number> {
+    const response = await fetchCallReadOnlyFunction({
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: REWARD_CONTRACT_NAME,
+      functionName: 'get-reward-pool-balance',
+      functionArgs: [],
+      network: NETWORK,
+      senderAddress: CONTRACT_ADDRESS,
+    });
+
+    const json = cvToJSON(response);
+    if (json?.success === true) {
+      return Number(json.value?.value || 0);
+    }
+    return Number(json?.value || 0);
+  },
+
   async readIsMilestoneClaimed(habitId: number, milestone: number): Promise<boolean> {
     const response = await fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
