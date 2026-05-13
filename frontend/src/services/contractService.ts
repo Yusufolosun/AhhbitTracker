@@ -188,6 +188,23 @@ export const contractService = {
     return json?.value?.referrer?.value || null;
   },
 
+  async readReferrerStats(referrerAddress: string): Promise<number> {
+    const response = await fetchCallReadOnlyFunction({
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+      functionName: 'get-referrer-stats',
+      functionArgs: [{ type: 'principal', value: referrerAddress } as any],
+      network: NETWORK,
+      senderAddress: CONTRACT_ADDRESS,
+    });
+
+    const json = cvToJSON(response);
+    if (json?.success === true) {
+      return Number(json.value?.value?.['successful-referrals']?.value || 0);
+    }
+    return Number(json?.value?.['successful-referrals']?.value || 0);
+  },
+
   async readForfeitStatus(habitId: number): Promise<any> {
 
   async readForfeitStatus(habitId: number): Promise<any> {
