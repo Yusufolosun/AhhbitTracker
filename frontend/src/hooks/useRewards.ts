@@ -11,6 +11,13 @@ export const useRewards = () => {
   const queryClient = useQueryClient();
   const [pendingRewardClaims, setPendingRewardClaims] = useState<Set<string>>(new Set());
 
+  // Fetch reward pool balance
+  const { data: rewardPoolBalance } = useQuery({
+    queryKey: ['rewardPoolBalance'],
+    queryFn: () => rewardService.readRewardPoolBalance(),
+    staleTime: CACHE_TIME,
+  });
+
   // Claim milestone reward mutation
   const claimRewardMutation = useMutation({
     mutationFn: ({ habitId, milestone }: { habitId: number; milestone: number }) =>
@@ -31,12 +38,26 @@ export const useRewards = () => {
       addTransaction(txId, 'claim-milestone-reward');
       void refreshBalance();
       // Invalidate relevant queries if any
+      void queryClient.invalidateQueries({ queryKey: ['rewardPoolBalance'] });
+    },
+  });
+
+  // Fund reward pool mutation
+  const fundRewardPoolMutation = useMutation({
+    mutationFn: (amount: number) => rewardService.fundRewardPool(amount),
+    onSuccess: (txId) => {
+      addTransaction(txId, 'fund-reward-pool');
+      void refreshBalance();
+      void queryClient.invalidateQueries({ queryKey: ['rewardPoolBalance'] });
     },
   });
 
   return {
+    rewardPoolBalance: rewardPoolBalance || 0,
     claimReward: claimRewardMutation.mutateAsync,
+    fundRewardPool: fundRewardPoolMutation.mutateAsync,
     pendingRewardClaims,
     isClaimingReward: claimRewardMutation.isPending,
+    isFundingRewardPool: fundRewardPoolMutation.isPending,
   };
 };
