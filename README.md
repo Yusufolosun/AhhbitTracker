@@ -42,7 +42,10 @@
 
 AhhbitTracker is a decentralized habit-tracking dApp on the [Stacks](https://www.stacks.co/) blockchain. Stake STX as a financial commitment to daily habits. Miss a window — 10% of your stake is forfeited per missed window to a shared pool. Complete a 7-day streak — reclaim your remaining stake and earn bonuses from forfeited stakes.
 
-**Live contract:** [`SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3`](https://explorer.hiro.so/address/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3?chain=mainnet)
+**Live contracts:**
+- Main Tracker: [`SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3`](https://explorer.hiro.so/address/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3?chain=mainnet)
+- Accountability: [`SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-accountability-group-v3`](https://explorer.hiro.so/address/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-accountability-group-v3?chain=mainnet)
+- Streak Rewards: [`SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-streak-reward-v3`](https://explorer.hiro.so/address/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-streak-reward-v3?chain=mainnet)
 
 ## How It Works
 
