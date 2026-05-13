@@ -23,9 +23,10 @@ export function AccountabilityPanel() {
 
     try {
       const amountMicroStx = Number(stakeAmount) * 1_000_000;
+      const durationBlocks = Number(duration) * 144; // 144 blocks per day
       await createGroup({
         stakeAmount: amountMicroStx,
-        duration: Number(duration),
+        duration: durationBlocks,
         habitId: selectedHabitId,
       });
       showToast('Accountability group creation signed!', 'success');
