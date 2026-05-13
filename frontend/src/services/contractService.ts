@@ -9,6 +9,7 @@ import {
   cvToJSON,
   fetchCallReadOnlyFunction,
   FungibleConditionCode,
+  makeContractSTXPostCondition,
   makeStandardSTXPostCondition,
   PostConditionMode,
 } from '@stacks/transactions';
@@ -336,8 +337,9 @@ export const contractService = {
           { type: 'uint', value: habitId.toString() } as any,
         ],
         postConditions: [
-          makeStandardSTXPostCondition(
+          makeContractSTXPostCondition(
             CONTRACT_ADDRESS,
+            CONTRACT_NAME,
             FungibleConditionCode.GreaterEqual,
             _stakeAmount.toString()
           ),
