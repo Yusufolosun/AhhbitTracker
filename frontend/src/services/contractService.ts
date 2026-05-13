@@ -3,7 +3,15 @@
  * Service for interacting with the AhhbitTracker smart contract.
  */
 import { showContractCall } from '@stacks/connect';
-import { cvToJSON, fetchCallReadOnlyFunction } from '@stacks/transactions';
+import {
+  createAssetInfo,
+  createLPString,
+  cvToJSON,
+  fetchCallReadOnlyFunction,
+  FungibleConditionCode,
+  makeStandardSTXPostCondition,
+  PostConditionMode,
+} from '@stacks/transactions';
 import {
   buildCheckIn,
   buildClaimBonus,
@@ -225,20 +233,28 @@ export const contractService = {
    * @returns Transaction ID for tracking
    * @throws Error if wallet not connected or transaction cancelled
    */
-  async withdrawStake(habitId: number, stakeAmount: number): Promise<string> {
+  async withdrawStake(habitId: number, _stakeAmount: number): Promise<string> {
     const userAddress = walletService.getAddress();
     if (!userAddress) {
       throw new Error('Wallet not connected');
     }
 
-    const txPayload = buildWithdrawStake(habitId, stakeAmount, {
-      contractAddress: CONTRACT_ADDRESS,
-      contractName: CONTRACT_NAME,
-    });
-
     return new Promise((resolve, reject) => {
       showContractCall({
-        ...txPayload,
+        contractAddress: CONTRACT_ADDRESS,
+        contractName: CONTRACT_NAME,
+        functionName: 'withdraw-stake',
+        functionArgs: [
+          { type: 'uint', value: habitId.toString() } as any,
+        ],
+        postConditions: [
+          makeStandardSTXPostCondition(
+            CONTRACT_ADDRESS,
+            FungibleConditionCode.GreaterEqual,
+            _stakeAmount.toString()
+          ),
+        ],
+        postConditionMode: PostConditionMode.Deny,
         network: NETWORK,
         appDetails,
         userSession: walletService.getUserSession(),
