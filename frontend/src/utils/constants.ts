@@ -16,6 +16,8 @@ export const STACKS_NETWORK = runtimeConfig.stacksNetwork;
 export const STACKS_API_URL = runtimeConfig.stacksApiUrl;
 export const CONTRACT_ADDRESS = runtimeConfig.contractAddress;
 export const CONTRACT_NAME = runtimeConfig.contractName;
+export const ACCOUNTABILITY_CONTRACT_NAME = runtimeConfig.accountabilityContractName;
+export const REWARD_CONTRACT_NAME = runtimeConfig.rewardContractName;
 
 // Contract Constants
 export const MIN_STAKE_AMOUNT = DEFAULT_MIN_STAKE; // 0.02 STX in microSTX (from stx-utils)

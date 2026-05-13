@@ -6,6 +6,8 @@ interface StageDefaults {
   stacksApiUrl: string;
   contractAddress: string;
   contractName: string;
+  accountabilityContractName: string;
+  rewardContractName: string;
   appUrl: string;
 }
 
@@ -15,6 +17,8 @@ export interface FrontendRuntimeConfig {
   stacksApiUrl: string;
   contractAddress: string;
   contractName: string;
+  accountabilityContractName: string;
+  rewardContractName: string;
   appUrl: string;
 }
 
@@ -24,6 +28,8 @@ const STAGE_DEFAULTS: Readonly<Record<FrontendStage, StageDefaults>> = {
     stacksApiUrl: 'https://api.testnet.hiro.so',
     contractAddress: 'ST1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK1GA0CF0',
     contractName: 'habit-tracker-v3',
+    accountabilityContractName: 'habit-accountability-group-v3',
+    rewardContractName: 'habit-streak-reward-v3',
     appUrl: 'http://localhost:3000',
   },
   staging: {
@@ -31,6 +37,8 @@ const STAGE_DEFAULTS: Readonly<Record<FrontendStage, StageDefaults>> = {
     stacksApiUrl: 'https://api.testnet.hiro.so',
     contractAddress: 'ST1M46W6CVGAMH3ZJD3TKMY5KCY48HWAZK1GA0CF0',
     contractName: 'habit-tracker-v3',
+    accountabilityContractName: 'habit-accountability-group-v3',
+    rewardContractName: 'habit-streak-reward-v3',
     appUrl: 'https://staging.ahhbittracker.app',
   },
   production: {
@@ -38,6 +46,8 @@ const STAGE_DEFAULTS: Readonly<Record<FrontendStage, StageDefaults>> = {
     stacksApiUrl: 'https://api.mainnet.hiro.so',
     contractAddress: 'SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z',
     contractName: 'habit-tracker-v3',
+    accountabilityContractName: 'habit-accountability-group-v3',
+    rewardContractName: 'habit-streak-reward-v3',
     appUrl: 'https://ahhbit-tracker.vercel.app',
   },
 } as const;
@@ -167,6 +177,8 @@ export function resolveFrontendRuntimeConfig(
     | 'VITE_STACKS_API_URL'
     | 'VITE_CONTRACT_ADDRESS'
     | 'VITE_CONTRACT_NAME'
+    | 'VITE_ACCOUNTABILITY_CONTRACT_NAME'
+    | 'VITE_REWARD_CONTRACT_NAME'
     | 'VITE_APP_URL'
   >,
 ): FrontendRuntimeConfig {
@@ -183,6 +195,14 @@ export function resolveFrontendRuntimeConfig(
       'VITE_CONTRACT_ADDRESS',
     ),
     contractName: assertContractName(env.VITE_CONTRACT_NAME ?? defaults.contractName, 'VITE_CONTRACT_NAME'),
+    accountabilityContractName: assertContractName(
+      env.VITE_ACCOUNTABILITY_CONTRACT_NAME ?? defaults.accountabilityContractName,
+      'VITE_ACCOUNTABILITY_CONTRACT_NAME',
+    ),
+    rewardContractName: assertContractName(
+      env.VITE_REWARD_CONTRACT_NAME ?? defaults.rewardContractName,
+      'VITE_REWARD_CONTRACT_NAME',
+    ),
     appUrl: assertAppUrl(env.VITE_APP_URL ?? defaults.appUrl),
   };
 }
