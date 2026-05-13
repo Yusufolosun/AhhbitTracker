@@ -223,8 +223,6 @@ export const contractService = {
   },
 
   async readForfeitStatus(habitId: number): Promise<any> {
-
-  async readForfeitStatus(habitId: number): Promise<any> {
     const response = await fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
