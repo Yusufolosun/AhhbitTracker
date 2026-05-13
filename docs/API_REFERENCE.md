@@ -4,7 +4,9 @@ Complete reference for all contract functions and data structures.
 
 ## Contract Information
 
-**Address:** `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3`  
+**Address (Main):** `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3`  
+**Address (Accountability):** `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-accountability-group-v3`  
+**Address (Rewards):** `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-streak-reward-v3`  
 **Network:** Stacks Mainnet  
 **Language:** Clarity v2  
 **Epoch:** 2.5
