@@ -26,6 +26,7 @@ export interface Habit {
 export interface UserStats {
   totalHabits: number;
   habitIds: number[];
+  successfulReferrals?: number;
 }
 
 /**
