@@ -131,6 +131,23 @@ export const contractService = {
     );
   },
 
+  async readForfeitStatus(habitId: number): Promise<any> {
+    const response = await fetchCallReadOnlyFunction({
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+      functionName: 'get-forfeit-status',
+      functionArgs: [{ type: 'uint', value: habitId.toString() } as any],
+      network: NETWORK,
+      senderAddress: CONTRACT_ADDRESS,
+    });
+
+    const json = cvToJSON(response);
+    if (json?.success === true) {
+      return json.value?.value;
+    }
+    return json?.value;
+  },
+
   /**
    * Create a new habit with the specified stake.
    *
