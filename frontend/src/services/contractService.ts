@@ -205,6 +205,23 @@ export const contractService = {
     return Number(json?.value?.['successful-referrals']?.value || 0);
   },
 
+  async readReferralBoost(userAddress: string): Promise<number> {
+    const response = await fetchCallReadOnlyFunction({
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+      functionName: 'get-referral-boost',
+      functionArgs: [{ type: 'principal', value: userAddress } as any],
+      network: NETWORK,
+      senderAddress: CONTRACT_ADDRESS,
+    });
+
+    const json = cvToJSON(response);
+    if (json?.success === true) {
+      return Number(json.value?.value || 0);
+    }
+    return Number(json?.value || 0);
+  },
+
   async readForfeitStatus(habitId: number): Promise<any> {
 
   async readForfeitStatus(habitId: number): Promise<any> {
