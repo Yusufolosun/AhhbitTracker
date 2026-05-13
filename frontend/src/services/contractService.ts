@@ -156,18 +156,17 @@ export const contractService = {
     const json = cvToJSON(response);
     if (json?.success === true) {
       const value = json.value?.value;
+      // get-user-stats returns { total-habits, habit-ids } only.
+      // Referral stats come from the separate get-referrer-stats function.
       return {
         totalHabits: Number(value?.['total-habits']?.value || 0),
         habitIds: value?.['habit-ids']?.value?.map((v: any) => Number(v.value)) || [],
-        successfulReferrals: Number(value?.['successful-referrals']?.value || 0),
       };
     }
     
-    // Fallback if SDK or parsing fails slightly
     return {
       totalHabits: 0,
       habitIds: [],
-      successfulReferrals: 0,
     };
   },
 
