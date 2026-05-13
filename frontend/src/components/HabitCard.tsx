@@ -236,6 +236,9 @@ export function HabitCard({ habit }: HabitCardProps) {
             <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
               {habit.bonusWeight ? `${habit.bonusWeight}x` : '1x'}
             </p>
+            <p className="text-[10px] text-surface-400 mt-0.5">
+              Boosted by successful referrals
+            </p>
           </div>
         )}
       </div>
