@@ -5,6 +5,7 @@ import { formatSTX } from '../utils/formatting';
 import { useCurrentBlock } from '../hooks/useCurrentBlock';
 import { getCheckInWindowState, isEligibleToWithdraw } from '../utils/habitStatus';
 import { DailyCheckInPanel } from './DailyCheckInPanel';
+import { AccountabilityPanel } from './AccountabilityPanel';
 import type { DailyCheckInResult } from '../hooks/useHabits';
 import { EmptyStateCard, SectionHeading } from './ui';
 
@@ -71,6 +72,8 @@ export function Dashboard({
         runDailyCheckIn={runDailyCheckIn}
         notify={notify}
       />
+
+      <AccountabilityPanel />
 
       {/* Empty state — first-time user onboarding */}
       {habits.length === 0 ? (
