@@ -311,6 +311,15 @@ export const useHabits = () => {
     },
   });
 
+  // Register referrer mutation
+  const registerReferrerMutation = useMutation({
+    mutationFn: (referrer: string) => contractService.registerReferrer(referrer),
+    onSuccess: (txId) => {
+      addTransaction(txId, 'register-referrer');
+      scheduleRefetch([queryKeys.userStats(walletState.address)]);
+    },
+  });
+
   const runDailyCheckIn = useCallback(async (habitIds: number[]): Promise<DailyCheckInResult> => {
     if (habitIds.length === 0) {
       return {
@@ -388,6 +397,7 @@ export const useHabits = () => {
     withdrawStake: withdrawStakeMutation.mutateAsync,
     claimBonus: claimBonusMutation.mutateAsync,
     slashHabit: slashHabitMutation.mutateAsync,
+    registerReferrer: registerReferrerMutation.mutateAsync,
 
     // Per-habit pending states
     pendingCheckIns,
@@ -402,5 +412,6 @@ export const useHabits = () => {
     isWithdrawing: withdrawStakeMutation.isPending,
     isClaiming: claimBonusMutation.isPending,
     isSlashing: slashHabitMutation.isPending,
+    isRegisteringReferrer: registerReferrerMutation.isPending,
   };
 };
