@@ -230,6 +230,14 @@ export function HabitCard({ habit }: HabitCardProps) {
               : `Block ${habit.lastCheckInBlock}`}
           </p>
         </div>
+        {habit.isCompleted && (
+          <div>
+            <p className="text-xs text-surface-500 dark:text-surface-400">Bonus Weight</p>
+            <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+              {habit.bonusWeight ? `${habit.bonusWeight}x` : '1x'}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Actions */}
