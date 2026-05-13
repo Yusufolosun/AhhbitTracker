@@ -9,7 +9,7 @@ export function MilestoneRewards() {
   const { claimReward, pendingRewardClaims } = useRewards();
   const { showToast } = useToast();
 
-  const milestones = [7, 30, 90, 365];
+  const milestones = [7, 14, 30, 60, 90];
 
   const handleClaim = async (habitId: number, milestone: number) => {
     try {
