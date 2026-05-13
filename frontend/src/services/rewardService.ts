@@ -66,7 +66,12 @@ export const rewardService = {
     });
 
     const json = cvToJSON(response);
-    return json?.success === true ? json.value?.value : json?.value;
+    // is-milestone-claimed returns a bare bool, not ok-wrapped.
+    // cvToJSON renders it as { type: 'bool', value: true/false }.
+    if (json?.type === 'bool') {
+      return Boolean(json.value);
+    }
+    return json?.success === true ? Boolean(json.value?.value) : Boolean(json?.value);
   },
 
   async claimMilestoneReward(habitId: number, milestone: number): Promise<string> {
