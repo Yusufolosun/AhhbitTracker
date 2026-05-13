@@ -152,6 +152,25 @@ export const contractService = {
     );
   },
 
+  async readReferrer(userAddress: string): Promise<string | null> {
+    const response = await fetchCallReadOnlyFunction({
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+      functionName: 'get-referrer',
+      functionArgs: [{ type: 'principal', value: userAddress } as any],
+      network: NETWORK,
+      senderAddress: CONTRACT_ADDRESS,
+    });
+
+    const json = cvToJSON(response);
+    if (json?.success === true) {
+      return json.value?.value?.referrer?.value || null;
+    }
+    return json?.value?.referrer?.value || null;
+  },
+
+  async readForfeitStatus(habitId: number): Promise<any> {
+
   async readForfeitStatus(habitId: number): Promise<any> {
     const response = await fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
