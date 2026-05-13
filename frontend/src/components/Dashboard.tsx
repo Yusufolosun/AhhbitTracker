@@ -6,6 +6,7 @@ import { useCurrentBlock } from '../hooks/useCurrentBlock';
 import { getCheckInWindowState, isEligibleToWithdraw } from '../utils/habitStatus';
 import { DailyCheckInPanel } from './DailyCheckInPanel';
 import { AccountabilityPanel } from './AccountabilityPanel';
+import { MilestoneRewards } from './MilestoneRewards';
 import type { DailyCheckInResult } from '../hooks/useHabits';
 import { EmptyStateCard, SectionHeading } from './ui';
 
@@ -74,6 +75,8 @@ export function Dashboard({
       />
 
       <AccountabilityPanel />
+
+      <MilestoneRewards />
 
       {/* Empty state — first-time user onboarding */}
       {habits.length === 0 ? (
