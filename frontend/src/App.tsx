@@ -24,6 +24,7 @@ const Dashboard = lazy(() => import('./components/Dashboard').then(m => ({ defau
 const HabitForm = lazy(() => import('./components/HabitForm').then(m => ({ default: m.HabitForm })));
 const HabitList = lazy(() => import('./components/HabitList').then(m => ({ default: m.HabitList })));
 const PoolDisplay = lazy(() => import('./components/PoolDisplay').then(m => ({ default: m.PoolDisplay })));
+const ReferrerRegistration = lazy(() => import('./components/ReferrerRegistration').then(m => ({ default: m.ReferrerRegistration })));
 
 /** API error shape for rate limit detection */
 interface ApiError {
@@ -140,7 +141,8 @@ function AppContent() {
           {/* Route-based rendering with code splitting */}
           <Suspense fallback={<DashboardSkeleton />}>
             {route === 'dashboard' && (
-              <section id="dashboard">
+              <section id="dashboard" className="space-y-6">
+                <ReferrerRegistration />
                 {isLoadingHabits ? (
                   <DashboardSkeleton />
                 ) : (
