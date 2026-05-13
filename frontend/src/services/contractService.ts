@@ -144,12 +144,31 @@ export const contractService = {
   },
 
   async readUserStats(userAddress: string): Promise<UserStats> {
-    return cacheUserStatsRead(userAddress, () =>
-      sdkGetUserStats(userAddress, NETWORK, {
-        contractAddress: CONTRACT_ADDRESS,
-        contractName: CONTRACT_NAME,
-      })
-    );
+    const response = await fetchCallReadOnlyFunction({
+      contractAddress: CONTRACT_ADDRESS,
+      contractName: CONTRACT_NAME,
+      functionName: 'get-user-stats',
+      functionArgs: [{ type: 'principal', value: userAddress } as any],
+      network: NETWORK,
+      senderAddress: CONTRACT_ADDRESS,
+    });
+
+    const json = cvToJSON(response);
+    if (json?.success === true) {
+      const value = json.value?.value;
+      return {
+        totalHabits: Number(value?.['total-habits']?.value || 0),
+        habitIds: value?.['habit-ids']?.value?.map((v: any) => Number(v.value)) || [],
+        successfulReferrals: Number(value?.['successful-referrals']?.value || 0),
+      };
+    }
+    
+    // Fallback if SDK or parsing fails slightly
+    return {
+      totalHabits: 0,
+      habitIds: [],
+      successfulReferrals: 0,
+    };
   },
 
   async readReferrer(userAddress: string): Promise<string | null> {
