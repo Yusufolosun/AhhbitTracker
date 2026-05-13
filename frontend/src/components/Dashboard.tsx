@@ -7,6 +7,7 @@ import { getCheckInWindowState, isEligibleToWithdraw } from '../utils/habitStatu
 import { DailyCheckInPanel } from './DailyCheckInPanel';
 import { AccountabilityPanel } from './AccountabilityPanel';
 import { MilestoneRewards } from './MilestoneRewards';
+import { useHabits } from '../hooks/useHabits';
 import type { DailyCheckInResult } from '../hooks/useHabits';
 import { EmptyStateCard, SectionHeading } from './ui';
 
@@ -29,6 +30,7 @@ export function Dashboard({
   notify,
 }: DashboardProps) {
   const currentBlock = useCurrentBlock();
+  const { userStats } = useHabits();
 
   const stats = useMemo(() => {
     const expiredCount = habits.filter(
