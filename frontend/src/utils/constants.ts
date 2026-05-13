@@ -29,22 +29,33 @@ export const MIN_STREAK_FOR_WITHDRAWAL = 7;
 
 // Error Codes - register with stx-utils for decodeError() support
 const ERROR_CODES: Record<number, string> = {
+  // habit-tracker-v3 errors
   100: 'Not authorized',
   101: 'Stake amount too low (minimum 0.02 STX)',
   102: 'Invalid habit name (max 50 characters)',
   103: 'Habit not found',
   104: 'You do not own this habit',
   105: 'Already checked in today',
-  106: 'Check-in window expired - penalty applied',
   107: 'Need 7+ consecutive days to withdraw',
   108: 'Habit already completed',
   109: 'Insufficient pool balance',
-  110: 'Transfer failed',
   111: 'Bonus already claimed for this habit',
   112: 'Maximum number of habits reached',
   113: 'Stake amount exceeds the maximum allowed',
-  114: 'Habit was slashed due to an expired check-in window',
-  // Accountability group errors
+  115: 'Referrer already set for this account',
+  116: 'Invalid referrer address',
+  117: 'Cannot refer yourself',
+  // habit-streak-reward-v3 errors
+  200: 'Not authorized',
+  201: 'Invalid milestone tier',
+  202: 'Milestone already claimed for this habit',
+  203: 'Streak does not meet milestone requirement',
+  204: 'Insufficient funds in reward pool',
+  206: 'Habit not found',
+  207: 'You do not own this habit',
+  208: 'Invalid amount',
+  209: 'Reward not configured for this milestone',
+  // habit-accountability-group-v3 errors
   300: 'Not authorized',
   301: 'Group not found',
   302: 'Group is full (max 10 members)',
