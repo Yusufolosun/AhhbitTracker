@@ -35,19 +35,21 @@ export const accountabilityService = {
     return json?.value;
   },
 
-  async readGroupMembers(groupId: number): Promise<string[]> {
+  async readGroupShare(groupId: number): Promise<number> {
     const response = await fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: ACCOUNTABILITY_CONTRACT_NAME,
-      functionName: 'get-group-members',
+      functionName: 'get-group-share',
       functionArgs: [{ type: 'uint', value: groupId.toString() } as any],
       network: NETWORK,
       senderAddress: CONTRACT_ADDRESS,
     });
 
     const json = cvToJSON(response);
-    const value = json?.success === true ? json.value?.value : json?.value;
-    return value?.members?.value?.map((v: any) => v.value) || [];
+    if (json?.success === true) {
+      return Number(json.value?.value ?? 0);
+    }
+    return 0;
   },
 
   async readMemberInfo(groupId: number, memberAddress: string): Promise<any> {
