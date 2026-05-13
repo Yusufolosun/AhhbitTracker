@@ -1,7 +1,7 @@
 import { useRewards } from '../hooks/useRewards';
 import { useHabits } from '../hooks/useHabits';
 import { useToast } from '../context/ToastContext';
-import { SurfaceCard, ActionButton } from './ui';
+import { SurfaceCard } from './ui';
 import { Habit } from '../types/habit';
 
 export function MilestoneRewards() {

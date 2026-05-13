@@ -3,12 +3,11 @@ import { useAccountability } from '../hooks/useAccountability';
 import { useHabits } from '../hooks/useHabits';
 import { useToast } from '../context/ToastContext';
 import { ActionButton, SurfaceCard } from './ui';
-import { formatSTX } from '../utils/formatting';
 import { trackEvent } from '../analytics';
 
 export function AccountabilityPanel() {
   const { habits } = useHabits();
-  const { createGroup, joinGroup, userGroups, isLoadingGroups } = useAccountability();
+  const { createGroup, userGroups, isLoadingGroups } = useAccountability();
   const { showToast } = useToast();
   
   const [selectedHabitId, setSelectedHabitId] = useState<number | ''>('');

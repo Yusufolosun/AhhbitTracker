@@ -76,7 +76,7 @@ describe('HabitForm', () => {
     fireEvent.change(screen.getByLabelText('Stake Amount (STX)'), {
       target: { value: '101' },
     });
-    fireEvent.submit(screen.getByRole('button', { name: 'Create Habit' }).closest('form'));
+    fireEvent.submit(screen.getByRole('button', { name: 'Create Habit' }).closest('form')!);
 
     expect(await screen.findByText('Maximum stake is 100 STX')).toBeDefined();
     expect(createHabit).not.toHaveBeenCalled();

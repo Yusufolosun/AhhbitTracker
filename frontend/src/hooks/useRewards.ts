@@ -6,7 +6,7 @@ import { useTransactions } from '../context/TransactionContext';
 import { CACHE_TIME } from '../utils/constants';
 
 export const useRewards = () => {
-  const { walletState, refreshBalance } = useWallet();
+  const { refreshBalance } = useWallet();
   const { addTransaction } = useTransactions();
   const queryClient = useQueryClient();
   const [pendingRewardClaims, setPendingRewardClaims] = useState<Set<string>>(new Set());

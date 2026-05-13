@@ -4,13 +4,9 @@
  */
 import { showContractCall } from '@stacks/connect';
 import {
-  createAssetInfo,
-  createLPString,
   cvToJSON,
   fetchCallReadOnlyFunction,
-  FungibleConditionCode,
-  makeContractSTXPostCondition,
-  makeStandardSTXPostCondition,
+  Pc,
   PostConditionMode,
 } from '@stacks/transactions';
 import {
@@ -18,11 +14,9 @@ import {
   buildClaimBonus,
   buildCreateHabit,
   buildSlashHabit,
-  buildWithdrawStake,
   getHabit as sdkGetHabit,
   getPoolBalance as sdkGetPoolBalance,
   getUserHabits as sdkGetUserHabits,
-  getUserStats as sdkGetUserStats,
 } from '@yusufolosun/ahhbit-tracker-sdk';
 import { CONTRACT_ADDRESS, CONTRACT_NAME, NETWORK } from '../utils/constants';
 import { walletService } from './walletService';
@@ -31,7 +25,6 @@ import {
   cacheHabitRead,
   cachePoolBalanceRead,
   cacheUserHabitsRead,
-  cacheUserStatsRead,
   clearAllContractReadCache,
   clearHabitReadCache,
   clearPoolReadCache,
@@ -58,12 +51,15 @@ const appDetails = {
  */
 export const contractService = {
   async readHabit(habitId: number): Promise<Habit | null> {
-    return cacheHabitRead(habitId, () =>
-      sdkGetHabit(habitId, NETWORK, {
+    return cacheHabitRead(habitId, async () => {
+      const result = await sdkGetHabit(habitId, NETWORK, {
         contractAddress: CONTRACT_ADDRESS,
         contractName: CONTRACT_NAME,
-      })
-    );
+      });
+      // The SDK Habit type may differ from the local Habit interface;
+      // cast through unknown to bridge the gap safely.
+      return result as unknown as Habit | null;
+    });
   },
 
   invalidateHabitReadCache(habitId: number): void {
@@ -337,12 +333,9 @@ export const contractService = {
           { type: 'uint', value: habitId.toString() } as any,
         ],
         postConditions: [
-          makeContractSTXPostCondition(
-            CONTRACT_ADDRESS,
-            CONTRACT_NAME,
-            FungibleConditionCode.GreaterEqual,
-            _stakeAmount.toString()
-          ),
+          Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`)
+            .willSendGte(_stakeAmount)
+            .ustx(),
         ],
         postConditionMode: PostConditionMode.Deny,
         network: NETWORK,

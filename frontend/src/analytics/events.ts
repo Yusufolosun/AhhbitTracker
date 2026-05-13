@@ -22,7 +22,10 @@ export type AnalyticsEventName =
   | 'habit_finalize_succeeded'
   | 'habit_finalize_failed'
   | 'daily_check_in_started'
-  | 'daily_check_in_completed';
+  | 'daily_check_in_completed'
+  | 'referrer_registration_clicked'
+  | 'referrer_registration_failed'
+  | 'view_group_clicked';
 
 export interface AnalyticsEventPayload {
   route?: string;
@@ -38,6 +41,9 @@ export interface AnalyticsEventPayload {
   failed?: number;
   errorCode?: string;
   errorMessage?: string;
+  referrer?: string;
+  error?: string;
+  groupId?: number;
 }
 
 export interface AnalyticsEvent {

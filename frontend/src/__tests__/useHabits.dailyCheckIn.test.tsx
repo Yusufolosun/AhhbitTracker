@@ -64,7 +64,7 @@ describe('useHabits runDailyCheckIn', () => {
     const wrapper = createQueryWrapper(queryClient);
     const { result } = renderHook(() => useHabits(), { wrapper });
 
-    let response;
+    let response: Awaited<ReturnType<typeof result.current.runDailyCheckIn>> | undefined;
     await act(async () => {
       response = await result.current.runDailyCheckIn([1, 2, 3]);
     });

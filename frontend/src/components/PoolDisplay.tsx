@@ -3,10 +3,10 @@ import { useHabits } from '../hooks/useHabits';
 import { useRewards } from '../hooks/useRewards';
 import { formatSTX, toMicroSTX } from '../utils/formatting';
 import { PoolSkeleton } from './Skeletons';
-import { CalloutCard, SurfaceCard, ActionButton } from './ui';
+import { SurfaceCard, ActionButton } from './ui';
 
 export function PoolDisplay() {
-  const { poolBalance, poolError, isLoadingHabits: loading, unclaimedCompletedWeight } = useHabits();
+  const { poolBalance, isLoadingHabits: loading, unclaimedCompletedWeight } = useHabits();
   const { rewardPoolBalance, fundRewardPool, isFundingRewardPool } = useRewards();
   const [fundAmount, setFundAmount] = useState('10');
 

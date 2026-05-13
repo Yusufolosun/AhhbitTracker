@@ -102,18 +102,22 @@ describe('getBlocksUntilNextCheckIn', () => {
 });
 
 describe('isEligibleToWithdraw', () => {
-  it('returns true when active with streak >= 7', () => {
-    expect(isEligibleToWithdraw(makeHabit({ currentStreak: 7 }))).toBe(true);
-    expect(isEligibleToWithdraw(makeHabit({ currentStreak: 10 }))).toBe(true);
+  it('returns true when active with streak >= 7 and valid window', () => {
+    expect(isEligibleToWithdraw(makeHabit({ currentStreak: 7 }), 1050)).toBe(true);
+    expect(isEligibleToWithdraw(makeHabit({ currentStreak: 10 }), 1050)).toBe(true);
   });
 
   it('returns false when streak < 7', () => {
-    expect(isEligibleToWithdraw(makeHabit({ currentStreak: 6 }))).toBe(false);
-    expect(isEligibleToWithdraw(makeHabit({ currentStreak: 0 }))).toBe(false);
+    expect(isEligibleToWithdraw(makeHabit({ currentStreak: 6 }), 1050)).toBe(false);
+    expect(isEligibleToWithdraw(makeHabit({ currentStreak: 0 }), 1050)).toBe(false);
   });
 
   it('returns false when not active even with high streak', () => {
-    expect(isEligibleToWithdraw(makeHabit({ isActive: false, currentStreak: 10 }))).toBe(false);
+    expect(isEligibleToWithdraw(makeHabit({ isActive: false, currentStreak: 10 }), 1050)).toBe(false);
+  });
+
+  it('returns false when window is expired', () => {
+    expect(isEligibleToWithdraw(makeHabit({ currentStreak: 10 }), 1200)).toBe(false);
   });
 });
 
