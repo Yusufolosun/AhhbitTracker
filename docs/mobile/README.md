@@ -17,4 +17,7 @@ This directory contains the comprehensive documentation for the AhhbitTracker mo
 - [**Security & Biometrics**](security.md): Authentication and secure data practices.
 - [**Analytics**](analytics.md): Event tracking and telemetry strategy.
 - [**Troubleshooting**](troubleshooting.md): Common issues and development pitfalls.
+- [**Usage Guide**](usage-guide.md): Developer best practices and patterns.
+- [**Contributing**](contributing.md): Guidelines for mobile contributions.
+
 
