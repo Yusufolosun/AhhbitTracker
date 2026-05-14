@@ -182,7 +182,9 @@ See [docs/SECURITY.md](docs/SECURITY.md) for the full security model.
 | [User Guide](docs/USER_GUIDE.md) | End-user walkthrough |
 | [API Reference](docs/API_REFERENCE.md) | Contract functions and error codes |
 | [Architecture](docs/ARCHITECTURE.md) | System design and data flow |
+| [Mobile Architecture](docs/mobile/README.md) | Mobile app design and setup |
 | [FAQ](docs/FAQ.md) | Common questions |
+
 | [Security](docs/SECURITY.md) | Security model |
 
 ## Contributing
