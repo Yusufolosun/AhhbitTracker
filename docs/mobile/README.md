@@ -7,7 +7,9 @@ This directory contains the comprehensive documentation for the AhhbitTracker mo
 - [**Architecture Overview**](architecture.md): High-level system design and folder structure.
 - [**Setup & Development**](setup.md): Environment configuration and local workflow.
 - [**Core Services**](core-services.md): Blockchain, storage, and network abstraction layers.
+- [**Block Math**](block-math.md): Logic for check-in window and block height calculations.
 - [**Feature Modules**](feature-modules.md): Domain-driven design patterns used in the app.
+
 - [**State Management**](state-management.md): Server state (React Query) and local state logic.
 - [**Navigation & Deep Linking**](navigation.md): Typed routing and URL scheme specifications.
 - [**Blockchain Integration**](blockchain-integration.md): Patterns for interacting with Stacks contracts.
