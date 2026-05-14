@@ -26,3 +26,26 @@ For successful handoffs, the app polls the Hiro API for the transaction status u
 
 - **No Private Keys**: The app never asks for or stores the user's secret recovery phrase.
 - **Post-Conditions**: Every transaction includes post-conditions to prevent malicious contract behavior from draining funds.
+
+## Wallet Handoff Implementation
+
+We use `openURL` from `expo-linking` to send the payload to the wallet.
+
+```typescript
+const url = `https://app.xverse.app/transactions?payload=${serializedPayload}&callback=${callbackUrl}`;
+await Linking.openURL(url);
+```
+
+## Callback Parsing
+
+The `AppRoot` navigation container listens for deep links and extracts transaction results:
+
+```typescript
+const handleDeepLink = (url: string) => {
+  const { queryParams } = Linking.parse(url);
+  if (queryParams?.txId) {
+    // Navigate to transaction success screen
+  }
+};
+```
+
