@@ -2,6 +2,10 @@
 
 React Native (Expo) client for AhhbitTracker, structured with feature-first boundaries and shared core services.
 
+> [!IMPORTANT]
+> For comprehensive documentation on architecture, setup, and usage, please refer to the [**Mobile Documentation Suite**](../docs/mobile/README.md).
+
+
 ## Architecture
 
 ```
