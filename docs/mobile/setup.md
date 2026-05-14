@@ -35,3 +35,28 @@ This guide outlines the prerequisites and steps required to set up the AhhbitTra
 - `EXPO_PUBLIC_CONTRACT_NAME`: The name of the main habit-tracker contract.
 - `EXPO_PUBLIC_HIRO_API_BASE_URL`: The API endpoint for the Stacks network.
 - `EXPO_PUBLIC_STACKS_NETWORK`: Either `mainnet`, `testnet`, or `devnet`.
+
+## Development Workflow
+
+### Starting the Development Server
+
+To start the Expo development server:
+
+```bash
+npm run start
+```
+
+This will open the Expo Dev Tools in your browser and provide a QR code to scan with the Expo Go app.
+
+### Available Scripts
+
+- `npm run android`: Starts the app on a connected Android device or emulator.
+- `npm run ios`: Starts the app on a connected iOS device or simulator.
+- `npm run web`: Starts a web version of the app (experimental).
+- `npm run check`: Runs TypeScript type checks across the project.
+- `npm run start:clear`: Starts Expo and clears the cache.
+
+### Connecting to Devnet
+
+If you are developing against a local Stacks devnet (via Clarinet), ensure your mobile device and devnet machine are on the same network, and update `EXPO_PUBLIC_HIRO_API_BASE_URL` to your machine's local IP address.
+
