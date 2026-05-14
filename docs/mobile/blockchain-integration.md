@@ -37,3 +37,23 @@ Before sending a transaction to a wallet, we generate a "Preview" in the app. Th
 ### 3. Wallet Handoff
 
 Since the mobile app does not store private keys, it hands off transaction signing to a dedicated Stacks wallet app (like Xverse or Leather) via deep links using the `makeContractCall` helper from `@stacks/transactions`.
+
+## Post-Condition Enforcement
+
+Post-conditions are critical for security in Stacks. The mobile app explicitly defines them for every state-changing transaction.
+
+### Example: Create Habit Post-Condition
+
+When creating a habit, we enforce that the user sends exactly the stake amount in STX to the contract.
+
+```typescript
+const postCondition = makeStandardSTXPostCondition(
+  senderAddress,
+  PostConditionMode.Deny,
+  FungibleConditionCode.Equal,
+  stakeAmount
+);
+```
+
+By setting the mode to `Deny`, the transaction will fail on-chain if the contract tries to transfer more STX or other assets from the user than specified.
+
