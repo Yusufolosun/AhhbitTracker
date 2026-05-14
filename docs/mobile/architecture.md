@@ -17,3 +17,20 @@ The AhhbitTracker mobile application is built using React Native and Expo, follo
 - `src/services/`: High-level API and contract interaction services.
 - `src/shared/`: Reusable UI components, design tokens, and utility functions.
 - `src/types/`: Centralized TypeScript definitions.
+
+## System Flow
+
+```mermaid
+graph TD
+    A[User Interaction] --> B[Feature Component]
+    B --> C[Custom Hook]
+    C --> D[React Query / State]
+    D --> E[Service Layer]
+    E --> F[Stacks Blockchain / Hiro API]
+    F --> E
+    E --> D
+    D --> C
+    C --> B
+    B --> A
+```
+
