@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import * as Linking from 'expo-linking';
-import { useAppStateContext } from '@/app/state';
+import { useAppStateActions } from '@/app/state';
 import { parseWalletInteractionState } from './linking';
 
 export function useWalletDeepLinking() {
-  const { setPreview, setWalletInteraction } = useAppStateContext();
+  const { setPreview, setWalletInteraction } = useAppStateActions();
 
   useEffect(() => {
     let isMounted = true;

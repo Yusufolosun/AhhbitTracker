@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useAppStateContext } from '@/app/state';
+import { useAppState } from '@/app/state';
 import { QUERY_KEYS } from '@/core/config';
 import { invalidateAddressReadCache, invalidatePoolReadCache } from '@/core/data';
 import { useNotificationCenter } from '@/features/notifications';
@@ -21,7 +21,7 @@ const TX_POLL_INTERVAL_MS = 15_000;
 const TX_POLL_TIMEOUT_MS = 30 * 60_000;
 
 export function useWalletInteractionSync() {
-  const { state } = useAppStateContext();
+  const state = useAppState();
   const queryClient = useQueryClient();
   const notificationCenter = useNotificationCenter();
   const notificationStateRef = useRef(notificationCenter.state);
