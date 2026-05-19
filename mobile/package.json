@@ -9,7 +9,9 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck"
+    "check": "npm run typecheck",
+    "lint": "eslint . --ext .ts,.tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix"
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^3.0.2",
@@ -35,8 +37,12 @@
     "react-native-screens": "^4.24.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.18.0",
     "@types/react": "~19.1.0",
-    "typescript": "~5.9.2"
+    "eslint": "^9.18.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "typescript": "~5.9.2",
+    "typescript-eslint": "^8.22.0"
   },
   "private": true
 }
