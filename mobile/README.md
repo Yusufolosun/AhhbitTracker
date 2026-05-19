@@ -48,6 +48,7 @@ mobile/src/
 ## Global State Management
 
 - `AppStateProvider` composes reducer-driven global state with focused selector hooks
+- State and actions are split into separate contexts to reduce rerenders in write-heavy screens
 - State is split by concern:
     - Address lifecycle: tracked address + hydration status (persisted in AsyncStorage)
     - Transaction preview lifecycle: in-memory preview payload shared across tabs/screens
@@ -60,7 +61,6 @@ mobile/src/
 ## Navigation
 
 - Root: Native stack with `MainTabs`, `HabitDetails`, and `CreateHabit`
-- Tabs: `Overview`, `Habits`, `Preview`, and `Account`
 - Tabs: `Overview`, `Habits`, `Notifications`, `Preview`, and `Account`
 - Deep links:
     - `ahhbittracker://overview`
@@ -77,6 +77,7 @@ mobile/src/
 - The notifications tab surfaces permission state, upcoming reminder plans, and recent event alerts
 - Address-dependent routes are protected with a reusable guard component
 - Transaction previews are shared between screens through a dedicated context provider
+- Shared route path constants keep navigation, wallet links, and notification routes consistent
 - The create-habit preview flow enforces the contract's 0.02-100 STX stake range and 50-character name limit before building the wallet handoff payload
 - Local reminders and event alerts use `expo-notifications`; the app requests permission on first use and stores notification history locally
 
@@ -86,6 +87,14 @@ mobile/src/
 cd mobile
 npm install
 npm run start
+```
+
+## Quality Checks
+
+```bash
+cd mobile
+npm run typecheck
+npm run lint
 ```
 
 ## Environment and Network
