@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 import type { MainTabScreenProps } from '@/app/navigation/types';
-import { MAIN_TAB_ROUTES, ROOT_ROUTES } from '@/app/navigation/types';
+import { navigateToHabitDetails, navigateToPreview } from '@/app/navigation';
 import { RequireAddress } from '@/app/navigation/RequireAddress';
 import { useAddressState, usePreviewState } from '@/app/state';
 import {
@@ -27,7 +27,7 @@ export function HabitsScreen({ navigation }: HabitsScreenProps) {
   const currentBlockQuery = useCurrentBlockQuery();
 
   const openPreviewTab = () => {
-    navigation.navigate(MAIN_TAB_ROUTES.Preview);
+    navigateToPreview(navigation);
   };
 
   const handleCheckInPreview = async (habitId: number) => {
@@ -81,7 +81,7 @@ export function HabitsScreen({ navigation }: HabitsScreenProps) {
                   onClaimPreview={handleClaimPreview}
                 />
                 <ActionButton
-                  onPress={() => navigation.navigate(ROOT_ROUTES.HabitDetails, { habitId: habit.habitId })}
+                  onPress={() => navigateToHabitDetails(navigation, habit.habitId)}
                   label="View habit details"
                   variant="secondary"
                   fullWidth

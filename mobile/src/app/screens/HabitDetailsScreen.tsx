@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { RequireAddress } from '@/app/navigation/RequireAddress';
-import { MAIN_TAB_ROUTES, type RootStackScreenProps } from '@/app/navigation/types';
+import type { RootStackScreenProps } from '@/app/navigation/types';
+import { navigateToPreview } from '@/app/navigation';
 import { useAddressState, usePreviewState } from '@/app/state';
 import { useCurrentBlockQuery, useUserHabitsQuery } from '@/features/habits';
 import {
@@ -65,8 +66,8 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
     );
   }
 
-  const navigateToPreview = () => {
-    navigation.navigate('MainTabs', { screen: MAIN_TAB_ROUTES.Preview });
+  const openPreview = () => {
+    navigateToPreview(navigation);
   };
 
   const currentBlock = currentBlockQuery.data ?? null;
@@ -87,7 +88,7 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
         habitId: habit.habitId,
         source: 'habit-details',
       });
-      navigateToPreview();
+      openPreview();
     });
   };
 
@@ -103,7 +104,7 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
         habitId: habit.habitId,
         source: 'habit-details',
       });
-      navigateToPreview();
+      openPreview();
     });
   };
 
@@ -115,7 +116,7 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
         habitId: habit.habitId,
         source: 'habit-details',
       });
-      navigateToPreview();
+      openPreview();
     });
   };
 

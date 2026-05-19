@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 import { RequireAddress } from '@/app/navigation/RequireAddress';
-import { MAIN_TAB_ROUTES, type RootStackScreenProps } from '@/app/navigation/types';
+import type { RootStackScreenProps } from '@/app/navigation/types';
+import { navigateToPreview } from '@/app/navigation';
 import { useAddressState, usePreviewState } from '@/app/state';
 import {
   buildCreateHabitPreview,
@@ -25,7 +26,7 @@ export function CreateHabitScreen({ navigation }: CreateHabitScreenProps) {
 
     await runProtectedAction('create-habit', () => {
       setPreview(buildCreateHabitPreview(activeAddress, name, toMicroSTX(stakeAmountStx)));
-      navigation.navigate('MainTabs', { screen: MAIN_TAB_ROUTES.Preview });
+      navigateToPreview(navigation);
     });
   };
 
@@ -45,7 +46,7 @@ export function CreateHabitScreen({ navigation }: CreateHabitScreenProps) {
 
         <ActionButton
           label="Open transaction preview panel"
-          onPress={() => navigation.navigate('MainTabs', { screen: MAIN_TAB_ROUTES.Preview })}
+          onPress={() => navigateToPreview(navigation)}
           variant="secondary"
           fullWidth
           style={styles.previewLink}

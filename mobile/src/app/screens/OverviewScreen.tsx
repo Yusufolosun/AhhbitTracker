@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import type { MainTabScreenProps } from '@/app/navigation/types';
-import { MAIN_TAB_ROUTES, ROOT_ROUTES } from '@/app/navigation/types';
+import { MAIN_TAB_ROUTES } from '@/app/navigation/types';
+import { navigateToCreateHabit, navigateToMainTab, navigateToPreview } from '@/app/navigation';
 import { useAddressState } from '@/app/state';
 import { AddressInputCard } from '@/features/address';
 import { useUserStatsQuery, usePoolBalanceQuery } from '@/features/habits';
@@ -54,19 +55,19 @@ export function OverviewScreen({ navigation }: OverviewScreenProps) {
       <View style={styles.actionsGrid}>
         <ActionButton
           label="Open habits"
-          onPress={() => navigation.navigate(MAIN_TAB_ROUTES.Habits)}
+          onPress={() => navigateToMainTab(navigation, MAIN_TAB_ROUTES.Habits)}
           variant="secondary"
           fullWidth
         />
         <ActionButton
           label="Create habit"
-          onPress={() => navigation.navigate(ROOT_ROUTES.CreateHabit)}
+          onPress={() => navigateToCreateHabit(navigation)}
           variant="secondary"
           fullWidth
         />
         <ActionButton
           label="View previews"
-          onPress={() => navigation.navigate(MAIN_TAB_ROUTES.Preview)}
+          onPress={() => navigateToPreview(navigation)}
           variant="secondary"
           fullWidth
         />
