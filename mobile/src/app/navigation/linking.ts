@@ -1,5 +1,6 @@
 import type { LinkingOptions } from '@react-navigation/native';
 import * as Linking from 'expo-linking';
+import { ROUTE_PATHS } from '@/core/navigation';
 import type { RootStackParamList } from './types';
 
 export const linkingConfig: LinkingOptions<RootStackParamList> = {
@@ -8,11 +9,11 @@ export const linkingConfig: LinkingOptions<RootStackParamList> = {
     screens: {
       MainTabs: {
         screens: {
-          Overview: 'overview',
-          Habits: 'habits',
-          Notifications: 'notifications',
+          Overview: ROUTE_PATHS.overview,
+          Habits: ROUTE_PATHS.habits,
+          Notifications: ROUTE_PATHS.notifications,
           Preview: {
-            path: 'preview',
+            path: ROUTE_PATHS.preview,
             parse: {
               payload: String,
               result: String,
@@ -22,16 +23,16 @@ export const linkingConfig: LinkingOptions<RootStackParamList> = {
               result: String,
             },
           },
-          Account: 'account',
+          Account: ROUTE_PATHS.account,
         },
       },
       HabitDetails: {
-        path: 'habits/:habitId',
+        path: ROUTE_PATHS.habitDetails,
         parse: {
           habitId: Number,
         },
       },
-      CreateHabit: 'habits/create',
+      CreateHabit: ROUTE_PATHS.createHabit,
     },
   },
 };
