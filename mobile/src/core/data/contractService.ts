@@ -46,12 +46,35 @@ export function clearContractReadCache(): void {
   invalidateReadCache(CACHE_PREFIX);
 }
 
-function unwrapOkNumber(json: any): number {
-  if (json?.success === true) {
-    return Number(json.value?.value ?? 0);
+function readNumericValue(value: unknown): number {
+  if (typeof value === 'number') {
+    return value;
   }
 
-  return Number(json?.value ?? 0);
+  if (typeof value === 'string' && value.trim() !== '') {
+    return Number(value);
+  }
+
+  if (value && typeof value === 'object' && 'value' in value) {
+    const nested = (value as { value?: unknown }).value;
+    return readNumericValue(nested);
+  }
+
+  return 0;
+}
+
+function unwrapOkNumber(json: unknown): number {
+  if (!json || typeof json !== 'object') {
+    return 0;
+  }
+
+  const record = json as { success?: boolean; value?: unknown };
+
+  if (record.success === true) {
+    return readNumericValue(record.value);
+  }
+
+  return readNumericValue(record.value ?? json);
 }
 
 async function readPoolDistributionValue(functionName: string): Promise<number> {

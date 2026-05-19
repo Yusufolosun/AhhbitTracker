@@ -38,6 +38,11 @@ const SYNC_TARGETS: Record<MobileTxType, WalletInteractionSyncTargets> = {
 
 export type WalletTransactionStatus = 'pending' | 'confirmed' | 'failed';
 
+interface HiroTransactionStatusPayload {
+  tx_status?: string;
+  status?: string;
+}
+
 export function getWalletInteractionSyncTargets(
   functionName: MobileTxType | null,
 ): WalletInteractionSyncTargets {
@@ -50,7 +55,7 @@ export function getWalletInteractionSyncTargets(
 
 export async function fetchWalletTransactionStatus(txId: string): Promise<WalletTransactionStatus> {
   try {
-    const payload = await fetchHiroJson<any>(`/extended/v1/tx/${txId}`, {
+    const payload = await fetchHiroJson<HiroTransactionStatusPayload>(`/extended/v1/tx/${txId}`, {
       ttlMs: 5_000,
       retries: 1,
     });
