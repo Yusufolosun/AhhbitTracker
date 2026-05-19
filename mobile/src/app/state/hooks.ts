@@ -1,12 +1,11 @@
 import { useMemo } from 'react';
-import { useAppStateContext } from './AppStateContext';
+import { useAppState, useAppStateActions } from './AppStateContext';
 
-export function useAppState() {
-  return useAppStateContext().state;
-}
+export { useAppState, useAppStateActions };
 
 export function useAddressState() {
-  const { state, setTrackedAddress, clearTrackedAddress } = useAppStateContext();
+  const state = useAppState();
+  const { setTrackedAddress, clearTrackedAddress } = useAppStateActions();
 
   return useMemo(
     () => ({
@@ -20,7 +19,8 @@ export function useAddressState() {
 }
 
 export function usePreviewState() {
-  const { state, setPreview, clearPreview } = useAppStateContext();
+  const state = useAppState();
+  const { setPreview, clearPreview } = useAppStateActions();
 
   return useMemo(
     () => ({
@@ -33,11 +33,8 @@ export function usePreviewState() {
 }
 
 export function useWalletInteractionState() {
-  const {
-    state,
-    setWalletInteraction,
-    clearWalletInteraction,
-  } = useAppStateContext();
+  const state = useAppState();
+  const { setWalletInteraction, clearWalletInteraction } = useAppStateActions();
 
   return useMemo(
     () => ({

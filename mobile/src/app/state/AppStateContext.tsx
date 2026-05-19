@@ -20,8 +20,7 @@ import type { AppState } from './types';
 import type { ContractCallPreview } from '@/core/types';
 import { trackMobileEvent, toWalletAddressHash } from '@/analytics';
 
-interface AppStateContextValue {
-  state: AppState;
+interface AppStateActions {
   setTrackedAddress: (value: string) => Promise<void>;
   clearTrackedAddress: () => Promise<void>;
   setPreview: (nextPreview: ContractCallPreview) => void;
@@ -30,7 +29,8 @@ interface AppStateContextValue {
   clearWalletInteraction: () => void;
 }
 
-const AppStateContext = createContext<AppStateContextValue | undefined>(undefined);
+const AppStateContext = createContext<AppState | undefined>(undefined);
+const AppStateActionsContext = createContext<AppStateActions | undefined>(undefined);
 
 export function AppStateProvider({ children }: PropsWithChildren) {
   const [state, dispatch] = useReducer(appStateReducer, undefined, createInitialAppState);
@@ -139,9 +139,8 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     dispatch(appStateActions.clearWalletInteraction());
   }, []);
 
-  const value = useMemo<AppStateContextValue>(
+  const actions = useMemo<AppStateActions>(
     () => ({
-      state,
       setTrackedAddress,
       clearTrackedAddress,
       setPreview,
@@ -150,7 +149,6 @@ export function AppStateProvider({ children }: PropsWithChildren) {
       clearWalletInteraction,
     }),
     [
-      state,
       setTrackedAddress,
       clearTrackedAddress,
       setPreview,
@@ -160,15 +158,44 @@ export function AppStateProvider({ children }: PropsWithChildren) {
     ],
   );
 
-  return <AppStateContext.Provider value={value}>{children}</AppStateContext.Provider>;
+  return (
+    <AppStateContext.Provider value={state}>
+      <AppStateActionsContext.Provider value={actions}>
+        {children}
+      </AppStateActionsContext.Provider>
+    </AppStateContext.Provider>
+  );
+}
+
+export function useAppState() {
+  const state = useContext(AppStateContext);
+
+  if (!state) {
+    throw new Error('useAppState must be used within AppStateProvider');
+  }
+
+  return state;
+}
+
+export function useAppStateActions() {
+  const actions = useContext(AppStateActionsContext);
+
+  if (!actions) {
+    throw new Error('useAppStateActions must be used within AppStateProvider');
+  }
+
+  return actions;
 }
 
 export function useAppStateContext() {
-  const context = useContext(AppStateContext);
+  const state = useAppState();
+  const actions = useAppStateActions();
 
-  if (!context) {
-    throw new Error('useAppStateContext must be used within AppStateProvider');
-  }
-
-  return context;
+  return useMemo(
+    () => ({
+      state,
+      ...actions,
+    }),
+    [state, actions],
+  );
 }
