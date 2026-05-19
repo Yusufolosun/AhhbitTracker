@@ -7,7 +7,7 @@ import { AddressInputCard } from '@/features/address';
 import { useUserStatsQuery, usePoolBalanceQuery } from '@/features/habits';
 import { PoolBalanceCard } from '@/features/pool';
 import { ActionButton, Card, EmptyState, LoadingState, MetricRow, Screen, SectionHeader } from '@/shared/components';
-import { palette, radius, spacing, typography } from '@/shared/theme';
+import { spacing } from '@/shared/theme';
 
 type OverviewScreenProps = MainTabScreenProps<'Overview'>;
 

@@ -1,3 +1,4 @@
+import { networkConfig } from '../config';
 import { invalidateReadCache, readThroughCache } from '../data/readCache';
 
 const CACHE_PREFIX = 'mobile-hiro-api:';
@@ -26,13 +27,13 @@ function shouldRetry(status?: number): boolean {
 }
 
 function getHiroApiBaseUrl(): string {
-  const configured = process.env.EXPO_PUBLIC_HIRO_API_BASE_URL?.trim();
+  const configured = networkConfig.hiroApiBaseUrl.trim();
 
   if (configured) {
     return configured.replace(/\/$/, '');
   }
 
-  return process.env.EXPO_PUBLIC_STACKS_NETWORK === 'testnet'
+  return networkConfig.stacksNetwork === 'testnet'
     ? 'https://api.testnet.hiro.so'
     : 'https://api.mainnet.hiro.so';
 }

@@ -22,7 +22,7 @@ function toPreview(
     functionName: MobileTxType;
     functionArgs: unknown[];
     postConditions: unknown[];
-    postConditionMode: number;
+    postConditionMode: PostConditionMode;
   },
 ): ContractCallPreview {
   return {

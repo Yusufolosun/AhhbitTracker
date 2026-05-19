@@ -1,7 +1,7 @@
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import type { PoolBalance } from '@/core/types';
 import { Card } from '@/shared/components';
-import { palette, radius, spacing, typography } from '@/shared/theme';
+import { palette, spacing, typography } from '@/shared/theme';
 
 interface PoolBalanceCardProps {
   data: PoolBalance | undefined;

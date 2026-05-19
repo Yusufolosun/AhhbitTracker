@@ -30,11 +30,17 @@ async function flushAnalyticsQueue(): Promise<void> {
     return;
   }
 
+  const endpoint = ANALYTICS_ENDPOINT;
+
+  if (!endpoint) {
+    return;
+  }
+
   isFlushing = true;
   const batch = queue.splice(0, queue.length);
 
   try {
-    await fetch(ANALYTICS_ENDPOINT!, {
+    await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

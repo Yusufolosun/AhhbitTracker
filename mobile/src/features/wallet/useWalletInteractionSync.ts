@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAppState } from '@/app/state';
 import { QUERY_KEYS } from '@/core/config';
@@ -31,7 +31,7 @@ export function useWalletInteractionSync() {
     notificationStateRef.current = notificationCenter.state;
   }, [notificationCenter.state]);
 
-  const notifyTransaction = async (status: 'confirmed' | 'failed') => {
+  const notifyTransaction = useCallback(async (status: 'confirmed' | 'failed') => {
     const walletInteraction = state.walletInteraction;
     const notificationState = notificationStateRef.current;
     const txId = walletInteraction?.txId ?? null;
@@ -57,7 +57,7 @@ export function useWalletInteractionSync() {
 
     const identifier = await scheduleNotification(plan);
     await notificationCenter.recordNotification(plan.key, toNotificationRecord(plan, identifier));
-  };
+  }, [notificationCenter, state.walletInteraction]);
 
   useEffect(() => {
     const walletInteraction = state.walletInteraction;
@@ -165,5 +165,5 @@ export function useWalletInteractionSync() {
         clearTimeout(timeoutTimer);
       }
     };
-  }, [queryClient, state.trackedAddress, state.walletInteraction]);
+  }, [notifyTransaction, queryClient, state.trackedAddress, state.walletInteraction]);
 }

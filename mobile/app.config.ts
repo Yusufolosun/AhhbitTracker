@@ -45,6 +45,7 @@ const STAGE_DEFAULTS: Readonly<Record<AppStage, ResolvedNetworkConfig>> = {
 
 const STACKS_ADDRESS_PATTERN = /^S[PMTN][A-Z0-9]{39}$/;
 const CONTRACT_NAME_PATTERN = /^[a-zA-Z]([a-zA-Z0-9_-]{0,127})$/;
+const env = process.env as Record<string, string | undefined>;
 
 function mustBeNonEmpty(value: string | undefined, key: string): string {
   const normalized = value?.trim();
@@ -97,24 +98,24 @@ function assertContractName(value: string, key: string): string {
 }
 
 function resolveNetworkConfig(): ResolvedNetworkConfig {
-  const appStage = toAppStage(process.env.EXPO_PUBLIC_APP_STAGE ?? process.env.APP_STAGE);
+  const appStage = toAppStage(env.EXPO_PUBLIC_APP_STAGE ?? env.APP_STAGE);
   const defaults = STAGE_DEFAULTS[appStage];
-  const networkMode = toNetwork(process.env.EXPO_PUBLIC_STACKS_NETWORK, defaults.networkMode);
+  const networkMode = toNetwork(env.EXPO_PUBLIC_STACKS_NETWORK, defaults.networkMode);
 
   return {
     appStage,
     networkMode,
     hiroApiBaseUrl: mustBeNonEmpty(
-      process.env.EXPO_PUBLIC_HIRO_API_BASE_URL ?? defaults.hiroApiBaseUrl,
+      env.EXPO_PUBLIC_HIRO_API_BASE_URL ?? defaults.hiroApiBaseUrl,
       'EXPO_PUBLIC_HIRO_API_BASE_URL',
     ),
     contract: {
       contractAddress: assertStacksAddress(
-        process.env.EXPO_PUBLIC_CONTRACT_ADDRESS ?? defaults.contract.contractAddress,
+        env.EXPO_PUBLIC_CONTRACT_ADDRESS ?? defaults.contract.contractAddress,
         'EXPO_PUBLIC_CONTRACT_ADDRESS',
       ),
       contractName: assertContractName(
-        process.env.EXPO_PUBLIC_CONTRACT_NAME ?? defaults.contract.contractName,
+        env.EXPO_PUBLIC_CONTRACT_NAME ?? defaults.contract.contractName,
         'EXPO_PUBLIC_CONTRACT_NAME',
       ),
     },
@@ -165,9 +166,9 @@ const config: ExpoConfig = {
     contractName: networkConfig.contract.contractName,
     hiroApiBaseUrl: networkConfig.hiroApiBaseUrl,
     stacksNetwork: networkConfig.networkMode,
-    analyticsEnabled: process.env.EXPO_PUBLIC_ANALYTICS_ENABLED,
-    analyticsEndpoint: process.env.EXPO_PUBLIC_ANALYTICS_ENDPOINT,
-    analyticsWriteKey: process.env.EXPO_PUBLIC_ANALYTICS_WRITE_KEY,
+    analyticsEnabled: env.EXPO_PUBLIC_ANALYTICS_ENABLED,
+    analyticsEndpoint: env.EXPO_PUBLIC_ANALYTICS_ENDPOINT,
+    analyticsWriteKey: env.EXPO_PUBLIC_ANALYTICS_WRITE_KEY,
   },
   web: {
     favicon: './assets/favicon.png',

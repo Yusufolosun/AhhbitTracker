@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { ContractCallPreview } from '@/core/types';
 import { ActionButton, Card } from '@/shared/components';
-import { palette, radius, spacing, typography } from '@/shared/theme';
+import { palette, spacing, typography } from '@/shared/theme';
 
 interface TransactionPreviewPanelProps {
   preview: ContractCallPreview | null;

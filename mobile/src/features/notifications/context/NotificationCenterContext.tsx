@@ -49,6 +49,15 @@ interface NotificationCenterContextValue {
 
 const MAX_RECENT_NOTIFICATIONS = 25;
 
+function toRoutePath(value: unknown): string | null {
+  if (typeof value !== 'string') {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  return trimmed ? trimmed : null;
+}
+
 function trimDeliveredEventKeys(keys: string[]): string[] {
   return keys.slice(0, MAX_RECENT_NOTIFICATIONS * 2);
 }
@@ -217,7 +226,7 @@ export function NotificationCenterProvider({ children }: PropsWithChildren) {
 
   useEffect(() => {
     const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
-      const routePath = String(response.notification.request.content.data?.routePath ?? '').trim();
+      const routePath = toRoutePath(response.notification.request.content.data?.routePath);
 
       if (!routePath) {
         return;
@@ -227,7 +236,7 @@ export function NotificationCenterProvider({ children }: PropsWithChildren) {
     });
 
     void Notifications.getLastNotificationResponseAsync().then((response) => {
-      const routePath = String(response?.notification.request.content.data?.routePath ?? '').trim();
+      const routePath = toRoutePath(response?.notification.request.content.data?.routePath);
 
       if (!routePath) {
         return;
@@ -376,12 +385,14 @@ export function NotificationCenterProvider({ children }: PropsWithChildren) {
     [state.permissionStatus, state.remindersEnabled, state.scheduledReminders],
   );
 
-  const recordNotification = useCallback(async (eventKey: string, notification: NotificationRecord) => {
+  const recordNotification = useCallback((eventKey: string, notification: NotificationRecord) => {
     dispatch({ type: 'notifications:record', payload: { eventKey, notification } });
+    return Promise.resolve();
   }, []);
 
-  const clearNotificationHistory = useCallback(async () => {
+  const clearNotificationHistory = useCallback(() => {
     dispatch({ type: 'notifications:clear' });
+    return Promise.resolve();
   }, []);
 
   const value = useMemo<NotificationCenterContextValue>(

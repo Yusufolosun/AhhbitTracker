@@ -32,7 +32,7 @@ export function PreviewScreen({ route }: PreviewScreenProps) {
     }
   }, [route.params, setPreview, setWalletInteraction]);
 
-  const handleClear = async () => {
+  const handleClear = () => {
     setIsClearing(true);
 
     try {

@@ -43,7 +43,7 @@ export function configureNotificationRuntime(): void {
   runtimeConfigured = true;
 
   Notifications.setNotificationHandler({
-    handleNotification: async () => ({
+    handleNotification: () => ({
       shouldShowBanner: true,
       shouldShowList: true,
       shouldPlaySound: true,

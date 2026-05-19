@@ -12,7 +12,7 @@ import {
   formatStreakDays,
   getMobileCheckInWindowState,
 } from '@/shared/utils';
-import { palette, radius, spacing, typography } from '@/shared/theme';
+import { palette, spacing, typography } from '@/shared/theme';
 
 interface HabitCardProps {
   habit: Habit;
