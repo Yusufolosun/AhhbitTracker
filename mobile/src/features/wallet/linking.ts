@@ -1,5 +1,6 @@
 import * as Linking from 'expo-linking';
 import { APP_LINK_SCHEME } from '@/core/config';
+import { ROUTE_PATHS } from '@/core/navigation';
 import { ContractCallPreview } from '@/core/types';
 import {
   WalletInteractionState,
@@ -9,7 +10,7 @@ import {
   WalletReturnStatus,
 } from './types';
 
-const PREVIEW_ROUTE = 'preview';
+const PREVIEW_ROUTE = ROUTE_PATHS.preview;
 
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === 'string');
