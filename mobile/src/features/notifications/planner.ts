@@ -1,4 +1,5 @@
 import { CHECK_IN_WINDOW_BLOCKS } from '../../core/config/constants';
+import { buildHabitDetailsPath, buildPreviewPath } from '../../core/navigation';
 import type { Habit } from '../../core/types/habit';
 import type { MobileTxType } from '../../core/types/transaction';
 import { formatStreakDays } from '../../shared/utils/formatting';
@@ -12,14 +13,6 @@ const CHECK_IN_REMINDER_LEAD_MS = CHECK_IN_REMINDER_LEAD_BLOCKS * APPROX_BLOCK_D
 
 function normalizeAddress(address: string): string {
   return address.trim().toUpperCase();
-}
-
-function buildHabitRoute(habitId: number): string {
-  return `/habits/${habitId}`;
-}
-
-function buildPreviewRoute(): string {
-  return '/preview';
 }
 
 function buildHabitReminderKey(
@@ -46,7 +39,7 @@ function buildTransactionEventKey(txId: string, status: 'confirmed' | 'failed'):
 function createPlan(partial: Omit<NotificationPlan, 'routePath'> & { routePath?: string }): NotificationPlan {
   return {
     ...partial,
-    routePath: partial.routePath ?? buildPreviewRoute(),
+    routePath: partial.routePath ?? buildPreviewPath(),
   };
 }
 
@@ -81,7 +74,7 @@ export function buildHabitNotificationPlans(params: {
         tone: 'warning',
         title: 'Check-in reminder',
         body: `${habit.name} will need a check-in in about 2 hours.`,
-        routePath: buildHabitRoute(habit.habitId),
+        routePath: buildHabitDetailsPath(habit.habitId),
         habitId: habit.habitId,
         deliverAt: reminderDeliverAt,
       }),
@@ -98,7 +91,7 @@ export function buildHabitNotificationPlans(params: {
         tone: 'warning',
         title: 'Check-in is urgent',
         body: `${habit.name} is inside the final 2-hour check-in window.`,
-        routePath: buildHabitRoute(habit.habitId),
+        routePath: buildHabitDetailsPath(habit.habitId),
         habitId: habit.habitId,
       }),
     );
@@ -112,7 +105,7 @@ export function buildHabitNotificationPlans(params: {
         tone: 'danger',
         title: 'Check-in window missed',
         body: `${habit.name} missed the 32-hour check-in window.`,
-        routePath: buildHabitRoute(habit.habitId),
+        routePath: buildHabitDetailsPath(habit.habitId),
         habitId: habit.habitId,
       }),
     );
@@ -126,7 +119,7 @@ export function buildHabitNotificationPlans(params: {
         tone: 'success',
         title: 'Withdrawal unlocked',
         body: `${habit.name} reached ${formatStreakDays(habit.currentStreak)} and can withdraw its stake.`,
-        routePath: buildHabitRoute(habit.habitId),
+        routePath: buildHabitDetailsPath(habit.habitId),
         habitId: habit.habitId,
       }),
     );
@@ -170,7 +163,7 @@ export function buildTransactionNotificationPlan(params: {
       tone: 'success',
       title: resolved?.title ?? 'Transaction confirmed',
       body: resolved?.body ?? 'A wallet transaction was confirmed on chain.',
-      routePath: buildPreviewRoute(),
+      routePath: buildPreviewPath(),
       txId,
     });
   }
@@ -183,7 +176,7 @@ export function buildTransactionNotificationPlan(params: {
     body: functionName
       ? `The ${functionName.replace('-', ' ')} transaction failed on chain.`
       : 'A wallet transaction failed on chain.',
-    routePath: buildPreviewRoute(),
+    routePath: buildPreviewPath(),
     txId,
   });
 }
