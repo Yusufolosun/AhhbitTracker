@@ -1,236 +1,65 @@
 # AhhbitTracker User Guide
 
-## Welcome
+Welcome to AhhbitTracker! If you are looking to build positive daily habits and need that extra push to stay committed, you are in the right place. 
 
-AhhbitTracker is a blockchain-based habit tracking system that uses financial commitment to help you build lasting habits.
-
-## How It Works
-
-### 1. Stake STX on Your Habit
-
-When you create a habit, you stake STX tokens as a commitment. The stake must be between 0.02 and 100 STX, and the habit name can be up to 50 characters.
-
-**Why stake?** Financial commitment creates real accountability.
-
-### 2. Check In Daily
-
-Every 16-32 hours, check in to prove you're following through. Each successful check-in increases your streak.
-
-**Important:** You have a 16-32 hour window (96-192 blocks) to check in.
-
-### 3. Complete or Forfeit
-
-- **Complete:** Check in for 7+ consecutive days, then withdraw your stake
-- **Forfeit:** Miss a check-in window and 10% of your stake is forfeited per missed window
-
-### 4. Earn Bonuses
-
-Successful users can claim bonuses from the forfeited pool created by users who missed their check-ins.
-
-**Referral rewards:** Register a referrer once using `register-referrer`. When a referred user completes a streak, the referrer earns a bonus-claim weight boost that increases their future bonus shares.
-
-## Getting Started
-
-### Prerequisites
-
-- Stacks wallet (Leather, Xverse, or Asigna)
-- Minimum 0.02 STX plus transaction fees
-
-### Creating Your First Habit
-
-1. Connect your Stacks wallet
-2. Click "Create New Habit"
-3. Enter habit name (e.g., "Morning Exercise")
-4. Set your stake amount (0.02 to 100 STX)
-5. Confirm the transaction
-
-On mobile, the app will ask for biometric confirmation before opening the wallet prompt when the device supports it.
-
-**Transaction cost:** ~0.15-0.25 STX
-
-### Daily Check-ins
-
-1. Visit AhhbitTracker once per day
-2. Use the Dashboard "Run Daily Check-In" action to submit all eligible habits, or click "Check In" on a single habit
-3. Confirm each wallet prompt
-4. Watch the transaction tracker for pending, confirmed, or failed on-chain status
-
-On mobile, check-in previews and wallet handoff are protected by biometric confirmation on supported devices.
-
-**Transaction cost:** ~0.10-0.20 STX per check-in
-
-### Withdrawing Your Stake
-
-After completing 7+ consecutive check-ins:
-
-1. Click "Withdraw Stake" on your completed habit
-2. Confirm the transaction
-3. Your stake is returned to your wallet
-
-On mobile, withdrawal and bonus claim actions also require biometric confirmation when available.
-
-**Transaction cost:** ~0.15-0.25 STX
-
-## Understanding Streaks
-
-### Streak Rules
-
-- **First check-in:** Starts your streak at 1
-- **Each consecutive check-in:** Adds 1 to your streak
-- **Missed window:** Resets streak and forfeits 10% per missed window (habit continues unless stake is fully depleted)
-
-### Check-in Window
-
-You must check in between 96 and 192 blocks (~16 to ~32 hours) after your last check-in.
-
-**Example timeline:**
-- Monday 9:00 AM: First check-in (streak = 1)
-- Tuesday before 9:00 AM: Second check-in (streak = 2)
-- Tuesday after 9:00 AM: Window expires, 10% penalty applied and streak resets
-
-### Multiple Habits
-
-You can track multiple habits simultaneously. Each habit:
-- Has its own stake
-- Maintains its own streak
-- Operates independently
-
-## The Forfeited Pool
-
-### How It Works
-
-When users miss check-ins, 10% per missed window is added to a shared pool.
-
-### Claiming Bonuses
-
-Users who successfully complete habits can claim a share of the pool:
-
-1. Complete a habit (7+ day streak)
-2. Withdraw your original stake
-3. Click "Claim Bonus"
-4. Receive your share of forfeited stakes
-
-**Bonus calculation:** Pool distributed among successful users, weighted by referral boosts
-
-## Best Practices
-
-### Choose Achievable Habits
-
-Start with habits you can realistically maintain daily:
-- Good: "10-minute walk"
-- Good: "Read one page"
-- Avoid: "Run a marathon"
-- Avoid: "Read entire book"
-
-### Set Meaningful Stakes
-
-Higher stakes = stronger commitment, but start reasonable:
-- Beginner: 0.1-0.5 STX
-- Intermediate: 0.5-2.0 STX
-- Advanced: 2.0+ STX
-
-### Create Check-in Reminders
-
-Set daily reminders to check in before your window expires.
-
-### Track Multiple Habits Gradually
-
-Don't overwhelm yourself:
-- Week 1: One habit
-- Week 2-3: Add second habit if first is stable
-- Week 4+: Consider third habit
-
-## Costs and Economics
-
-### Transaction Costs
-
-| Action | Estimated Cost |
-|--------|----------------|
-| Create habit | 0.15-0.25 STX |
-| Daily check-in | 0.10-0.20 STX |
-| Withdraw stake | 0.15-0.25 STX |
-| Claim bonus | 0.15-0.25 STX |
-
-### Monthly Cost Example
-
-For one habit with daily check-ins:
-- Creation: 0.20 STX
-- 30 check-ins: 4.50 STX
-- Withdrawal: 0.20 STX
-- **Total:** ~4.90 STX
-
-**Plus your stake:** If you stake 1 STX, total commitment is ~5.90 STX
-
-### Return on Investment
-
-If you complete your habit:
-- Recover: Your original stake
-- Earn: Share of forfeited pool
-- **Net result:** Potentially profit from others' failures
-
-## Troubleshooting
-
-### "Already Checked In" Error
-
-You've already checked in today. The next check-in is valid between 96 and 192 blocks after your last one (~16 to ~32 hours).
-
-### "Window Expired" Error
-
-You missed your check-in window. A 10% per missed window penalty was applied to your remaining stake.
-
-### "Insufficient Streak" Error
-
-You need 7+ consecutive check-ins before withdrawing your stake.
-
-### Transaction Failed
-
-Common causes:
-- Insufficient STX balance
-- Incorrect habit ID
-- Network congestion
-
-**Solution:** Check your wallet balance and try again.
-
-## FAQ
-
-**Q: What if I'm traveling and can't check in?**
-
-A: You'll incur a 10% penalty per missed window. The habit continues while stake remains, so plan for timing before committing.
-
-**Q: Can I delete a habit?**
-
-A: No. Habits are permanent on the blockchain. You can only complete them or take penalties if you miss windows.
-
-**Q: How is the bonus pool distributed?**
-
-A: Shared among users who successfully complete habits.
-
-**Q: What happens if no one forfeits?**
-
-A: The pool remains at zero. Bonuses only exist when stakes are forfeited.
-
-**Q: Can I increase my stake mid-habit?**
-
-A: No. Stake amount is locked when you create the habit.
-
-**Q: Is my data private?**
-
-A: All transactions are public on the Stacks blockchain.
-
-## Getting Help
-
-- **Contract Address:** `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3`
-- **Documentation:** [GitHub Repository](https://github.com/Yusufolosun/AhhbitTracker)
-- **Issues:** Report bugs via GitHub Issues
-
-## Tips for Success
-
-1. **Start small** - Build the check-in habit before adding complexity
-2. **Be consistent** - Same time each day works best
-3. **Use technology** - Set phone reminders
-4. **Stay motivated** - Remember your financial commitment
-5. **Track progress** - Celebrate each streak milestone
+Unlike regular habit apps where you can simply ignore notifications, AhhbitTracker uses a concept called **financial accountability (loss aversion)** to ensure you stick to your goals.
 
 ---
 
-**Ready to build better habits? Start your journey today!**
+## How It Works: The 30-Second Summary
+
+1. **Commit & Deposit**: Choose a daily habit (e.g., "Drink 3L of water", "Walk 30 minutes", "Practice coding"). Lock in a small security deposit of STX tokens (as low as 0.02 STX) as your commitment.
+2. **Check In Daily**: Log into the app once a day within your active window (every 16 to 32 hours) to record your habit completion.
+3. **Build a 7-Day Streak**: Keep checking in daily. Once you hit a 7-day streak, you can withdraw your full deposit back to your wallet.
+4. **Earn Bonus Rewards**: Every time a user misses a check-in, they forfeit 10% of their deposit. This forfeited amount goes into a shared **Community Reward Pool**. When you complete your 7-day streak, you get to claim a share of this pool as a bonus!
+
+---
+
+## Beginner's Guide: Web3 Concepts Explained Simply
+
+If you are new to blockchain, cryptocurrency, or "Web3," don't worry. Here are the basic concepts explained in everyday language:
+
+### What is STX?
+STX is a digital utility token used on the **Stacks** network. Think of Stacks as a secure layer built on top of **Bitcoin**. STX tokens act like your digital security deposit in the app.
+
+### What is a Web3 Wallet?
+A digital wallet is like a secure keychain and banking app combined. It stores your STX and lets you log into blockchain applications securely. You retain full control over your funds—no company or third party can access them.
+*   **Recommended Wallets**: [Leather](https://leather.io) (Desktop) or [Xverse](https://xverse.app) (Mobile & Desktop).
+
+### What is a Smart Contract?
+A smart contract is a digital agreement that runs automatically. There is no human middleman. The rules (7-day streak to withdraw, 10% forfeit on missed days) are hardcoded into the contract, meaning your funds are handled fairly and strictly according to the rules.
+
+### What are Transaction Fees (Gas)?
+Every time you perform an action on the blockchain (like checking in or withdrawing), the network requires a tiny fee (usually less than 0.1 STX) to process the transaction. These fees do not go to AhhbitTracker; they go to network validators who keep the system secure.
+
+---
+
+## Step-by-Step Instructions
+
+### Step 1: Connect Your Wallet or Try the Demo
+When you first open the app, you can:
+*   Connect your installed Stacks wallet, OR
+*   Click **"Try Interactive Demo"** to enter Sandbox Mode. The demo uses mock funds and mock habits so you can test the entire experience without spending any money!
+
+### Step 2: Create a Habit
+1.  Enter your habit name (e.g., "Read 10 Pages").
+2.  Choose your commitment deposit (minimum 0.02 STX). If you are a beginner, start small!
+3.  Click **Create Habit** and approve the transaction in your wallet.
+
+### Step 3: Check In Daily
+1.  Once you create a habit, your first check-in is logged automatically.
+2.  Your next check-in window opens in **16 hours (96 blocks)** and stays open for another **16 hours** (up to 32 hours or 192 blocks total since your last check-in).
+3.  Check in during this window by clicking **"Check In"** on the dashboard.
+4.  *Tip: Set a daily alarm on your phone so you never miss your check-in window!*
+
+### Step 4: Complete and Withdraw
+*   After completing 7 consecutive check-ins, click **"Withdraw Stake"**. Your deposit will be transferred back to your wallet.
+*   Click **"Claim Bonus"** to receive your share of STX from the forfeited pool!
+
+---
+
+## Tips for Success
+
+1.  **Start Small**: Don't select massive habits. "Read 1 page" is easier to maintain than "Read 1 book".
+2.  **Use Sandbox Mode first**: Play with the simulator to understand how the 16-32 hour check-in windows work.
+3.  **Check in Early**: Do not wait until the last minute. The network can sometimes take a few minutes to confirm your transaction.
