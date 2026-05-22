@@ -1,6 +1,7 @@
 /**
  * @module contractService
  * Service for interacting with the AhhbitTracker smart contract.
+ * In demo mode, reads and writes are handled by demoService instead.
  */
 import { showContractCall } from '@stacks/connect';
 import {
@@ -20,6 +21,7 @@ import {
 } from '@yusufolosun/ahhbit-tracker-sdk';
 import { CONTRACT_ADDRESS, CONTRACT_NAME, NETWORK } from '../utils/constants';
 import { walletService } from './walletService';
+import { demoService } from './demoService';
 import type { Habit, UserStats } from '../types/habit';
 import {
   cacheHabitRead,
@@ -51,13 +53,14 @@ const appDetails = {
  */
 export const contractService = {
   async readHabit(habitId: number): Promise<Habit | null> {
+    if (demoService.isDemoMode()) {
+      return demoService.readHabit(habitId);
+    }
     return cacheHabitRead(habitId, async () => {
       const result = await sdkGetHabit(habitId, NETWORK, {
         contractAddress: CONTRACT_ADDRESS,
         contractName: CONTRACT_NAME,
       });
-      // The SDK Habit type may differ from the local Habit interface;
-      // cast through unknown to bridge the gap safely.
       return result as unknown as Habit | null;
     });
   },
@@ -82,6 +85,9 @@ export const contractService = {
   },
 
   async readUserHabits(userAddress: string): Promise<number[]> {
+    if (demoService.isDemoMode()) {
+      return demoService.readUserHabits();
+    }
     const result = await cacheUserHabitsRead(userAddress, () =>
       sdkGetUserHabits(userAddress, NETWORK, {
         contractAddress: CONTRACT_ADDRESS,
@@ -93,6 +99,9 @@ export const contractService = {
   },
 
   async readPoolBalance(): Promise<number> {
+    if (demoService.isDemoMode()) {
+      return demoService.getPoolBalance();
+    }
     return cachePoolBalanceRead(() =>
       sdkGetPoolBalance(NETWORK, {
         contractAddress: CONTRACT_ADDRESS,
@@ -102,6 +111,9 @@ export const contractService = {
   },
 
   async readEstimatedBonusShare(): Promise<number> {
+    if (demoService.isDemoMode()) {
+      return demoService.getEstimatedBonusShare();
+    }
     const response = await fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
@@ -115,6 +127,9 @@ export const contractService = {
   },
 
   async readUnclaimedCompletedHabits(): Promise<number> {
+    if (demoService.isDemoMode()) {
+      return demoService.getUnclaimedCompletedHabits();
+    }
     const response = await fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
@@ -128,6 +143,9 @@ export const contractService = {
   },
 
   async readUnclaimedCompletedWeight(): Promise<number> {
+    if (demoService.isDemoMode()) {
+      return demoService.getUnclaimedCompletedWeight();
+    }
     const response = await fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
@@ -141,6 +159,9 @@ export const contractService = {
   },
 
   async readUserStats(userAddress: string): Promise<UserStats> {
+    if (demoService.isDemoMode()) {
+      return demoService.readUserStats();
+    }
     const response = await fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
@@ -153,8 +174,6 @@ export const contractService = {
     const json = cvToJSON(response);
     if (json?.success === true) {
       const value = json.value?.value;
-      // get-user-stats returns { total-habits, habit-ids } only.
-      // Referral stats come from the separate get-referrer-stats function.
       return {
         totalHabits: Number(value?.['total-habits']?.value || 0),
         habitIds: value?.['habit-ids']?.value?.map((v: any) => Number(v.value)) || [],
@@ -168,6 +187,9 @@ export const contractService = {
   },
 
   async readReferrer(userAddress: string): Promise<string | null> {
+    if (demoService.isDemoMode()) {
+      return demoService.readReferrer();
+    }
     const response = await fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
@@ -178,12 +200,9 @@ export const contractService = {
     });
 
     const json = cvToJSON(response);
-    // get-referrer returns (optional { referrer, set-at-block }) — not ok/err.
-    // cvToJSON renders some as { type: 'some', value: { ... } } and none as { type: 'none' }.
     if (json?.type === 'some') {
       return json.value?.referrer?.value || null;
     }
-    // Fallback: handle ok-wrapped optional (some contract calls wrap in ok)
     if (json?.success === true && json.value?.value?.referrer?.value) {
       return json.value.value.referrer.value;
     }
