@@ -10,6 +10,8 @@ import { MilestoneRewards } from './MilestoneRewards';
 import { useHabits } from '../hooks/useHabits';
 import type { DailyCheckInResult } from '../hooks/useHabits';
 import { EmptyStateCard, SectionHeading } from './ui';
+import { useWallet } from '../context/WalletContext';
+import { DemoSandboxBar } from './DemoSandboxBar';
 
 interface DashboardProps {
   habits: Habit[];
@@ -64,9 +66,15 @@ export function Dashboard({
     };
   }, [habits, currentBlock]);
 
+  const { isDemoMode } = useWallet();
+
   return (
     <div className="space-y-6">
-      <SectionHeading title="Dashboard" subtitle="Track your habit-building progress" />
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <SectionHeading title="Dashboard" subtitle="Track your habit-building progress" />
+      </div>
+
+      <DemoSandboxBar />
 
       <DailyCheckInPanel
         habits={habits}
@@ -80,21 +88,83 @@ export function Dashboard({
 
       <MilestoneRewards />
 
-      {/* Empty state — first-time user onboarding */}
+      {/* Empty state & Demo walkthrough guide */}
       {habits.length === 0 ? (
-        <EmptyStateCard
-          title="No habits yet"
-          description="Create your first on-chain habit below. Stake STX, check in every 16-32 hours, and earn rewards from the forfeited pool when you stay consistent."
-          icon={
-            <svg className="w-8 h-8 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-          }
-          actionLabel="Create Your First Habit"
-          onAction={() => {
-            window.location.hash = '#create-habit';
-          }}
-        />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <EmptyStateCard
+              title="No habits yet"
+              description="Create your first on-chain habit below. Stake STX, check in every 16-32 hours, and earn rewards from the forfeited pool when you stay consistent."
+              icon={
+                <svg className="w-8 h-8 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              }
+              actionLabel="Create Your First Habit"
+              onAction={() => {
+                window.location.hash = '#create-habit';
+              }}
+            />
+          </div>
+
+          {isDemoMode && (
+            <div className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 p-6 shadow-sm flex flex-col justify-between">
+              <div>
+                <h3 className="text-lg font-bold text-surface-900 dark:text-white mb-2 flex items-center gap-2">
+                  <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs">
+                    ★
+                  </span>
+                  Sandbox Quick Tour
+                </h3>
+                <p className="text-xs text-surface-500 dark:text-surface-400 mb-6">
+                  Follow these 4 simple steps to understand how the app works in under 60 seconds:
+                </p>
+
+                <ol className="space-y-4 text-xs">
+                  <li className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary-100 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400 flex items-center justify-center font-bold">
+                      1
+                    </span>
+                    <div>
+                      <p className="font-semibold text-surface-900 dark:text-white">Create a Habit</p>
+                      <p className="text-surface-500 dark:text-surface-400">Tap "Create Your First Habit" and stake some demo STX.</p>
+                    </div>
+                  </li>
+
+                  <li className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary-100 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400 flex items-center justify-center font-bold">
+                      2
+                    </span>
+                    <div>
+                      <p className="font-semibold text-surface-900 dark:text-white">Simulate Time Travel</p>
+                      <p className="text-surface-500 dark:text-surface-400">Click <strong>"+16 Hrs"</strong> on the yellow Sandbox Bar above to fast-forward blocks.</p>
+                    </div>
+                  </li>
+
+                  <li className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary-100 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400 flex items-center justify-center font-bold">
+                      3
+                    </span>
+                    <div>
+                      <p className="font-semibold text-surface-900 dark:text-white">Check In Daily</p>
+                      <p className="text-surface-500 dark:text-surface-400">Your habit card will update. Tap check in to increase your streak.</p>
+                    </div>
+                  </li>
+
+                  <li className="flex items-start gap-3">
+                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary-100 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400 flex items-center justify-center font-bold">
+                      4
+                    </span>
+                    <div>
+                      <p className="font-semibold text-surface-900 dark:text-white">Complete & Claim</p>
+                      <p className="text-surface-500 dark:text-surface-400">Repeat until streak is 7. Withdraw stake + claim community reward share!</p>
+                    </div>
+                  </li>
+                </ol>
+              </div>
+            </div>
+          )}
+        </div>
       ) : (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
