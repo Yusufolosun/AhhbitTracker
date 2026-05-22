@@ -51,7 +51,9 @@ export function CalloutCard({
 
         <div className="min-w-0 flex-1 space-y-1">
           <p className={`text-sm font-semibold ${titleStyles[tone]}`}>{title}</p>
-          {description ? <p className={`text-sm ${descriptionStyles[tone]}`}>{description}</p> : null}
+          {description ? (
+            <p className={`text-sm ${descriptionStyles[tone]}`}>{description}</p>
+          ) : null}
           {children ? <div className={`text-sm ${descriptionStyles[tone]}`}>{children}</div> : null}
         </div>
 

@@ -126,7 +126,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
         () => {
           trackEvent('wallet_connect_cancelled');
           setIsLoading(false);
-        }
+        },
       );
     } catch (error) {
       console.error('Error connecting wallet:', error);
@@ -148,6 +148,7 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
           walletAddressHash: toWalletAddressHash(walletState.address),
         });
       }
+      await Promise.resolve();
       setWalletState({
         isConnected: false,
         address: null,
@@ -164,7 +165,19 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   const isDemoMode = demoService.isDemoMode();
 
   return (
-    <WalletContext.Provider value={{ walletState, connect, connectDemo, disconnect, refreshBalance, isLoading, isBalanceLoading, isDisconnecting, isDemoMode }}>
+    <WalletContext.Provider
+      value={{
+        walletState,
+        connect,
+        connectDemo,
+        disconnect,
+        refreshBalance,
+        isLoading,
+        isBalanceLoading,
+        isDisconnecting,
+        isDemoMode,
+      }}
+    >
       {children}
     </WalletContext.Provider>
   );

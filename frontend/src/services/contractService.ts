@@ -4,12 +4,7 @@
  * In demo mode, reads and writes are handled by demoService instead.
  */
 import { showContractCall } from '@stacks/connect';
-import {
-  cvToJSON,
-  fetchCallReadOnlyFunction,
-  Pc,
-  PostConditionMode,
-} from '@stacks/transactions';
+import { cvToJSON, fetchCallReadOnlyFunction, Pc, PostConditionMode } from '@stacks/transactions';
 import {
   buildCheckIn,
   buildClaimBonus,
@@ -92,7 +87,7 @@ export const contractService = {
       sdkGetUserHabits(userAddress, NETWORK, {
         contractAddress: CONTRACT_ADDRESS,
         contractName: CONTRACT_NAME,
-      })
+      }),
     );
 
     return result.habitIds;
@@ -106,7 +101,7 @@ export const contractService = {
       sdkGetPoolBalance(NETWORK, {
         contractAddress: CONTRACT_ADDRESS,
         contractName: CONTRACT_NAME,
-      })
+      }),
     );
   },
 
@@ -179,7 +174,7 @@ export const contractService = {
         habitIds: value?.['habit-ids']?.value?.map((v: any) => Number(v.value)) || [],
       };
     }
-    
+
     return {
       totalHabits: 0,
       habitIds: [],
@@ -357,13 +352,9 @@ export const contractService = {
         contractAddress: CONTRACT_ADDRESS,
         contractName: CONTRACT_NAME,
         functionName: 'withdraw-stake',
-        functionArgs: [
-          { type: 'uint', value: habitId.toString() } as any,
-        ],
+        functionArgs: [{ type: 'uint', value: habitId.toString() } as any],
         postConditions: [
-          Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`)
-            .willSendGte(_stakeAmount)
-            .ustx(),
+          Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`).willSendGte(_stakeAmount).ustx(),
         ],
         postConditionMode: PostConditionMode.Deny,
         network: NETWORK,

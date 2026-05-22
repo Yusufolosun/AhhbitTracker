@@ -18,12 +18,17 @@ export function WalletConnect() {
           Start Building Habits
         </h2>
         <p className="text-surface-600 dark:text-surface-400 max-w-sm mx-auto text-sm leading-relaxed">
-          Lock in small deposits to hold yourself accountable. Reclaim your funds upon completion + earn streaks rewards.
+          Lock in small deposits to hold yourself accountable. Reclaim your funds upon completion +
+          earn streaks rewards.
         </p>
       </div>
 
       <div className="space-y-4 mb-8">
-        <ActionButton onClick={connect} isLoading={isLoading} className="w-full py-4 text-base shadow-lg shadow-primary-500/25">
+        <ActionButton
+          onClick={connect}
+          isLoading={isLoading}
+          className="w-full py-4 text-base shadow-lg shadow-primary-500/25"
+        >
           Connect Stacks Wallet
         </ActionButton>
 
@@ -70,7 +75,8 @@ export function WalletConnect() {
           </a>
         </div>
         <p className="text-xxs text-surface-400 dark:text-surface-500 mt-4 leading-relaxed">
-          Installing a wallet takes less than 2 minutes. Once installed, refresh this page to connect.
+          Installing a wallet takes less than 2 minutes. Once installed, refresh this page to
+          connect.
         </p>
       </div>
     </SurfaceCard>

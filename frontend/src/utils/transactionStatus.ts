@@ -34,7 +34,9 @@ export function extractClarityErrorCode(repr: string | undefined): number | null
   return Number.parseInt(match[1], 10);
 }
 
-export function summarizeTransactionStatus(data: HiroTransactionResponse): TransactionStatusSummary {
+export function summarizeTransactionStatus(
+  data: HiroTransactionResponse,
+): TransactionStatusSummary {
   const rawStatus = data.tx_status ?? 'pending';
 
   if (rawStatus === 'success') {

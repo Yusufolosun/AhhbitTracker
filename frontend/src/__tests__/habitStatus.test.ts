@@ -113,7 +113,9 @@ describe('isEligibleToWithdraw', () => {
   });
 
   it('returns false when not active even with high streak', () => {
-    expect(isEligibleToWithdraw(makeHabit({ isActive: false, currentStreak: 10 }), 1050)).toBe(false);
+    expect(isEligibleToWithdraw(makeHabit({ isActive: false, currentStreak: 10 }), 1050)).toBe(
+      false,
+    );
   });
 
   it('returns false when window is expired', () => {

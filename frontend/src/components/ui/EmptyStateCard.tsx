@@ -25,7 +25,9 @@ export function EmptyStateCard({
       </div>
       <h3 className="mb-2 text-lg font-semibold text-surface-800 dark:text-white">{title}</h3>
       <p className="mx-auto max-w-md text-surface-500 dark:text-surface-400">{description}</p>
-      {children ? <div className="mt-4 text-sm text-surface-600 dark:text-surface-400">{children}</div> : null}
+      {children ? (
+        <div className="mt-4 text-sm text-surface-600 dark:text-surface-400">{children}</div>
+      ) : null}
       {actionLabel && onAction ? (
         <ActionButton className="mt-6" onClick={onAction}>
           {actionLabel}

@@ -44,7 +44,10 @@ export function StakeCalculator() {
       <div className="space-y-5">
         {/* Stake input */}
         <div>
-          <label htmlFor="calc-stake" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+          <label
+            htmlFor="calc-stake"
+            className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2"
+          >
             Your Deposit (STX)
           </label>
           <input
@@ -66,7 +69,10 @@ export function StakeCalculator() {
 
         {/* Missed days input */}
         <div>
-          <label htmlFor="calc-missed" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+          <label
+            htmlFor="calc-missed"
+            className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2"
+          >
             Missed Check-In Windows
           </label>
           <input
@@ -81,7 +87,11 @@ export function StakeCalculator() {
           />
           <div className="flex justify-between text-xs text-surface-400 mt-1">
             <span>0 missed</span>
-            <span className={`font-semibold ${missedDays > 0 ? 'text-red-500' : 'text-emerald-500'}`}>{missedDays} missed</span>
+            <span
+              className={`font-semibold ${missedDays > 0 ? 'text-red-500' : 'text-emerald-500'}`}
+            >
+              {missedDays} missed
+            </span>
             <span>10 missed</span>
           </div>
         </div>
@@ -89,8 +99,12 @@ export function StakeCalculator() {
         {/* Visual result */}
         <div className="rounded-xl bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-700 p-4">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-surface-600 dark:text-surface-400">Remaining Deposit</span>
-            <span className="text-lg font-bold text-surface-900 dark:text-white">{result.remainingSTX} STX</span>
+            <span className="text-sm text-surface-600 dark:text-surface-400">
+              Remaining Deposit
+            </span>
+            <span className="text-lg font-bold text-surface-900 dark:text-white">
+              {result.remainingSTX} STX
+            </span>
           </div>
 
           {/* Progress bar */}
@@ -99,11 +113,12 @@ export function StakeCalculator() {
               className="h-3 rounded-full transition-all duration-500 ease-out"
               style={{
                 width: `${result.remainingPercent}%`,
-                background: result.remainingPercent > 70
-                  ? 'linear-gradient(90deg, #10B981, #34D399)'
-                  : result.remainingPercent > 30
-                    ? 'linear-gradient(90deg, #F59E0B, #FBBF24)'
-                    : 'linear-gradient(90deg, #EF4444, #F87171)',
+                background:
+                  result.remainingPercent > 70
+                    ? 'linear-gradient(90deg, #10B981, #34D399)'
+                    : result.remainingPercent > 30
+                      ? 'linear-gradient(90deg, #F59E0B, #FBBF24)'
+                      : 'linear-gradient(90deg, #EF4444, #F87171)',
               }}
             />
           </div>
@@ -112,9 +127,7 @@ export function StakeCalculator() {
             <span className="text-emerald-600 dark:text-emerald-400 font-medium">
               {result.remainingPercent}% kept
             </span>
-            <span className="text-red-500 font-medium">
-              {result.forfeitedSTX} STX forfeited
-            </span>
+            <span className="text-red-500 font-medium">{result.forfeitedSTX} STX forfeited</span>
           </div>
 
           {missedDays === 0 && (

@@ -16,7 +16,15 @@ const NAV_LINKS = [
 ];
 
 export function Header() {
-  const { walletState, connect, disconnect, isLoading, isBalanceLoading, isDisconnecting } = useWallet();
+  const {
+    walletState,
+    connect,
+    disconnect,
+    isLoading,
+    isBalanceLoading,
+    isDisconnecting,
+    isDemoMode,
+  } = useWallet();
   const { showToast } = useToast();
   const { route } = useHashRoute();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -49,9 +57,9 @@ export function Header() {
 
     try {
       await disconnect();
-      showToast('Wallet disconnected.', 'success');
+      showToast(isDemoMode ? 'Demo session ended.' : 'Wallet disconnected.', 'success');
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unable to disconnect wallet.';
+      const message = error instanceof Error ? error.message : 'Unable to disconnect.';
       showToast(message, 'error');
     }
   };
@@ -101,24 +109,41 @@ export function Header() {
             {walletState.isConnected ? (
               <>
                 <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 bg-surface-100 dark:bg-surface-800 rounded-lg border border-surface-200 dark:border-surface-700">
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                  <a
-                    href={addressUrl(walletState.address!, 'mainnet')}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-medium text-surface-700 dark:text-surface-300 hover:text-primary-500 transition-colors"
-                    title="View on Stacks Explorer"
-                  >
-                    {shortenAddress(walletState.address!)}
-                  </a>
-                  {isBalanceLoading ? (
+                  {isDemoMode ? (
+                    <>
+                      <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
+                      <span className="text-sm font-semibold text-amber-600 dark:text-amber-400">
+                        Demo Sandbox
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                      <a
+                        href={addressUrl(walletState.address!, 'mainnet')}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-medium text-surface-700 dark:text-surface-300 hover:text-primary-500 transition-colors"
+                        title="View on Stacks Explorer"
+                      >
+                        {shortenAddress(walletState.address!)}
+                      </a>
+                    </>
+                  )}
+                  {isDemoMode ? (
+                    <span className="text-xs text-surface-500 border-l border-surface-300 dark:border-surface-600 pl-2 font-medium">
+                      {formatSTX(walletState.balance)} STX
+                    </span>
+                  ) : isBalanceLoading ? (
                     <span className="text-xs text-surface-400 border-l border-surface-300 dark:border-surface-600 pl-2 animate-pulse">
                       Loading…
                     </span>
-                  ) : walletState.balance > 0 && (
-                    <span className="text-xs text-surface-500 border-l border-surface-300 dark:border-surface-600 pl-2">
-                      {formatSTX(walletState.balance)} STX
-                    </span>
+                  ) : (
+                    walletState.balance > 0 && (
+                      <span className="text-xs text-surface-500 border-l border-surface-300 dark:border-surface-600 pl-2">
+                        {formatSTX(walletState.balance)} STX
+                      </span>
+                    )
                   )}
                 </div>
                 <ActionButton
@@ -128,7 +153,7 @@ export function Header() {
                   className="text-sm px-3 py-2"
                   aria-label="Disconnect wallet"
                 >
-                  Disconnect
+                  {isDemoMode ? 'Exit Demo' : 'Disconnect'}
                 </ActionButton>
               </>
             ) : (
@@ -146,11 +171,21 @@ export function Header() {
             >
               {mobileMenuOpen ? (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               ) : (
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 </svg>
               )}
             </button>
@@ -185,9 +220,14 @@ export function Header() {
           {walletState.isConnected && (
             <div className="px-4 py-3 border-t border-surface-200 dark:border-surface-700 sm:hidden">
               <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full" />
+                <div
+                  className={`w-2 h-2 rounded-full ${isDemoMode ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                />
                 <span className="text-sm font-medium text-surface-700 dark:text-surface-300">
-                  {shortenAddress(walletState.address!)}
+                  {isDemoMode ? 'Demo Sandbox' : shortenAddress(walletState.address!)}
+                </span>
+                <span className="text-xs text-surface-500 pl-2">
+                  ({formatSTX(walletState.balance)} STX)
                 </span>
               </div>
             </div>

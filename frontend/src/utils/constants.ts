@@ -7,8 +7,16 @@ import { getFrontendRuntimeConfig } from './environment';
 const isDev = typeof import.meta !== 'undefined' && import.meta.env?.DEV;
 const runtimeConfig = getFrontendRuntimeConfig();
 export const NETWORK = isDev
-  ? createNetwork({ network: runtimeConfig.stacksNetwork, client: { baseUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/api/stacks` } })
-  : createNetwork({ network: runtimeConfig.stacksNetwork, client: { baseUrl: runtimeConfig.stacksApiUrl } });
+  ? createNetwork({
+      network: runtimeConfig.stacksNetwork,
+      client: {
+        baseUrl: `${typeof window !== 'undefined' ? window.location.origin : ''}/api/stacks`,
+      },
+    })
+  : createNetwork({
+      network: runtimeConfig.stacksNetwork,
+      client: { baseUrl: runtimeConfig.stacksApiUrl },
+    });
 
 // Contract Configuration — override via VITE_CONTRACT_ADDRESS / VITE_CONTRACT_NAME
 export const APP_STAGE = runtimeConfig.stage;
@@ -93,5 +101,5 @@ export const TOAST_DURATION = 5000;
 // Stacks blocks average ~10 min; polling faster than every 2 minutes
 // wastes Hiro API quota without meaningful benefit.
 export const POLLING_INTERVAL = 120_000; // 2 minutes
-export const CACHE_TIME = 120_000;       // 2 minutes
-export const POOL_CACHE_TIME = 300_000;  // 5 minutes — pool balance changes infrequently
+export const CACHE_TIME = 120_000; // 2 minutes
+export const POOL_CACHE_TIME = 300_000; // 5 minutes — pool balance changes infrequently

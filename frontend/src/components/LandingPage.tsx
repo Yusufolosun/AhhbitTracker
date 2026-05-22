@@ -6,30 +6,48 @@ const STEPS = [
   {
     number: '01',
     title: 'Set a Habit & Deposit',
-    description: 'Pick any daily habit you want to build. Lock in a small deposit of STX tokens as your commitment — as low as 0.02 STX.',
+    description:
+      'Pick any daily habit you want to build. Lock in a small deposit of STX tokens as your commitment — as low as 0.02 STX.',
     icon: (
       <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.5}
+          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+        />
       </svg>
     ),
   },
   {
     number: '02',
     title: 'Check In Daily',
-    description: 'Come back once a day (every 16 to 32 hours) and tap "Check In" to record your progress on the blockchain.',
+    description:
+      'Come back once a day (every 16 to 32 hours) and tap "Check In" to record your progress on the blockchain.',
     icon: (
       <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.5}
+          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
       </svg>
     ),
   },
   {
     number: '03',
     title: 'Complete 7 Days & Earn',
-    description: 'Hit a 7-day streak to unlock your deposit. Claim bonus payouts from the reward pool funded by people who missed their habits!',
+    description:
+      'Hit a 7-day streak to unlock your deposit. Claim bonus payouts from the reward pool funded by people who missed their habits!',
     icon: (
       <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.5}
+          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
       </svg>
     ),
   },
@@ -54,16 +72,24 @@ export function LandingPage() {
 
           <h1 className="text-4xl sm:text-5xl font-extrabold text-surface-900 dark:text-white mb-4 tracking-tight leading-tight">
             Build Habits That
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary-500 to-primary-400"> Actually Stick</span>
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary-500 to-primary-400">
+              {' '}
+              Actually Stick
+            </span>
           </h1>
 
           <p className="max-w-2xl mx-auto text-lg text-surface-600 dark:text-surface-300 mb-10 leading-relaxed">
-            Put a small deposit on the line. Check in daily. Stay consistent and earn rewards.
-            Miss a day? Lose a small portion to the community pool. It is the accountability app powered by real stakes.
+            Put a small deposit on the line. Check in daily. Stay consistent and earn rewards. Miss
+            a day? Lose a small portion to the community pool. It is the accountability app powered
+            by real stakes.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-            <ActionButton onClick={connect} isLoading={isLoading} className="px-8 py-4 text-base shadow-lg shadow-primary-500/20 hover:shadow-primary-500/30 transition-shadow">
+            <ActionButton
+              onClick={connect}
+              isLoading={isLoading}
+              className="px-8 py-4 text-base shadow-lg shadow-primary-500/20 hover:shadow-primary-500/30 transition-shadow"
+            >
               Connect Wallet & Start
             </ActionButton>
             <button
@@ -76,7 +102,8 @@ export function LandingPage() {
           </div>
 
           <p className="text-sm text-surface-400 dark:text-surface-500">
-            No wallet? The demo lets you explore the full app with simulated funds — zero setup required.
+            No wallet? The demo lets you explore the full app with simulated funds — zero setup
+            required.
           </p>
         </div>
       </section>
@@ -104,8 +131,12 @@ export function LandingPage() {
                   Step {step.number}
                 </span>
               </div>
-              <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-2">{step.title}</h3>
-              <p className="text-sm text-surface-600 dark:text-surface-400 leading-relaxed">{step.description}</p>
+              <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-2">
+                {step.title}
+              </h3>
+              <p className="text-sm text-surface-600 dark:text-surface-400 leading-relaxed">
+                {step.description}
+              </p>
             </div>
           ))}
         </div>
@@ -120,32 +151,61 @@ export function LandingPage() {
                 Why Does It Work?
               </h2>
               <p className="text-surface-600 dark:text-surface-300 mb-6 leading-relaxed">
-                Studies show that people are <strong>twice as motivated by loss</strong> than by gain. By putting real tokens on the line,
-                your brain treats each check-in like protecting something valuable — not just ticking a box.
+                Studies show that people are <strong>twice as motivated by loss</strong> than by
+                gain. By putting real tokens on the line, your brain treats each check-in like
+                protecting something valuable — not just ticking a box.
               </p>
 
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <span className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-500/10 flex items-center justify-center">
-                    <svg className="w-4 h-4 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-4 h-4 text-emerald-600 dark:text-emerald-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   </span>
                   <div>
-                    <p className="font-medium text-surface-900 dark:text-white">Stay consistent → Get your deposit back + bonus</p>
-                    <p className="text-sm text-surface-500 dark:text-surface-400">Complete a 7-day streak to reclaim everything.</p>
+                    <p className="font-medium text-surface-900 dark:text-white">
+                      Stay consistent → Get your deposit back + bonus
+                    </p>
+                    <p className="text-sm text-surface-500 dark:text-surface-400">
+                      Complete a 7-day streak to reclaim everything.
+                    </p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
                   <span className="flex-shrink-0 w-8 h-8 rounded-full bg-red-100 dark:bg-red-500/10 flex items-center justify-center">
-                    <svg className="w-4 h-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-4 h-4 text-red-600 dark:text-red-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </span>
                   <div>
-                    <p className="font-medium text-surface-900 dark:text-white">Miss a day → 10% penalty to community pool</p>
-                    <p className="text-sm text-surface-500 dark:text-surface-400">Your forfeited funds reward users who stayed consistent.</p>
+                    <p className="font-medium text-surface-900 dark:text-white">
+                      Miss a day → 10% penalty to community pool
+                    </p>
+                    <p className="text-sm text-surface-500 dark:text-surface-400">
+                      Your forfeited funds reward users who stayed consistent.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -162,8 +222,8 @@ export function LandingPage() {
           New to Web3?
         </h2>
         <p className="text-surface-500 dark:text-surface-400 mb-8 max-w-xl mx-auto">
-          You just need a Stacks wallet. It takes under 2 minutes to set up. These wallets are free browser
-          extensions that let you securely manage your STX tokens.
+          You just need a Stacks wallet. It takes under 2 minutes to set up. These wallets are free
+          browser extensions that let you securely manage your STX tokens.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
           {[
@@ -171,7 +231,10 @@ export function LandingPage() {
             { name: 'Xverse', url: 'https://xverse.app', desc: 'Great on mobile & desktop' },
             { name: 'Asigna', url: 'https://asigna.io', desc: 'Multisig-focused wallet' },
           ].map((wallet) => (
-            <SurfaceCard key={wallet.name} className="text-center hover:border-primary-300 dark:hover:border-primary-500/30 transition-colors">
+            <SurfaceCard
+              key={wallet.name}
+              className="text-center hover:border-primary-300 dark:hover:border-primary-500/30 transition-colors"
+            >
               <h3 className="font-semibold text-surface-900 dark:text-white mb-1">{wallet.name}</h3>
               <p className="text-xs text-surface-500 dark:text-surface-400 mb-3">{wallet.desc}</p>
               <a
@@ -193,15 +256,21 @@ export function LandingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
             <div>
               <p className="text-2xl font-bold text-surface-900 dark:text-white">100%</p>
-              <p className="text-sm text-surface-500 dark:text-surface-400">Open Source & Auditable</p>
+              <p className="text-sm text-surface-500 dark:text-surface-400">
+                Open Source & Auditable
+              </p>
             </div>
             <div>
               <p className="text-2xl font-bold text-surface-900 dark:text-white">No Admin Key</p>
-              <p className="text-sm text-surface-500 dark:text-surface-400">Fully decentralized — no one can change the rules</p>
+              <p className="text-sm text-surface-500 dark:text-surface-400">
+                Fully decentralized — no one can change the rules
+              </p>
             </div>
             <div>
               <p className="text-2xl font-bold text-surface-900 dark:text-white">Bitcoin-Secured</p>
-              <p className="text-sm text-surface-500 dark:text-surface-400">Built on Stacks, anchored to Bitcoin</p>
+              <p className="text-sm text-surface-500 dark:text-surface-400">
+                Built on Stacks, anchored to Bitcoin
+              </p>
             </div>
           </div>
         </div>

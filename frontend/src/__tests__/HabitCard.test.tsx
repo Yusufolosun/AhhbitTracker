@@ -107,6 +107,7 @@ describe('HabitCard', () => {
   });
 
   it('shows cooldown status before check-in opens', () => {
+    mockCurrentBlock = 150;
     render(<HabitCard habit={mockHabit} />, { wrapper: TestWrapper });
     expect(screen.getByText('Cooldown')).toBeDefined();
     const button = screen.getByRole('button', { name: 'Check In Not Ready' });

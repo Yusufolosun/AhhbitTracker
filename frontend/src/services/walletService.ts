@@ -2,7 +2,13 @@
  * @module walletService
  * Service for Stacks wallet integration and account management.
  */
-import { AppConfig, UserSession, showConnect, clearSelectedProviderId, FinishedAuthData } from '@stacks/connect';
+import {
+  AppConfig,
+  UserSession,
+  showConnect,
+  clearSelectedProviderId,
+  FinishedAuthData,
+} from '@stacks/connect';
 import { NETWORK } from '../utils/constants';
 import { fetchHiroApiJson } from './hiroApiClient';
 

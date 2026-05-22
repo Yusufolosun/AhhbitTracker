@@ -39,7 +39,9 @@ export function ConfirmationDialog({
   useEffect(() => {
     if (!open) return;
     document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, [open]);
 
   // Trap focus inside the dialog
@@ -48,7 +50,7 @@ export function ConfirmationDialog({
 
     const dialog = dialogRef.current;
     const focusableElements = dialog.querySelectorAll<HTMLElement>(
-      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
     );
     const firstFocusable = focusableElements[0];
     const lastFocusable = focusableElements[focusableElements.length - 1];
@@ -95,16 +97,9 @@ export function ConfirmationDialog({
       />
 
       {/* Dialog */}
-      <div
-        ref={dialogRef}
-        tabIndex={-1}
-        className="relative max-w-md w-full mx-4 animate-fade-in"
-      >
+      <div ref={dialogRef} tabIndex={-1} className="relative max-w-md w-full mx-4 animate-fade-in">
         <SurfaceCard className="p-6 shadow-xl" padding="none">
-          <h2
-            id={titleId}
-            className="text-lg font-semibold text-surface-900 dark:text-white mb-4"
-          >
+          <h2 id={titleId} className="text-lg font-semibold text-surface-900 dark:text-white mb-4">
             {title}
           </h2>
 
@@ -119,11 +114,7 @@ export function ConfirmationDialog({
             >
               {cancelLabel}
             </ActionButton>
-            <ActionButton
-              onClick={onConfirm}
-              disabled={isLoading}
-              className="px-4 py-2 text-sm"
-            >
+            <ActionButton onClick={onConfirm} disabled={isLoading} className="px-4 py-2 text-sm">
               {isLoading ? 'Processing...' : confirmLabel}
             </ActionButton>
           </div>

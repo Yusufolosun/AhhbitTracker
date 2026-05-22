@@ -36,7 +36,8 @@ export function ReferrerRegistration() {
         Referral Program
       </h3>
       <p className="text-sm text-surface-600 dark:text-surface-400 mb-4">
-        Register a referrer to support the community and boost your own rewards. This is a one-time setup.
+        Register a referrer to support the community and boost your own rewards. This is a one-time
+        setup.
       </p>
 
       <form onSubmit={handleRegister} className="flex flex-col sm:flex-row gap-3">

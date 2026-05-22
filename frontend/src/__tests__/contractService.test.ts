@@ -140,15 +140,10 @@ describe('contractService', () => {
   describe('createHabit', () => {
     it('resolves with the transaction ID on approval', async () => {
       const promise = contractService.createHabit('Running', 500_000);
-      expect(mocks.buildCreateHabit).toHaveBeenCalledWith(
-        'Running',
-        500_000,
-        'SP2ABC123',
-        {
-          contractAddress: 'SP000000000000000000002Q6VF78',
-          contractName: 'ahhbit-tracker',
-        },
-      );
+      expect(mocks.buildCreateHabit).toHaveBeenCalledWith('Running', 500_000, 'SP2ABC123', {
+        contractAddress: 'SP000000000000000000002Q6VF78',
+        contractName: 'ahhbit-tracker',
+      });
       requireCapturedOptions().onFinish({ txId: 'tx-create' });
       await expect(promise).resolves.toBe('tx-create');
     });
@@ -212,7 +207,9 @@ describe('contractService', () => {
 
     it('withdrawStake throws when wallet is not connected', async () => {
       vi.spyOn(walletService, 'getAddress').mockReturnValueOnce(null);
-      await expect(contractService.withdrawStake(1, 1_000_000)).rejects.toThrow('Wallet not connected');
+      await expect(contractService.withdrawStake(1, 1_000_000)).rejects.toThrow(
+        'Wallet not connected',
+      );
     });
 
     it('claimBonus throws when wallet is not connected', async () => {

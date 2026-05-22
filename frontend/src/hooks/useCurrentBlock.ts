@@ -36,7 +36,7 @@ export function useCurrentBlock(): number | null {
   const isDemo = demoService.isDemoMode();
 
   const [demoBlock, setDemoBlock] = useState<number | null>(
-    isDemo ? demoService.getCurrentBlock() : null
+    isDemo ? demoService.getCurrentBlock() : null,
   );
 
   const refreshDemoBlock = useCallback(() => {

@@ -15,7 +15,7 @@ export function PoolDisplay() {
     try {
       await fundRewardPool(toMicroSTX(Number(fundAmount)));
       setFundAmount('10');
-    } catch (err: unknown) {
+    } catch {
       // Error handled by mutation/toast
     }
   };
@@ -47,8 +47,18 @@ export function PoolDisplay() {
               </p>
             </div>
             <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/25">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
               </svg>
             </div>
           </div>
@@ -71,8 +81,18 @@ export function PoolDisplay() {
               </p>
             </div>
             <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/25">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z" />
+              <svg
+                className="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z"
+                />
               </svg>
             </div>
           </div>
@@ -82,9 +102,10 @@ export function PoolDisplay() {
       <SurfaceCard>
         <h3 className="text-lg font-semibold mb-4">Support the Community</h3>
         <p className="text-sm text-surface-600 dark:text-surface-400 mb-6">
-          The Streak Reward Pool is community-funded. Contribute STX to help reward consistent habit builders!
+          The Streak Reward Pool is community-funded. Contribute STX to help reward consistent habit
+          builders!
         </p>
-        
+
         <form onSubmit={handleFund} className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <input
@@ -99,11 +120,7 @@ export function PoolDisplay() {
               <span className="text-surface-400 text-sm">STX</span>
             </div>
           </div>
-          <ActionButton
-            type="submit"
-            disabled={isFundingRewardPool}
-            className="whitespace-nowrap"
-          >
+          <ActionButton type="submit" disabled={isFundingRewardPool} className="whitespace-nowrap">
             {isFundingRewardPool ? 'Funding...' : 'Fund Reward Pool'}
           </ActionButton>
         </form>

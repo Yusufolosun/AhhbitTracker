@@ -30,12 +30,13 @@ export function Footer() {
               </span>
             </div>
             <p className="text-sm text-surface-600 dark:text-surface-400 leading-relaxed">
-              On-chain habit tracking with accountability.
-              Stake STX, build streaks, earn rewards.
+              On-chain habit tracking with accountability. Stake STX, build streaks, earn rewards.
             </p>
           </div>
           <div>
-            <h4 className="text-xs font-bold text-surface-400 dark:text-surface-500 uppercase tracking-widest mb-4">Resources</h4>
+            <h4 className="text-xs font-bold text-surface-400 dark:text-surface-500 uppercase tracking-widest mb-4">
+              Resources
+            </h4>
             <ul className="space-y-2.5">
               {RESOURCE_LINKS.map((link) => (
                 <li key={link.label}>
@@ -52,7 +53,9 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h4 className="text-xs font-bold text-surface-400 dark:text-surface-500 uppercase tracking-widest mb-4">Smart Contract</h4>
+            <h4 className="text-xs font-bold text-surface-400 dark:text-surface-500 uppercase tracking-widest mb-4">
+              Smart Contract
+            </h4>
             <a
               href={EXPLORER_CONTRACT_URL}
               target="_blank"

@@ -1,7 +1,27 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render as originalRender, screen } from '@testing-library/react';
 import { Dashboard } from '../components/Dashboard';
 import { Habit } from '../types/habit';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ToastProvider } from '../context/ToastContext';
+import { TransactionProvider } from '../context/TransactionContext';
+import React from 'react';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: false },
+  },
+});
+
+const TestWrapper = ({ children }: { children: React.ReactNode }) => (
+  <QueryClientProvider client={queryClient}>
+    <TransactionProvider>
+      <ToastProvider>{children}</ToastProvider>
+    </TransactionProvider>
+  </QueryClientProvider>
+);
+
+const render = (ui: React.ReactElement) => originalRender(ui, { wrapper: TestWrapper });
 
 // Minimal mock for formatSTX used inside Dashboard
 vi.mock('../utils/formatting', () => ({
@@ -11,6 +31,30 @@ vi.mock('../utils/formatting', () => ({
 // Mock useCurrentBlock so Dashboard can derive window state
 vi.mock('../hooks/useCurrentBlock', () => ({
   useCurrentBlock: () => 200,
+}));
+
+// Mock useHabits to supply userStats needed for referral panel
+vi.mock('../hooks/useHabits', () => ({
+  useHabits: () => ({
+    habits: [],
+    isLoadingHabits: false,
+    userStats: {
+      successfulReferrals: 0,
+    },
+  }),
+}));
+
+// Mock useWallet to supply isDemoMode and walletState
+vi.mock('../context/WalletContext', () => ({
+  useWallet: () => ({
+    isDemoMode: false,
+    walletState: {
+      isConnected: true,
+      address: 'SP2ABC123',
+      balance: 10_000_000,
+    },
+    refreshBalance: vi.fn(),
+  }),
 }));
 
 const activeHabit: Habit = {

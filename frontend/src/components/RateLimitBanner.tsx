@@ -1,8 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import {
-  HIRO_RATE_LIMIT_EVENT,
-  HiroRateLimitDetail,
-} from '../utils/rateLimitEvents';
+import { HIRO_RATE_LIMIT_EVENT, HiroRateLimitDetail } from '../utils/rateLimitEvents';
 import { CalloutCard } from './ui';
 
 /**
@@ -23,7 +20,8 @@ export function RateLimitBanner() {
 
   useEffect(() => {
     window.addEventListener(HIRO_RATE_LIMIT_EVENT, handleRateLimit as EventListener);
-    return () => window.removeEventListener(HIRO_RATE_LIMIT_EVENT, handleRateLimit as EventListener);
+    return () =>
+      window.removeEventListener(HIRO_RATE_LIMIT_EVENT, handleRateLimit as EventListener);
   }, [handleRateLimit]);
 
   useEffect(() => {
@@ -43,12 +41,24 @@ export function RateLimitBanner() {
         title="API rate limit reached"
         tone="warning"
         icon={
-          <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <svg
+            className="w-4 h-4 flex-shrink-0"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
           </svg>
         }
       >
-        <span>retrying in <strong>{countdown}s</strong></span>
+        <span>
+          retrying in <strong>{countdown}s</strong>
+        </span>
       </CalloutCard>
     </div>
   );

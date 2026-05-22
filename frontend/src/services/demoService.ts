@@ -112,19 +112,19 @@ export const demoService = {
   },
 
   readUserHabits(): number[] {
-    return loadState().habits.map(h => h.habitId);
+    return loadState().habits.map((h) => h.habitId);
   },
 
   readHabit(habitId: number): Habit | null {
     const state = loadState();
-    return state.habits.find(h => h.habitId === habitId) ?? null;
+    return state.habits.find((h) => h.habitId === habitId) ?? null;
   },
 
   readUserStats(): { totalHabits: number; habitIds: number[] } {
     const state = loadState();
     return {
       totalHabits: state.habits.length,
-      habitIds: state.habits.map(h => h.habitId),
+      habitIds: state.habits.map((h) => h.habitId),
     };
   },
 
@@ -161,7 +161,7 @@ export const demoService = {
 
   checkIn(habitId: number): string {
     const state = loadState();
-    const habit = state.habits.find(h => h.habitId === habitId);
+    const habit = state.habits.find((h) => h.habitId === habitId);
     if (!habit) throw new Error('Habit not found');
     if (!habit.isActive) throw new Error('Habit is not active');
 
@@ -173,7 +173,9 @@ export const demoService = {
 
     if (blocksSinceLast > CHECK_IN_WINDOW) {
       // late check-in: apply penalty and reset streak
-      const missedWindows = Math.floor((blocksSinceLast - MIN_CHECK_IN_INTERVAL) / MIN_CHECK_IN_INTERVAL);
+      const missedWindows = Math.floor(
+        (blocksSinceLast - MIN_CHECK_IN_INTERVAL) / MIN_CHECK_IN_INTERVAL,
+      );
       const penaltyPerWindow = Math.floor((habit.stakeAmount * FORFEIT_BPS) / BPS_DENOMINATOR);
       const totalPenalty = Math.min(penaltyPerWindow * missedWindows, habit.stakeAmount);
       habit.stakeAmount -= totalPenalty;
@@ -195,7 +197,7 @@ export const demoService = {
 
   withdrawStake(habitId: number): string {
     const state = loadState();
-    const habit = state.habits.find(h => h.habitId === habitId);
+    const habit = state.habits.find((h) => h.habitId === habitId);
     if (!habit) throw new Error('Habit not found');
     if (habit.currentStreak < MIN_STREAK_FOR_WITHDRAWAL) {
       throw new Error('Need 7+ day streak to withdraw');
@@ -205,14 +207,14 @@ export const demoService = {
     habit.isActive = false;
     habit.isCompleted = true;
     state.unclaimedCompletedHabits += 1;
-    state.unclaimedCompletedWeight += (habit.bonusWeight ?? 1);
+    state.unclaimedCompletedWeight += habit.bonusWeight ?? 1;
     saveState(state);
     return `demo-tx-withdraw-${habitId}`;
   },
 
   claimBonus(habitId: number): string {
     const state = loadState();
-    const habit = state.habits.find(h => h.habitId === habitId);
+    const habit = state.habits.find((h) => h.habitId === habitId);
     if (!habit) throw new Error('Habit not found');
     if (!habit.isCompleted) throw new Error('Habit not completed');
     if (habit.bonusClaimed) throw new Error('Bonus already claimed');
@@ -223,14 +225,17 @@ export const demoService = {
     state.poolBalance -= share;
     habit.bonusClaimed = true;
     state.unclaimedCompletedHabits = Math.max(0, state.unclaimedCompletedHabits - 1);
-    state.unclaimedCompletedWeight = Math.max(0, state.unclaimedCompletedWeight - (habit.bonusWeight ?? 1));
+    state.unclaimedCompletedWeight = Math.max(
+      0,
+      state.unclaimedCompletedWeight - (habit.bonusWeight ?? 1),
+    );
     saveState(state);
     return `demo-tx-claim-${habitId}`;
   },
 
   slashHabit(habitId: number): string {
     const state = loadState();
-    const habit = state.habits.find(h => h.habitId === habitId);
+    const habit = state.habits.find((h) => h.habitId === habitId);
     if (!habit) throw new Error('Habit not found');
     if (!habit.isActive) throw new Error('Habit not active');
 

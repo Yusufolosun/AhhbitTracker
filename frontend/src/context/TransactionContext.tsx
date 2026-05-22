@@ -1,4 +1,13 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  useMemo,
+  ReactNode,
+} from 'react';
 import { txUrl } from '@yusufolosun/stx-utils';
 import {
   normalizeTxId,
@@ -72,16 +81,18 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const addTransaction = useCallback((txId: string, functionName: string) => {
-    setTransactions((prev) => [
-      {
-        txId,
-        functionName,
-        status: 'pending' as const,
-        timestamp: Date.now(),
-        updatedAt: Date.now(),
-      },
-      ...prev,
-    ].slice(0, TX_MAX_ENTRIES));
+    setTransactions((prev) =>
+      [
+        {
+          txId,
+          functionName,
+          status: 'pending' as const,
+          timestamp: Date.now(),
+          updatedAt: Date.now(),
+        },
+        ...prev,
+      ].slice(0, TX_MAX_ENTRIES),
+    );
   }, []);
 
   const dismissTransaction = useCallback((txId: string) => {
@@ -98,13 +109,21 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
 
   // Memoized keys for useEffect dependencies to avoid complex expressions
   const pendingTxIdsKey = useMemo(
-    () => transactions.filter((tx) => tx.status === 'pending').map((tx) => tx.txId).join(','),
-    [transactions]
+    () =>
+      transactions
+        .filter((tx) => tx.status === 'pending')
+        .map((tx) => tx.txId)
+        .join(','),
+    [transactions],
   );
 
   const settledTxIdsKey = useMemo(
-    () => transactions.filter((tx) => tx.status !== 'pending').map((tx) => tx.txId).join(','),
-    [transactions]
+    () =>
+      transactions
+        .filter((tx) => tx.status !== 'pending')
+        .map((tx) => tx.txId)
+        .join(','),
+    [transactions],
   );
 
   // Poll pending transactions for confirmation
@@ -113,7 +132,7 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
       const now = Date.now();
 
       const pendingTxs = transactions.filter(
-        (tx) => tx.status === 'pending' && now - tx.timestamp < TX_POLL_TIMEOUT
+        (tx) => tx.status === 'pending' && now - tx.timestamp < TX_POLL_TIMEOUT,
       );
 
       if (pendingTxs.length === 0) return;
@@ -126,7 +145,7 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
           if (next.status !== 'pending') {
             updates.push({ txId: tx.txId, next });
           }
-        })
+        }),
       );
 
       if (updates.length > 0) {
@@ -142,7 +161,7 @@ export const TransactionProvider: React.FC<TransactionProviderProps> = ({ childr
                   errorMessage: update.next.errorMessage,
                 }
               : tx;
-          })
+          }),
         );
       }
     };

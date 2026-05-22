@@ -1,10 +1,10 @@
 /**
  * Formatting utilities for the AhhbitTracker frontend.
- * 
+ *
  * Re-exports formatting utilities from the stx-utils package.
  * This file preserves backward compatibility for existing imports
  * while centralizing all formatting logic.
- * 
+ *
  * @module utils/formatting
  */
 export {

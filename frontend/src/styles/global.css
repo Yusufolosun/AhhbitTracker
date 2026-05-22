@@ -55,24 +55,41 @@
            focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500
            disabled:bg-surface-100 disabled:cursor-not-allowed
            dark:bg-surface-800 dark:border-surface-700 dark:text-gray-100
-           dark:disabled:bg-surface-900 transition-all duration-200 shadow-inner-sm;
+           dark:disabled:bg-surface-900 transition-all duration-200 shadow-inner;
   }
 }
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideIn {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .animate-fade-in {
@@ -114,14 +131,27 @@
 }
 
 @keyframes successPop {
-  0% { transform: scale(0.8); opacity: 0; }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 @keyframes bounceSubtle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
 }
 
 .animate-bounce-subtle {
@@ -146,7 +176,7 @@
 /* Loading spinner */
 .spinner {
   border: 3px solid rgba(241, 90, 34, 0.15);
-  border-top-color: #F15A22;
+  border-top-color: #f15a22;
   border-radius: 50%;
   width: 40px;
   height: 40px;
@@ -154,7 +184,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Screen-reader only utility */
@@ -172,6 +204,6 @@
 
 /* Focus visible for keyboard navigation */
 :focus-visible {
-  outline: 2px solid #F15A22;
+  outline: 2px solid #f15a22;
   outline-offset: 2px;
 }

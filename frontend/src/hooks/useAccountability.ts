@@ -12,10 +12,7 @@ export const useAccountability = () => {
   const [pendingGroupJoins, setPendingGroupJoins] = useState<Set<number>>(new Set());
 
   // Fetch user groups
-  const {
-    data: userGroups,
-    isLoading: isLoadingGroups,
-  } = useQuery({
+  const { data: userGroups, isLoading: isLoadingGroups } = useQuery({
     queryKey: ['userGroups', walletState.address],
     queryFn: async () => {
       if (!walletState.address) return [];
@@ -28,8 +25,15 @@ export const useAccountability = () => {
 
   // Create group mutation
   const createGroupMutation = useMutation({
-    mutationFn: ({ stakeAmount, duration, habitId }: { stakeAmount: number; duration: number; habitId: number }) =>
-      accountabilityService.createGroup(stakeAmount, duration, habitId),
+    mutationFn: ({
+      stakeAmount,
+      duration,
+      habitId,
+    }: {
+      stakeAmount: number;
+      duration: number;
+      habitId: number;
+    }) => accountabilityService.createGroup(stakeAmount, duration, habitId),
     onSuccess: (txId) => {
       addTransaction(txId, 'create-group');
       void refreshBalance();

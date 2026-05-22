@@ -22,7 +22,9 @@ export function anonymizeAddress(address: string | null | undefined): string | u
   return stableHash(address.toLowerCase());
 }
 
-export function sanitizePayload(payload?: AnalyticsEventPayload): AnalyticsEventPayload | undefined {
+export function sanitizePayload(
+  payload?: AnalyticsEventPayload,
+): AnalyticsEventPayload | undefined {
   if (!payload) {
     return undefined;
   }

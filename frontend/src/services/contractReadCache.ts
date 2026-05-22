@@ -16,13 +16,19 @@ export async function cacheHabitRead<T>(habitId: number, fetcher: () => Promise<
   });
 }
 
-export async function cacheUserHabitsRead<T>(address: string, fetcher: () => Promise<T>): Promise<T> {
+export async function cacheUserHabitsRead<T>(
+  address: string,
+  fetcher: () => Promise<T>,
+): Promise<T> {
   return readThroughCache(contractReadCacheKeys.userHabits(address), fetcher, {
     ttlMs: CACHE_TIME,
   });
 }
 
-export async function cacheUserStatsRead<T>(address: string, fetcher: () => Promise<T>): Promise<T> {
+export async function cacheUserStatsRead<T>(
+  address: string,
+  fetcher: () => Promise<T>,
+): Promise<T> {
   return readThroughCache(contractReadCacheKeys.userStats(address), fetcher, {
     ttlMs: CACHE_TIME,
   });

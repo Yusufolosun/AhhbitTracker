@@ -43,7 +43,7 @@ describe('EmptyStateCard', () => {
         description="Create your first habit"
         actionLabel="Create habit"
         onAction={onAction}
-      />
+      />,
     );
 
     expect(screen.getByText('No habits')).toBeDefined();

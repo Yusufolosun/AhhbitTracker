@@ -5,7 +5,7 @@ import { LongestStreakBanner } from '../components/LongestStreakBanner';
 describe('LongestStreakBanner', () => {
   it('shows loading skeleton when loading', () => {
     const { container } = render(
-      <LongestStreakBanner longestStreak={0} hasHabits={false} isLoading={true} />
+      <LongestStreakBanner longestStreak={0} hasHabits={false} isLoading={true} />,
     );
 
     expect(container.querySelector('.animate-pulse')).not.toBeNull();
@@ -26,7 +26,7 @@ describe('LongestStreakBanner', () => {
         habitName="Morning Run"
         hasHabits={true}
         isLoading={false}
-      />
+      />,
     );
 
     expect(screen.getByText('17 days')).toBeDefined();

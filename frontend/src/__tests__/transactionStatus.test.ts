@@ -38,12 +38,12 @@ describe('summarizeTransactionStatus', () => {
   it('classifies abort statuses as failed with decoded message', () => {
     const summary = summarizeTransactionStatus({
       tx_status: 'abort_by_response',
-      tx_result: { repr: '(err u114)' },
+      tx_result: { repr: '(err u103)' },
     });
 
     expect(summary.status).toBe('failed');
-    expect(summary.errorCode).toBe(114);
-    expect(summary.errorMessage).toContain('auto-slashed');
+    expect(summary.errorCode).toBe(103);
+    expect(summary.errorMessage).toContain('not found');
   });
 
   it('keeps raw status when no Clarity error code exists', () => {
