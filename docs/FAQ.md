@@ -1,313 +1,65 @@
-# Frequently Asked Questions
+# Frequently Asked Questions (FAQ)
 
-## General Questions
+## 💡 About AhhbitTracker
 
 ### What is AhhbitTracker?
+AhhbitTracker is a habit-building app where you put a tiny amount of STX (a digital token) on the line to keep you accountable. Check in daily to build your streak. If you finish your 7-day streak, you get your money back plus a bonus! If you miss a day, you lose a tiny portion to the bonus pool.
 
-AhhbitTracker is a decentralized application on the Stacks blockchain that helps you build habits through financial commitment. You stake STX on your habits and check in daily to maintain your streak.
+### Does this require real money?
+Yes, it uses STX, which is a real cryptocurrency. However, you can use our **Interactive Demo Mode** (Sandbox) on the website to practice with simulated tokens and mock habits for free!
 
-### How does it work?
+### Why does it use blockchain instead of a normal server?
+Using the Stacks blockchain means:
+1.  **Trustless Enforcement**: No company can take your money or change the rules. Your deposit is held by an automated program (smart contract) that acts exactly as coded.
+2.  **No Sign-ups**: You don't need to share your email, phone number, or password. Your wallet address is your secure log-in.
 
-1. Stake STX on a habit
-2. Check in every 16-32 hours
-3. Complete 7+ days to withdraw your stake
-4. Miss a check-in and forfeit 10% per missed window to the community pool
+---
 
-### Why use blockchain for habit tracking?
+## 🔑 Getting Started & Wallets
 
-- **Immutable:** Your commitments can't be changed
-- **Transparent:** All activity is publicly verifiable
-- **Incentivized:** Financial stakes create real accountability
-- **Decentralized:** No company can shut down or alter your data
+### What is a Stacks wallet?
+A Stacks wallet is a secure application that holds your digital tokens and lets you interact with the app. Think of it as a secure login card.
 
-## Getting Started
+### How do I get a Stacks wallet?
+You can install Leather or Xverse as a browser extension (desktop) or mobile app:
+*   [Download Xverse Wallet](https://xverse.app)
+*   [Download Leather Wallet](https://leather.io)
 
-### What do I need?
+### How do I get STX tokens?
+If you are ready to use real funds:
+1.  Buy STX on an exchange (like Coinbase, Binance, or local P2P platforms).
+2.  Withdraw the STX to your personal Stacks wallet address (which looks like a long string of letters and numbers starting with `SP`).
 
-- Stacks wallet (Leather, Xverse, or Asigna recommended)
-- Minimum 0.02 STX for stake
-- Additional STX for transaction fees (~0.5 STX for 7-day completion)
+---
 
-### How do I create a wallet?
+## ⏱️ Habit Mechanics & Block Times
 
-Download one of these wallets:
-- **Leather:** https://leather.io
-- **Xverse:** https://xverse.app
-- **Asigna:** https://asigna.io
-
-Follow their setup instructions to create your wallet and backup your seed phrase.
-
-### Where do I get STX?
-
-Purchase STX from:
-- Cryptocurrency exchanges (Coinbase, Binance, etc.)
-- Peer-to-peer platforms
-- DEX platforms on Stacks
-
-## Using the Contract
-
-### What's the minimum stake?
-
-0.02 STX (20,000 microSTX)
-
-### Can I stake more?
-
-Yes, up to 100 STX per habit (100,000,000 microSTX). Higher stakes = stronger commitment.
-
-### How long can my habit name be?
-
-Habit names can be up to 50 UTF-8 characters.
-
-### How often must I check in?
-
-Once every 16-32 hours (96-192 blocks on Stacks).
-
-### What if I miss a day?
-
-Your streak resets to zero and 10% of your stake is forfeited per missed window. The habit stays active unless the remaining stake reaches zero.
-
-### Can I check in multiple times per day?
-
-No. The contract prevents check-ins until at least 96 blocks have passed (~16 hours on Stacks).
+### What is a "Block" and why does the app use it for time?
+The Stacks blockchain updates in chunks called "blocks" (secured by Bitcoin) approximately every 10 minutes. The app counts time using blocks instead of traditional hours so that the contract rules can be checked fairly on-chain.
+*   **96 blocks** is about **16 hours**.
+*   **192 blocks** is about **32 hours**.
 
 ### Why can't I check in immediately after creating a habit?
+To prevent cheating, your first check-in window starts **after** your habit is created. You must wait at least 96 blocks (~16 hours) before you can log your first check-in. If you try earlier, you will see a "Check In Not Ready" warning.
 
-When you create a habit, the contract automatically sets the `last-check-in-block` to the creation block. You must wait at least 96 blocks (~16 hours) before your first manual check-in. This prevents:
-- Double-claiming rewards (creation + immediate check-in)
-- Gaming the system
-- Ensures genuine daily habit tracking
+### What is the check-in window?
+After your last check-in, you have a window between **16 hours and 32 hours** to check in again.
+*   If you check in too early (before 16 hours), you are in **cooldown** and can't check in yet.
+*   If you check in on time (between 16 and 32 hours), your streak increases.
+*   If you miss the window (after 32 hours), your streak resets to zero and a **10% penalty** is applied.
 
-**Error code:** If you try, you'll get `(err u105)` - ERR-ALREADY-CHECKED-IN
+---
 
-**Solution:** Wait approximately 16 hours (96 blocks) after creating a habit before your first check-in.
+## 🛠️ Fees & Troubleshooting
 
-### How many days for withdrawal?
+### Why is my transaction pending?
+Blockchain transactions can take a few minutes to confirm. The dashboard includes a transaction tracker that will update once the Stacks network registers your action.
 
-Minimum 7 consecutive check-ins required.
+### Why do I need to pay a transaction fee (gas)?
+Every update on the blockchain requires transaction fees to pay the network validators who secure the blockchain. These fees are very low (usually fractions of a cent in STX) and do not go to the app creators.
 
-### Can I withdraw before 7 days?
-
-No. You must complete the minimum streak to withdraw your remaining stake.
-
-## Streaks and Timing
-
-### When does my check-in window start?
-
-Immediately after your last check-in. If you check in at 9 AM Monday, you have until 9 AM Tuesday.
-
-### What if I'm traveling across time zones?
-
-The contract uses blockchain time (block height), not wall clock time. Your check-in window is measured in blocks (96-192 after your last check-in) regardless of your location.
-
-### Can I check in early?
-
-Yes. Check in between 96 and 192 blocks (~16 to ~32 hours) after your last check-in. Earlier is safer than later.
-
-### What happens if Stacks network is slow?
-
-Transaction delays can cause you to miss your window. Always check in with buffer time (e.g., 20 hours instead of 23.5 hours).
-
-## Forfeited Pool
-
-### What is the forfeited pool?
-
-A shared pool of STX from users who missed their check-ins.
-
-### How do I claim bonuses?
-
-After completing a habit (7+ days), use the `claim-bonus` function to receive your share.
-
-### How is the bonus calculated?
-
-The pool is distributed among successful users. More forfeited stakes = larger bonuses.
-
-### Can I claim bonuses multiple times?
-
-Yes, once per completed habit.
-
-### What if the pool is empty?
-
-You can still withdraw your original stake, but there won't be a bonus.
-
-### Do referrals affect bonuses?
-
-Yes. Register a referrer once using `register-referrer`. When a referred user
-completes a streak, the referrer earns a bonus-claim weight boost that increases
-their share of future bonus claims.
-
-## v3 Features
-
-### What are Accountability Groups?
-
-Groups allow you to stake STX together with others. If you miss a check-in, 
-the penalty goes to the other group members instead of the global pool.
-
-### How do Milestone Rewards work?
-
-In addition to the global forfeited pool, there is a community-funded Streak 
-Reward Pool. Reaching milestones like 7, 30, 90, or 365 days allows you to 
-claim extra rewards from this pool.
-
-## Costs and Fees
-
-### How much does it cost?
-
-**One-time costs:**
-- Habit creation: ~0.15-0.25 STX
-
-**Recurring costs:**
-- Daily check-in: ~0.10-0.20 STX
-
-**End costs:**
-- Withdrawal: ~0.15-0.25 STX
-- Bonus claim: ~0.15-0.25 STX
-
-### Why are there transaction fees?
-
-Stacks blockchain requires fees to process transactions and prevent spam.
-
-### Do fees go to you?
-
-No. All transaction fees go to Stacks miners, not to AhhbitTracker.
-
-### Can I reduce costs?
-
-- Use "low-cost" deployment mode
-- Batch multiple habits together
-- Check in during low network congestion
-
-## Multiple Habits
-
-### Can I track multiple habits?
-
-Yes! Create as many as you want.
-
-### Does each habit need its own stake?
-
-Yes. Each habit requires a separate stake.
-
-### Do habits affect each other?
-
-No. Each habit has an independent stake and streak.
-
-### Can I use the same name for multiple habits?
-
-Yes, but habit IDs are unique. Using different names helps you distinguish them.
-
-## Technical Questions
-
-### What blockchain is this on?
-
-Stacks (STX) - a Bitcoin layer for smart contracts.
-
-### Is the contract open source?
-
-Yes. View the code at: https://github.com/Yusufolosun/AhhbitTracker
-
-### Can the contract be changed?
-
-No. Once deployed, the contract is immutable. No one can modify the rules.
-
-### Where is my data stored?
-
-On the Stacks blockchain. All data is permanent and public.
-
-### Is my data private?
-
-No. All blockchain transactions are public. Anyone can see:
-- Your habits
-- Your stakes
-- Your check-ins
-- Your streaks
-
-**NOT visible:** Your personal identity (only your blockchain address)
-
-## Troubleshooting
-
-### Transaction failed
-
-**Possible causes:**
-- Insufficient STX balance
-- Network congestion
-- Incorrect parameters
-
-**Solution:**
-- Check wallet balance
-- Increase transaction fee
-- Wait and retry
-
-### "Already Checked In" error (ERR-U105)
-
-**Error Code:** `(err u105)` - ERR-ALREADY-CHECKED-IN
-
-**Common Causes:**
-1. You already checked in today
-2. You just created the habit and tried to check in immediately
-3. Less than 96 blocks have passed since last check-in
-
-**Solution:**
-- If you just created the habit: Wait at least ~16 hours (96 Stacks blocks) before first check-in
-- If you already checked in: Wait until the next window opens (~16 hours)
-- Check the habit details with `get-habit` to see `last-check-in-block`
-
-### "Window Expired" error
-
-You missed your check-in window. A 10% per missed window penalty was applied to your remaining stake.
-
-### "Insufficient Streak" error
-
-You need 7+ consecutive days before withdrawal.
-
-### "Habit Not Found" error
-
-You're using an invalid habit ID. Check your habit IDs with `get-user-habits`.
-
-### Contract not responding
-
-Check Stacks network status:
-- https://status.hiro.so
-- https://explorer.hiro.so
-
-## Safety and Security
-
-### Is my stake safe?
-
-Your stake is held securely by the smart contract. No one (including the developer) can access it except through the defined contract functions.
-
-### What if I lose my wallet?
-
-If you lose access to your wallet (seed phrase), you lose access to your stakes. **Always backup your seed phrase securely.**
-
-### Can someone steal my habits?
-
-No. Only you (the owner) can check in or withdraw from your habits.
-
-### What are the error codes?
-
-**Common Error Codes:**
-- `(err u100)` - ERR-NOT-AUTHORIZED: You don't have permission for this action
-- `(err u101)` - ERR-INVALID-STAKE-AMOUNT: Stake amount too low (minimum 0.02 STX)
-- `(err u102)` - ERR-INVALID-HABIT-NAME: Habit name empty or too long (max 50 characters)
-- `(err u103)` - ERR-HABIT-NOT-FOUND: Habit ID doesn't exist
-- `(err u104)` - ERR-NOT-HABIT-OWNER: You're not the owner of this habit
-- `(err u105)` - ERR-ALREADY-CHECKED-IN: You already checked in or just created the habit
-- `(err u107)` - ERR-INSUFFICIENT-STREAK: Need 7+ consecutive check-ins to withdraw
-- `(err u108)` - ERR-HABIT-ALREADY-COMPLETED: Habit already completed
-- `(err u109)` - ERR-POOL-INSUFFICIENT-BALANCE: Not enough STX in forfeited pool
-- `(err u110)` - ERR-TRANSFER-FAILED: STX transfer issue
-- `(err u111)` - ERR-BONUS-ALREADY-CLAIMED: Bonus already claimed for this habit
-- `(err u112)` - ERR-HABIT-LIMIT-REACHED: Maximum habit count reached for this user
-- `(err u113)` - ERR-STAKE-TOO-HIGH: Stake exceeds 100 STX cap
-- `(err u114)` - ERR-HABIT-AUTO-SLASHED: Missed check-in window; penalty applied
-
-**Troubleshooting Tip:** Use `get-habit` to check habit status before transactions.
-
-### Is there an admin key?
-
-No. The contract has no admin functions. It's completely decentralized.
-
-## Still Have Questions?
-
-- **GitHub Issues:** https://github.com/Yusufolosun/AhhbitTracker/issues
-- **Documentation:** https://github.com/Yusufolosun/AhhbitTracker/tree/main/docs
-- **Contract Explorer:** https://explorer.hiro.so/address/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3?chain=mainnet
+### What are the common error codes?
+If a transaction fails, you might see one of these codes:
+*   **ERR-u105 (Already Checked In)**: You are trying to check in during your cooldown period. Wait until 16 hours have passed since your last check-in.
+*   **ERR-u107 (Insufficient Streak)**: You are trying to withdraw before completing a 7-day streak.
+*   **ERR-u101 (Stake Too Low)**: You need to deposit at least 0.02 STX.
