@@ -91,70 +91,20 @@ npm install
 npm run dev                  # → http://localhost:3000
 ```
 
-### Testing
+### Running Tests
 
+If you want to verify the system locally, you can run the test suite:
 ```bash
-npm test              # Run contract and integration tests
-cd frontend && npm test   # Run frontend tests (30 tests)
-clarinet check        # Validate Clarity syntax
+npm test              # Run unit tests
+cd frontend && npm test   # Run frontend tests
 ```
-
-Critical user-flow coverage lives alongside the test suites:
-
-- Contract E2E flows: `tests/*.e2e.test.ts`
-- Frontend E2E flows: `frontend/src/__tests__/*` (daily check-ins, withdraws, claims)
-
-### Environment Stages
-
-The repository now supports three explicit runtime stages without committing secrets:
-
-- `development`
-- `staging`
-- `production`
-
-Use stage templates as your starting point and keep real values in local-only files:
-
-```bash
-# Root scripts (deployment and automation)
-cp .env.development.example .env.development.local
-cp .env.staging.example .env.staging.local
-cp .env.production.example .env.production.local
-
-# Frontend (Vite)
-cp frontend/.env.development.example frontend/.env.development.local
-cp frontend/.env.staging.example frontend/.env.staging.local
-cp frontend/.env.production.example frontend/.env.production.local
-
-# Mobile (Expo)
-cp mobile/.env.development.example mobile/.env.development.local
-cp mobile/.env.staging.example mobile/.env.staging.local
-cp mobile/.env.production.example mobile/.env.production.local
-```
-
-`*.local` env files are gitignored. Commit only `*.example` templates and never commit mnemonics, private keys, or secret API credentials.
 
 ### External Packages
+The project relies on these specialized packages for the Stacks ecosystem:
+- [`stx-utils`](https://github.com/Yusufolosun/ahhbit-tracker-stx-utils): Zero-dependency utility library for Stacks (formatting, block math, address helpers)
+- [`ahhbit-tracker-sdk`](https://github.com/Yusufolosun/ahhbit-tracker-sdk): Typed SDK for the contract (transactions, queries, post-conditions)
+- [`defikit`](https://github.com/Yusufolosun/ahhbit-tracker-defikit): DeFi utility toolkit for basis points and fee math
 
-| Package | Description |
-|---|---|
-| [`stx-utils`](https://github.com/Yusufolosun/ahhbit-tracker-stx-utils) | Zero-dependency utility library for Stacks — formatting, validation, block math, address helpers |
-| [`ahhbit-tracker-sdk`](https://github.com/Yusufolosun/ahhbit-tracker-sdk) | Typed SDK for the AhhbitTracker contract — transaction builders, read-only queries, post-conditions |
-| [`defikit`](https://github.com/Yusufolosun/ahhbit-tracker-defikit) | DeFi utility toolkit for basis points, fee math, slippage, AMM and token amount helpers |
-
-### Production Build
-
-```bash
-cd frontend
-npm run build         # → frontend/dist/
-npm run preview       # Preview locally
-```
-
-## Deploy to Vercel
-
-1. Import the repository in [Vercel](https://vercel.com)
-2. Set **Root Directory** → `frontend`
-3. Build settings are auto-detected from `vercel.json`
-4. Optionally override `VITE_CONTRACT_ADDRESS` / `VITE_CONTRACT_NAME`
 
 ## Contract Reference
 
