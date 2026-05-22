@@ -1,16 +1,19 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { walletService } from '../services/walletService';
+import { demoService, DEMO_ADDRESS } from '../services/demoService';
 import { WalletState } from '../types/habit';
 import { trackEvent, toWalletAddressHash } from '../analytics';
 
 interface WalletContextType {
   walletState: WalletState;
   connect: () => void;
+  connectDemo: () => void;
   disconnect: () => Promise<void>;
   refreshBalance: () => Promise<void>;
   isLoading: boolean;
   isBalanceLoading: boolean;
   isDisconnecting: boolean;
+  isDemoMode: boolean;
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
@@ -56,9 +59,18 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
   };
 
   useEffect(() => {
-    // Check if wallet is already connected on mount
     const checkConnection = async () => {
       try {
+        if (demoService.isDemoMode()) {
+          setWalletState({
+            isConnected: true,
+            address: DEMO_ADDRESS,
+            balance: demoService.getUserBalance(),
+          });
+          setIsLoading(false);
+          return;
+        }
+
         const isSignedIn = walletService.isSignedIn();
         if (isSignedIn) {
           const address = walletService.getAddress();
@@ -81,6 +93,16 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     void checkConnection();
   }, []);
 
+  const connectDemo = () => {
+    demoService.enableDemoMode();
+    setWalletState({
+      isConnected: true,
+      address: DEMO_ADDRESS,
+      balance: demoService.getUserBalance(),
+    });
+    trackEvent('demo_mode_started');
+  };
+
   const connect = () => {
     setIsLoading(true);
     trackEvent('wallet_connect_started', { source: 'header' });
@@ -102,10 +124,9 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
           setIsLoading(false);
         },
         () => {
-          // User cancelled the wallet picker
           trackEvent('wallet_connect_cancelled');
           setIsLoading(false);
-        }
+        },
       );
     } catch (error) {
       console.error('Error connecting wallet:', error);
@@ -118,10 +139,16 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     setIsDisconnecting(true);
 
     try {
-      walletService.disconnect();
-      trackEvent('wallet_disconnected', {
-        walletAddressHash: toWalletAddressHash(walletState.address),
-      });
+      if (demoService.isDemoMode()) {
+        demoService.disableDemoMode();
+        trackEvent('demo_mode_ended');
+      } else {
+        walletService.disconnect();
+        trackEvent('wallet_disconnected', {
+          walletAddressHash: toWalletAddressHash(walletState.address),
+        });
+      }
+      await Promise.resolve();
       setWalletState({
         isConnected: false,
         address: null,
@@ -135,8 +162,22 @@ export const WalletProvider: React.FC<WalletProviderProps> = ({ children }) => {
     }
   };
 
+  const isDemoMode = demoService.isDemoMode();
+
   return (
-    <WalletContext.Provider value={{ walletState, connect, disconnect, refreshBalance, isLoading, isBalanceLoading, isDisconnecting }}>
+    <WalletContext.Provider
+      value={{
+        walletState,
+        connect,
+        connectDemo,
+        disconnect,
+        refreshBalance,
+        isLoading,
+        isBalanceLoading,
+        isDisconnecting,
+        isDemoMode,
+      }}
+    >
       {children}
     </WalletContext.Provider>
   );

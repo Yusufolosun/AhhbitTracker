@@ -3,9 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { contractService } from '../services/contractService';
 import { useWallet } from '../context/WalletContext';
 import { useTransactions } from '../context/TransactionContext';
-import {
-  Habit,
-} from '../types/habit';
+import { Habit } from '../types/habit';
 import { POLLING_INTERVAL, CACHE_TIME, POOL_CACHE_TIME } from '../utils/constants';
 import { getHabitSyncTargets } from './habitTransactionSync';
 import { queryKeys } from '../utils/queryKeys';
@@ -73,10 +71,7 @@ export const useHabits = () => {
   });
 
   // Fetch user stats
-  const {
-    data: userStats,
-    isLoading: isLoadingStats,
-  } = useQuery({
+  const { data: userStats, isLoading: isLoadingStats } = useQuery({
     queryKey: queryKeys.userStats(walletState.address),
     queryFn: async () => {
       if (!walletState.address) return null;
@@ -160,7 +155,7 @@ export const useHabits = () => {
     }
 
     const confirmedTransactions = transactions.filter(
-      (tx) => tx.status === 'confirmed' && !handledConfirmedTransactionsRef.current.has(tx.txId)
+      (tx) => tx.status === 'confirmed' && !handledConfirmedTransactionsRef.current.has(tx.txId),
     );
 
     if (!confirmedTransactions.length) {
@@ -243,7 +238,10 @@ export const useHabits = () => {
     onSuccess: (txId) => {
       addTransaction(txId, 'check-in');
       contractService.invalidateAddressReadCache(walletState.address);
-      scheduleRefetch([queryKeys.habits(walletState.address), queryKeys.userStats(walletState.address)]);
+      scheduleRefetch([
+        queryKeys.habits(walletState.address),
+        queryKeys.userStats(walletState.address),
+      ]);
     },
   });
 
@@ -339,59 +337,62 @@ export const useHabits = () => {
     },
   });
 
-  const runDailyCheckIn = useCallback(async (habitIds: number[]): Promise<DailyCheckInResult> => {
-    if (habitIds.length === 0) {
-      return {
-        attempted: 0,
-        submitted: 0,
-        failed: 0,
-        entries: [],
-      };
-    }
+  const runDailyCheckIn = useCallback(
+    async (habitIds: number[]): Promise<DailyCheckInResult> => {
+      if (habitIds.length === 0) {
+        return {
+          attempted: 0,
+          submitted: 0,
+          failed: 0,
+          entries: [],
+        };
+      }
 
-    trackEvent('daily_check_in_started', {
-      attempted: habitIds.length,
-    });
+      trackEvent('daily_check_in_started', {
+        attempted: habitIds.length,
+      });
 
-    setIsRunningDailyCheckIn(true);
-    const entries: DailyCheckInEntry[] = [];
+      setIsRunningDailyCheckIn(true);
+      const entries: DailyCheckInEntry[] = [];
 
-    try {
-      for (const habitId of habitIds) {
-        try {
-          const txId = await checkInMutation.mutateAsync(habitId);
-          entries.push({ habitId, txId });
-        } catch (error) {
-          const message = error instanceof Error ? error.message : String(error);
-          entries.push({ habitId, error: message });
+      try {
+        for (const habitId of habitIds) {
+          try {
+            const txId = await checkInMutation.mutateAsync(habitId);
+            entries.push({ habitId, txId });
+          } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            entries.push({ habitId, error: message });
 
-          // User cancellation should stop the remaining queue to avoid repeatedly
-          // reopening the wallet popup after an intentional cancel action.
-          if (message === 'Transaction cancelled') {
-            break;
+            // User cancellation should stop the remaining queue to avoid repeatedly
+            // reopening the wallet popup after an intentional cancel action.
+            if (message === 'Transaction cancelled') {
+              break;
+            }
           }
         }
+      } finally {
+        setIsRunningDailyCheckIn(false);
       }
-    } finally {
-      setIsRunningDailyCheckIn(false);
-    }
 
-    const submitted = entries.filter((entry) => entry.txId).length;
-    const failed = entries.length - submitted;
+      const submitted = entries.filter((entry) => entry.txId).length;
+      const failed = entries.length - submitted;
 
-    trackEvent('daily_check_in_completed', {
-      attempted: entries.length,
-      submitted,
-      failed,
-    });
+      trackEvent('daily_check_in_completed', {
+        attempted: entries.length,
+        submitted,
+        failed,
+      });
 
-    return {
-      attempted: entries.length,
-      submitted,
-      failed,
-      entries,
-    };
-  }, [checkInMutation]);
+      return {
+        attempted: entries.length,
+        submitted,
+        failed,
+        entries,
+      };
+    },
+    [checkInMutation],
+  );
 
   return {
     // Data

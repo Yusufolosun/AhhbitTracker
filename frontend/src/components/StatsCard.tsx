@@ -26,7 +26,9 @@ export function StatsCard({ title, value, subtitle, icon, trend }: StatsCardProp
           <p className="text-sm font-medium text-surface-600 dark:text-surface-400 mb-1">{title}</p>
           <p className="text-2xl font-bold text-surface-900 dark:text-white">{value}</p>
           {subtitle && (
-            <p className={`text-xs mt-1 ${trend ? trendColors[trend] : 'text-surface-500 dark:text-surface-400'}`}>
+            <p
+              className={`text-xs mt-1 ${trend ? trendColors[trend] : 'text-surface-500 dark:text-surface-400'}`}
+            >
               {subtitle}
             </p>
           )}

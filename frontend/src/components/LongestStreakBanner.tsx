@@ -23,7 +23,10 @@ export function LongestStreakBanner({
   }
 
   return (
-    <SurfaceCard className="rounded-2xl bg-gradient-to-r from-primary-50 to-amber-50 dark:from-primary-500/10 dark:to-amber-500/10" tone="accent">
+    <SurfaceCard
+      className="rounded-2xl bg-gradient-to-r from-primary-50 to-amber-50 dark:from-primary-500/10 dark:to-amber-500/10"
+      tone="accent"
+    >
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-xs sm:text-sm font-semibold tracking-wide uppercase text-primary-700 dark:text-primary-300">
@@ -44,7 +47,12 @@ export function LongestStreakBanner({
         </div>
 
         <div className="w-12 h-12 rounded-xl bg-white/70 dark:bg-surface-800/80 border border-primary-200 dark:border-primary-500/20 flex items-center justify-center">
-          <svg className="w-6 h-6 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <svg
+            className="w-6 h-6 text-amber-500"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"

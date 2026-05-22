@@ -2,9 +2,7 @@ import type { ButtonHTMLAttributes, PropsWithChildren } from 'react';
 
 type ActionVariant = 'primary' | 'secondary' | 'ghost' | 'destructive';
 
-interface ActionButtonProps
-  extends PropsWithChildren,
-    ButtonHTMLAttributes<HTMLButtonElement> {
+interface ActionButtonProps extends PropsWithChildren, ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ActionVariant;
   isLoading?: boolean;
 }
@@ -14,10 +12,8 @@ const variantClasses: Record<ActionVariant, string> = {
     'bg-primary-500 text-white hover:bg-primary-600 active:bg-primary-700 shadow-sm hover:shadow-md',
   secondary:
     'bg-surface-200 text-surface-800 hover:bg-surface-300 dark:bg-surface-700 dark:text-gray-200 dark:hover:bg-surface-600 shadow-sm',
-  ghost:
-    'text-surface-600 hover:bg-surface-100 dark:text-surface-400 dark:hover:bg-surface-800',
-  destructive:
-    'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 shadow-sm hover:shadow-md',
+  ghost: 'text-surface-600 hover:bg-surface-100 dark:text-surface-400 dark:hover:bg-surface-800',
+  destructive: 'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 shadow-sm hover:shadow-md',
 };
 
 export function ActionButton({

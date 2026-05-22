@@ -31,7 +31,10 @@ export function SurfaceCard({
   ...props
 }: SurfaceCardProps) {
   return (
-    <div {...props} className={`card ${toneClasses[tone]} ${paddingClasses[padding]} ${className}`.trim()}>
+    <div
+      {...props}
+      className={`card ${toneClasses[tone]} ${paddingClasses[padding]} ${className}`.trim()}
+    >
       {children}
     </div>
   );

@@ -1,9 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Habit } from '../types/habit';
-import {
-  getEligibleDailyCheckInHabitIds,
-  getCheckInWindowState,
-} from '../utils/habitStatus';
+import { getEligibleDailyCheckInHabitIds, getCheckInWindowState } from '../utils/habitStatus';
 import type { DailyCheckInResult } from '../hooks/useHabits';
 
 type NotificationLevel = 'success' | 'error' | 'info';
@@ -69,7 +66,8 @@ export function DailyCheckInPanel({
         <div>
           <h3 className="text-lg font-semibold text-surface-900 dark:text-white">Daily Check-In</h3>
           <p className="text-sm text-surface-600 dark:text-surface-300">
-            {eligibleHabitIds.length} habit{eligibleHabitIds.length !== 1 ? 's are' : ' is'} ready now
+            {eligibleHabitIds.length} habit{eligibleHabitIds.length !== 1 ? 's are' : ' is'} ready
+            now
             {urgentCount > 0 ? ` · ${urgentCount} expiring soon` : ''}
           </p>
         </div>
@@ -86,7 +84,8 @@ export function DailyCheckInPanel({
 
       {lastResult ? (
         <p className="mt-3 text-xs text-surface-600 dark:text-surface-300">
-          Last run: attempted {lastResult.attempted}, submitted {lastResult.submitted}, failed {lastResult.failed}.
+          Last run: attempted {lastResult.attempted}, submitted {lastResult.submitted}, failed{' '}
+          {lastResult.failed}.
         </p>
       ) : null}
     </div>

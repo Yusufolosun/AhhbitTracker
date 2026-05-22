@@ -8,7 +8,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
-import { WalletConnect } from './components/WalletConnect';
+import { LandingPage } from './components/LandingPage';
 import { RateLimitBanner } from './components/RateLimitBanner';
 import { ToastContainer } from './components/ToastContainer';
 import { TransactionTracker } from './components/TransactionTracker';
@@ -20,11 +20,21 @@ import { trackEvent } from './analytics';
 import './styles/global.css';
 
 // Code-split route-level components
-const Dashboard = lazy(() => import('./components/Dashboard').then(m => ({ default: m.Dashboard })));
-const HabitForm = lazy(() => import('./components/HabitForm').then(m => ({ default: m.HabitForm })));
-const HabitList = lazy(() => import('./components/HabitList').then(m => ({ default: m.HabitList })));
-const PoolDisplay = lazy(() => import('./components/PoolDisplay').then(m => ({ default: m.PoolDisplay })));
-const ReferrerRegistration = lazy(() => import('./components/ReferrerRegistration').then(m => ({ default: m.ReferrerRegistration })));
+const Dashboard = lazy(() =>
+  import('./components/Dashboard').then((m) => ({ default: m.Dashboard })),
+);
+const HabitForm = lazy(() =>
+  import('./components/HabitForm').then((m) => ({ default: m.HabitForm })),
+);
+const HabitList = lazy(() =>
+  import('./components/HabitList').then((m) => ({ default: m.HabitList })),
+);
+const PoolDisplay = lazy(() =>
+  import('./components/PoolDisplay').then((m) => ({ default: m.PoolDisplay })),
+);
+const ReferrerRegistration = lazy(() =>
+  import('./components/ReferrerRegistration').then((m) => ({ default: m.ReferrerRegistration })),
+);
 
 /** API error shape for rate limit detection */
 interface ApiError {
@@ -64,12 +74,7 @@ const queryClient = new QueryClient({
 function AppContent() {
   const { walletState } = useWallet();
   const { showToast } = useToast();
-  const {
-    habits,
-    isLoadingHabits,
-    runDailyCheckIn,
-    isRunningDailyCheckIn,
-  } = useHabits();
+  const { habits, isLoadingHabits, runDailyCheckIn, isRunningDailyCheckIn } = useHabits();
   const { route } = useHashRoute();
   const trackedAppLoadRef = useRef(false);
 
@@ -104,16 +109,12 @@ function AppContent() {
 
         return best;
       },
-      { longestStreak: 0, habitName: '' }
+      { longestStreak: 0, habitName: '' },
     );
   }, [habits]);
 
   if (!walletState.isConnected) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-surface-50 dark:bg-surface-900 px-4">
-        <WalletConnect />
-      </div>
-    );
+    return <LandingPage />;
   }
 
   return (
@@ -170,7 +171,9 @@ function AppContent() {
 
             {route === 'habits' && (
               <section id="habits">
-                <h2 className="text-2xl font-bold text-surface-900 dark:text-white mb-6">My Habits</h2>
+                <h2 className="text-2xl font-bold text-surface-900 dark:text-white mb-6">
+                  My Habits
+                </h2>
                 <HabitList habits={habits} loading={isLoadingHabits} />
               </section>
             )}
@@ -202,4 +205,3 @@ export function App() {
     </ErrorBoundary>
   );
 }
-

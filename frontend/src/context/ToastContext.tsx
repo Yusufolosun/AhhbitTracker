@@ -52,13 +52,10 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({ children }) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  const showToast = useCallback(
-    (message: string, type: ToastItem['type']) => {
-      const id = `toast-${++toastCounter}`;
-      setToasts((prev) => [...prev, { id, message, type }]);
-    },
-    []
-  );
+  const showToast = useCallback((message: string, type: ToastItem['type']) => {
+    const id = `toast-${++toastCounter}`;
+    setToasts((prev) => [...prev, { id, message, type }]);
+  }, []);
 
   return (
     <ToastContext.Provider value={{ toasts, showToast, dismissToast }}>

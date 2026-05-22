@@ -1,9 +1,5 @@
 import { Habit } from '../types/habit';
-import {
-  CHECK_IN_WINDOW,
-  MIN_CHECK_IN_INTERVAL,
-  MIN_STREAK_FOR_WITHDRAWAL,
-} from './constants';
+import { CHECK_IN_WINDOW, MIN_CHECK_IN_INTERVAL, MIN_STREAK_FOR_WITHDRAWAL } from './constants';
 
 /**
  * Threshold (in blocks) at which we warn the user the valid check-in period
@@ -72,10 +68,7 @@ export function isEligibleToWithdraw(habit: Habit, currentBlock: number | null):
 /**
  * Whether a habit is currently eligible for a daily check-in transaction.
  */
-export function isEligibleForDailyCheckIn(
-  habit: Habit,
-  currentBlock: number | null,
-): boolean {
+export function isEligibleForDailyCheckIn(habit: Habit, currentBlock: number | null): boolean {
   const state = getCheckInWindowState(habit, currentBlock);
   return state === 'available' || state === 'urgent' || state === 'expired';
 }

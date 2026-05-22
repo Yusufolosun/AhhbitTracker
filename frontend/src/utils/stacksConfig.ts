@@ -189,12 +189,18 @@ export function resolveFrontendRuntimeConfig(
   return {
     stage,
     stacksNetwork,
-    stacksApiUrl: assertStacksApiUrl(env.VITE_STACKS_API_URL ?? defaults.stacksApiUrl, stacksNetwork),
+    stacksApiUrl: assertStacksApiUrl(
+      env.VITE_STACKS_API_URL ?? defaults.stacksApiUrl,
+      stacksNetwork,
+    ),
     contractAddress: assertStacksAddress(
       env.VITE_CONTRACT_ADDRESS ?? defaults.contractAddress,
       'VITE_CONTRACT_ADDRESS',
     ),
-    contractName: assertContractName(env.VITE_CONTRACT_NAME ?? defaults.contractName, 'VITE_CONTRACT_NAME'),
+    contractName: assertContractName(
+      env.VITE_CONTRACT_NAME ?? defaults.contractName,
+      'VITE_CONTRACT_NAME',
+    ),
     accountabilityContractName: assertContractName(
       env.VITE_ACCOUNTABILITY_CONTRACT_NAME ?? defaults.accountabilityContractName,
       'VITE_ACCOUNTABILITY_CONTRACT_NAME',

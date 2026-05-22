@@ -284,21 +284,7 @@ for (let i = 0; i < 10; i++) {
 
 ### Testnet First
 
-**Always test on devnet/testnet before mainnet:**
-```bash
-# Deploy to testnet
-clarinet deploy --testnet
-
-# Run test transactions
-npm run test:testnet
-
-# Verify behavior
-```
-
-**Benefits:**
-- Free transactions
-- Safe to experiment
-- Catch bugs early
+Always test on devnet or testnet before using mainnet with real funds. This lets you verify behavior safely without financial risk.
 
 ---
 

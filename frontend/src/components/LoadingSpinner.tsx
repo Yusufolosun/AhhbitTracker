@@ -1,5 +1,3 @@
-
-
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';
   text?: string;
@@ -13,7 +11,11 @@ export function LoadingSpinner({ size = 'md', text }: LoadingSpinnerProps) {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center py-8" role="status" aria-live="polite">
+    <div
+      className="flex flex-col items-center justify-center py-8"
+      role="status"
+      aria-live="polite"
+    >
       <div className={`spinner ${sizeClasses[size]}`} aria-hidden="true"></div>
       {text ? (
         <p className="mt-4 text-sm text-gray-600">{text}</p>

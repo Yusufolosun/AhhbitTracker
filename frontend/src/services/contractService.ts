@@ -1,14 +1,10 @@
 /**
  * @module contractService
  * Service for interacting with the AhhbitTracker smart contract.
+ * In demo mode, reads and writes are handled by demoService instead.
  */
 import { showContractCall } from '@stacks/connect';
-import {
-  cvToJSON,
-  fetchCallReadOnlyFunction,
-  Pc,
-  PostConditionMode,
-} from '@stacks/transactions';
+import { cvToJSON, fetchCallReadOnlyFunction, Pc, PostConditionMode } from '@stacks/transactions';
 import {
   buildCheckIn,
   buildClaimBonus,
@@ -20,6 +16,7 @@ import {
 } from '@yusufolosun/ahhbit-tracker-sdk';
 import { CONTRACT_ADDRESS, CONTRACT_NAME, NETWORK } from '../utils/constants';
 import { walletService } from './walletService';
+import { demoService } from './demoService';
 import type { Habit, UserStats } from '../types/habit';
 import {
   cacheHabitRead,
@@ -51,13 +48,14 @@ const appDetails = {
  */
 export const contractService = {
   async readHabit(habitId: number): Promise<Habit | null> {
+    if (demoService.isDemoMode()) {
+      return demoService.readHabit(habitId);
+    }
     return cacheHabitRead(habitId, async () => {
       const result = await sdkGetHabit(habitId, NETWORK, {
         contractAddress: CONTRACT_ADDRESS,
         contractName: CONTRACT_NAME,
       });
-      // The SDK Habit type may differ from the local Habit interface;
-      // cast through unknown to bridge the gap safely.
       return result as unknown as Habit | null;
     });
   },
@@ -82,26 +80,35 @@ export const contractService = {
   },
 
   async readUserHabits(userAddress: string): Promise<number[]> {
+    if (demoService.isDemoMode()) {
+      return demoService.readUserHabits();
+    }
     const result = await cacheUserHabitsRead(userAddress, () =>
       sdkGetUserHabits(userAddress, NETWORK, {
         contractAddress: CONTRACT_ADDRESS,
         contractName: CONTRACT_NAME,
-      })
+      }),
     );
 
     return result.habitIds;
   },
 
   async readPoolBalance(): Promise<number> {
+    if (demoService.isDemoMode()) {
+      return demoService.getPoolBalance();
+    }
     return cachePoolBalanceRead(() =>
       sdkGetPoolBalance(NETWORK, {
         contractAddress: CONTRACT_ADDRESS,
         contractName: CONTRACT_NAME,
-      })
+      }),
     );
   },
 
   async readEstimatedBonusShare(): Promise<number> {
+    if (demoService.isDemoMode()) {
+      return demoService.getEstimatedBonusShare();
+    }
     const response = await fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
@@ -115,6 +122,9 @@ export const contractService = {
   },
 
   async readUnclaimedCompletedHabits(): Promise<number> {
+    if (demoService.isDemoMode()) {
+      return demoService.getUnclaimedCompletedHabits();
+    }
     const response = await fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
@@ -128,6 +138,9 @@ export const contractService = {
   },
 
   async readUnclaimedCompletedWeight(): Promise<number> {
+    if (demoService.isDemoMode()) {
+      return demoService.getUnclaimedCompletedWeight();
+    }
     const response = await fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
@@ -141,6 +154,9 @@ export const contractService = {
   },
 
   async readUserStats(userAddress: string): Promise<UserStats> {
+    if (demoService.isDemoMode()) {
+      return demoService.readUserStats();
+    }
     const response = await fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
@@ -153,14 +169,12 @@ export const contractService = {
     const json = cvToJSON(response);
     if (json?.success === true) {
       const value = json.value?.value;
-      // get-user-stats returns { total-habits, habit-ids } only.
-      // Referral stats come from the separate get-referrer-stats function.
       return {
         totalHabits: Number(value?.['total-habits']?.value || 0),
         habitIds: value?.['habit-ids']?.value?.map((v: any) => Number(v.value)) || [],
       };
     }
-    
+
     return {
       totalHabits: 0,
       habitIds: [],
@@ -168,6 +182,9 @@ export const contractService = {
   },
 
   async readReferrer(userAddress: string): Promise<string | null> {
+    if (demoService.isDemoMode()) {
+      return demoService.readReferrer();
+    }
     const response = await fetchCallReadOnlyFunction({
       contractAddress: CONTRACT_ADDRESS,
       contractName: CONTRACT_NAME,
@@ -178,12 +195,9 @@ export const contractService = {
     });
 
     const json = cvToJSON(response);
-    // get-referrer returns (optional { referrer, set-at-block }) — not ok/err.
-    // cvToJSON renders some as { type: 'some', value: { ... } } and none as { type: 'none' }.
     if (json?.type === 'some') {
       return json.value?.referrer?.value || null;
     }
-    // Fallback: handle ok-wrapped optional (some contract calls wrap in ok)
     if (json?.success === true && json.value?.value?.referrer?.value) {
       return json.value.value.referrer.value;
     }
@@ -250,6 +264,9 @@ export const contractService = {
    * @throws Error if wallet not connected or transaction cancelled
    */
   async createHabit(name: string, stakeAmount: number): Promise<string> {
+    if (demoService.isDemoMode()) {
+      return demoService.createHabit(name, stakeAmount);
+    }
     const userAddress = walletService.getAddress();
     if (!userAddress) {
       throw new Error('Wallet not connected');
@@ -284,6 +301,9 @@ export const contractService = {
    * @throws Error if transaction cancelled
    */
   async checkIn(habitId: number): Promise<string> {
+    if (demoService.isDemoMode()) {
+      return demoService.checkIn(habitId);
+    }
     const userAddress = walletService.getAddress();
     if (!userAddress) {
       throw new Error('Wallet not connected');
@@ -319,6 +339,9 @@ export const contractService = {
    * @throws Error if wallet not connected or transaction cancelled
    */
   async withdrawStake(habitId: number, _stakeAmount: number): Promise<string> {
+    if (demoService.isDemoMode()) {
+      return demoService.withdrawStake(habitId);
+    }
     const userAddress = walletService.getAddress();
     if (!userAddress) {
       throw new Error('Wallet not connected');
@@ -329,13 +352,9 @@ export const contractService = {
         contractAddress: CONTRACT_ADDRESS,
         contractName: CONTRACT_NAME,
         functionName: 'withdraw-stake',
-        functionArgs: [
-          { type: 'uint', value: habitId.toString() } as any,
-        ],
+        functionArgs: [{ type: 'uint', value: habitId.toString() } as any],
         postConditions: [
-          Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`)
-            .willSendGte(_stakeAmount)
-            .ustx(),
+          Pc.principal(`${CONTRACT_ADDRESS}.${CONTRACT_NAME}`).willSendGte(_stakeAmount).ustx(),
         ],
         postConditionMode: PostConditionMode.Deny,
         network: NETWORK,
@@ -359,6 +378,9 @@ export const contractService = {
    * @throws Error if wallet not connected or transaction cancelled
    */
   async claimBonus(habitId: number): Promise<string> {
+    if (demoService.isDemoMode()) {
+      return demoService.claimBonus(habitId);
+    }
     const userAddress = walletService.getAddress();
     if (!userAddress) {
       throw new Error('Wallet not connected');
@@ -394,6 +416,9 @@ export const contractService = {
    * @throws Error if transaction cancelled
    */
   async slashHabit(habitId: number): Promise<string> {
+    if (demoService.isDemoMode()) {
+      return demoService.slashHabit(habitId);
+    }
     const userAddress = walletService.getAddress();
     if (!userAddress) {
       throw new Error('Wallet not connected');
@@ -429,6 +454,9 @@ export const contractService = {
    * @throws Error if wallet not connected or transaction cancelled
    */
   async registerReferrer(referrer: string): Promise<string> {
+    if (demoService.isDemoMode()) {
+      return demoService.registerReferrer(referrer);
+    }
     const userAddress = walletService.getAddress();
     if (!userAddress) {
       throw new Error('Wallet not connected');

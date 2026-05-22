@@ -31,7 +31,10 @@ export function TransactionTracker() {
                   {formatFunctionName(tx.functionName)}
                 </p>
               </div>
-              <p className="text-xs text-surface-500 dark:text-surface-400 truncate" title={tx.txId}>
+              <p
+                className="text-xs text-surface-500 dark:text-surface-400 truncate"
+                title={tx.txId}
+              >
                 {shortenTxId(tx.txId)}
               </p>
             </div>
@@ -42,7 +45,12 @@ export function TransactionTracker() {
               aria-label="Dismiss notification"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </ActionButton>
           </div>
@@ -86,16 +94,12 @@ function StatusDot({ status }: { status: TrackedTransaction['status'] }) {
 function StatusLabel({ status }: { status: TrackedTransaction['status'] }) {
   if (status === 'confirmed') {
     return (
-      <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-        Confirmed
-      </span>
+      <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Confirmed</span>
     );
   }
   if (status === 'failed') {
     return (
-      <span className="text-xs text-red-600 dark:text-red-400 font-medium">
-        Failed on-chain
-      </span>
+      <span className="text-xs text-red-600 dark:text-red-400 font-medium">Failed on-chain</span>
     );
   }
   return (
@@ -118,7 +122,5 @@ function shortenTxId(txId: string): string {
 }
 
 function formatFunctionName(name: string): string {
-  return name
-    .replace(/-/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+  return name.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }

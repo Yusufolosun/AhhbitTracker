@@ -1,6 +1,6 @@
 # API Reference
 
-Complete reference for all contract functions and data structures.
+This is the full technical reference for the AhhbitTracker smart contracts deployed on the Stacks blockchain. It documents every function you can call, what parameters they expect, and what they return. If you are a developer integrating with the contract, this is your go-to resource.
 
 ## Contract Information
 

@@ -101,13 +101,14 @@ export function HabitForm() {
 
   return (
     <SurfaceCard>
-      <h2 className="text-xl font-bold text-surface-900 dark:text-white mb-4">
-        Create New Habit
-      </h2>
+      <h2 className="text-xl font-bold text-surface-900 dark:text-white mb-4">Create New Habit</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="name" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+          <label
+            htmlFor="name"
+            className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2"
+          >
             Habit Name
           </label>
           <input
@@ -128,7 +129,10 @@ export function HabitForm() {
         </div>
 
         <div>
-          <label htmlFor="stake" className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+          <label
+            htmlFor="stake"
+            className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2"
+          >
             Stake Amount (STX)
           </label>
           <input
@@ -151,7 +155,11 @@ export function HabitForm() {
         </div>
 
         {error && (
-          <div id="form-error" role="alert" className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-lg">
+          <div
+            id="form-error"
+            role="alert"
+            className="p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-lg"
+          >
             <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
           </div>
         )}
@@ -175,7 +183,8 @@ export function HabitForm() {
 
       <div className="mt-4 p-4 bg-primary-50 dark:bg-primary-500/10 rounded-lg border border-primary-200 dark:border-primary-500/20">
         <p className="text-sm text-primary-800 dark:text-primary-300">
-          <strong>Tip:</strong> Choose a realistic daily habit. You'll need to check in every 16-32 hours!
+          <strong>Tip:</strong> Choose a realistic daily habit. You'll need to check in every 16-32
+          hours!
         </p>
       </div>
     </SurfaceCard>

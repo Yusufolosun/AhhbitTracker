@@ -9,12 +9,12 @@ export function AccountabilityPanel() {
   const { habits } = useHabits();
   const { createGroup, userGroups, isLoadingGroups } = useAccountability();
   const { showToast } = useToast();
-  
+
   const [selectedHabitId, setSelectedHabitId] = useState<number | ''>('');
   const [stakeAmount, setStakeAmount] = useState('10');
   const [duration, setDuration] = useState('14');
 
-  const activeHabits = habits.filter(h => h.isActive);
+  const activeHabits = habits.filter((h) => h.isActive);
 
   const handleCreateGroup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +39,7 @@ export function AccountabilityPanel() {
       <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-4">
         Accountability Groups
       </h3>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <h4 className="text-sm font-semibold text-surface-700 dark:text-surface-300 mb-3">
@@ -55,8 +55,10 @@ export function AccountabilityPanel() {
                 required
               >
                 <option value="">Select an active habit</option>
-                {activeHabits.map(h => (
-                  <option key={h.habitId} value={h.habitId}>{h.name} (#{h.habitId})</option>
+                {activeHabits.map((h) => (
+                  <option key={h.habitId} value={h.habitId}>
+                    {h.name} (#{h.habitId})
+                  </option>
                 ))}
               </select>
             </div>
@@ -84,7 +86,11 @@ export function AccountabilityPanel() {
                 />
               </div>
             </div>
-            <ActionButton type="submit" className="w-full text-sm" disabled={selectedHabitId === ''}>
+            <ActionButton
+              type="submit"
+              className="w-full text-sm"
+              disabled={selectedHabitId === ''}
+            >
               Create Group
             </ActionButton>
           </form>
@@ -99,9 +105,12 @@ export function AccountabilityPanel() {
           ) : userGroups && userGroups.length > 0 ? (
             <div className="space-y-2">
               {userGroups.map((groupId: number) => (
-                <div key={groupId} className="p-3 bg-surface-50 dark:bg-surface-800 rounded-lg border border-surface-200 dark:border-surface-700 flex justify-between items-center">
+                <div
+                  key={groupId}
+                  className="p-3 bg-surface-50 dark:bg-surface-800 rounded-lg border border-surface-200 dark:border-surface-700 flex justify-between items-center"
+                >
                   <span className="text-sm font-medium">Group #{groupId}</span>
-                  <button 
+                  <button
                     className="text-xs text-primary-500 hover:underline"
                     onClick={() => trackEvent('view_group_clicked', { groupId })}
                   >

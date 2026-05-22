@@ -4,11 +4,7 @@
  */
 import { showContractCall } from '@stacks/connect';
 import { cvToJSON, fetchCallReadOnlyFunction } from '@stacks/transactions';
-import {
-  ACCOUNTABILITY_CONTRACT_NAME,
-  CONTRACT_ADDRESS,
-  NETWORK,
-} from '../utils/constants';
+import { ACCOUNTABILITY_CONTRACT_NAME, CONTRACT_ADDRESS, NETWORK } from '../utils/constants';
 import { walletService } from './walletService';
 
 /** Application details for wallet transaction popups. */

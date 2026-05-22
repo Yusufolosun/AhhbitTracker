@@ -102,7 +102,10 @@ export function HabitCard({ habit }: HabitCardProps) {
       } else if (action === 'slash') {
         await slashHabit(habit.habitId);
         trackEvent('habit_finalize_succeeded', { habitId: habit.habitId });
-        showToast('Habit finalized! Stake will be moved to the pool once confirmed on-chain.', 'success');
+        showToast(
+          'Habit finalized! Stake will be moved to the pool once confirmed on-chain.',
+          'success',
+        );
       }
     } catch (err: unknown) {
       const message = getErrorMessage(err);
@@ -132,33 +135,62 @@ export function HabitCard({ habit }: HabitCardProps) {
   const estimatedBonus = estimatedBonusShare;
 
   const getBadge = () => {
-    if (habit.isCompleted) return { label: 'Completed', className: 'bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-400' };
-    if (!habit.isActive && !habit.isCompleted) return { label: 'Forfeited', className: 'bg-surface-100 text-surface-600 dark:bg-surface-700 dark:text-surface-400' };
-    if (windowState === 'expired') return { label: 'Window Expired', className: 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-400' };
-    if (windowState === 'cooldown') return { label: 'Cooldown', className: 'bg-sky-100 text-sky-800 dark:bg-sky-500/15 dark:text-sky-400' };
-    if (windowState === 'urgent') return { label: 'Expiring Soon', className: 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-400' };
-    return { label: 'Active', className: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-400' };
+    if (habit.isCompleted)
+      return {
+        label: 'Completed',
+        className: 'bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-400',
+      };
+    if (!habit.isActive && !habit.isCompleted)
+      return {
+        label: 'Forfeited',
+        className: 'bg-surface-100 text-surface-600 dark:bg-surface-700 dark:text-surface-400',
+      };
+    if (windowState === 'expired')
+      return {
+        label: 'Window Expired',
+        className: 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-400',
+      };
+    if (windowState === 'cooldown')
+      return {
+        label: 'Cooldown',
+        className: 'bg-sky-100 text-sky-800 dark:bg-sky-500/15 dark:text-sky-400',
+      };
+    if (windowState === 'urgent')
+      return {
+        label: 'Expiring Soon',
+        className: 'bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-400',
+      };
+    return {
+      label: 'Active',
+      className: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-400',
+    };
   };
 
   const badge = getBadge();
 
   return (
-    <div className={`card hover:shadow-md transition-all duration-200 ${
-      windowState === 'expired'
-        ? 'border-red-300 dark:border-red-500/30 hover:border-red-400 dark:hover:border-red-500/40'
-        : windowState === 'urgent'
-          ? 'border-amber-300 dark:border-amber-500/30 hover:border-amber-400 dark:hover:border-amber-500/40'
-          : 'hover:border-primary-500/30 dark:hover:border-primary-500/20'
-    }`}>
+    <div
+      className={`card hover:shadow-md transition-all duration-200 ${
+        windowState === 'expired'
+          ? 'border-red-300 dark:border-red-500/30 hover:border-red-400 dark:hover:border-red-500/40'
+          : windowState === 'urgent'
+            ? 'border-amber-300 dark:border-amber-500/30 hover:border-amber-400 dark:hover:border-amber-500/40'
+            : 'hover:border-primary-500/30 dark:hover:border-primary-500/20'
+      }`}
+    >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-1">
-            <span className="text-xs font-normal text-surface-400 dark:text-surface-500 mr-1.5">#{habit.habitId}</span>
+            <span className="text-xs font-normal text-surface-400 dark:text-surface-500 mr-1.5">
+              #{habit.habitId}
+            </span>
             {habit.name}
           </h3>
           <div className="flex items-center space-x-2">
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badge.className}`}>
+            <span
+              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badge.className}`}
+            >
               {badge.label}
             </span>
             {canWithdraw && (
@@ -171,9 +203,7 @@ export function HabitCard({ habit }: HabitCardProps) {
 
         {/* Streak Display */}
         <div className="text-right">
-          <div className="text-3xl font-bold text-primary-500">
-            {habit.currentStreak}
-          </div>
+          <div className="text-3xl font-bold text-primary-500">{habit.currentStreak}</div>
           <div className="text-xs text-gray-500">day streak</div>
         </div>
       </div>
@@ -185,7 +215,8 @@ export function HabitCard({ habit }: HabitCardProps) {
             Check-in window missed
           </p>
           <p className="text-xs text-red-600 dark:text-red-400 mt-1">
-            Late check-ins apply a 10% penalty per missed window and reset your streak. This habit continues while stake remains.
+            Late check-ins apply a 10% penalty per missed window and reset your streak. This habit
+            continues while stake remains.
           </p>
         </div>
       )}
@@ -224,7 +255,10 @@ export function HabitCard({ habit }: HabitCardProps) {
         </div>
         <div>
           <p className="text-xs text-surface-500 dark:text-surface-400">Last Check-in</p>
-          <p className="text-sm font-semibold text-surface-900 dark:text-white" title={`Block ${habit.lastCheckInBlock}`}>
+          <p
+            className="text-sm font-semibold text-surface-900 dark:text-white"
+            title={`Block ${habit.lastCheckInBlock}`}
+          >
             {currentBlock
               ? blocksAgo(currentBlock, habit.lastCheckInBlock)
               : `Block ${habit.lastCheckInBlock}`}
@@ -236,9 +270,7 @@ export function HabitCard({ habit }: HabitCardProps) {
             <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
               {habit.bonusWeight ? `${habit.bonusWeight}x` : '1x'}
             </p>
-            <p className="text-[10px] text-surface-400 mt-0.5">
-              Boosted by successful referrals
-            </p>
+            <p className="text-[10px] text-surface-400 mt-0.5">Boosted by successful referrals</p>
           </div>
         )}
       </div>
@@ -251,7 +283,13 @@ export function HabitCard({ habit }: HabitCardProps) {
             disabled={isCheckingIn || !canSubmitCheckIn}
             className="btn-primary w-full"
           >
-            {isCheckingIn ? 'Checking In...' : canSubmitCheckIn ? (windowState === 'expired' ? 'Check In (Late)' : 'Check In') : 'Check In Not Ready'}
+            {isCheckingIn
+              ? 'Checking In...'
+              : canSubmitCheckIn
+                ? windowState === 'expired'
+                  ? 'Check In (Late)'
+                  : 'Check In'
+                : 'Check In Not Ready'}
           </button>
         )}
 
@@ -266,21 +304,13 @@ export function HabitCard({ habit }: HabitCardProps) {
         )}
 
         {canClaimBonus && isOwnHabit && (
-          <button
-            onClick={handleClaimBonus}
-            disabled={isClaiming}
-            className="btn-secondary w-full"
-          >
+          <button onClick={handleClaimBonus} disabled={isClaiming} className="btn-secondary w-full">
             {isClaiming ? 'Claiming...' : 'Claim Bonus'}
           </button>
         )}
 
         {windowState === 'expired' && !isOwnHabit && habit.isActive && (
-          <button
-            onClick={handleSlashHabit}
-            disabled={isSlashing}
-            className="btn-secondary w-full"
-          >
+          <button onClick={handleSlashHabit} disabled={isSlashing} className="btn-secondary w-full">
             {isSlashing ? 'Finalizing...' : 'Finalize Expired Habit'}
           </button>
         )}
@@ -302,7 +332,9 @@ export function HabitCard({ habit }: HabitCardProps) {
       {habit.isActive && (
         <div className="mt-4 pt-4 border-t border-surface-200 dark:border-surface-700">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs text-surface-600 dark:text-surface-400">Progress to Withdrawal</span>
+            <span className="text-xs text-surface-600 dark:text-surface-400">
+              Progress to Withdrawal
+            </span>
             <span className="text-xs font-medium text-surface-900 dark:text-white">
               {habit.currentStreak}/{MIN_STREAK_FOR_WITHDRAWAL} days
             </span>
@@ -317,7 +349,9 @@ export function HabitCard({ habit }: HabitCardProps) {
           >
             <div
               className="bg-primary-500 h-2 rounded-full transition-all duration-500"
-              style={{ width: `${Math.min((habit.currentStreak / MIN_STREAK_FOR_WITHDRAWAL) * 100, 100)}%` }}
+              style={{
+                width: `${Math.min((habit.currentStreak / MIN_STREAK_FOR_WITHDRAWAL) * 100, 100)}%`,
+              }}
             ></div>
           </div>
         </div>
@@ -341,11 +375,15 @@ export function HabitCard({ habit }: HabitCardProps) {
             </div>
             <div className="flex justify-between">
               <dt className="text-surface-500 dark:text-surface-400">Stake</dt>
-              <dd className="font-medium text-surface-900 dark:text-white">{formatSTX(habit.stakeAmount)} STX</dd>
+              <dd className="font-medium text-surface-900 dark:text-white">
+                {formatSTX(habit.stakeAmount)} STX
+              </dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-surface-500 dark:text-surface-400">Current Streak</dt>
-              <dd className="font-medium text-surface-900 dark:text-white">{habit.currentStreak} days</dd>
+              <dd className="font-medium text-surface-900 dark:text-white">
+                {habit.currentStreak} days
+              </dd>
             </div>
           </dl>
           <p className="text-xs text-amber-600 dark:text-amber-400">
@@ -372,15 +410,22 @@ export function HabitCard({ habit }: HabitCardProps) {
             </div>
             <div className="flex justify-between">
               <dt className="text-surface-500 dark:text-surface-400">Final Streak</dt>
-              <dd className="font-medium text-surface-900 dark:text-white">{habit.currentStreak} days</dd>
+              <dd className="font-medium text-surface-900 dark:text-white">
+                {habit.currentStreak} days
+              </dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-surface-500 dark:text-surface-400">Est. Bonus</dt>
-              <dd className="font-medium text-emerald-600 dark:text-emerald-400">{formatSTX(estimatedBonus)} STX</dd>
+              <dd className="font-medium text-emerald-600 dark:text-emerald-400">
+                {formatSTX(estimatedBonus)} STX
+              </dd>
             </div>
           </dl>
           <p className="text-xs text-surface-500 dark:text-surface-400">
-            Bonus payout is the current equal-share estimate from contract state for {unclaimedCompletedHabits || 0} pending claimant{(unclaimedCompletedHabits || 0) === 1 ? '' : 's'}. The actual amount may differ if claims settle before your transaction confirms.
+            Bonus payout is the current equal-share estimate from contract state for{' '}
+            {unclaimedCompletedHabits || 0} pending claimant
+            {(unclaimedCompletedHabits || 0) === 1 ? '' : 's'}. The actual amount may differ if
+            claims settle before your transaction confirms.
           </p>
           <p className="text-xs text-amber-600 dark:text-amber-400">
             This action is irreversible and will incur a gas fee.
@@ -398,7 +443,10 @@ export function HabitCard({ habit }: HabitCardProps) {
         isLoading={isSlashing}
       >
         <div className="space-y-2">
-          <p>You are about to finalize an expired habit. This will apply the missed-window penalty and move the forfeited portion to the pool:</p>
+          <p>
+            You are about to finalize an expired habit. This will apply the missed-window penalty
+            and move the forfeited portion to the pool:
+          </p>
           <dl className="bg-surface-50 dark:bg-surface-700 rounded-lg p-3 space-y-1">
             <div className="flex justify-between">
               <dt className="text-surface-500 dark:text-surface-400">Habit</dt>
@@ -406,15 +454,23 @@ export function HabitCard({ habit }: HabitCardProps) {
             </div>
             <div className="flex justify-between">
               <dt className="text-surface-500 dark:text-surface-400">Owner</dt>
-              <dd className="font-medium text-surface-900 dark:text-white truncate max-w-[200px]" title={habit.owner}>{habit.owner}</dd>
+              <dd
+                className="font-medium text-surface-900 dark:text-white truncate max-w-[200px]"
+                title={habit.owner}
+              >
+                {habit.owner}
+              </dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-surface-500 dark:text-surface-400">Stake Amount</dt>
-              <dd className="font-medium text-surface-900 dark:text-white">{formatSTX(habit.stakeAmount)} STX</dd>
+              <dd className="font-medium text-surface-900 dark:text-white">
+                {formatSTX(habit.stakeAmount)} STX
+              </dd>
             </div>
           </dl>
           <p className="text-xs text-surface-500 dark:text-surface-400">
-            Anyone can finalize an expired habit. The forfeited portion will be added to the pool for future bonus claims.
+            Anyone can finalize an expired habit. The forfeited portion will be added to the pool
+            for future bonus claims.
           </p>
           <p className="text-xs text-amber-600 dark:text-amber-400">
             This action will incur a gas fee.
