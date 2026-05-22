@@ -269,6 +269,9 @@ export const contractService = {
    * @throws Error if wallet not connected or transaction cancelled
    */
   async createHabit(name: string, stakeAmount: number): Promise<string> {
+    if (demoService.isDemoMode()) {
+      return demoService.createHabit(name, stakeAmount);
+    }
     const userAddress = walletService.getAddress();
     if (!userAddress) {
       throw new Error('Wallet not connected');
@@ -303,6 +306,9 @@ export const contractService = {
    * @throws Error if transaction cancelled
    */
   async checkIn(habitId: number): Promise<string> {
+    if (demoService.isDemoMode()) {
+      return demoService.checkIn(habitId);
+    }
     const userAddress = walletService.getAddress();
     if (!userAddress) {
       throw new Error('Wallet not connected');
@@ -338,6 +344,9 @@ export const contractService = {
    * @throws Error if wallet not connected or transaction cancelled
    */
   async withdrawStake(habitId: number, _stakeAmount: number): Promise<string> {
+    if (demoService.isDemoMode()) {
+      return demoService.withdrawStake(habitId);
+    }
     const userAddress = walletService.getAddress();
     if (!userAddress) {
       throw new Error('Wallet not connected');
@@ -378,6 +387,9 @@ export const contractService = {
    * @throws Error if wallet not connected or transaction cancelled
    */
   async claimBonus(habitId: number): Promise<string> {
+    if (demoService.isDemoMode()) {
+      return demoService.claimBonus(habitId);
+    }
     const userAddress = walletService.getAddress();
     if (!userAddress) {
       throw new Error('Wallet not connected');
@@ -413,6 +425,9 @@ export const contractService = {
    * @throws Error if transaction cancelled
    */
   async slashHabit(habitId: number): Promise<string> {
+    if (demoService.isDemoMode()) {
+      return demoService.slashHabit(habitId);
+    }
     const userAddress = walletService.getAddress();
     if (!userAddress) {
       throw new Error('Wallet not connected');
@@ -448,6 +463,9 @@ export const contractService = {
    * @throws Error if wallet not connected or transaction cancelled
    */
   async registerReferrer(referrer: string): Promise<string> {
+    if (demoService.isDemoMode()) {
+      return demoService.registerReferrer(referrer);
+    }
     const userAddress = walletService.getAddress();
     if (!userAddress) {
       throw new Error('Wallet not connected');
