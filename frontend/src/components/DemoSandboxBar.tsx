@@ -95,54 +95,56 @@ export function DemoSandboxBar() {
         </div>
       </div>
 
-      <div className="mt-4 pt-3 border-t border-amber-500/20 flex flex-wrap gap-2 items-center justify-between">
+      <div className="mt-4 pt-3 border-t border-amber-500/20 flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
         {/* Fast forward controls */}
-        <div className="flex flex-wrap gap-2 items-center">
-          <span className="text-xs font-semibold text-amber-800 dark:text-amber-400 mr-1">
+        <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+          <span className="text-xs font-semibold text-amber-800 dark:text-amber-400 whitespace-nowrap mb-1 sm:mb-0">
             Time Travel:
           </span>
-          <button
-            type="button"
-            disabled={isAdvancing}
-            onClick={() => handleAdvanceBlocks(100, '16 Hours (Check-In opens)')}
-            className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-50"
-            title="Advance 100 blocks to open the check-in window (96+ block cooldown)"
-          >
-            +16 Hrs (Open Check-In)
-          </button>
-          <button
-            type="button"
-            disabled={isAdvancing}
-            onClick={() => handleAdvanceBlocks(200, '32 Hours (Miss Check-In)')}
-            className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-50"
-            title="Advance 200 blocks to miss the check-in window (192 blocks maximum)"
-          >
-             +32 Hrs (Miss Window)
-          </button>
-          <button
-            type="button"
-            disabled={isAdvancing}
-            onClick={() => handleAdvanceBlocks(1000, '7 Days (Goal Completion)')}
-            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-50"
-            title="Advance 1000 blocks to simulate a full week"
-          >
-            +7 Days
-          </button>
+          <div className="grid grid-cols-1 sm:flex sm:flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={isAdvancing}
+              onClick={() => handleAdvanceBlocks(100, '16 Hours (Check-In opens)')}
+              className="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 text-center min-h-[40px] sm:min-h-0 flex items-center justify-center"
+              title="Advance 100 blocks to open the check-in window (96+ block cooldown)"
+            >
+              +16 Hrs (Open Check-In)
+            </button>
+            <button
+              type="button"
+              disabled={isAdvancing}
+              onClick={() => handleAdvanceBlocks(200, '32 Hours (Miss Check-In)')}
+              className="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 text-center min-h-[40px] sm:min-h-0 flex items-center justify-center"
+              title="Advance 200 blocks to miss the check-in window (192 blocks maximum)"
+            >
+              +32 Hrs (Miss Window)
+            </button>
+            <button
+              type="button"
+              disabled={isAdvancing}
+              onClick={() => handleAdvanceBlocks(1000, '7 Days (Goal Completion)')}
+              className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-50 text-center min-h-[40px] sm:min-h-0 flex items-center justify-center"
+              title="Advance 1000 blocks to simulate a full week"
+            >
+              +7 Days
+            </button>
+          </div>
         </div>
 
         {/* Sandbox Utilities */}
-        <div className="flex gap-2">
+        <div className="grid grid-cols-2 md:flex gap-2">
           <button
             type="button"
             onClick={handleAddFunds}
-            className="px-3 py-1.5 bg-surface-200 dark:bg-surface-800 hover:bg-surface-300 dark:hover:bg-surface-700 text-surface-700 dark:text-surface-300 rounded-lg text-xs font-semibold transition-colors"
+            className="px-3 py-2 bg-surface-200 dark:bg-surface-800 hover:bg-surface-300 dark:hover:bg-surface-700 text-surface-700 dark:text-surface-300 rounded-lg text-xs font-semibold transition-colors text-center min-h-[40px] sm:min-h-0 flex items-center justify-center"
           >
             +10 STX Demo Funds
           </button>
           <button
             type="button"
             onClick={handleResetDemo}
-            className="px-3 py-1.5 border border-red-500/30 hover:bg-red-500/10 text-red-500 rounded-lg text-xs font-semibold transition-colors"
+            className="px-3 py-2 border border-red-500/30 hover:bg-red-500/10 text-red-500 rounded-lg text-xs font-semibold transition-colors text-center min-h-[40px] sm:min-h-0 flex items-center justify-center"
           >
             Reset Sandbox
           </button>
