@@ -28,8 +28,6 @@
 - [Getting Started](#getting-started)
   - [Testing](#testing)
   - [External Packages](#external-packages)
-  - [Production Build](#production-build)
-- [Deploy to Vercel](#deploy-to-vercel)
 - [Contract Reference](#contract-reference)
 - [Security](#security)
 - [Documentation](#documentation)
@@ -141,7 +139,6 @@ See [docs/SECURITY.md](docs/SECURITY.md) for the full security model.
 | [Architecture](docs/ARCHITECTURE.md) | System design and data flow |
 | [Mobile Architecture](docs/mobile/README.md) | Mobile app design and setup |
 | [FAQ](docs/FAQ.md) | Common questions |
-
 | [Security](docs/SECURITY.md) | Security model |
 
 ## Contributing
