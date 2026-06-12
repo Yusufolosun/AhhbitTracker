@@ -114,7 +114,12 @@ function AppContent() {
   }, [habits]);
 
   if (!walletState.isConnected) {
-    return <LandingPage />;
+    return (
+      <>
+        <LandingPage />
+        <Footer />
+      </>
+    );
   }
 
   return (
