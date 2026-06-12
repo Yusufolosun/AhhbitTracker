@@ -43,7 +43,7 @@ export function PoolDisplay() {
                 From missed check-in penalties
               </p>
               <p className="text-[10px] text-primary-500/60 dark:text-primary-400/40 mt-0.5">
-                Total Unclaimed Weight: {unclaimedCompletedWeight}
+                Total Pending Claimants: {unclaimedCompletedWeight}
               </p>
             </div>
             <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/25">
