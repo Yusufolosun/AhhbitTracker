@@ -124,7 +124,6 @@ temp/
 *~
 .cache/
 nul
-fix_encoding.py
 
 # ============================================
 # MISCELLANEOUS
