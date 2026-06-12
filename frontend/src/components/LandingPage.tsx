@@ -79,9 +79,9 @@ export function LandingPage() {
           </h1>
 
           <p className="max-w-2xl mx-auto text-lg text-surface-600 dark:text-surface-300 mb-10 leading-relaxed">
-            Put a small deposit on the line. Check in daily. Stay consistent and earn rewards. Miss
-            a day? Lose a small portion to the community pool. It is the accountability app powered
-            by real stakes.
+            Stake a small deposit, check in daily, and earn rewards for staying consistent. Miss a
+            day? A portion goes to a shared pool that rewards everyone who showed up. Real money,
+            real motivation.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
@@ -90,7 +90,7 @@ export function LandingPage() {
               isLoading={isLoading}
               className="px-8 py-4 text-base shadow-lg shadow-primary-500/20 hover:shadow-primary-500/30 transition-shadow"
             >
-              Connect Wallet & Start
+              Connect Wallet to Get Started
             </ActionButton>
             <button
               type="button"
@@ -102,8 +102,8 @@ export function LandingPage() {
           </div>
 
           <p className="text-sm text-surface-400 dark:text-surface-500">
-            No wallet? The demo lets you explore the full app with simulated funds — zero setup
-            required.
+            No wallet yet? Try the demo to explore the full app with simulated funds — no setup
+            needed.
           </p>
         </div>
       </section>
