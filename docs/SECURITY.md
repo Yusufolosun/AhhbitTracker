@@ -1,368 +1,74 @@
-# Security Best Practices
+# Security Policy
 
-Security guidelines for AhhbitTracker developers and users.
+This document outlines the security model, policies, and responsibilities for AhhbitTracker users and developers.
 
-## Contract Security
+## Smart Contract Security
 
 ### Immutability
+The AhhbitTracker smart contracts are immutable once deployed to the Stacks blockchain. 
+- **No Admin Roles**: There are no admin functions, owner backdoors, or upgrade keys.
+- **Rule Enforcement**: The rules (7-day streak requirements, 10% penalty on missed check-ins) are permanently hardcoded and cannot be modified by any party.
+- **Auditing**: The smart contracts enforce access control directly on-chain. Only the owner of a habit can log check-ins, withdraw deposits, or claim bonuses.
 
-**Status:** Contract is immutable after deployment
-
-**What this means:**
-- No admin functions to modify rules
-- No upgrade mechanism
-- Code cannot be changed
-- All rules are permanent
-
-**Implications:**
-- Bugs cannot be patched
-- New features require new deployment
-- Users can trust the code
+### Core Safeguards
+- **Reentrancy**: State changes occur before external asset transfers. Clarity's execution environment prevents reentrancy.
+- **Overflow Protection**: Clarity has native overflow checking. Any overflow error immediately aborts the transaction.
+- **Denial of Service**: All contract functions are designed to operate in constant time with predictable gas costs, eliminating looping and transaction blocking risks.
 
 ---
 
-## Smart Contract Audit
+## User Security Guidelines
 
-### Self-Audit Checklist
+### Key Protection
+Your Stacks private key or 12-word seed phrase is your identity and ownership key.
+- **Never share** your seed phrase or private key with anyone, including the development team.
+- **Never input** your seed phrase into websites or applications. Use trusted browser extensions like Leather or Xverse.
+- Store backups offline, in a physical format, or in a secure, encrypted password manager.
 
-**Access Control:** Verified
-- Only owners can check in their habits
-- Only owners can withdraw their stakes
-- No privileged admin functions
+### Transaction Verification
+Before signing any transaction in your wallet:
+1. **Verify Contract Address**: Ensure the contract is the official deployer address:
+   `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3`
+2. **Review Functions & Fees**: Verify the function name, parameters, and gas fee.
+3. **Verify STX Amounts**: Double-check the stake deposit amount.
 
-**Reentrancy:** Verified
-- No external calls before state updates
-- STX transfers use built-in functions
-- No recursion risks
-
-**Integer Overflow:** Verified
-- Clarity has built-in overflow protection
-- All arithmetic operations safe
-
-**Denial of Service:** Verified
-- No unbounded loops
-- No user-controllable gas consumption
-- Constant-time operations
-
-**Front-Running:** Low Risk
-- Check-in timing could be front-run
-- Mitigation: Transaction ordering doesn't affect fairness
-- Impact: Low
+### Privacy Best Practices
+All transactions, habit names, and deposit amounts on the Stacks blockchain are public.
+- Do not use personal or sensitive information in your habit names.
+- Use generic names (e.g., "Daily Exercise" or "Coding Practice").
 
 ---
 
-## User Security
+## Developer Security Guidelines
 
-### Wallet Security
+### Secrets Management
+- Do not commit `.env`, `.env.local`, or any private key settings to git.
+- Use `.env.example` as a template for public configuration references.
+- Private keys must only reside in gitignored configuration files (such as `settings/Mainnet.toml`).
 
-**Private Key Management:**
-
-**NEVER:**
-- Share private keys
-- Store keys in plain text
-- Commit keys to git
-- Send keys via email/chat
-- Screenshot keys
-
-**ALWAYS:**
-- Use hardware wallets when possible
-- Backup seed phrases offline
-- Store in encrypted format
-- Use separate wallets for testing
+### RPC Node Security
+- Only use trusted Stacks mainnet RPC nodes, such as Hiro API (`https://api.mainnet.hiro.so`).
+- Avoid connecting to unverified public nodes.
 
 ---
 
-### Transaction Security
+## Security Vulnerability Disclosure
 
-**Before Signing:**
+If you discover a security vulnerability, please report it responsibly:
 
-1. **Verify contract address**
-   ```
-   SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3
-   ```
+### Contact
+- **GitHub Security Advisories**: Submit a private advisory via [GitHub Security Advisories](https://github.com/Yusufolosun/AhhbitTracker/security/advisories/new).
+- **Email**: security@ahhbittracker.com
 
-2. **Check function name** matches intention
-
-3. **Review stake amount** in microSTX
-
-4. **Confirm network** (mainnet vs testnet)
-
-### Mobile Biometric Protection
-
-- Sensitive mobile actions such as create habit, check-in, withdraw, claim bonus, save address, and clear address require biometric confirmation when the device supports it
-
-**Never sign:**
-- Transactions from unknown sources
-- Requests for full wallet access
-- Transactions with unclear parameters
-
----
-
-### Data Privacy
-
-**Public Information:**
-- All transactions visible on blockchain
-- Habit names stored on-chain
-- Stake amounts publicly viewable
-- Check-in history traceable
-
-**Not Public:**
-- Your real-world identity (only address visible)
-- Personal details (only if you include in habit name)
-
-**Best Practice:**
-- Don't use identifying information in habit names
-- Use generic names: "Daily Exercise" not "John's Morning Run"
-
----
-
-## Developer Security
-
-### Environment Variables
-
-**Never commit:**
-```bash
-# .env files
-.env
-.env.local
-.env.production
-
-# Wallet files
-*.wallet
-*.keystore
-
-# Private keys
-*private-key*
-settings/Mainnet.toml
-```
-
-**Always use:**
-- `.env.example` templates
-- Environment variable injection
-- Secret management services in production
-
----
-
-### Code Security
-
-**Input Validation:**
-```typescript
-// Good
-function validateHabitName(name: string): boolean {
-  if (!name || name.length === 0) return false;
-  if (name.length > 50) return false;
-  return true;
-}
-
-// Bad
-function createHabit(name: string) {
-  // No validation - trusts user input
-}
-```
-
-**Error Handling:**
-```typescript
-// Good
-try {
-  const result = await createHabit(name, stake);
-  if ('error' in result) {
-    console.error('Transaction failed:', result.error);
-    return;
-  }
-} catch (error) {
-  console.error('Unexpected error:', error);
-}
-
-// Bad
-const result = await createHabit(name, stake);
-// No error handling
-```
-
----
-
-## Network Security
-
-### RPC Endpoint Security
-
-**Use trusted endpoints:**
-
-**Recommended:**
-```typescript
-import { STACKS_MAINNET } from '@stacks/network';
-
-const network = STACKS_MAINNET;
-// Uses: https://api.mainnet.hiro.so
-```
-
-**Avoid:**
-- Random public endpoints
-- Unverified third-party APIs
-- HTTP (non-HTTPS) endpoints
-
----
-
-### Rate Limiting
-
-**Respect API limits:**
-```typescript
-// Good - with delay
-for (let i = 0; i < 10; i++) {
-  await createHabit(...);
-  await sleep(2000); // 2 second delay
-}
-
-// Bad - will be rate limited
-for (let i = 0; i < 10; i++) {
-  await createHabit(...); // No delay
-}
-```
-
----
-
-## Contract-Specific Risks
-
-### Known Limitations
-
-**1. Time-Based Forfeiture**
-
-**Risk:** Network congestion could prevent timely check-in and trigger 10% per missed window penalties
-
-**Mitigation:**
-- Check in early (don't wait until last minute)
-- Monitor network status
-- Have backup plan for critical habits
-
-**2. Pool Distribution**
-
-**Risk:** Bonus calculation simplified (equal distribution)
-
-**Mitigation:**
-- Understand bonus is best-effort
-- Don't rely on bonuses for financial planning
-- Main value is stake recovery
-
-**3. No Emergency Stop**
-
-**Risk:** Cannot pause contract if issues found
-
-**Mitigation:**
-- Contract is simple and well-tested
-- No admin functions = no admin risk
-- Users can stop using anytime
-
----
-
-## Incident Response
-
-### If You Suspect Compromise
-
-**Wallet compromised:**
-
-1. **Immediately:**
-   - Stop using affected wallet
-   - Transfer remaining funds to new wallet
-   - Never use compromised wallet again
-
-2. **Do NOT:**
-   - Try to "rescue" funds (may lose more)
-   - Share details publicly before securing funds
-
-**Contract issue:**
-
-1. **Verify issue:**
-   - Check transaction on Explorer
-   - Review contract code
-   - Confirm not user error
-
-2. **Report:**
-   - GitHub Issues: https://github.com/Yusufolosun/AhhbitTracker/issues
-   - Include: transaction ID, expected vs actual behavior
-
----
-
-## Testing Security
-
-### Testnet First
-
-Always test on devnet or testnet before using mainnet with real funds. This lets you verify behavior safely without financial risk.
-
----
-
-### Security Checklist
-
-Before deploying or using:
-
-**Contract:**
-- [ ] All functions tested
-- [ ] No admin backdoors
-- [ ] Access control verified
-- [ ] Error handling complete
-- [ ] Gas costs reasonable
-
-**Integration:**
-- [ ] Input validation implemented
-- [ ] Error handling robust
-- [ ] No sensitive data in logs
-- [ ] Rate limiting respected
-- [ ] Network security verified
-
-**User:**
-- [ ] Private keys secured
-- [ ] Wallet backed up
-- [ ] Contract address verified
-- [ ] Transaction parameters reviewed
-- [ ] Test wallet funded first
-
----
-
-## Responsible Disclosure
-
-Found a security issue?
-
-**Contact:**
-- **Email:** security@ahhbittracker.com (or create private security advisory on GitHub)
-- **GitHub Security Advisory:** https://github.com/Yusufolosun/AhhbitTracker/security/advisories/new
-
-**DO:**
-1. Email details privately (if serious)
-2. Provide: steps to reproduce, impact assessment, potential fix
-3. Wait for response before public disclosure (90 days recommended)
-4. Allow time for patch development and testing
-
-**DON'T:**
-1. Post publicly immediately
-2. Exploit for personal gain
-3. Disclose user data
-4. Demand payment for disclosure
-
-**Recognition:**
-- Acknowledged in release notes
-- Listed in CONTRIBUTORS.md
-- Public credit once resolved (if desired)
+### Guidelines
+1. Do not exploit the vulnerability for personal gain or disclose user data.
+2. Provide a clear description, reproduction steps, and potential mitigations.
+3. Allow the development team up to 90 days to verify and address the vulnerability before public disclosure.
 
 ---
 
 ## Resources
 
-**Stacks Security:**
-- Clarity Security: https://docs.stacks.co/clarity/security
-- Best Practices: https://docs.stacks.co/build-apps/guides/security
-
-**Wallet Security:**
-- Hardware Wallets: https://leather.io
-- Seed Phrase Security: https://www.ledger.com/academy
-
-**General:**
-- OWASP: https://owasp.org
-- Smart Contract Security: https://consensys.github.io/smart-contract-best-practices/
-
----
-
-## Conclusion
-
-Security is shared responsibility:
-- **Contract:** Built with security-first design
-- **Developers:** Follow best practices
-- **Users:** Protect credentials and verify transactions
-
-Stay vigilant, test thoroughly, and never trust blindly.
+- **Stacks Security Documentation**: [Clarity Security Guidelines](https://docs.stacks.co/clarity/security)
+- **Stacks Developer Portal**: [Build Secure Apps on Stacks](https://docs.stacks.co/build-apps/guides/security)
+- **Leather Wallet Security Guide**: [Leather Security Support](https://leather.io)
