@@ -1,65 +1,69 @@
 # Frequently Asked Questions (FAQ)
 
-## 💡 About AhhbitTracker
+## About AhhbitTracker
 
 ### What is AhhbitTracker?
-AhhbitTracker is a habit-building app where you put a tiny amount of STX (a digital token) on the line to keep you accountable. Check in daily to build your streak. If you finish your 7-day streak, you get your money back plus a bonus! If you miss a day, you lose a tiny portion to the bonus pool.
+AhhbitTracker is a habit-building app where you stake a small amount of STX as a commitment to stay consistent. By checking in daily, you build your streak. Completing a 7-day streak allows you to withdraw your deposit plus a community-funded bonus. Missing a day forfeits a portion of your stake to the reward pool.
 
 ### Does this require real money?
-Yes, it uses STX, which is a real cryptocurrency. However, you can use our **Interactive Demo Mode** (Sandbox) on the website to practice with simulated tokens and mock habits for free!
+Yes, it uses STX, which is a real cryptocurrency. However, you can use **Demo Mode** on the website to practice with simulated tokens and mock habits for free.
 
 ### Why does it use blockchain instead of a normal server?
-Using the Stacks blockchain means:
-1.  **Trustless Enforcement**: No company can take your money or change the rules. Your deposit is held by an automated program (smart contract) that acts exactly as coded.
-2.  **No Sign-ups**: You don't need to share your email, phone number, or password. Your wallet address is your secure log-in.
+Using the Stacks blockchain provides:
+1. **Trustless Enforcement**: No company can seize your money or change the rules. Your deposit is held by a smart contract that acts strictly as coded.
+2. **Privacy**: No sign-ups, passwords, or personal details are required. Your wallet address is your secure log-in.
 
 ---
 
-## 🔑 Getting Started & Wallets
+## Getting Started & Wallets
 
 ### What is a Stacks wallet?
-A Stacks wallet is a secure application that holds your digital tokens and lets you interact with the app. Think of it as a secure login card.
+A Stacks wallet is a secure application that holds your digital tokens and lets you sign transactions. Think of it as your secure identity card on the blockchain.
 
 ### How do I get a Stacks wallet?
-You can install Leather or Xverse as a browser extension (desktop) or mobile app:
-*   [Download Xverse Wallet](https://xverse.app)
-*   [Download Leather Wallet](https://leather.io)
+You can install Leather or Xverse as a browser extension or mobile app:
+* [Xverse Wallet](https://xverse.app)
+* [Leather Wallet](https://leather.io)
 
 ### How do I get STX tokens?
-If you are ready to use real funds:
-1.  Buy STX on an exchange (like Coinbase, Binance, or local P2P platforms).
-2.  Withdraw the STX to your personal Stacks wallet address (which looks like a long string of letters and numbers starting with `SP`).
+To use real funds:
+1. Buy STX on a reputable exchange (such as Coinbase or Binance).
+2. Transfer the STX to your personal Stacks wallet address (a string starting with `SP`).
 
 ---
 
-## ⏱️ Habit Mechanics & Block Times
+## Habit Mechanics & Timing
 
-### What is a "Block" and why does the app use it for time?
-The Stacks blockchain updates in chunks called "blocks" (secured by Bitcoin) approximately every 10 minutes. The app counts time using blocks instead of traditional hours so that the contract rules can be checked fairly on-chain.
-*   **96 blocks** is about **16 hours**.
-*   **192 blocks** is about **32 hours**.
+### What happens to my habit if I miss just one day?
+If you miss the 32-hour check-in window, a 10% penalty is applied to your remaining deposit, and your streak resets to zero. Your stake is not fully lost. You can continue checking in to start a new streak, or finalize the habit to retrieve your remaining balance.
+
+### Can I create multiple habits?
+Yes, you can track multiple habits concurrently. Each habit is managed independently with its own stake, streak tracker, and check-in times.
+
+### What is a "Block" and why is it used for time?
+The Stacks blockchain updates in blocks approximately every 10 minutes. The app counts time using blocks so that contract rules can be verified on-chain.
+* **96 blocks** is approximately **16 hours**.
+* **192 blocks** is approximately **32 hours**.
 
 ### Why can't I check in immediately after creating a habit?
-To prevent cheating, your first check-in window starts **after** your habit is created. You must wait at least 96 blocks (~16 hours) before you can log your first check-in. If you try earlier, you will see a "Check In Not Ready" warning.
+Your first check-in window starts after your habit is created. You must wait at least 96 blocks (~16 hours) before logging your first check-in. This prevents immediate double-check-ins and ensures real daily spacing.
 
 ### What is the check-in window?
-After your last check-in, you have a window between **16 hours and 32 hours** to check in again.
-*   If you check in too early (before 16 hours), you are in **cooldown** and can't check in yet.
-*   If you check in on time (between 16 and 32 hours), your streak increases.
-*   If you miss the window (after 32 hours), your streak resets to zero and a **10% penalty** is applied.
+* **Cooldown**: Before 16 hours have passed. You cannot check in yet.
+* **On Time**: Between 16 and 32 hours after your last check-in. Your streak increases.
+* **Late/Missed**: After 32 hours. Your streak resets to zero and a 10% penalty is applied.
 
 ---
 
-## 🛠️ Fees & Troubleshooting
+## Troubleshooting & Errors
 
 ### Why is my transaction pending?
 Blockchain transactions can take a few minutes to confirm. The dashboard includes a transaction tracker that will update once the Stacks network registers your action.
 
 ### Why do I need to pay a transaction fee (gas)?
-Every update on the blockchain requires transaction fees to pay the network validators who secure the blockchain. These fees are very low (usually fractions of a cent in STX) and do not go to the app creators.
+Every transaction on the blockchain requires fee payments to secure the network. These fees are fractions of a cent in STX and go to network validators, not AhhbitTracker.
 
 ### What are the common error codes?
-If a transaction fails, you might see one of these codes:
-*   **ERR-u105 (Already Checked In)**: You are trying to check in during your cooldown period. Wait until 16 hours have passed since your last check-in.
-*   **ERR-u107 (Insufficient Streak)**: You are trying to withdraw before completing a 7-day streak.
-*   **ERR-u101 (Stake Too Low)**: You need to deposit at least 0.02 STX.
+* **ERR-u105 (Already Checked In)**: You are in your cooldown period. Wait until 16 hours have passed since your last check-in.
+* **ERR-u107 (Insufficient Streak)**: You are trying to withdraw before completing a 7-day streak.
+* **ERR-u101 (Stake Too Low)**: You need to deposit at least 0.02 STX.
