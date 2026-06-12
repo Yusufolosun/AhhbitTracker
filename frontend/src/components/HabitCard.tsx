@@ -204,7 +204,7 @@ export function HabitCard({ habit }: HabitCardProps) {
         {/* Streak Display */}
         <div className="text-right">
           <div className="text-3xl font-bold text-primary-500">{habit.currentStreak}</div>
-          <div className="text-xs text-gray-500">day streak</div>
+          <div className="text-xs text-gray-500">{habit.currentStreak === 1 ? 'day streak' : 'day streak'}</div>
         </div>
       </div>
 
@@ -240,7 +240,7 @@ export function HabitCard({ habit }: HabitCardProps) {
             Next check-in unlocks in ~{blocksToTime(blocksUntilNextCheckIn)}
           </p>
           <p className="text-xs text-sky-600 dark:text-sky-400 mt-1">
-            Check-ins are valid between 96 and 192 blocks after your last check-in.
+            Check-ins are accepted between 16 and 32 hours after your last check-in.
           </p>
         </div>
       )}
@@ -287,9 +287,9 @@ export function HabitCard({ habit }: HabitCardProps) {
               ? 'Checking In...'
               : canSubmitCheckIn
                 ? windowState === 'expired'
-                  ? 'Check In (Late)'
+                  ? 'Check In (Penalty Applies)'
                   : 'Check In'
-                : 'Check In Not Ready'}
+                : 'Check-In Opens Soon'}
           </button>
         )}
 
