@@ -207,3 +207,15 @@
   outline: 2px solid #f15a22;
   outline-offset: 2px;
 }
+
+@layer utilities {
+  .text-xxs {
+    font-size: 0.625rem; /* 10px */
+    line-height: 0.75rem; /* 12px */
+  }
+
+  .min-touch-target {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
