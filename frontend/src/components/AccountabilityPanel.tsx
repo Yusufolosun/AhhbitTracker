@@ -47,8 +47,9 @@ export function AccountabilityPanel() {
           </h4>
           <form onSubmit={handleCreateGroup} className="space-y-4">
             <div>
-              <label className="block text-xs text-surface-500 mb-1">Select Habit</label>
+              <label htmlFor="acc-habit" className="block text-xs text-surface-500 mb-1">Select Habit</label>
               <select
+                id="acc-habit"
                 className="input text-sm"
                 value={selectedHabitId}
                 onChange={(e) => setSelectedHabitId(Number(e.target.value))}
@@ -64,8 +65,9 @@ export function AccountabilityPanel() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-surface-500 mb-1">Stake (STX)</label>
+                <label htmlFor="acc-stake" className="block text-xs text-surface-500 mb-1">Stake (STX)</label>
                 <input
+                  id="acc-stake"
                   type="number"
                   className="input text-sm"
                   value={stakeAmount}
@@ -75,8 +77,9 @@ export function AccountabilityPanel() {
                 />
               </div>
               <div>
-                <label className="block text-xs text-surface-500 mb-1">Duration (Days)</label>
+                <label htmlFor="acc-duration" className="block text-xs text-surface-500 mb-1">Duration (Days)</label>
                 <input
+                  id="acc-duration"
                   type="number"
                   className="input text-sm"
                   value={duration}
