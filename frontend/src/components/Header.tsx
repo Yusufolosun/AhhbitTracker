@@ -11,7 +11,7 @@ import { trackEvent } from '../analytics';
 const NAV_LINKS = [
   { href: '#dashboard', label: 'Dashboard' },
   { href: '#habits', label: 'My Habits' },
-  { href: '#create-habit', label: 'New Habit' },
+  { href: '#create-habit', label: 'Create Habit' },
   { href: '#pool', label: 'Pool' },
 ];
 
@@ -113,7 +113,7 @@ export function Header() {
                     <>
                       <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
                       <span className="text-sm font-semibold text-amber-600 dark:text-amber-400">
-                        Demo Sandbox
+                        Demo Mode
                       </span>
                     </>
                   ) : (
@@ -224,7 +224,7 @@ export function Header() {
                   className={`w-2 h-2 rounded-full ${isDemoMode ? 'bg-amber-500' : 'bg-emerald-500'}`}
                 />
                 <span className="text-sm font-medium text-surface-700 dark:text-surface-300">
-                  {isDemoMode ? 'Demo Sandbox' : shortenAddress(walletState.address!)}
+                  {isDemoMode ? 'Demo Mode' : shortenAddress(walletState.address!)}
                 </span>
                 <span className="text-xs text-surface-500 pl-2">
                   ({formatSTX(walletState.balance)} STX)
