@@ -37,7 +37,7 @@ export function WalletConnect() {
           onClick={connectDemo}
           className="w-full btn-secondary py-4 text-base border border-surface-300 dark:border-surface-600 hover:bg-surface-50 dark:hover:bg-surface-700/50 rounded-xl transition-all"
         >
-          Try Simulated Sandbox Mode
+          Try Demo Mode
         </button>
       </div>
 
@@ -55,7 +55,7 @@ export function WalletConnect() {
             <span className="font-semibold text-sm text-surface-950 dark:text-white group-hover:text-primary-500 transition-colors">
               Leather Wallet
             </span>
-            <span className="text-xxs text-surface-500 dark:text-surface-400 mt-1">
+            <span className="text-[10px] text-surface-500 dark:text-surface-400 mt-1">
               Desktop Chrome/Firefox
             </span>
           </a>
@@ -69,12 +69,12 @@ export function WalletConnect() {
             <span className="font-semibold text-sm text-surface-950 dark:text-white group-hover:text-primary-500 transition-colors">
               Xverse Wallet
             </span>
-            <span className="text-xxs text-surface-500 dark:text-surface-400 mt-1">
+            <span className="text-[10px] text-surface-500 dark:text-surface-400 mt-1">
               Mobile App & Desktop
             </span>
           </a>
         </div>
-        <p className="text-xxs text-surface-400 dark:text-surface-500 mt-4 leading-relaxed">
+        <p className="text-[10px] text-surface-400 dark:text-surface-500 mt-4 leading-relaxed">
           Installing a wallet takes less than 2 minutes. Once installed, refresh this page to
           connect.
         </p>
