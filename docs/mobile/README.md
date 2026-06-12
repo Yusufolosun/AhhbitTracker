@@ -21,5 +21,3 @@ This directory contains the comprehensive documentation for the AhhbitTracker mo
 - [**Troubleshooting**](troubleshooting.md): Common issues and development pitfalls.
 - [**Usage Guide**](usage-guide.md): Developer best practices and patterns.
 - [**Contributing**](contributing.md): Guidelines for mobile contributions.
-
-
