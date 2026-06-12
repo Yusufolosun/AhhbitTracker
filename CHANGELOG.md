@@ -7,26 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Custom utility classes `text-xxs` and `min-touch-target` to `global.css`
+- Standard Footer component display on guest landing page
+
 ### Changed
+- Hero subtitle copy and call-to-actions simplified for better onboarding
+- Replaced technical block-based jargon with user-friendly hour/day indicators
+- Improved mobile responsiveness of `HabitCard`, `MilestoneRewards` grid, and `DemoSandboxBar` controls
+- Redesigned and streamlined `SECURITY.md`, `USER_GUIDE.md`, and `FAQ.md` files
+- Merged performance cache optimization notes from `PERFORMANCE.md` into `ARCHITECTURE.md`
 
-- Check-in windows now anchor to the last successful check-in
-- Missed check-ins apply partial forfeits (10% per missed day) instead of full stake loss
-- Penalty tracking added for missed check-ins and slashing
-
-### Documentation
-
-- Updated contract and user docs to reflect partial forfeits and new events
+### Fixed
+- Associated form inputs with labels via `id` and `htmlFor` in `AccountabilityPanel`
+- Non-standard `text-xxs` classes in `WalletConnect` and `Footer` components
+- Layout issues on 5-column grid in `MilestoneRewards` on larger screens
 
 ## [1.1.0] - 2026-02-18
 
-### Changed
+### Added
+- Penalty tracking added for missed check-ins and slashing
+- Updated contract and user docs to reflect partial forfeits and new events
+- `SECURITY.md` for GitHub security tab
+- `FUNDING.yml` for GitHub Sponsors
+- `CONTRIBUTORS.md` to recognize project contributors
+- `.nvmrc` specifying Node.js version (18.20.0)
 
+### Changed
 - **Mainnet redeployment** to new deployer address `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z`
 - Minimum stake reduced from 0.1 STX to 0.02 STX across all contracts
+- Check-in windows now anchor to the last successful check-in
+- Missed check-ins apply partial forfeits (10% per missed day) instead of full stake loss
 - All 3 contracts deployed: `habit-tracker-v3`, `habit-streak-reward-v3`, `habit-accountability-group-v3`
+- GitHub Actions workflows updated to use checkout@v4, setup-node@v4, and codeql-action@v3
+- Added WebSocket endpoint to CSP connect-src for real-time updates
+- Font loading optimized with non-blocking strategy
+- Multiple accessibility improvements for screen readers
+- Scripts now use environment variables instead of hardcoded values
+- Improved bug report, feature request issue templates, and pull request template
+
+### Fixed
+- Incorrect check-in wait time in user guide (corrected to 120+ blocks)
+- Removed non-existent `ERR-TRANSFER-FAILED` (u110) from API reference
+- Fixed broken deployment guide link in contracts README
+- Fixed escaped backtick syntax in FAQ
+- Added missing project metadata in Clarinet.toml
 
 ### Deployment
-
 - **Deployer:** `SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z`
 - **habit-tracker-v3:** [Explorer](https://explorer.hiro.so/txid/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-tracker-v3?chain=mainnet)
 - **habit-streak-reward-v3:** [Explorer](https://explorer.hiro.so/txid/SP1N3809W9CBWWX04KN3TCQHP8A9GN520BD4JMP8Z.habit-streak-reward-v3?chain=mainnet)
@@ -141,38 +168,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Minimum withdrawal streak: 7 days
 - Maximum habits per user: 100
 - Habit name max length: 50 characters
-
----
-
-## [Unreleased]
-
-### Added
-
-- SECURITY.md for GitHub security tab
-- FUNDING.yml for GitHub Sponsors
-- CONTRIBUTORS.md to recognize project contributors
-- .nvmrc for Node.js version management
-- Error code type and helper function in frontend constants
-- Actual API verification in deployment script
-
-### Changed
-
-- GitHub Actions workflows updated to use checkout@v4 and setup-node@v4
-- CodeQL workflow updated to use codeql-action@v3
-- Added WebSocket endpoint to CSP connect-src for real-time updates
-- Font loading optimized with non-blocking strategy
-- Multiple accessibility improvements for screen readers
-- Scripts now use environment variables instead of hardcoded values
-- Improved bug report and feature request issue templates
-- Enhanced pull request template with more sections
-
-### Fixed
-
-- Incorrect check-in wait time in user guide (was 14+ blocks, corrected to 120+ blocks)
-- Removed non-existent ERR-TRANSFER-FAILED (u110) from API reference
-- Fixed broken deployment guide link in contracts README
-- Fixed escaped backtick syntax in FAQ
-- Added missing project metadata in Clarinet.toml
 
 ---
 
