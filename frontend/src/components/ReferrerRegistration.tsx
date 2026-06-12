@@ -36,7 +36,7 @@ export function ReferrerRegistration() {
         Referral Program
       </h3>
       <p className="text-sm text-surface-600 dark:text-surface-400 mb-4">
-        Register a referrer to support the community and boost your own rewards. This is a one-time
+        Were you referred by someone? Enter their Stacks address to give them credit. This is a one-time
         setup.
       </p>
 
