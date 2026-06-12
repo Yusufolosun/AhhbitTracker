@@ -59,4 +59,3 @@ This will open the Expo Dev Tools in your browser and provide a QR code to scan 
 ### Connecting to Devnet
 
 If you are developing against a local Stacks devnet (via Clarinet), ensure your mobile device and devnet machine are on the same network, and update `EXPO_PUBLIC_HIRO_API_BASE_URL` to your machine's local IP address.
-
