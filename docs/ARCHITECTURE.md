@@ -293,23 +293,31 @@ refunds or penalty math.
 src/
 ├── App.tsx                    # Root with providers and routing
 ├── components/
+│   ├── AccountabilityPanel.tsx # Accountability group setup & tracking
 │   ├── ConfirmationDialog.tsx # Modal for destructive actions
-│   ├── Dashboard.tsx          # User statistics overview
-│   ├── ErrorBoundary.tsx      # Error catching component
+│   ├── DailyCheckInPanel.tsx # Batch check-in eligible habits
+│   ├── Dashboard.tsx          # User statistics and quick actions overview
+│   ├── DemoSandboxBar.tsx     # Simulated time-travel and demo wallet controls
+│   ├── ErrorBoundary.tsx      # Catch-all component for React errors
 │   ├── Footer.tsx             # Site footer with links
-│   ├── HabitCard.tsx          # Individual habit with check-in/withdraw/claim
+│   ├── HabitCard.tsx          # Habit details, status display, and actions
 │   ├── HabitForm.tsx          # Create new habit form
-│   ├── HabitList.tsx          # Display and filter habits by status
-│   ├── Header.tsx             # Navigation and wallet display
+│   ├── HabitList.tsx          # Filtered display of habits by status
+│   ├── Header.tsx             # Navigation bar and wallet status
+│   ├── LandingPage.tsx        # Guest dashboard and onboarding hero
 │   ├── LoadingSpinner.tsx     # Loading indicator
-│   ├── PoolDisplay.tsx        # Forfeited pool balance
-│   ├── RateLimitBanner.tsx    # API rate limit warning
-│   ├── Skeletons.tsx          # Loading placeholders
-│   ├── StatsCard.tsx          # Statistics display card
-│   ├── ThemeToggle.tsx        # Dark/light mode toggle
-│   ├── Toast.tsx              # Notification component
-│   ├── ToastContainer.tsx     # Toast display layer
-│   ├── TransactionTracker.tsx # Pending transaction display
+│   ├── LongestStreakBanner.tsx# Congratulatory banner for streak records
+│   ├── MilestoneRewards.tsx   # Milestone rewards claim dashboard
+│   ├── PoolDisplay.tsx        # Community reward pool statistics
+│   ├── RateLimitBanner.tsx    # Node API rate limit warning banner
+│   ├── ReferrerRegistration.tsx# Referrer setup and boosts
+│   ├── Skeletons.tsx          # Layout-stable loading placeholders
+│   ├── StakeCalculator.tsx    # Stake simulator for consistent check-ins
+│   ├── StatsCard.tsx          # Metric cards
+│   ├── ThemeToggle.tsx        # Dark/light mode switcher
+│   ├── Toast.tsx              # Notification item popup
+│   ├── ToastContainer.tsx     # Toast list display layer
+│   ├── TransactionTracker.tsx # Transaction status tracker
 │   └── WalletConnect.tsx      # Wallet connection screen
 ├── context/
 │   ├── ThemeContext.tsx       # Dark/light theme state
@@ -317,12 +325,21 @@ src/
 │   ├── TransactionContext.tsx # Pending transaction tracking
 │   └── WalletContext.tsx      # Wallet connection state
 ├── hooks/
+│   ├── habitTransactionSync.ts# Synchronizes state on transaction confirmation
+│   ├── useAccountability.ts   # Accountability groups actions and state
 │   ├── useCurrentBlock.ts     # Current block height polling
 │   ├── useHabits.ts           # Habits data, stats, and mutations
 │   ├── useHashParam.ts        # URL hash parameter state
-│   └── useHashRoute.ts        # Hash-based SPA routing
+│   ├── useHashRoute.ts        # Hash-based SPA routing
+│   └── useRewards.ts          # Rewards eligibility and claiming
 ├── services/
-│   ├── contractService.ts     # Smart contract interactions
+│   ├── accountabilityService.ts# Contract caller for accountability
+│   ├── contractReadCache.ts   # In-memory query caching Layer
+│   ├── contractService.ts     # Smart contract main interactions
+│   ├── demoService.ts         # Sandbox / Demo mode blockchain simulator
+│   ├── hiroApiClient.ts       # Hiro API client with retries
+│   ├── readCache.ts           # Low-level cache storage implementation
+│   ├── rewardService.ts       # Contract caller for rewards
 │   └── walletService.ts       # Wallet connection logic
 ├── styles/
 │   └── global.css             # Tailwind layers and custom styles
@@ -408,13 +425,16 @@ Daily check-ins use the same flow with additional safeguards:
 
 ### Performance Optimizations
 
-1. **Code Splitting:** Route-level lazy loading with React.lazy()
-2. **React Query Caching:** 2-minute stale time reduces API calls
-3. **Optimistic Updates:** UI updates immediately, reverts on error
-4. **Skeleton Loading:** Layout-stable loading states prevent CLS
-5. **Memoization:** useMemo for expensive calculations (Dashboard stats)
-6. **Read-through Caching:** Data-layer caching with in-flight de-duplication for blockchain reads
-7. **Transaction-aware Invalidation:** Cache + query invalidation synchronized with confirmed writes
+1. **Code Splitting**: Route-level lazy loading with `React.lazy()`.
+2. **React Query Caching**: 3-minute stale time (180_000ms) for main query caching, reducing API calls.
+3. **Optimistic Updates**: UI updates immediately and reverts on error to feel instantaneous.
+4. **Skeleton Loading**: Layout-stable loading states prevent Cumulative Layout Shift (CLS).
+5. **Memoization**: HabitCard is wrapped with `React.memo` and uses `useMemo()` and `useCallback()` to avoid redundant re-renders.
+6. **Read-through Caching**: Data-layer caching with in-flight de-duplication for blockchain reads (TTL extended to 5 minutes for pool data cache).
+7. **Transaction-aware Invalidation**: Cache + query invalidation synchronized with confirmed writes to guarantee fresh state.
+8. **Async Pool Concurrency Limiting**: Limits details fetching to a maximum of 6 concurrent requests to prevent Hiro API rate limiting.
+9. **Habit Window Summarization**: Single-pass aggregation of habit status to eliminate O(n) redundant filters.
+10. **Subscription Consolidation**: Avoids O(n) block height listener overhead by subscribing at the list level and passing it down to cards.
 
 ## Deployment Strategy
 
@@ -423,16 +443,8 @@ Daily check-ins use the same flow with additional safeguards:
 3. **Frontend Deployment:** Host on Vercel/Netlify with API calls to Hiro API
 4. **Contract Address:** Hard-code in frontend after deployment
 
-## Future Enhancements (Post-MVP)
-
-- Multi-currency support (custom SIP-010 tokens)
-- Habit categories and badges
-- Social features (share streaks)
-- Leaderboards
-- Variable check-in windows (weekly, custom intervals)
-
 ---
 
-**Version:** 1.0.0
-**Last Updated:** 2026-04-09
+**Version:** 1.1.0
+**Last Updated:** 2026-06-12
 **Network:** Stacks Mainnet
