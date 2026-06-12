@@ -7,7 +7,7 @@ const STEPS = [
     number: '01',
     title: 'Set a Habit & Deposit',
     description:
-      'Pick any daily habit you want to build. Lock in a small deposit of STX tokens as your commitment — as low as 0.02 STX.',
+      'Choose a daily habit you want to build and lock in a small deposit of STX tokens as your commitment. Start with as little as 0.02 STX.',
     icon: (
       <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -23,7 +23,7 @@ const STEPS = [
     number: '02',
     title: 'Check In Daily',
     description:
-      'Come back once a day (every 16 to 32 hours) and tap "Check In" to record your progress on the blockchain.',
+      'Open the app once a day, anytime between 16 and 32 hours after your last check-in, and tap "Check In" to log your progress on the blockchain.',
     icon: (
       <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -39,7 +39,7 @@ const STEPS = [
     number: '03',
     title: 'Complete 7 Days & Earn',
     description:
-      'Hit a 7-day streak to unlock your deposit. Claim bonus payouts from the reward pool funded by people who missed their habits!',
+      'Hit a 7-day streak to unlock your deposit. On top of that, claim bonus payouts from the reward pool — funded by people who missed their habits.',
     icon: (
       <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
@@ -219,11 +219,11 @@ export function LandingPage() {
       {/* Wallet Section */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
         <h2 className="text-2xl sm:text-3xl font-bold text-surface-900 dark:text-white mb-4">
-          New to Web3?
+          First Time Here?
         </h2>
         <p className="text-surface-500 dark:text-surface-400 mb-8 max-w-xl mx-auto">
-          You just need a Stacks wallet. It takes under 2 minutes to set up. These wallets are free
-          browser extensions that let you securely manage your STX tokens.
+          You just need a Stacks wallet to get started. It takes under 2 minutes to set up.
+          These wallets are free browser extensions that let you securely hold your STX tokens.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
           {[
