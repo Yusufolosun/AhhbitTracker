@@ -71,7 +71,7 @@ export function Dashboard({
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <SectionHeading title="Dashboard" subtitle="Track your habit-building progress" />
+        <SectionHeading title="Dashboard" subtitle="Your habit tracker at a glance" />
       </div>
 
       <DemoSandboxBar />
@@ -288,7 +288,7 @@ export function Dashboard({
             <StatsCard
               title="Referrals"
               value={userStats?.successfulReferrals || 0}
-              subtitle="Successful habit completions"
+              subtitle="Referred completions"
               icon={
                 <svg
                   className="w-6 h-6 text-purple-500"
