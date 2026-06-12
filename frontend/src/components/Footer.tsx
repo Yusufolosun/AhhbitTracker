@@ -60,7 +60,7 @@ export function Footer() {
               href={EXPLORER_CONTRACT_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-surface-500 dark:text-surface-400 font-mono break-all hover:text-primary-500 dark:hover:text-primary-400 transition-colors leading-relaxed block"
+              className="text-xs text-surface-500 dark:text-surface-400 font-mono break-all hover:text-primary-500 dark:hover:text-primary-400 transition-colors leading-relaxed block py-1"
             >
               {CONTRACT_ADDRESS.slice(0, 10)}...{CONTRACT_NAME}
             </a>
