@@ -189,5 +189,15 @@ scripts/**/*-results.json
 # Vite config compilation cache (auto-generated, never commit)
 frontend/vite.config.ts.timestamp-*.mjs
 
+# ============================================
+# DATABASE & CERTIFICATE FILES
+# ============================================
+*.sqlite
+*.sqlite3
+*.db
+*.p12
+*.pfx
+*.jks
+
 scripts/test
 scripts/test2
