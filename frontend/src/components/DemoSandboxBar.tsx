@@ -75,11 +75,11 @@ export function DemoSandboxBar() {
           </span>
           <div>
             <h4 className="font-semibold text-amber-800 dark:text-amber-300 text-sm md:text-base flex items-center gap-2">
-              Interactive Demo Sandbox Active
+              Demo Mode Active
             </h4>
             <p className="text-xs text-amber-700/80 dark:text-amber-400/80 max-w-xl">
-              You are using a simulated blockchain. Use the time-travel buttons below to
-              fast-forward blocks and see how habits, check-in windows, and slashings behave.
+               You are using a simulated blockchain. Use the time-travel buttons below to
+              fast-forward blocks and see how habits, check-in windows, and penalties behave.
             </p>
           </div>
         </div>
@@ -117,7 +117,7 @@ export function DemoSandboxBar() {
             className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-semibold transition-colors disabled:opacity-50"
             title="Advance 200 blocks to miss the check-in window (192 blocks maximum)"
           >
-            +32 Hrs (Miss & Risk Slash)
+             +32 Hrs (Miss Window)
           </button>
           <button
             type="button"
