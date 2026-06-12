@@ -40,7 +40,7 @@ export function MilestoneRewards() {
             <h4 className="text-sm font-semibold mb-3">
               {habit.name} (#{habit.habitId})
             </h4>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
               {milestones.map((milestone) => {
                 const isReached = habit.currentStreak >= milestone;
                 const isPending = pendingRewardClaims.has(`${habit.habitId}-${milestone}`);
