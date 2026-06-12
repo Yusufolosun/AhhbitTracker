@@ -455,7 +455,7 @@ export function HabitCard({ habit }: HabitCardProps) {
             <div className="flex justify-between">
               <dt className="text-surface-500 dark:text-surface-400">Owner</dt>
               <dd
-                className="font-medium text-surface-900 dark:text-white truncate max-w-[200px]"
+                className="font-medium text-surface-900 dark:text-white truncate max-w-[140px] sm:max-w-[200px]"
                 title={habit.owner}
               >
                 {habit.owner}
