@@ -73,7 +73,7 @@ export function StakeCalculator() {
             htmlFor="calc-missed"
             className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2"
           >
-            Missed Check-In Windows
+            Missed Days
           </label>
           <input
             id="calc-missed"
@@ -132,19 +132,19 @@ export function StakeCalculator() {
 
           {missedDays === 0 && (
             <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-3 text-center font-medium">
-              Stay consistent and you keep everything + earn from the reward pool!
+              Stay consistent to keep 100% of your deposit and earn rewards from the pool!
             </p>
           )}
 
           {missedDays > 0 && missedDays < 5 && (
             <p className="text-xs text-amber-600 dark:text-amber-400 mt-3 text-center">
-              Each missed window costs 10% of your remaining deposit.
+              Each missed day forfeits 10% of your remaining deposit.
             </p>
           )}
 
           {missedDays >= 5 && (
             <p className="text-xs text-red-500 mt-3 text-center">
-              After {missedDays} missed windows, over half your deposit could be forfeited!
+              After {missedDays} missed days, over half your deposit is forfeited!
             </p>
           )}
         </div>
