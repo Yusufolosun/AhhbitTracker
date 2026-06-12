@@ -78,7 +78,7 @@ export function DailyCheckInPanel({
           disabled={isRunningDailyCheckIn || eligibleHabitIds.length === 0}
           className="btn-primary"
         >
-          {isRunningDailyCheckIn ? 'Submitting Daily Check-Ins...' : 'Run Daily Check-In'}
+          {isRunningDailyCheckIn ? 'Submitting Check-Ins...' : 'Check In All Eligible Habits'}
         </button>
       </div>
 
