@@ -1,154 +1,140 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
+import { SurfaceCard } from './ui';
 
-/**
- * Interactive stake simulator that lets prospective users see exactly
- * what happens when they stay consistent vs. miss check-ins.
- */
+const PENALTY_RATE = 0.1;
+const STREAK_GOAL  = 7;
+
+function calcReturn(stakeStx: number, missedDays: number) {
+  let balance = stakeStx;
+  for (let i = 0; i < missedDays; i++) {
+    balance -= balance * PENALTY_RATE;
+  }
+  return balance;
+}
+
 export function StakeCalculator() {
-  const [stakeSTX, setStakeSTX] = useState(1);
+  const [stakeInput, setStakeInput] = useState('1');
   const [missedDays, setMissedDays] = useState(0);
 
-  const result = useMemo(() => {
-    const stakeUstx = stakeSTX * 1_000_000;
-    const penaltyRate = 0.1; // 10% per missed window
-    let remaining = stakeUstx;
-    let totalForfeited = 0;
-
-    for (let i = 0; i < missedDays; i++) {
-      const penalty = Math.floor(remaining * penaltyRate);
-      totalForfeited += penalty;
-      remaining -= penalty;
-      if (remaining <= 0) {
-        remaining = 0;
-        break;
-      }
-    }
-
-    return {
-      originalSTX: stakeSTX,
-      remainingSTX: (remaining / 1_000_000).toFixed(4),
-      forfeitedSTX: (totalForfeited / 1_000_000).toFixed(4),
-      remainingPercent: stakeUstx > 0 ? Math.round((remaining / stakeUstx) * 100) : 0,
-    };
-  }, [stakeSTX, missedDays]);
+  const stake      = Math.max(0, parseFloat(stakeInput) || 0);
+  const returnAmt  = calcReturn(stake, missedDays);
+  const penaltyAmt = stake - returnAmt;
+  const pct        = stake > 0 ? Math.round((returnAmt / stake) * 100) : 100;
 
   return (
-    <div className="bg-surface-50 dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 p-6 shadow-sm">
-      <h3 className="text-lg font-semibold text-surface-900 dark:text-white mb-1">
-        Stake Simulator
-      </h3>
-      <p className="text-sm text-surface-500 dark:text-surface-400 mb-6">
-        See what happens to your deposit based on missed days.
-      </p>
+    <SurfaceCard className="relative overflow-hidden">
+      {/* Subtle top-left glow */}
+      <div className="absolute -top-6 -left-6 w-24 h-24 bg-primary-500/10 rounded-full blur-2xl pointer-events-none" />
 
-      <div className="space-y-5">
-        {/* Stake input */}
-        <div>
-          <label
-            htmlFor="calc-stake"
-            className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2"
-          >
-            Your Deposit (STX)
-          </label>
-          <input
-            id="calc-stake"
-            type="range"
-            min={0.02}
-            max={10}
-            step={0.01}
-            value={stakeSTX}
-            onChange={(e) => setStakeSTX(Number(e.target.value))}
-            className="w-full accent-primary-500"
-          />
-          <div className="flex justify-between text-xs text-surface-400 mt-1">
-            <span>0.02 STX</span>
-            <span className="font-semibold text-primary-500">{stakeSTX.toFixed(2)} STX</span>
-            <span>10 STX</span>
+      <div className="relative">
+        <div className="flex items-center gap-2 mb-1">
+          <h3 className="text-lg font-bold text-surface-900 dark:text-white">Stake Simulator</h3>
+          <span className="text-sm">🧮</span>
+        </div>
+        <p className="text-xs text-surface-500 dark:text-surface-400 mb-5">
+          See how much you'd get back after missed check-ins
+        </p>
+
+        <div className="space-y-4 mb-5">
+          {/* Stake input */}
+          <div>
+            <label htmlFor="calc-stake" className="block text-xs font-medium text-surface-700 dark:text-surface-300 mb-1.5">
+              Stake Amount
+            </label>
+            <div className="relative">
+              <input
+                id="calc-stake"
+                type="number"
+                className="input pr-14"
+                value={stakeInput}
+                onChange={(e) => setStakeInput(e.target.value)}
+                min="0"
+                step="0.5"
+              />
+              <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
+                <span className="text-sm font-semibold text-surface-400">STX</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Missed days slider */}
+          <div>
+            <div className="flex justify-between mb-1.5">
+              <label htmlFor="calc-missed" className="text-xs font-medium text-surface-700 dark:text-surface-300">
+                Missed Days
+              </label>
+              <span className="text-xs font-bold tabular-nums text-surface-600 dark:text-surface-400">
+                {missedDays} / {STREAK_GOAL}
+              </span>
+            </div>
+            <input
+              id="calc-missed"
+              type="range"
+              min={0}
+              max={STREAK_GOAL}
+              value={missedDays}
+              onChange={(e) => setMissedDays(Number(e.target.value))}
+              className="w-full h-2 appearance-none rounded-full bg-surface-200 dark:bg-surface-700 accent-primary-500 cursor-pointer"
+            />
           </div>
         </div>
 
-        {/* Missed days input */}
-        <div>
-          <label
-            htmlFor="calc-missed"
-            className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2"
-          >
-            Missed Days
-          </label>
-          <input
-            id="calc-missed"
-            type="range"
-            min={0}
-            max={10}
-            step={1}
-            value={missedDays}
-            onChange={(e) => setMissedDays(Number(e.target.value))}
-            className="w-full accent-red-500"
-          />
-          <div className="flex justify-between text-xs text-surface-400 mt-1">
-            <span>0 missed</span>
-            <span
-              className={`font-semibold ${missedDays > 0 ? 'text-red-500' : 'text-emerald-500'}`}
-            >
-              {missedDays} missed
+        {/* Result panel */}
+        <div className={[
+          'rounded-xl p-4 border space-y-3 transition-colors duration-300',
+          missedDays === 0
+            ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20'
+            : missedDays <= 2
+              ? 'bg-amber-50 border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/20'
+              : 'bg-red-50 border-red-200 dark:bg-red-500/10 dark:border-red-500/20',
+        ].join(' ')}>
+          <div className="flex justify-between items-center">
+            <span className="text-xs font-semibold text-surface-600 dark:text-surface-400">
+              {missedDays === 0 ? '✅ Full stake returned' : `⚠ After ${missedDays} missed day${missedDays > 1 ? 's' : ''}`}
             </span>
-            <span>10 missed</span>
+            <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+              missedDays === 0
+                ? 'text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-500/20'
+                : 'text-red-700 dark:text-red-300 bg-red-100 dark:bg-red-500/20'
+            }`}>
+              {pct}% returned
+            </span>
           </div>
-        </div>
 
-        {/* Visual result */}
-        <div className="rounded-xl bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-700 p-4">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-surface-600 dark:text-surface-400">
-              Remaining Deposit
-            </span>
-            <span className="text-lg font-bold text-surface-900 dark:text-white">
-              {result.remainingSTX} STX
-            </span>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <p className="text-xxs text-surface-500 dark:text-surface-400 uppercase tracking-widest mb-0.5">You Get Back</p>
+              <p className="text-2xl font-black text-surface-900 dark:text-white">
+                {returnAmt.toFixed(3)}
+              </p>
+              <p className="text-xxs text-surface-400">STX</p>
+            </div>
+            <div>
+              <p className="text-xxs text-surface-500 dark:text-surface-400 uppercase tracking-widest mb-0.5">Penalty Lost</p>
+              <p className={`text-2xl font-black ${penaltyAmt > 0 ? 'text-red-600 dark:text-red-400' : 'text-surface-300 dark:text-surface-600'}`}>
+                {penaltyAmt.toFixed(3)}
+              </p>
+              <p className="text-xxs text-surface-400">STX</p>
+            </div>
           </div>
 
           {/* Progress bar */}
-          <div className="w-full bg-surface-200 dark:bg-surface-700 rounded-full h-3 mb-3 overflow-hidden">
+          <div className="w-full h-2 bg-surface-200 dark:bg-surface-700 rounded-full overflow-hidden">
             <div
-              className="h-3 rounded-full transition-all duration-500 ease-out"
-              style={{
-                width: `${result.remainingPercent}%`,
-                background:
-                  result.remainingPercent > 70
-                    ? 'linear-gradient(90deg, #10B981, #34D399)'
-                    : result.remainingPercent > 30
-                      ? 'linear-gradient(90deg, #F59E0B, #FBBF24)'
-                      : 'linear-gradient(90deg, #EF4444, #F87171)',
-              }}
+              className={`h-full rounded-full transition-all duration-500 ${
+                missedDays === 0 ? 'bg-emerald-500' : missedDays <= 2 ? 'bg-amber-500' : 'bg-red-500'
+              }`}
+              style={{ width: `${pct}%` }}
             />
           </div>
 
-          <div className="flex justify-between text-xs">
-            <span className="text-emerald-600 dark:text-emerald-400 font-medium">
-              {result.remainingPercent}% kept
-            </span>
-            <span className="text-red-500 font-medium">{result.forfeitedSTX} STX forfeited</span>
-          </div>
-
-          {missedDays === 0 && (
-            <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-3 text-center font-medium">
-              Stay consistent to keep 100% of your deposit and earn rewards from the pool!
-            </p>
-          )}
-
-          {missedDays > 0 && missedDays < 5 && (
-            <p className="text-xs text-amber-600 dark:text-amber-400 mt-3 text-center">
-              Each missed day forfeits 10% of your remaining deposit.
-            </p>
-          )}
-
-          {missedDays >= 5 && (
-            <p className="text-xs text-red-500 mt-3 text-center">
-              After {missedDays} missed days, over half your deposit is forfeited!
+          {missedDays === 0 && stake > 0 && (
+            <p className="text-xs text-emerald-700 dark:text-emerald-300 font-medium">
+              Zero missed days = zero penalties. Plus you earn a share of the community pool!
             </p>
           )}
         </div>
       </div>
-    </div>
+    </SurfaceCard>
   );
 }
