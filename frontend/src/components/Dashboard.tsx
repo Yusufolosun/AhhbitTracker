@@ -23,12 +23,7 @@ interface DashboardProps {
 export function Dashboard({
   habits,
   isRunningDailyCheckIn = false,
-  runDailyCheckIn = () => ({
-    attempted: 0,
-    submitted: 0,
-    failed: 0,
-    entries: [],
-  }),
+  runDailyCheckIn = () => ({ attempted: 0, submitted: 0, failed: 0, entries: [] }),
   notify,
 }: DashboardProps) {
   const currentBlock = useCurrentBlock();
@@ -85,108 +80,52 @@ export function Dashboard({
       />
 
       <AccountabilityPanel />
-
       <MilestoneRewards />
 
-      {/* Empty state & Demo walkthrough guide */}
+      {/* Empty state */}
       {habits.length === 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <EmptyStateCard
               title="No habits yet"
-              description="Create your first on-chain habit below. Stake STX, check in every 16-32 hours, and earn rewards from the forfeited pool when you stay consistent."
+              description="Create your first on-chain habit. Stake STX, check in every 16–32 hours, and earn rewards from the forfeited pool when you stay consistent."
               icon={
-                <svg
-                  className="w-8 h-8 text-primary-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
+                <svg className="w-10 h-10 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
               }
               actionLabel="Create Your First Habit"
-              onAction={() => {
-                window.location.hash = '#create-habit';
-              }}
+              onAction={() => { window.location.hash = '#create-habit'; }}
             />
           </div>
 
           {isDemoMode && (
             <div className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 p-6 shadow-sm flex flex-col justify-between">
               <div>
-                <h3 className="text-lg font-bold text-surface-900 dark:text-white mb-2 flex items-center gap-2">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-lg bg-amber-500/20 text-amber-600 dark:text-amber-400 text-xs">
-                    ★
-                  </span>
+                <h3 className="text-base font-bold text-surface-900 dark:text-white mb-2 flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-500 text-xs">★</span>
                   Sandbox Quick Tour
                 </h3>
-                <p className="text-xs text-surface-500 dark:text-surface-400 mb-6">
-                  Follow these 4 simple steps to understand how the app works in under 60 seconds:
+                <p className="text-xs text-surface-500 dark:text-surface-400 mb-5">
+                  Follow these 4 steps to understand the app in under 60 seconds:
                 </p>
-
-                <ol className="space-y-4 text-xs">
-                  <li className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary-100 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400 flex items-center justify-center font-bold">
-                      1
-                    </span>
-                    <div>
-                      <p className="font-semibold text-surface-900 dark:text-white">
-                        Create a Habit
-                      </p>
-                      <p className="text-surface-500 dark:text-surface-400">
-                        Tap "Create Your First Habit" and stake some demo STX.
-                      </p>
-                    </div>
-                  </li>
-
-                  <li className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary-100 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400 flex items-center justify-center font-bold">
-                      2
-                    </span>
-                    <div>
-                      <p className="font-semibold text-surface-900 dark:text-white">
-                        Simulate Time Travel
-                      </p>
-                      <p className="text-surface-500 dark:text-surface-400">
-                        Click <strong>"+16 Hrs"</strong> on the yellow Sandbox Bar above to
-                        fast-forward blocks.
-                      </p>
-                    </div>
-                  </li>
-
-                  <li className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary-100 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400 flex items-center justify-center font-bold">
-                      3
-                    </span>
-                    <div>
-                      <p className="font-semibold text-surface-900 dark:text-white">
-                        Check In Daily
-                      </p>
-                      <p className="text-surface-500 dark:text-surface-400">
-                        Your habit card will update. Tap check in to increase your streak.
-                      </p>
-                    </div>
-                  </li>
-
-                  <li className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary-100 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400 flex items-center justify-center font-bold">
-                      4
-                    </span>
-                    <div>
-                      <p className="font-semibold text-surface-900 dark:text-white">
-                        Complete & Claim
-                      </p>
-                      <p className="text-surface-500 dark:text-surface-400">
-                        Repeat until streak is 7. Withdraw stake + claim community reward share!
-                      </p>
-                    </div>
-                  </li>
+                <ol className="space-y-3 text-xs">
+                  {[
+                    ['Create a Habit', 'Tap "Create Your First Habit" and stake some demo STX.'],
+                    ['Simulate Time Travel', 'Click "+16 Hrs" on the Sandbox Bar to fast-forward blocks.'],
+                    ['Check In Daily', 'Your habit card updates. Tap Check In to grow your streak.'],
+                    ['Complete & Claim', 'Hit streak 7. Withdraw stake + claim your community bonus!'],
+                  ].map(([title, desc], i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary-100 dark:bg-primary-500/20 text-primary-600 dark:text-primary-400 flex items-center justify-center font-bold text-[10px]">
+                        {i + 1}
+                      </span>
+                      <div>
+                        <p className="font-semibold text-surface-900 dark:text-white">{title}</p>
+                        <p className="text-surface-500 dark:text-surface-400">{desc}</p>
+                      </div>
+                    </li>
+                  ))}
                 </ol>
               </div>
             </div>
@@ -194,212 +133,118 @@ export function Dashboard({
         </div>
       ) : (
         <>
+          {/* Stats grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             <StatsCard
               title="Total Habits"
               value={stats.total}
+              accentColor="primary"
               icon={
-                <svg
-                  className="w-6 h-6 text-primary-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
+                <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               }
             />
-
             <StatsCard
               title="Active Habits"
               value={stats.active}
-              subtitle={
-                stats.expiredCount > 0
-                  ? `${stats.expiredCount} expired`
-                  : stats.active > 0
-                    ? 'Keep it up!'
-                    : 'Create a habit'
-              }
+              subtitle={stats.expiredCount > 0 ? `${stats.expiredCount} expired` : stats.active > 0 ? 'Keep it up!' : 'Create a habit'}
               trend={stats.expiredCount > 0 ? 'down' : stats.active > 0 ? 'up' : 'neutral'}
+              accentColor="green"
               icon={
-                <svg
-                  className="w-6 h-6 text-green-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
+                <svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               }
             />
-
             <StatsCard
               title="Total Staked"
               value={`${formatSTX(stats.totalStaked)} STX`}
-              subtitle={stats.expiredCount > 0 ? 'Excludes expired habits' : 'In active habits'}
+              subtitle={stats.expiredCount > 0 ? 'Excludes expired' : 'In active habits'}
+              accentColor="yellow"
               icon={
-                <svg
-                  className="w-6 h-6 text-yellow-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
+                <svg className="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               }
             />
-
             <StatsCard
               title="Avg. Streak"
               value={`${stats.avgStreak} days`}
-              subtitle={stats.expiredCount > 0 ? 'Excludes expired habits' : 'Across active habits'}
+              subtitle={stats.expiredCount > 0 ? 'Excludes expired' : 'Across active habits'}
+              accentColor="orange"
               icon={
-                <svg
-                  className="w-6 h-6 text-orange-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"
-                  />
+                <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
                 </svg>
               }
             />
-
             <StatsCard
               title="Referrals"
               value={userStats?.successfulReferrals || 0}
               subtitle="Referred completions"
+              accentColor="purple"
               icon={
-                <svg
-                  className="w-6 h-6 text-purple-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
+                <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               }
             />
           </div>
 
-          {/* Expired window alert */}
+          {/* Alert: expired windows */}
           {stats.expiredCount > 0 && (
-            <div className="card bg-red-50 border-red-200 dark:bg-red-500/10 dark:border-red-500/20">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <svg
-                    className="w-8 h-8 text-red-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-                    />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-red-900 dark:text-red-300">
-                    {stats.expiredCount} habit{stats.expiredCount > 1 ? 's have' : ' has'} a missed
-                    check-in window
-                  </p>
-                  <p className="text-xs text-red-700 dark:text-red-400 mt-1">
-                    {formatSTX(stats.expiredStake)} STX at risk of penalty. These habits are no
-                    longer counted as active.
-                  </p>
-                </div>
+            <div className="flex items-start gap-4 p-4 rounded-2xl bg-red-50 border border-red-200 dark:bg-red-500/10 dark:border-red-500/20">
+              <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-red-100 dark:bg-red-500/20 flex items-center justify-center">
+                <svg className="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-red-800 dark:text-red-300">
+                  {stats.expiredCount} habit{stats.expiredCount > 1 ? 's have' : ' has'} a missed check-in window
+                </p>
+                <p className="text-xs text-red-600 dark:text-red-400 mt-0.5">
+                  {formatSTX(stats.expiredStake)} STX at risk of penalty. These habits are no longer counted as active.
+                </p>
               </div>
             </div>
           )}
 
-          {/* Withdrawal ready alert */}
+          {/* Alert: withdrawal ready */}
           {stats.withdrawReady > 0 && (
-            <div className="card bg-emerald-50 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <svg
-                    className="w-8 h-8 text-emerald-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-emerald-900 dark:text-emerald-300">
-                    {stats.withdrawReady} habit{stats.withdrawReady > 1 ? 's are' : ' is'} ready to
-                    withdraw
-                  </p>
-                  <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-1">
-                    You've reached 7+ consecutive check-ins. Withdraw your stake to complete the
-                    habit.
-                  </p>
-                </div>
+            <div className="flex items-start gap-4 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20 animate-glow-emerald">
+              <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center">
+                <svg className="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">
+                  🎉 {stats.withdrawReady} habit{stats.withdrawReady > 1 ? 's are' : ' is'} ready to withdraw!
+                </p>
+                <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5">
+                  You've hit 7+ consecutive check-ins. Head to My Habits to claim your stake.
+                </p>
               </div>
             </div>
           )}
 
+          {/* Alert: completed habits */}
           {stats.completed > 0 && (
-            <div className="card bg-emerald-50 border-emerald-200 dark:bg-emerald-500/10 dark:border-emerald-500/20">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <svg
-                    className="w-8 h-8 text-emerald-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-emerald-900 dark:text-emerald-300">
-                    Congratulations! You've completed {stats.completed} habit
-                    {stats.completed > 1 ? 's' : ''}!
-                  </p>
-                  <p className="text-xs text-emerald-700 dark:text-emerald-400 mt-1">
-                    Don't forget to claim your bonuses from the forfeited pool.
-                  </p>
-                </div>
+            <div className="flex items-start gap-4 p-4 rounded-2xl bg-blue-50 border border-blue-200 dark:bg-blue-500/10 dark:border-blue-500/20">
+              <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center">
+                <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-blue-800 dark:text-blue-300">
+                  Congratulations! You've completed {stats.completed} habit{stats.completed > 1 ? 's' : ''}!
+                </p>
+                <p className="text-xs text-blue-600 dark:text-blue-400 mt-0.5">
+                  Don't forget to claim your bonus from the forfeited pool.
+                </p>
               </div>
             </div>
           )}
