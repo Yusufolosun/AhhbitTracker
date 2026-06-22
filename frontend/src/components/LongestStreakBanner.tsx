@@ -15,53 +15,67 @@ export function LongestStreakBanner({
 }: LongestStreakBannerProps) {
   if (isLoading) {
     return (
-      <SurfaceCard className="rounded-2xl animate-pulse" tone="default">
-        <div className="h-4 w-40 bg-surface-200 dark:bg-surface-700 rounded" />
-        <div className="mt-3 h-10 w-32 bg-surface-200 dark:bg-surface-700 rounded" />
-      </SurfaceCard>
+      <div className="rounded-2xl border border-surface-200 dark:border-surface-700 p-6 shimmer-bg h-24" />
     );
   }
 
+  const hasStreak = longestStreak > 0;
+  const isHot = longestStreak >= 7;
+
   return (
-    <SurfaceCard
-      className="rounded-2xl bg-gradient-to-r from-primary-50 to-amber-50 dark:from-primary-500/10 dark:to-amber-500/10"
-      tone="accent"
+    <div
+      className={[
+        'relative overflow-hidden rounded-2xl border p-5 sm:p-6',
+        isHot
+          ? 'bg-gradient-to-br from-primary-500/15 via-amber-500/10 to-primary-500/5 border-primary-300 dark:border-primary-500/30 animate-glow-pulse'
+          : 'bg-gradient-to-br from-primary-50 to-amber-50 dark:from-primary-500/10 dark:to-amber-500/10 border-primary-200 dark:border-primary-500/20',
+      ].join(' ')}
     >
-      <div className="flex items-start justify-between gap-4">
+      {/* Decorative glow blob */}
+      {isHot && (
+        <div className="absolute -top-6 -right-6 w-24 h-24 bg-amber-500/20 rounded-full blur-2xl pointer-events-none" />
+      )}
+
+      <div className="flex items-center justify-between gap-4">
         <div>
-          <p className="text-xs sm:text-sm font-semibold tracking-wide uppercase text-primary-700 dark:text-primary-300">
-            Longest Streak
+          <p className="text-xxs sm:text-xs font-bold uppercase tracking-widest text-primary-600 dark:text-primary-400 mb-1">
+            🏆 Longest Streak
           </p>
-          <p className="mt-1 text-3xl sm:text-4xl font-bold text-surface-900 dark:text-white">
-            {longestStreak} day{longestStreak === 1 ? '' : 's'}
+          <div className="flex items-baseline gap-2">
+            <p className="text-4xl sm:text-5xl font-black text-surface-900 dark:text-white leading-none">
+              {longestStreak}
+            </p>
+            <p className="text-lg font-bold text-surface-500 dark:text-surface-400">
+              {longestStreak === 1 ? 'day' : 'days'}
+            </p>
+          </div>
+          <p className="mt-1.5 text-sm text-surface-600 dark:text-surface-300">
+            {hasHabits
+              ? habitName
+                ? `Best run: ${habitName}`
+                : 'Keep building momentum.'
+              : 'Create your first habit to start your streak.'}
           </p>
-          {hasHabits ? (
-            <p className="mt-1 text-sm text-surface-700 dark:text-surface-300">
-              {habitName ? `Best run: ${habitName}` : 'Keep building momentum.'}
-            </p>
-          ) : (
-            <p className="mt-1 text-sm text-surface-700 dark:text-surface-300">
-              Create your first habit to start your streak.
-            </p>
-          )}
         </div>
 
-        <div className="w-12 h-12 rounded-xl bg-white/70 dark:bg-surface-800/80 border border-primary-200 dark:border-primary-500/20 flex items-center justify-center">
-          <svg
-            className="w-6 h-6 text-amber-500"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
+        <div className="flex-shrink-0 flex flex-col items-center gap-1">
+          {/* Flame icon */}
+          <span
+            className={[
+              'text-5xl sm:text-6xl select-none',
+              hasStreak ? 'animate-streak-flame' : 'opacity-30 grayscale',
+            ].join(' ')}
+            aria-hidden="true"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 3l2.4 4.86 5.36.78-3.88 3.78.92 5.34L12 15.77 7.2 17.76l.92-5.34L4.24 8.64l5.36-.78L12 3z"
-            />
-          </svg>
+            🔥
+          </span>
+          {isHot && (
+            <span className="text-xxs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">
+              On Fire!
+            </span>
+          )}
         </div>
       </div>
-    </SurfaceCard>
+    </div>
   );
 }
