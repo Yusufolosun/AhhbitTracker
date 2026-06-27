@@ -6,4 +6,5 @@ const selectedNetwork = networkConfig.networkMode === 'testnet' ? STACKS_TESTNET
 /** The Stacks network instance resolved from the current configuration mode. */
 export const stacksNetwork = selectedNetwork;
 
+/** The resolved chain ID corresponding to the selected Stacks network. */
 export const chainId = selectedNetwork.chainId;
