@@ -1,6 +1,12 @@
 import { toMicroSTX, validateName, validatePrincipal, validateStake } from '@yusufolosun/stx-utils';
 import { MAX_HABIT_NAME_LENGTH, MAX_STAKE_AMOUNT, MIN_STAKE_AMOUNT } from '@/core/config';
 
+/**
+ * Validates a Stacks address / principal.
+ *
+ * @param value - The Stacks address to validate.
+ * @returns An error message string if invalid, or null if valid.
+ */
 export function validateStacksAddress(value: string): string | null {
   return validatePrincipal(value.trim());
 }
