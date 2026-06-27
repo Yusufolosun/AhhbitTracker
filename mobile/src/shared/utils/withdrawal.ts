@@ -30,8 +30,8 @@ export function getMobileWithdrawStatus(habit: Habit, currentBlock?: number | nu
   return 'withdrawable';
 }
 
-export function canWithdrawHabit(habit: Habit): boolean {
-  return getMobileWithdrawStatus(habit) === 'withdrawable';
+export function canWithdrawHabit(habit: Habit, currentBlock?: number | null): boolean {
+  return getMobileWithdrawStatus(habit, currentBlock) === 'withdrawable';
 }
 
 export function describeWithdrawHabitStatus(habit: Habit): string {
