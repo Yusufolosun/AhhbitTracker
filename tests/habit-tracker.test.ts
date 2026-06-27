@@ -654,7 +654,7 @@ describe("AhhbitTracker Contract", () => {
       withdrawStake(user1, boostedId);
 
       const boostedRecord = getHabit(boostedId);
-      const boostedWeight = (boostedRecord.result as any).value.value.data["bonus-weight"];
+      const boostedWeight = (boostedRecord.result as any).value.value["bonus-weight"];
       expect(boostedWeight).toEqual(Cl.uint(2));
 
       // user3 completes a habit without boost (weight = 1)
