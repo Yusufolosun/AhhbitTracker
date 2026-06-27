@@ -163,6 +163,11 @@ export async function fetchHabitsByAddress(address: string): Promise<Habit[]> {
     .sort((a, b) => b.habitId - a.habitId);
 }
 
+/**
+ * Fetches the current community pool balance and reward statistics from the contract.
+ *
+ * @returns The resolved PoolBalance stats.
+ */
 export async function fetchPoolBalance(): Promise<PoolBalance> {
   const [microStx, estimatedBonusShareMicroStx, unclaimedCompletedHabits] = await Promise.all([
     readThroughCache(
