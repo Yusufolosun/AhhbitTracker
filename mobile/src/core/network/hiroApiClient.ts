@@ -5,6 +5,7 @@ const CACHE_PREFIX = 'mobile-hiro-api:';
 const DEFAULT_TIMEOUT_MS = 10_000;
 const DEFAULT_RETRIES = 2;
 
+/** Custom error type for Hiro API request failures. */
 export class HiroApiError extends Error {
   status?: number;
 
@@ -47,6 +48,11 @@ function makeCacheKey(path: string): string {
   return `${CACHE_PREFIX}${getHiroApiBaseUrl()}${path}`;
 }
 
+/**
+ * Invalidates cached Hiro API responses for paths matching a prefix.
+ *
+ * @param pathPrefix - The API path prefix to invalidate. Defaults to "/".
+ */
 export function invalidateHiroApiCache(pathPrefix = '/'): void {
   invalidateReadCache(makeCacheKey(pathPrefix));
 }
@@ -102,6 +108,13 @@ async function fetchJson<T>(path: string, timeoutMs: number, retries: number): P
   throw new HiroApiError(`Hiro API request failed after retries for ${path}`);
 }
 
+/**
+ * Fetches JSON from the Hiro Stacks API with caching, retry, and timeout support.
+ *
+ * @param path - The API path to request (e.g. "/v2/info").
+ * @param options - Optional request configuration.
+ * @returns The parsed JSON response.
+ */
 export async function fetchHiroJson<T>(
   path: string,
   options: HiroRequestOptions = {},
