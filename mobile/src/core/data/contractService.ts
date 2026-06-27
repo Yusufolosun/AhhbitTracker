@@ -121,6 +121,12 @@ function toMobileHabit(habitId: number, value: SdkHabit): Habit {
   };
 }
 
+/**
+ * Fetches all habits belonging to a specific Stacks address from the contract.
+ *
+ * @param address - The Stacks principal address.
+ * @returns Array of habits sorted by ID descending.
+ */
 export async function fetchHabitsByAddress(address: string): Promise<Habit[]> {
   const userHabits = await readThroughCache(
     cacheKeys.userHabits(address),
