@@ -34,8 +34,8 @@ export function canWithdrawHabit(habit: Habit, currentBlock?: number | null): bo
   return getMobileWithdrawStatus(habit, currentBlock) === 'withdrawable';
 }
 
-export function describeWithdrawHabitStatus(habit: Habit): string {
-  const status = getMobileWithdrawStatus(habit);
+export function describeWithdrawHabitStatus(habit: Habit, currentBlock?: number | null): string {
+  const status = getMobileWithdrawStatus(habit, currentBlock);
 
   if (status === 'completed-on-chain') {
     return 'Already withdrawn on-chain';
