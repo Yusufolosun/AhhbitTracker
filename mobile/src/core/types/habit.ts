@@ -24,20 +24,32 @@ export interface Habit {
   bonusClaimed: boolean;
 }
 
+/** Summary statistics for a user's habits. */
 export interface UserStats {
+  /** Total number of habits created by the user. */
   totalHabits: number;
+  /** Array of habit IDs belonging to the user. */
   habitIds: number[];
 }
 
+/** Represents the current state of the community reward pool. */
 export interface PoolBalance {
+  /** Pool balance in micro-STX. */
   microStx: number;
+  /** Pool balance formatted as STX string. */
   stx: string;
+  /** Estimated per-habit bonus share in micro-STX. */
   estimatedBonusShareMicroStx: number;
+  /** Estimated per-habit bonus share formatted as STX string. */
   estimatedBonusShareStx: string;
+  /** Number of completed habits that have not yet claimed their bonus. */
   unclaimedCompletedHabits: number;
 }
 
+/** Filter options for querying habits. */
 export interface HabitFilters {
+  /** When true, only active habits are shown. */
   activeOnly: boolean;
+  /** When true, only completed habits are shown. */
   completedOnly: boolean;
 }
