@@ -46,6 +46,9 @@ export function invalidateAddressReadCache(address: string | null | undefined): 
   invalidateReadCache(cacheKeys.userStats(address));
 }
 
+/**
+ * Invalidates the cached pool balance, estimated bonus share, and unclaimed completed habits.
+ */
 export function invalidatePoolReadCache(): void {
   invalidateReadCache(cacheKeys.poolBalance());
   invalidateReadCache(cacheKeys.estimatedBonusShare());
