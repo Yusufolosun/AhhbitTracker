@@ -1,4 +1,4 @@
-import { MIN_STREAK_FOR_WITHDRAWAL } from '../../core/config/constants';
+import { CHECK_IN_WINDOW_BLOCKS, MIN_STREAK_FOR_WITHDRAWAL } from '../../core/config/constants';
 import type { Habit } from '../../core/types/habit';
 
 export type MobileWithdrawStatus =
