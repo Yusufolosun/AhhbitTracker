@@ -24,6 +24,12 @@ function readExtraValue(key: ConfigExtraKey): string | undefined {
   return typeof value === 'string' ? value : undefined;
 }
 
+/**
+ * Reads an analytics configuration value from Expo's extra config object.
+ *
+ * @param key - The analytics configuration key to read.
+ * @returns The analytics configuration value if present, or undefined.
+ */
 function readAnalyticsExtraValue(key: AnalyticsExtraKey): string | undefined {
   const extra = Constants.expoConfig?.extra;
 
