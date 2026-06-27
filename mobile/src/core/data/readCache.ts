@@ -54,6 +54,11 @@ export async function readThroughCache<T>(
   return request;
 }
 
+/**
+ * Invalidates cache entries (both completed values and in-flight promises) matching a prefix.
+ *
+ * @param prefix - The cache key prefix to match and remove.
+ */
 export function invalidateReadCache(prefix: string): void {
   for (const key of valueCache.keys()) {
     if (key.startsWith(prefix)) {
