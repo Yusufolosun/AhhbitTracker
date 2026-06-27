@@ -37,6 +37,13 @@ export function getMobileWithdrawStatus(habit: Habit, currentBlock?: number | nu
   return 'withdrawable';
 }
 
+/**
+ * Checks whether a habit is withdrawable.
+ *
+ * @param habit - The habit snapshot object.
+ * @param currentBlock - The current Stacks block height.
+ * @returns True if withdrawable, false otherwise.
+ */
 export function canWithdrawHabit(habit: Habit, currentBlock?: number | null): boolean {
   return getMobileWithdrawStatus(habit, currentBlock) === 'withdrawable';
 }
