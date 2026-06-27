@@ -32,6 +32,11 @@ export function invalidateHabitReadCache(habitId: number): void {
   invalidateReadCache(cacheKeys.habit(habitId));
 }
 
+/**
+ * Invalidates the cached user habits and user stats for a specific Stacks address.
+ *
+ * @param address - The Stacks principal address.
+ */
 export function invalidateAddressReadCache(address: string | null | undefined): void {
   if (!address) {
     return;
