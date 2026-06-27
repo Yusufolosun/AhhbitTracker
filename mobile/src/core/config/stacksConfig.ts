@@ -52,6 +52,13 @@ function isLocalHostname(hostname: string): boolean {
   );
 }
 
+/**
+ * Normalizes a string input into a valid AppStage value.
+ * Defaults to 'production' if invalid or undefined.
+ *
+ * @param value - The input stage value.
+ * @returns A validated AppStage string.
+ */
 export function toAppStage(value: string | undefined): AppStage {
   const normalized = value?.trim().toLowerCase();
 
