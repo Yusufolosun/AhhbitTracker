@@ -11,6 +11,14 @@ export interface ReadCacheOptions {
   forceRefresh?: boolean;
 }
 
+/**
+ * Implements a read-through cache strategy with deduplication of in-flight requests.
+ *
+ * @param key - The cache key.
+ * @param fetcher - The async function to call to retrieve the value.
+ * @param options - Cache options (TTL, forceRefresh).
+ * @returns The cached or freshly fetched value.
+ */
 export async function readThroughCache<T>(
   key: string,
   fetcher: () => Promise<T>,
