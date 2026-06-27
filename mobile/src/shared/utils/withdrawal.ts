@@ -42,6 +42,12 @@ export function describeWithdrawHabitStatus(habit: Habit, currentBlock?: number 
   }
 
   if (status === 'inactive-on-chain') {
+    if (currentBlock !== undefined && currentBlock !== null) {
+      const elapsed = currentBlock - habit.lastCheckInBlock;
+      if (elapsed > CHECK_IN_WINDOW_BLOCKS) {
+        return 'Check-in window expired — cannot withdraw';
+      }
+    }
     return 'Habit is inactive on-chain';
   }
 
