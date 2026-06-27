@@ -7,7 +7,7 @@ export type MobileWithdrawStatus =
   | 'inactive-on-chain'
   | 'insufficient-streak';
 
-export function getMobileWithdrawStatus(habit: Habit): MobileWithdrawStatus {
+export function getMobileWithdrawStatus(habit: Habit, currentBlock?: number | null): MobileWithdrawStatus {
   if (habit.isCompleted) {
     return 'completed-on-chain';
   }
