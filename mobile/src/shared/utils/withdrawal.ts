@@ -48,6 +48,13 @@ export function canWithdrawHabit(habit: Habit, currentBlock?: number | null): bo
   return getMobileWithdrawStatus(habit, currentBlock) === 'withdrawable';
 }
 
+/**
+ * Returns a human-friendly string description of a habit's withdrawal status.
+ *
+ * @param habit - The habit snapshot object.
+ * @param currentBlock - The current Stacks block height.
+ * @returns A user-friendly message describing eligibility.
+ */
 export function describeWithdrawHabitStatus(habit: Habit, currentBlock?: number | null): string {
   const status = getMobileWithdrawStatus(habit, currentBlock);
 
