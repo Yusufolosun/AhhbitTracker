@@ -41,6 +41,7 @@ function readAnalyticsExtraValue(key: AnalyticsExtraKey): string | undefined {
   return typeof value === 'string' ? value : undefined;
 }
 
+/** Frozen configuration containing Stacks network setup parameters. */
 export const networkConfig: AppNetworkConfig = Object.freeze(
   resolveMobileNetworkConfig({
     appStage: env.EXPO_PUBLIC_APP_STAGE ?? readExtraValue('appStage'),
@@ -51,6 +52,7 @@ export const networkConfig: AppNetworkConfig = Object.freeze(
   }),
 );
 
+/** Frozen configuration containing Segment / product analytics settings. */
 export const analyticsRuntimeConfig = Object.freeze({
   enabled:
     (env.EXPO_PUBLIC_ANALYTICS_ENABLED ?? readAnalyticsExtraValue('analyticsEnabled') ?? 'true') !==
