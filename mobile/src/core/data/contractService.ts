@@ -55,6 +55,9 @@ export function invalidatePoolReadCache(): void {
   invalidateReadCache(cacheKeys.unclaimedCompletedHabits());
 }
 
+/**
+ * Clears the entire contract read cache.
+ */
 export function clearContractReadCache(): void {
   invalidateReadCache(CACHE_PREFIX);
 }
