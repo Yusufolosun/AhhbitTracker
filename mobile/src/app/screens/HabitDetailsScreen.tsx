@@ -73,7 +73,7 @@ export function HabitDetailsScreen({ route, navigation }: HabitDetailsScreenProp
   const currentBlock = currentBlockQuery.data ?? null;
   const checkInWindowState = getMobileCheckInWindowState(habit, currentBlock);
   const canCheckIn = canSubmitMobileDailyCheckIn(habit, currentBlock);
-  const canWithdraw = canWithdrawHabit(habit);
+  const canWithdraw = canWithdrawHabit(habit, currentBlock);
   const withdrawStatus = describeWithdrawHabitStatus(habit);
 
   const handleCheckInPreview = () => {
