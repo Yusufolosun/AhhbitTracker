@@ -5,6 +5,7 @@ import {
   checkIn,
   createHabit,
   mineBlocks,
+  mineToNextCheckIn,
   readOkUint,
   slashHabit,
 } from "./helpers/habit-flow";
@@ -43,6 +44,7 @@ describe("expired habit e2e", () => {
     );
     expect(habit.result).not.toBeNone();
 
+    mineToNextCheckIn();
     const lateCheckIn = checkIn(user1, habitId);
     expect(lateCheckIn.result).toBeOk(Cl.uint(1));
   });
