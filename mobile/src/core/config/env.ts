@@ -7,6 +7,12 @@ type AnalyticsExtraKey = 'analyticsEnabled' | 'analyticsEndpoint' | 'analyticsWr
 
 const env = process.env as Record<string, string | undefined>;
 
+/**
+ * Reads a configuration value from Expo's extra config object.
+ *
+ * @param key - The configuration key to read.
+ * @returns The configuration value if present, or undefined.
+ */
 function readExtraValue(key: ConfigExtraKey): string | undefined {
   const extra = Constants.expoConfig?.extra;
 
