@@ -140,6 +140,13 @@ interface MobileConfigInput {
   contractName?: string;
 }
 
+/**
+ * Resolves, validates, and standardizes environment network configurations.
+ * Validates URLs, Stacks addresses, contract name patterns, and consistency checks.
+ *
+ * @param input - The config options from environment variables or Expo extra fields.
+ * @returns Standardized, validated AppNetworkConfig object.
+ */
 export function resolveMobileNetworkConfig(input: MobileConfigInput): AppNetworkConfig {
   const appStage = toAppStage(input.appStage);
   const defaults = STAGE_DEFAULTS[appStage];
