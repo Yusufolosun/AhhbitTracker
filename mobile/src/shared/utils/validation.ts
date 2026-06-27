@@ -11,6 +11,12 @@ export function validateStacksAddress(value: string): string | null {
   return validatePrincipal(value.trim());
 }
 
+/**
+ * Validates a habit name against the maximum allowed length.
+ *
+ * @param value - The habit name string.
+ * @returns An error message string if invalid, or null if valid.
+ */
 export function validateHabitName(value: string): string | null {
   return validateName(value.trim(), MAX_HABIT_NAME_LENGTH);
 }
