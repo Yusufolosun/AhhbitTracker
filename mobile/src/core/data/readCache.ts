@@ -73,6 +73,9 @@ export function invalidateReadCache(prefix: string): void {
   }
 }
 
+/**
+ * Completely clears all cached values and in-flight promises.
+ */
 export function clearReadCache(): void {
   valueCache.clear();
   inFlightCache.clear();
