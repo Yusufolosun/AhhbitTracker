@@ -674,7 +674,7 @@ describe("AhhbitTracker Contract", () => {
         [Cl.uint(boostedId)],
         user1
       );
-      expect(claimBoosted.result).toBeOk(Cl.uint(MIN_STAKE));
+      expect(claimBoosted.result).toBeOk(Cl.uint(15000));
 
       const claimStandard = simnet.callPublicFn(
         "habit-tracker-v3",
@@ -682,7 +682,7 @@ describe("AhhbitTracker Contract", () => {
         [Cl.uint(standardId)],
         user3
       );
-      expect(claimStandard.result).toBeOk(Cl.uint(MIN_STAKE / 2));
+      expect(claimStandard.result).toBeOk(Cl.uint(7500));
     });
   });
 
