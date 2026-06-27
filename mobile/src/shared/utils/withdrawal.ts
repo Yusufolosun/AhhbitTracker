@@ -16,6 +16,13 @@ export function getMobileWithdrawStatus(habit: Habit, currentBlock?: number | nu
     return 'inactive-on-chain';
   }
 
+  if (currentBlock !== undefined && currentBlock !== null) {
+    const elapsed = currentBlock - habit.lastCheckInBlock;
+    if (elapsed > CHECK_IN_WINDOW_BLOCKS) {
+      return 'inactive-on-chain';
+    }
+  }
+
   if (habit.currentStreak < MIN_STREAK_FOR_WITHDRAWAL) {
     return 'insufficient-streak';
   }
