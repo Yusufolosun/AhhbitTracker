@@ -23,6 +23,11 @@ const cacheKeys = {
   unclaimedCompletedHabits: () => `${CACHE_PREFIX}unclaimed-completed-habits`,
 };
 
+/**
+ * Invalidates the cache for a specific habit ID.
+ *
+ * @param habitId - The ID of the habit to invalidate.
+ */
 export function invalidateHabitReadCache(habitId: number): void {
   invalidateReadCache(cacheKeys.habit(habitId));
 }
