@@ -54,4 +54,17 @@ describe('mobile withdrawal readiness helpers', () => {
     expect(getMobileWithdrawStatus(habit)).toBe('inactive-on-chain');
     expect(describeWithdrawHabitStatus(habit)).toBe('Habit is inactive on-chain');
   });
+
+  it('blocks withdrawals when the check-in window has expired', () => {
+    const habit = makeHabit({
+      currentStreak: 7,
+      isActive: true,
+      isCompleted: false,
+      lastCheckInBlock: 100,
+    });
+
+    expect(canWithdrawHabit(habit, 293)).toBe(false);
+    expect(getMobileWithdrawStatus(habit, 293)).toBe('inactive-on-chain');
+    expect(describeWithdrawHabitStatus(habit, 293)).toBe('Check-in window expired — cannot withdraw');
+  });
 });
