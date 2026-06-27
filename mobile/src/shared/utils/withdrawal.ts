@@ -7,6 +7,13 @@ export type MobileWithdrawStatus =
   | 'inactive-on-chain'
   | 'insufficient-streak';
 
+/**
+ * Determines the withdrawal status of a habit based on active state, streak, and check-in window.
+ *
+ * @param habit - The habit snapshot object.
+ * @param currentBlock - The current Stacks block height.
+ * @returns The MobileWithdrawStatus indicator.
+ */
 export function getMobileWithdrawStatus(habit: Habit, currentBlock?: number | null): MobileWithdrawStatus {
   if (habit.isCompleted) {
     return 'completed-on-chain';
