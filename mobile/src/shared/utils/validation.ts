@@ -21,6 +21,12 @@ export function validateHabitName(value: string): string | null {
   return validateName(value.trim(), MAX_HABIT_NAME_LENGTH);
 }
 
+/**
+ * Validates a habit stake amount against minimum and maximum constraints.
+ *
+ * @param stxAmount - The stake amount in STX.
+ * @returns An error message string if invalid, or null if valid.
+ */
 export function validateHabitStake(stxAmount: number): string | null {
   const minErr = validateStake(stxAmount, MIN_STAKE_AMOUNT);
 
