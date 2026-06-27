@@ -27,15 +27,20 @@ function shouldRetry(status?: number): boolean {
 }
 
 function getHiroApiBaseUrl(): string {
-  const configured = networkConfig.hiroApiBaseUrl.trim();
+  const configured = (process.env.EXPO_PUBLIC_HIRO_API_BASE_URL || '').trim();
 
   if (configured) {
     return configured.replace(/\/$/, '');
   }
 
-  return networkConfig.stacksNetwork === 'testnet'
-    ? 'https://api.testnet.hiro.so'
-    : 'https://api.mainnet.hiro.so';
+  const network = (process.env.EXPO_PUBLIC_STACKS_NETWORK || '').trim().toLowerCase();
+  if (network === 'testnet' || network === 'mainnet') {
+    return network === 'testnet'
+      ? 'https://api.testnet.hiro.so'
+      : 'https://api.mainnet.hiro.so';
+  }
+
+  return networkConfig.hiroApiBaseUrl.replace(/\/$/, '');
 }
 
 function makeCacheKey(path: string): string {
