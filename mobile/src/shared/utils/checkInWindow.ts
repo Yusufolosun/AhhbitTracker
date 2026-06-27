@@ -13,6 +13,13 @@ export type MobileCheckInWindowState =
   | 'urgent'
   | 'expired';
 
+/**
+ * Computes the current check-in window state for a habit.
+ *
+ * @param habit - The habit snapshot object.
+ * @param currentBlock - The current Stacks block height, or null if unknown.
+ * @returns The current window state: unknown, cooldown, available, urgent, or expired.
+ */
 export function getMobileCheckInWindowState(
   habit: Habit,
   currentBlock: number | null,
@@ -38,6 +45,13 @@ export function getMobileCheckInWindowState(
   return 'available';
 }
 
+/**
+ * Returns whether a daily check-in can be submitted for the given habit.
+ *
+ * @param habit - The habit snapshot object.
+ * @param currentBlock - The current Stacks block height, or null if unknown.
+ * @returns True if the window state allows a check-in submission.
+ */
 export function canSubmitMobileDailyCheckIn(
   habit: Habit,
   currentBlock: number | null,
