@@ -36,7 +36,7 @@ export function HabitCard({
   const checkInWindowState = getMobileCheckInWindowState(habit, currentBlock);
   const canCheckIn = canSubmitMobileDailyCheckIn(habit, currentBlock);
   const canWithdraw = canWithdrawHabit(habit, currentBlock);
-  const withdrawStatus = describeWithdrawHabitStatus(habit);
+  const withdrawStatus = describeWithdrawHabitStatus(habit, currentBlock);
   const cardTone = !habit.isActive && !habit.isCompleted
     ? 'danger'
     : habit.isCompleted
